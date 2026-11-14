@@ -1,4 +1,4 @@
-# @mathtwin/core — Lô 1.1 và 1.2
+# @mathtwin/core — Lô 1.1–1.4
 
 Lõi TypeScript thuần, ES2022/ESM, không có dependency runtime, UI hay AI.
 Chạy `npm install`, `npm test` và `npm run build` từ thư mục gốc.
@@ -11,8 +11,10 @@ Sau khi build, package xuất JavaScript và khai báo kiểu từ `dist/index`.
 - `validateSpec(spec)` trả `{ ok, errors }`. Kiểm tra cấu trúc JSON, mã trùng,
   tham chiếu đỉnh/cạnh, tối đa 20 đỉnh, trọng số hữu hạn dương, dạng task và
   metadata. Nội dung mệnh đề chỉ được kiểm tra cấu trúc, chưa xét đúng/sai.
-  `StatementCheck` loại trừ `statement`, `choice` và `final_answer` để tránh
-  tự tham chiếu hoặc nội dung không kiểm chứng độc lập được.
+  `StatementCheck` loại trừ `statement`, `choice`, `final_answer`,
+  `dijkstra_init` và `dijkstra_select` để tránh tự tham chiếu hoặc thao tác
+  không có nghĩa khi đứng độc lập. Mệnh đề `dijkstra_label` yêu cầu
+  `source`; mệnh đề `nn_step` yêu cầu `start`.
   Dãy bậc không tồn tại đồ thị vẫn là đề hợp lệ.
 - `degree(graph, vertex)`, `degrees(graph)`, `oddVertices(graph)`,
   `isolatedVertices(graph)`: khuyên cộng hai vào bậc. Truy vấn bậc của đỉnh
@@ -44,7 +46,8 @@ những task khác có thể dùng đồ thị hoàn toàn không trọng số. 
 được báo tại từng `graph.edges[i].w`, không tự gán giá trị mặc định.
 Chuỗi thông báo tiếng Việt nằm trong `src/explain/templates.vi.ts`.
 
-`solve()` và `grade()` sẽ được triển khai trong các lô được giao sau.
+`solve(spec)` là API công khai để giải toàn bộ các dạng bài, mô tả ở phần
+Lô 1.4 bên dưới. `grade()` thuộc Lô 1.5, chưa được triển khai.
 
 ## Euler, Hamilton và kiểm tra walk (Lô 1.2)
 
@@ -78,16 +81,21 @@ const checked = checkWalk(graph, {
   tồn tại, thao tác thuật toán và walk cuối cùng.
 - `analyzeHamilton(graph)` trả liên thông trên toàn bộ đỉnh, tính đơn,
   số láng giềng phân biệt `neighborCounts` (bỏ khuyên) và
-  `dirac`, `ore`, mỗi trường gồm `{ applicable, holds }`. Hai định lý chỉ
-  áp dụng trực tiếp cho đơn đồ thị có ít nhất 3 đỉnh. Không thỏa điều kiện
+  `dirac`, `ore`, mỗi trường gồm `{ applicable, holds }`. Hai định lý được
+  xét trên đồ thị đơn nền có ít nhất 3 đỉnh (bỏ khuyên, gộp cạnh song song),
+  kể cả khi đầu vào là đa đồ thị. `simple` vẫn mô tả đồ thị đầu vào. Không thỏa điều kiện
   đủ không được suy ra là không có chu trình.
-- `hamiltonCycleRules(graph)` suy luận cho chu trình trên đơn đồ thị:
+- `underlyingSimpleGraph(graph)` bỏ khuyên, gộp mỗi cặp cạnh song song và
+  giữ cạnh đầu tiên trong thứ tự đầu vào làm đại diện, giữ nguyên các đỉnh.
+- `hamiltonCycleRules(graph)` suy luận cho chu trình trên đồ thị đơn nền:
   ép chọn hai cạnh khi chỉ còn hai cạnh khả dụng; loại cạnh thừa khi đã
   đủ hai cạnh bắt buộc; phát hiện bậc không đủ, quá nhiều cạnh bắt buộc,
   hoặc chu trình bắt buộc khép kín trước khi qua mọi đỉnh. Trả
   `{ status, forcedEdgeIds, excludedEdgeIds, trace }`, với `status` là
   `cycle`, `impossible` hoặc `inconclusive`. Không áp dụng các quy tắc
   dành cho chu trình này để loại đường đi Hamilton.
+  Các mã cạnh trong trace và kết quả là mã cạnh đại diện có thật ở đầu vào;
+  khuyên và các bản song song còn lại không được tính vào số cạnh khả dụng.
 - `solveHamilton(graph, options?)`: mặc định `{ want: 'cycle' }`. Trả
   `HamiltonSolution` mở rộng `Solution` với `analysis`, `method` và `trace`.
   `answer` có cùng cấu trúc phân nhánh như Euler. Dùng quy tắc SGK nếu đủ
@@ -99,6 +107,8 @@ const checked = checkWalk(graph, {
   `{ statesVisited, memoHits }` nếu có, rồi `start`, các bước `advance`,
   bước `close` cho chu trình và `verify`. Không lưu mọi nhánh thử của tìm
   kiếm. Lời giải trình bày quy tắc SGK, hoặc đường tìm được kèm kiểm tra.
+  Với đa đồ thị, lời giải nêu rõ việc bỏ khuyên, gộp cạnh song song và dùng
+  bậc trên đồ thị đơn nền cho Dirac/Ore cùng quy tắc SGK.
   Các bước `SolutionStep` của hai solver có `data` và `highlight` để phát
   lại và tô màu; mọi câu hiển thị lấy từ `src/explain/templates.vi.ts`.
 - `checkWalk(graph, input, constraints?)` kiểm tra walk bất kỳ, độc lập với
@@ -231,3 +241,101 @@ ngược), 1.000 đồ thị tối đa 8 đỉnh so Held–Karp với vét cạn
 Euler trên đồ thị tăng cường, ca 20 đỉnh cho Held–Karp/ghép cặp, ví dụ
 gần nhất không tối ưu, 2/4 đỉnh lẻ với điểm đầu bậc chẵn, khuyên/đa cạnh,
 đồ thị thiếu cạnh, dữ liệu bất biến, tên tiếng Việt và JSON kết quả.
+
+## API tổng hợp, templates, notes và statements (Lô 1.4)
+
+```ts
+import { solve } from '@mathtwin/core';
+
+const solution = solve({
+  graph,
+  task: { type: 'statements', items: [
+    { id: 'a', text: 'Nhãn cuối của B từ A bằng 5',
+      check: { type: 'dijkstra_label', source: 'A', v: 'B', value: 5 } },
+    { id: 'b', text: 'Có bước B đến C khi chọn gần nhất từ A',
+      check: { type: 'nn_step', start: 'A', from: 'B', to: 'C' } },
+  ] },
+  questionFormat: 'dung_sai',
+});
+```
+
+- `solve(spec): Solution` gọi `validateSpec` trước khi điều phối mọi giá
+  trị của `Task`; đề không hợp lệ ném `RangeError` gồm đầy đủ thông báo
+  tiếng Việt. Các task thuật toán giữ nguyên `answer`, `trace` và các
+  trường mở rộng của solver tương ứng. Không thay đổi dữ liệu đầu vào.
+- Các lời giải cơ bản có template tiếng Việt, dữ liệu và highlight:
+  liệt kê đỉnh/cạnh/khuyên/đỉnh cô lập, tính bậc, dựng dãy bậc,
+  tìm đường BFS, phân tích thành phần liên thông.
+- Đáp án đỉnh/cạnh gồm `vertices`, `edges` (mã), `vertexCount`, `edgeCount`,
+  `loops`, `isolatedVertices`, `hasLoops`, `hasParallelEdges`, `simple`,
+  `multigraph`. Đáp án bậc gồm `degrees` của các đỉnh được yêu cầu,
+  `degreeSum` và `oddVertices` trên toàn đồ thị. Dãy bậc giữ cấu trúc đáp án
+  của `realizeDegreeSequence`. Đường đi trả `{ exists: false }` hoặc
+  `{ exists: true, walk }`. Liên thông trả `{ connected, components }`.
+- `solveStatements(graph, { items })` và `evaluateStatement(graph, check)`
+  là các API cấp thấp, nhận đồ thị/check đã hợp lệ như các solver trước.
+  `StatementsSolution` mở rộng `Solution`: `answer` là ánh xạ mã ý sang
+  `true`, `false` hoặc `null` (chưa đủ dữ kiện), an toàn với các mã như
+  `__proto__`; `evaluations` chứa `{ id, value, facts }` cho từng ý.
+  `steps` giải thích từng kết quả theo thứ tự đầu vào. Chỉ đọc `check`
+  để quyết định kết quả; `text` là câu gốc để hiển thị, không được suy diễn.
+- Mọi câu hiển thị nằm trong `src/explain/templates.vi.ts`; mọi dạng bài
+  đều có `notes` về bẫy. Với `statements`, gom các lưu ý tương ứng những
+  loại ý có trong đề, không lặp lại cùng một lưu ý.
+- Walk TSP theo quy ước của Lô 1.3; walk người đưa thư phải khép kín và
+  phủ mọi cạnh gốc ít nhất một lần, chưa yêu cầu tối ưu chỉ từ loại walk.
+  Nếu không chỉ rõ mã cạnh, số lần đi giữa mỗi cặp đầu mút phải đủ phủ
+  toàn bộ cạnh song song của cặp đó.
+- `validateSpec` yêu cầu trọng số cho mọi cạnh nếu có ý về độ dài,
+  nhãn cuối Dijkstra, láng giềng gần nhất hay đường lặp người đưa thư. Các mệnh đề
+  chỉ nói về cấu trúc đồ thị vẫn nhận đồ thị không trọng số.
+
+### Quyết định & giả định — quy ước statements chốt ngày 2026-11-14
+
+- **Mỗi ý độc lập**, không có trạng thái chung; đảo thứ tự ý hoặc thay
+  kết quả của một ý không thay đổi các ý còn lại. Các phép tìm kiếm đồng
+  hạng dưới đây không chỉ đối chiếu với một trace mẫu duy nhất.
+- Riêng `StatementCheck` thêm `source?: VertexId` cho `dijkstra_label`
+  và `start?: VertexId` cho `nn_step`. Hai trường tùy chọn ở cấp kiểu để
+  nhận JSON thiếu dữ kiện, nhưng **bắt buộc qua `validateSpec`**, phải là
+  đỉnh tồn tại. `ClaimBody` không đổi; ngữ nghĩa claim theo bước thuộc
+  Lô 1.5. `dijkstra_init`/`dijkstra_select` bị từ chối trong `statements`
+  với thông báo tiếng Việt vì không có trạng thái thao tác để kiểm riêng.
+- `dijkstra_label` là **nhãn cuối**: khoảng cách ngắn nhất từ `source`
+  tới `v`; `value: null` nghĩa là không tới được. `via` nếu có phải là
+  đỉnh ngay trước `v` trên ít nhất một đường ngắn nhất; chấp nhận mọi
+  đường đồng hạng, không buộc giống đỉnh trước do solver mẫu chọn.
+  Nếu không tới được hoặc `v` là nguồn thì không có đỉnh liền trước.
+- `nn_step` đúng khi một cách chạy láng giềng gần nhất từ `start` chứa
+  bước `from` tới `to`, xét **mọi cách phá đồng hạng**. Tìm kiếm ghi nhớ
+  trạng thái `(tập đỉnh đã thăm, đỉnh hiện tại)`, tối đa 20 đỉnh. Chỉ quay
+  về `start` sau khi đã thăm đủ, theo quy ước TSP của Lô 1.3. Một bước
+  hợp lệ trước khi cách chạy bị kẹt vẫn là một bước hợp lệ. Một đỉnh
+  không có bước tự đi khuyên vì hành trình của nó có độ dài không.
+- `length` kiểm dãy đi trực tiếp, không thay bằng đường ngắn nhất.
+  Nếu mỗi bước xác định duy nhất trọng số (kể cả nhiều cạnh song song
+  bằng trọng số), cộng các trọng số rồi so sánh. Nếu bất kỳ bước nào có
+  cạnh song song khác trọng số thì trả `null`, giải thích **chưa đủ dữ
+  kiện** và ghi các bước mơ hồ trong `facts.ambiguousSteps`. `null` ở đáp
+  án này không phải một kết luận sai. Nếu có cặp đỉnh không kề thì trả
+  `false`, kể cả một bước khác đang mơ hồ. Dãy một đỉnh dài 0, dãy rỗng
+  không mô tả đường đi hợp lệ.
+- `postman_duplicate` kiểm riêng đường lặp nối hai đỉnh bậc lẻ phân biệt:
+  đường phải ngắn nhất và cặp đầu mút phải thuộc ít nhất một ghép cặp
+  hoàn hảo tối ưu. Chấp nhận hai chiều, mọi đường ngắn nhất đồng hạng
+  và mọi ghép cặp đồng hạng. Khi không có mã cạnh, xét khả năng dùng cạnh
+  song song nhẹ nhất. Đồ thị có nhiều thành phần chứa cạnh không có hành
+  trình người đưa thư. DP ghép cặp dùng chung với solver người đưa thư.
+- Hamilton: `simple` trong phân tích vẫn mô tả đồ thị gốc; Dirac, Ore và
+  quy tắc SGK dùng **đồ thị đơn nền**, giữ cạnh đầu tiên làm đại diện.
+  Lời giải nói rõ việc bỏ khuyên, gộp cạnh song song. Kiểm tra lý do trong
+  `hamilton_exists` nếu được nêu; kết luận đúng nhưng lý do không suy ra
+  kết luận vẫn làm mệnh đề sai.
+
+Kiểm thử Lô 1.4 phủ điều phối mọi task, các định dạng câu hỏi, lời giải và
+notes, tính độc lập khi đổi thứ tự ý, nhãn cuối/via đồng hạng, ca không
+tới được, bước gần nhất ngoài trace mẫu, độ dài mơ hồ và các walk khác
+đáp án mẫu. Fast-check đối chiếu bước gần nhất với vét cạn mọi cách chạy
+đồng hạng trên 300 đồ thị tới 7 đỉnh, seed 1401. Các test Hamilton từ Lô
+1.2 tiếp tục đối chiếu đồ thị đơn/đa với vét cạn và kiểm tra quy tắc SGK
+trên đồ thị đơn nền.

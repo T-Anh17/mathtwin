@@ -151,17 +151,43 @@ describe('Hamilton solver', () => {
     }
   });
 
-  it('ignores loops and parallel multiplicity during search and does not apply simple-graph theorems', () => {
+  it('applies theorems and cycle rules to the underlying simple graph of a multigraph', () => {
     const input = cycleGraph(5);
     input.edges.unshift({ id: 'loop', u: '0', v: '0' }, { id: 'parallel', u: '0', v: '1' });
     const result = solveHamilton(input);
-    expect(result.analysis).toMatchObject({ simple: false, neighborCounts: { '0': 2 }, dirac: { applicable: false, holds: false }, ore: { applicable: false, holds: false } });
-    expect(result.method).toBe('search');
+    expect(result.analysis).toMatchObject({ simple: false, neighborCounts: { '0': 2 }, dirac: { applicable: true, holds: false }, ore: { applicable: true, holds: false } });
+    expect(result.method).toBe('rules');
+    expect(result.steps.find(({ kind }) => kind === 'hamilton_underlying')?.text).toContain('bỏ các khuyên và gộp các cạnh song song');
     assertHamilton(input, result, { want: 'cycle' });
     if (result.answer.exists) {
       expect(result.answer.walk.edgeIds[0]).toBe('parallel');
       expect(result.answer.walk.edgeIds).not.toContain('loop');
     }
+  });
+
+  it('uses distinct neighbors for Dirac/Ore even when edge multiplicity inflates degrees', () => {
+    const complete = completeGraph(5);
+    complete.edges.push({ id: 'loop', u: '0', v: '0' }, { id: 'copy', u: '0', v: '1' });
+    expect(analyzeHamilton(complete)).toMatchObject({ simple: false, dirac: { applicable: true, holds: true }, ore: { applicable: true, holds: true } });
+    const inflated = fromPairs(['A', 'B', 'C'], [['A', 'B'], ['A', 'B'], ['A', 'B'], ['B', 'C'], ['A', 'A'], ['C', 'C']]);
+    expect(analyzeHamilton(inflated)).toMatchObject({ neighborCounts: { A: 1, B: 2, C: 1 }, dirac: { holds: false }, ore: { holds: false } });
+    const result = solveHamilton(inflated);
+    expect(result.method).toBe('rules');
+    expect(result.trace).toContainEqual({ type: 'insufficient_degree', vertex: 'A', degree: 1 });
+    assertHamilton(inflated, solveHamilton(inflated, { want: 'path' }), { want: 'path' });
+  });
+
+  it('excludes surplus representative edges and proves contradictions on multigraphs', () => {
+    const input = cycleGraph(4);
+    input.edges.push({ id: 'diagonal', u: '0', v: '2' }, { id: 'parallel', u: '2', v: '0' }, { id: 'loop', u: '1', v: '1' });
+    const rules = hamiltonCycleRules(input);
+    expect(rules.status).toBe('cycle');
+    expect(rules.excludedEdgeIds).toEqual(['diagonal']);
+    expect(rules.forcedEdgeIds).not.toContain('parallel');
+    assertHamilton(input, solveHamilton(input), { want: 'cycle' });
+    const impossible = bipartite(2, 3);
+    impossible.edges.push({ id: 'copy', u: 'L0', v: 'R0' }, { id: 'loop', u: 'L0', v: 'L0' });
+    expect(hamiltonCycleRules(impossible).status).toBe('impossible');
   });
 
   it('uses vertex input order for choices and the first parallel edge in edge input order', () => {

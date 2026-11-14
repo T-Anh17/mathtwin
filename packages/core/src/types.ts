@@ -74,7 +74,11 @@ export type ClaimBody =
   | { type: 'statement'; id: string; value: boolean }
   | { type: 'choice'; option: string };
 
-export type StatementCheck = Exclude<ClaimBody, { type: 'statement' | 'choice' | 'final_answer' }>;
+/** Statement items are independent; source/start are required by runtime validation. */
+export type StatementCheck =
+  | Exclude<ClaimBody, { type: 'statement' | 'choice' | 'final_answer' | 'dijkstra_init' | 'dijkstra_select' | 'dijkstra_label' | 'nn_step' }>
+  | (Extract<ClaimBody, { type: 'dijkstra_label' }> & { source?: VertexId })
+  | (Extract<ClaimBody, { type: 'nn_step' }> & { start?: VertexId });
 
 export type ErrorCode =
   | 'SAI_PHEP_TINH' | 'SAI_DIEU_KIEN' | 'BO_SOT' | 'CANH_KHONG_TON_TAI' | 'LAP'

@@ -127,6 +127,21 @@ describe('validateSpec', () => {
     expect(validateSpec(spec)).toEqual({ ok: true, errors: [] });
   });
 
+  it('requires weights for weighted statements and keeps unweighted graph predicates valid', () => {
+    const input = graph(['A', 'B'], [{ id: 'ab', u: 'A', v: 'B' }]);
+    for (const check of [
+      { type: 'length', vertices: ['A', 'B'], value: 1 },
+      { type: 'shortest_length', from: 'A', to: 'B', value: 1 },
+      { type: 'dijkstra_label', source: 'A', v: 'A', value: 0 },
+      { type: 'nn_step', start: 'A', from: 'A', to: 'B' },
+      { type: 'postman_duplicate', vertices: ['A', 'B'] },
+    ] satisfies StatementCheck[]) {
+      expectInvalid({ ...problem({ type: 'statements', items: [{ id: 's', text: 'Ý', check }] }), graph: input }, 'graph.edges[0].w');
+    }
+    const spec = { ...problem({ type: 'statements', items: [{ id: 's', text: 'Đường', check: { type: 'walk', kind: 'hamilton_path', vertices: ['A', 'B'] } }] }), graph: input };
+    expect(validateSpec(spec).ok).toBe(true);
+  });
+
   it('accepts degree sequences at the limit of 100', () => {
     expect(validateSpec(problem({ type: 'degree_sequence', sequence: Array<number>(20).fill(100), simple: false }))).toEqual({ ok: true, errors: [] });
   });
@@ -181,10 +196,9 @@ describe('validateSpec', () => {
     { type: 'theorem', name: 'dirac', holds: false },
     { type: 'walk', kind: 'path', vertices: ['A', 'B'], edgeIds: ['e1'] },
     { type: 'length', vertices: ['A', 'B'], value: 2 },
-    { type: 'dijkstra_init', source: 'A' }, { type: 'dijkstra_select', v: 'B' },
-    { type: 'dijkstra_label', v: 'B', value: null },
-    { type: 'dijkstra_label', v: 'B', value: 2, via: 'A' },
-    { type: 'nn_step', from: 'A', to: 'B' },
+    { type: 'dijkstra_label', source: 'A', v: 'B', value: null },
+    { type: 'dijkstra_label', source: 'A', v: 'B', value: 2, via: 'A' },
+    { type: 'nn_step', start: 'A', from: 'A', to: 'B' },
     { type: 'postman_duplicate', vertices: ['A', 'B'] },
     { type: 'shortest_length', from: 'A', to: 'C', value: 5 },
   ];
@@ -196,6 +210,8 @@ describe('validateSpec', () => {
     { type: 'statement', id: 's1', value: true },
     { type: 'choice', option: 'A' },
     { type: 'final_answer', value: { answer: 3 } },
+    { type: 'dijkstra_init', source: 'A' },
+    { type: 'dijkstra_select', v: 'B' },
   ];
   it.each(nonCheckableClaims)('rejects $type as a StatementCheck', (check) => {
     expectInvalid({ ...problem(), task: { type: 'statements', items: [{ id: 's1', text: 'Mệnh đề', check }] } }, 'task.items[0].check.type');
@@ -211,8 +227,11 @@ describe('validateSpec', () => {
     [{ type: 'theorem', name: 'bad', holds: true }, 'task.items[0].check.name'],
     [{ type: 'theorem', name: 'ore', holds: 1 }, 'task.items[0].check.holds'],
     [{ type: 'walk', kind: 'path', vertices: ['A'], edgeIds: ['missing'] }, 'task.items[0].check.edgeIds[0]'],
-    [{ type: 'dijkstra_init', source: 'D' }, 'task.items[0].check.source'],
-    [{ type: 'dijkstra_label', v: 'B', value: 2, via: 'D' }, 'task.items[0].check.via'],
+    [{ type: 'dijkstra_label', v: 'B', value: 2 }, 'task.items[0].check.source'],
+    [{ type: 'dijkstra_label', source: 'D', v: 'B', value: 2 }, 'task.items[0].check.source'],
+    [{ type: 'dijkstra_label', source: 'A', v: 'B', value: 2, via: 'D' }, 'task.items[0].check.via'],
+    [{ type: 'nn_step', from: 'A', to: 'B' }, 'task.items[0].check.start'],
+    [{ type: 'nn_step', start: 'D', from: 'A', to: 'B' }, 'task.items[0].check.start'],
     [{ type: 'shortest_length', from: 'A', to: 'D', value: 2 }, 'task.items[0].check.to'],
     [{ type: 'odd_vertices', vertices: null }, 'task.items[0].check.vertices'],
     [{ type: 'final_answer' }, 'task.items[0].check.type'],
@@ -235,5 +254,16 @@ describe('validateSpec', () => {
     Object.freeze(spec);
     expect(validateSpec(spec).ok).toBe(true);
     expect(JSON.stringify(spec)).toBe(before);
+  });
+
+  it('explains why standalone Dijkstra operations and missing statement context are invalid', () => {
+    for (const type of ['dijkstra_init', 'dijkstra_select']) {
+      const result = validate({ ...problem(), task: { type: 'statements', items: [{ id: 's', text: 'Ý', check: { type, source: 'A', v: 'A' } }] } });
+      expect(result.errors).toEqual(['task.items[0].check.type: Khởi tạo hoặc khoanh đỉnh Dijkstra không có nghĩa khi đứng riêng trong các ý độc lập; hãy dùng mệnh đề nhãn cuối có đỉnh nguồn.']);
+    }
+    const label = validateSpec(problem({ type: 'statements', items: [{ id: 's', text: 'Ý', check: { type: 'dijkstra_label', v: 'A', value: 0 } }] }));
+    expect(label.errors).toContain('task.items[0].check.source: Mệnh đề nhãn cuối Dijkstra phải chỉ rõ đỉnh nguồn (source).');
+    const nn = validateSpec(problem({ type: 'statements', items: [{ id: 's', text: 'Ý', check: { type: 'nn_step', from: 'A', to: 'B' } }] }));
+    expect(nn.errors).toContain('task.items[0].check.start: Mệnh đề bước láng giềng gần nhất phải chỉ rõ đỉnh xuất phát (start).');
   });
 });

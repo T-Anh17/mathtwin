@@ -61,6 +61,7 @@ export function solveHamilton(graph: Graph, options: HamiltonOptions = { want: '
     steps.push({ index: steps.length + 1, kind, text, data, ...(highlight === undefined ? {} : { highlight }) });
   };
   add('hamilton_conditions', hamiltonTemplates.conditions(n, analysis.connected), analysis);
+  if (!analysis.simple) add('hamilton_underlying', hamiltonTemplates.underlying, { neighborCounts: analysis.neighborCounts });
   if (cycle) add('hamilton_theorems', hamiltonTemplates.theorems(analysis, n), { dirac: analysis.dirac, ore: analysis.ore });
   const finish = (answer: HamiltonAnswer): HamiltonSolution => ({ answer, analysis, method, trace, steps, notes: [hamiltonTemplates.note] });
   const fail = (reason: HamiltonFailureReason): HamiltonSolution => {

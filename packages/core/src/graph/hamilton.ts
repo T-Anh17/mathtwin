@@ -9,7 +9,19 @@ export interface HamiltonAnalysis {
   ore: { applicable: boolean; holds: boolean };
 }
 
-/** Dirac and Ore apply only to simple graphs with at least three vertices. */
+/** Remove loops and retain the first input edge for each unordered pair. */
+export function underlyingSimpleGraph(graph: Graph): Graph {
+  const neighbors = new Map(graph.vertices.map(({ id }) => [id, new Set<VertexId>()]));
+  const edges = graph.edges.filter(({ u, v }) => {
+    if (u === v || neighbors.get(u)!.has(v)) return false;
+    neighbors.get(u)!.add(v);
+    neighbors.get(v)!.add(u);
+    return true;
+  });
+  return { directed: false, vertices: graph.vertices, edges };
+}
+
+/** Dirac and Ore are evaluated on the underlying simple graph, for n >= 3. */
 export function analyzeHamilton(graph: Graph): HamiltonAnalysis {
   const neighbors = new Map(graph.vertices.map(({ id }) => [id, new Set<VertexId>()]));
   for (const { u, v } of graph.edges) {
@@ -19,7 +31,7 @@ export function analyzeHamilton(graph: Graph): HamiltonAnalysis {
   }
   const n = graph.vertices.length;
   const simple = isSimpleGraph(graph);
-  const applicable = simple && n >= 3;
+  const applicable = n >= 3;
   const neighborCounts = Object.fromEntries(graph.vertices.map(({ id }) => [id, neighbors.get(id)!.size]));
   const dirac = applicable && graph.vertices.every(({ id }) => neighborCounts[id]! >= n / 2);
   let ore = applicable;
@@ -52,8 +64,9 @@ export interface HamiltonRulesResult {
   trace: HamiltonRuleStep[];
 }
 
-/** Necessary cycle rules, never applied to Hamilton paths or non-simple graphs. */
-export function hamiltonCycleRules(graph: Graph): HamiltonRulesResult {
+/** Necessary cycle rules on the underlying simple graph; never constrain paths. */
+export function hamiltonCycleRules(input: Graph): HamiltonRulesResult {
+  const graph = underlyingSimpleGraph(input);
   const trace: HamiltonRuleStep[] = [];
   // 0 = undecided, 1 = forced, 2 = excluded. Edge order is the input order.
   const state = new Uint8Array(graph.edges.length);
@@ -63,7 +76,7 @@ export function hamiltonCycleRules(graph: Graph): HamiltonRulesResult {
     excludedEdgeIds: graph.edges.filter((_, i) => state[i] === 2).map(({ id }) => id),
     trace,
   });
-  if (!isSimpleGraph(graph) || graph.vertices.length < 3) return result('inconclusive');
+  if (graph.vertices.length < 3) return result('inconclusive');
 
   const incident = new Map(graph.vertices.map(({ id }) => [id, [] as number[]]));
   graph.edges.forEach(({ u, v }, i) => {

@@ -10,6 +10,11 @@ function isId(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0;
 }
 
+function statementRequiresWeights(value: unknown): boolean {
+  if (!isObject(value)) return false;
+  return ['length', 'shortest_length', 'dijkstra_label', 'nn_step', 'postman_duplicate'].includes(String(value.type));
+}
+
 /** Runtime checks protect the JSON boundary even when a caller bypasses TS. */
 export function validateSpec(spec: ProblemSpec): { ok: boolean; errors: string[] } {
   const errors: string[] = [];
@@ -74,7 +79,9 @@ export function validateSpec(spec: ProblemSpec): { ok: boolean; errors: string[]
     }
     if (array(graph.edges, 'graph.edges')) {
       const requiresWeights = isObject(input.task)
-        && (input.task.type === 'shortest_path' || input.task.type === 'tsp' || input.task.type === 'postman');
+        && (input.task.type === 'shortest_path' || input.task.type === 'tsp' || input.task.type === 'postman'
+          || (input.task.type === 'statements' && Array.isArray(input.task.items)
+            && input.task.items.some((item: unknown) => isObject(item) && statementRequiresWeights(item.check))));
       const hasWeights = graph.edges.some((item) => isObject(item) && item.w !== undefined);
       graph.edges.forEach((item, index) => {
         const path = `graph.edges[${index}]`;
@@ -139,18 +146,21 @@ export function validateSpec(spec: ProblemSpec): { ok: boolean; errors: string[]
         vertexList(value.vertices, `${path}.vertices`);
         numericValue();
         break;
-      case 'dijkstra_init':
-        vertex(value.source, `${path}.source`);
-        break;
-      case 'dijkstra_select':
-        vertex(value.v, `${path}.v`);
+      case 'dijkstra_init': case 'dijkstra_select':
+        add(`${path}.type`, messages.standaloneDijkstra);
         break;
       case 'dijkstra_label':
+        if (value.source === undefined) add(`${path}.source`, messages.statementSource);
+        else vertex(value.source, `${path}.source`);
         vertex(value.v, `${path}.v`);
         if (value.value !== null) numericValue();
         optionalVertex(value.via, `${path}.via`);
         break;
       case 'nn_step': case 'shortest_length':
+        if (value.type === 'nn_step') {
+          if (value.start === undefined) add(`${path}.start`, messages.statementStart);
+          else vertex(value.start, `${path}.start`);
+        }
         vertex(value.from, `${path}.from`);
         vertex(value.to, `${path}.to`);
         if (value.type === 'shortest_length') numericValue();
