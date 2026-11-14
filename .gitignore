@@ -3,6 +3,7 @@ CLAUDE.md
 AGENTS.md
 .claude/
 docs/prompts/
+.ai/
 
 # Dependencies & build
 node_modules/
@@ -11,3 +12,4 @@ coverage/
 *.log
 .env
 .env.*
+*.tsbuildinfo

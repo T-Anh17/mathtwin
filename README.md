@@ -15,3 +15,17 @@ mathtwin/
 ├── server/             # API trung gian gọi vision LLM
 └── testdata/           # bộ test chuẩn: ảnh đề, ảnh bài làm, nhãn chuẩn
 ```
+
+## Phát triển lõi TypeScript
+
+Yêu cầu Node.js 22.12 trở lên và npm 10 trở lên.
+
+```sh
+npm install
+npm test
+npm run build
+```
+
+`npm test` kiểm tra kiểu strict và chạy Vitest (gồm kiểm thử thuộc tính bằng
+fast-check). Lô 1.1 cung cấp kiểu dữ liệu, kiểm tra đề và các hàm đồ thị cơ bản;
+xem [API hiện có của core](packages/core/README.md).
