@@ -1,4 +1,4 @@
-# @mathtwin/core — Lô 1.1–1.4
+# @mathtwin/core — Lô 1.1–1.5
 
 Lõi TypeScript thuần, ES2022/ESM, không có dependency runtime, UI hay AI.
 Chạy `npm install`, `npm test` và `npm run build` từ thư mục gốc.
@@ -47,7 +47,7 @@ những task khác có thể dùng đồ thị hoàn toàn không trọng số. 
 Chuỗi thông báo tiếng Việt nằm trong `src/explain/templates.vi.ts`.
 
 `solve(spec)` là API công khai để giải toàn bộ các dạng bài, mô tả ở phần
-Lô 1.4 bên dưới. `grade()` thuộc Lô 1.5, chưa được triển khai.
+Lô 1.4 bên dưới. `grade()` được mô tả trong phần Lô 1.5 cuối tài liệu.
 
 ## Euler, Hamilton và kiểm tra walk (Lô 1.2)
 
@@ -339,3 +339,74 @@ tới được, bước gần nhất ngoài trace mẫu, độ dài mơ hồ và
 đồng hạng trên 300 đồ thị tới 7 đỉnh, seed 1401. Các test Hamilton từ Lô
 1.2 tiếp tục đối chiếu đồ thị đơn/đa với vét cạn và kiểm tra quy tắc SGK
 trên đồ thị đơn nền.
+
+## Chấm bài (Lô 1.5)
+
+`grade(spec, claims, { confThreshold? })` trả `GradeResult`. Đề được kiểm tra
+qua cùng biên `solve()`; đề không hợp lệ ném `RangeError`. Ngưỡng mặc định
+là `0.85`, chấp nhận số hữu hạn trong `[0, 1]`; `conf` vắng mặt được coi
+là chắc chắn. Các claim nhận theo kiểu `Claim`, không suy diễn từ `raw`.
+Hàm không sửa đề hoặc danh sách claim, sắp xếp ổn định theo `step`.
+
+- Mọi loại claim đều có đường kiểm tra. Claim thiếu ngữ cảnh, thiếu trọng
+  số hoặc chưa đủ dữ kiện được bỏ qua kèm note; không còn claim dùng được
+  thì trả `KHONG_DU_CAN_CU`. Kết quả `DUNG` xác nhận các claim kiểm được,
+  không suy diễn những phần bài làm chưa được cung cấp.
+- Giữ lỗi đầu tiên và vị trí `box` trong `facts`. Các lỗi sau chỉ thêm
+  note. Khi lỗi đầu có `conf` dưới ngưỡng hoặc phụ thuộc dữ kiện trong
+  `spec.uncertain`, trả `CAN_XAC_NHAN` và `needsConfirmation`. Trọng số
+  chưa chắc không ảnh hưởng các claim thuần cấu trúc như bậc hoặc số cạnh.
+- `walk` có `edge_count_mismatch` luôn cần xác nhận `edgeIds` tại bước đó,
+  kể cả confidence cao. Đây là dữ liệu đọc không nhất quán, không gán
+  mã lỗi toán. Quy ước này cũng áp dụng walk trong ý và trong đáp số.
+- `statement` dùng `id`; `choice.option` là mã một ý đúng trong
+  `task.items`. Không đoán mã lựa chọn từ câu chữ. Ý có kết quả `null`
+  được bỏ qua với note, dù học sinh chọn đúng hay sai; không dùng `null`
+  như `false`. Các ý vẫn được kiểm tra độc lập.
+- Dijkstra tự có trạng thái khởi tạo khi task là `shortest_path`; với
+  task khác cần `dijkstra_init`. Sau mỗi `select`, tính toàn bộ nhãn đúng;
+  `label` kiểm nhãn tại thời điểm hiện tại và `via` hợp lệ. Chấp nhận trace
+  chỉ ghi các lần khoanh; nếu ghi một phần các cập nhật trong một lượt
+  rồi khoanh tiếp thì báo `BO_SOT` tại lần khoanh kế tiếp. Chỉ nhãn thuộc
+  lượt cập nhật đó mới được tính là đang ghi bảng cập nhật. Nhãn sai không
+  làm sai trạng thái dùng cho bước sau. Chọn sai được sửa bằng đỉnh hợp lệ
+  đầu tiên theo thứ tự đầu vào. Dừng khi khoanh đích. Nhận diện Prim hoặc
+  láng giềng gần nhất trên toàn chuỗi khoanh, chấp nhận cả đồng hạng của
+  các thuật toán đó; chỉ gắn `NHAM_THUAT_TOAN` khi bước không hợp lệ với
+  Dijkstra.
+- Láng giềng gần nhất dùng `task.start` nếu có, nếu không dùng `from` của
+  bước đầu. Theo các lựa chọn đồng hạng của học sinh và chỉ quay về sau
+  khi thăm đủ. Task không chỉ định `start` có thể ghi nhiều lượt hoàn chỉnh
+  từ các đỉnh khác nhau. Đường lặp người đưa thư phải thuộc một ghép cặp
+  tối ưu tương thích với các đường lặp đã chấp nhận, không dùng lại đầu
+  mút lẻ đã ghép.
+
+### Quyết định & giả định về đáp số
+
+- `final_answer.value` nhận cấu trúc `solve(spec).answer` hoặc các trường
+  kết luận có trong cấu trúc đó. Với task có một đáp số rõ ràng, cũng nhận
+  số (bậc của một đỉnh, độ dài ngắn nhất, TSP, người đưa thư) hoặc boolean
+  (liên thông, tồn tại đường/Euler/Hamilton/dãy bậc). Không tới được có độ
+  dài `null`. Task đỉnh/cạnh có nhiều đại lượng nên không tự đoán một số
+  đơn lẻ là số đỉnh hay số cạnh.
+- Đáp số chỉ có một mình vẫn được chấm và thêm note không có bước giải
+  để kiểm tra, theo quy tắc chấm của prompt 01 và spec §6.1.5.
+- Khi có witness `walk` hoặc đồ thị dựng được của dãy bậc, kiểm witness
+  về mặt toán; không yêu cầu trùng đáp án mẫu. Các danh sách phần tử/tập
+  liên thông không phụ thuộc thứ tự. Đường đi trong đáp số phải tuân thủ
+  đỉnh đầu/cuối và tính tối ưu nếu đề yêu cầu. Walk TSP/người đưa thư
+  đứng riêng chỉ khẳng định cấu trúc; tối ưu được kiểm ở đáp số.
+- Với TSP gần nhất có nhiều lựa chọn đồng hạng làm thay đổi độ dài, một
+  đáp số kèm walk hoặc một trace hoàn chỉnh được kiểm theo lựa chọn đó.
+  Nếu chỉ có độ dài khác lượt mẫu và có đồng hạng, chưa đủ căn cứ để
+  kết luận sai: bỏ qua với note yêu cầu bổ sung đường đi hoặc trace. Khi
+  đề chạy từ mọi đỉnh, đáp số đầy đủ dùng danh sách `nearestNeighbor`.
+- Nội dung `final_answer` không xác định được cấu trúc cần kiểm thì bỏ
+  qua với note, không phân tích ngôn ngữ tự nhiên. Không thay đổi các kiểu
+  dữ liệu công khai hay thêm dependency.
+
+Test Lô 1.5 phủ mọi loại claim, bốn verdict, chín mã lỗi, thứ tự và lỗi
+đầu tiên, confidence, dữ liệu đề chưa chắc, hai quy ước reviewer, walk
+thay thế, trace đồng hạng, ghép cặp, đáp số và tính không thay đổi đầu vào.
+Fast-check dùng seed 1505 trên 150 đồ thị tới 7 đỉnh, kiểm nhận trace
+Dijkstra cùng các witness Euler/Hamilton hợp lệ do solver sinh ra.

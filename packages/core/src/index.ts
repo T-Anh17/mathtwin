@@ -10,5 +10,6 @@ export * from './solvers/tsp.js';
 export * from './solvers/postman.js';
 export { validateSpec } from './validate.js';
 export { solve } from './solve.js';
+export { grade } from './grade.js';
 export { evaluateStatement, solveStatements } from './solvers/statements.js';
 export type { StatementTruth, StatementsAnswer, StatementsSolution } from './solvers/statements.js';

@@ -5,7 +5,148 @@ import type { HamiltonAnalysis, HamiltonRuleStep } from '../graph/hamilton.js';
 import type { DijkstraUpdate } from '../solvers/dijkstra.js';
 import type { TourAnswer, TspComparison, TspFailureReason } from '../solvers/tsp.js';
 import type { PostmanFailureReason, PostmanPair } from '../solvers/postman.js';
-import type { Graph, StatementCheck } from '../types.js';
+import type { ErrorCode, Graph, StatementCheck } from '../types.js';
+
+function gradeValue(value: unknown): string {
+  if (value === null) return '∞';
+  if (value === true) return 'đúng';
+  if (value === false) return 'sai';
+  if (Array.isArray(value)) return value.map(gradeValue).join(', ');
+  if (typeof value === 'object' && value !== null) return Object.entries(value).map(([k, v]) => `${k}: ${gradeValue(v)}`).join('; ');
+  return value === undefined ? '' : String(value);
+}
+function gradeRows(value: unknown): Record<string, unknown>[] {
+  return Array.isArray(value) ? value.filter((v): v is Record<string, unknown> => typeof v === 'object' && v !== null) : [];
+}
+function gradeSubject(f: Record<string, unknown>): string {
+  switch (f.claimType) {
+    case 'vertex_count': return 'số đỉnh';
+    case 'edge_count': return 'số cạnh';
+    case 'degree': return `bậc của đỉnh ${f.vertexLabel}`;
+    case 'degree_sum': return 'tổng bậc';
+    case 'dijkstra_label': return `nhãn tại ${f.vertexLabel}`;
+    case 'dijkstra_select': return 'đỉnh được khoanh';
+    case 'nn_step': return `đỉnh tiếp theo từ ${f.fromLabel}`;
+    case 'odd_vertices': return 'tập đỉnh bậc lẻ';
+    case 'walk': return 'dãy đi';
+    case 'theorem': return 'kết luận áp dụng định lý';
+    case 'length': case 'shortest_length': return 'độ dài đường đi';
+    case 'statement': case 'choice': return `kết quả của ý ${f.option}`;
+    case 'connected': return 'kết luận liên thông';
+    default: return 'đáp số';
+  }
+}
+function gradeSelection(f: Record<string, unknown>): string {
+  const candidates = gradeRows(f.candidates);
+  if (candidates.length === 0) return 'không còn đỉnh chưa khoanh có nhãn hữu hạn được phép chọn. Hãy dừng thuật toán.';
+  const tied = candidates.map((v) => `${v.vertex} (nhãn ${gradeValue(v.label)})`).join(', ');
+  return `bài khoanh ${gradeValue(f.displayGot)} có nhãn ${gradeValue(f.chosenLabel)}, trong khi ${tied} có nhãn nhỏ nhất chưa khoanh. `
+    + `Phải khoanh ${candidates.length === 1 ? candidates[0]!.vertex : `một trong các đỉnh đồng hạng ${candidates.map((v) => v.vertex).join(', ')}`}.`;
+}
+function gradeHamilton(f: Record<string, unknown>): string {
+  const witness = Array.isArray(f.hamiltonWitness) ? f.hamiltonWitness.join('–') : '';
+  const conclusion = witness ? ` Đồ thị vẫn có ${f.kind === 'path' ? 'đường đi' : 'chu trình'} Hamilton ${witness}; hãy kiểm tra từng cạnh của đường này.`
+    : ` Hãy kiểm tra lại kết luận tồn tại trên đủ ${f.vertexCount} đỉnh, không suy ngược từ điều kiện đủ.`;
+  if (Number(f.vertexCount) < Number(f.minimumOrder)) return `Dirac và Ore yêu cầu ít nhất ${f.minimumOrder} đỉnh, nhưng đồ thị chỉ có ${f.vertexCount} đỉnh. Không được áp dụng định lý khi thiếu giả thiết này.` + conclusion;
+  if (f.theorem === 'dirac') {
+    const violations = gradeRows(f.diracViolations);
+    return `Dirac cần mọi bậc trên đồ thị đơn nền ≥ n/${f.divisor}, với n = ${f.vertexCount} nên ngưỡng là ${f.threshold}. `
+      + (violations.length > 0 ? `${violations.map((v) => `${v.vertex} có bậc ${v.degree}`).join(', ')} không đạt ngưỡng.` : 'Mọi bậc đều đạt ngưỡng nên đồ thị thỏa điều kiện Dirac.')
+      + ' Dirac chỉ là điều kiện đủ; không thỏa không suy ra không có chu trình Hamilton.' + conclusion;
+  }
+  if (f.theorem === 'ore') {
+    const pair = typeof f.oreViolation === 'object' && f.oreViolation !== null ? f.oreViolation as Record<string, unknown> : undefined;
+    return `Ore cần tổng bậc của mọi cặp đỉnh không kề ≥ n = ${f.vertexCount}. `
+      + (pair === undefined ? 'Các cặp đỉnh không kề đều thỏa điều kiện này.' : `${pair.u} và ${pair.v} không kề, có tổng bậc ${pair.sum}, nhỏ hơn ${f.vertexCount}.`)
+      + ' Ore chỉ là điều kiện đủ; không được suy ngược để phủ định chu trình Hamilton.' + conclusion;
+  }
+  return `Lý do đã nêu chưa chứng minh được kết luận Hamilton trên ${f.vertexCount} đỉnh. `
+    + `Bậc trên đồ thị đơn nền: ${gradeRows(f.neighborDegrees).map((v) => `${v.vertex}: ${v.degree}`).join(', ')}.` + conclusion;
+}
+
+export const gradeTemplates = {
+  invalidThreshold: 'Ngưỡng tin cậy phải là số hữu hạn trong khoảng từ 0 đến 1.',
+  correct: 'Các mệnh đề kiểm tra được đều đúng và các bước đã nêu đều hợp lệ.',
+  insufficient: 'Chưa có mệnh đề đủ dữ kiện để kiểm tra. Cần bổ sung bài làm hoặc nhập lại dữ liệu còn thiếu.',
+  answerOnly: 'Không có bước giải để kiểm tra; chỉ chấm đáp số.',
+  skipped: (step: number, reason: unknown): string => `Bỏ qua bước ${step}: ` + (reason === 'null_statement'
+    ? 'ý này chưa đủ dữ kiện để kết luận đúng hay sai.'
+    : reason === 'ambiguous_nearest_answer' ? 'láng giềng gần nhất có đồng hạng; cần bổ sung đường đi hoặc các bước chọn để kiểm tra độ dài khác lượt giải mẫu.'
+    : reason === 'missing_weights' ? 'chưa có đủ trọng số cạnh để kiểm tra.'
+      : reason === 'missing_source' ? 'chưa xác định đỉnh nguồn Dijkstra; cần bổ sung bước khởi tạo.'
+        : reason === 'missing_options' ? 'đề chưa có các phương án có cấu trúc để kiểm tra lựa chọn.'
+          : reason === 'unknown_statement' ? 'mã ý không có trong đề đã đọc; cần xác nhận lại mã ý.'
+            : reason === 'answer_shape' ? 'dạng đáp số chưa xác định được nội dung cần kiểm tra.'
+              : 'chưa đủ dữ kiện để kiểm tra mệnh đề.'),
+  confirm: (facts: Record<string, unknown>): string => `Cần xác nhận ở bước ${facts.step}: `
+    + gradeRows(facts.confirmationDetails).map((detail) => {
+      if (detail.kind === 'w') return `trọng số cạnh ${detail.edge} đọc được là ${Array.isArray(detail.candidates) ? detail.candidates.map(gradeValue).join(' hoặc ') : ''}`;
+      if (detail.kind === 'u' || detail.kind === 'v') return `đầu mút cạnh ${detail.edge} đọc được là ${Array.isArray(detail.candidates) ? detail.candidates.map(gradeValue).join(' hoặc ') : ''}`;
+      if (detail.kind === 'name') return `tên cạnh ${detail.edge} đọc được là ${gradeValue(detail.candidates)}`;
+      if (detail.kind === 'edge_count_mismatch') return `dãy có ${facts.walkVertexCount} đỉnh, cần ${facts.expectedEdges} cạnh nhưng đã đọc ${facts.readEdgeCount} cạnh`;
+      if (detail.kind === 'claim') return `${gradeSubject(facts)} đọc được là ${gradeValue(facts.displayGot)} chưa chắc chắn`;
+      return 'phần đồ thị hoặc yêu cầu đề đã đọc còn chưa chắc chắn';
+    }).join('; ') + '. Hãy đối chiếu ảnh hoặc nhập lại dữ kiện này trước khi kết luận.',
+  later: (step: number, uncertain: boolean): string => `Bước ${step} cũng ${uncertain ? 'cần xác nhận dữ liệu' : 'chưa hợp lệ khi kiểm tra bằng trạng thái toán đúng'}; kết luận chính vẫn giữ bước đầu tiên.`,
+  error: (code: ErrorCode, facts: Record<string, unknown>): string => {
+    const prefix = `Bước ${facts.step}: `;
+    const position = facts.position === undefined ? '' : ` tại vị trí ${facts.position} trong dãy đỉnh`;
+    const pair = facts.edgeLabel || `${facts.fromLabel ?? facts.viaLabel ?? ''}–${facts.toLabel ?? facts.vertexLabel ?? ''}`;
+    const comparison = `${gradeSubject(facts)} đúng là ${gradeValue(facts.displayExpected)}, bài ghi ${gradeValue(facts.displayGot)}`;
+    switch (code) {
+      case 'SAI_PHEP_TINH':
+        if (facts.claimType === 'dijkstra_label' && facts.candidate !== undefined) {
+          const sum = `tại ${facts.vertexLabel}, n(${facts.viaLabel}) + w(${pair}) = ${facts.nVia ?? facts.viaDistance} + ${facts.w ?? facts.weight} = ${facts.candidate}`;
+          return prefix + sum + (facts.reason === 'minimum_not_taken'
+            ? `; ${facts.candidate} > ${facts.old} nên giữ nhãn ${facts.old} của ${facts.vertexLabel}, bài ghi ${gradeValue(facts.got)}. Hãy lấy nhãn nhỏ hơn giữa nhãn cũ và giá trị qua ${facts.viaLabel}.`
+            : `, nhưng bài ghi ${gradeValue(facts.got)}. Hãy tính lại tổng rồi so với nhãn cũ ${gradeValue(facts.old)} để lấy nhãn nhỏ hơn.`);
+        }
+        return prefix + comparison + '. Hãy tính lại từ các cạnh và trọng số đã cho.';
+      case 'SAI_DIEU_KIEN':
+        if (facts.claimType === 'hamilton_exists' || facts.claimType === 'theorem') return prefix + gradeHamilton(facts);
+        if (facts.claimType === 'euler_exists') return prefix + `phần có cạnh có ${facts.componentCount} thành phần liên thông và ${facts.oddCount} đỉnh bậc lẻ (${gradeValue(facts.oddVertexLabels)}). `
+          + 'Chu trình Euler cần phần có cạnh liên thông và mọi bậc chẵn; đường đi Euler cho phép đúng hai đỉnh bậc lẻ. Hãy xét lại điều kiện của loại đường đề yêu cầu.';
+        if (facts.claimType === 'postman_duplicate') return prefix + `đường lặp ${gradeValue(facts.walkVertices)} chưa nối hợp lệ một cặp đỉnh bậc lẻ bằng đường ngắn nhất. Hãy chọn cặp lẻ và đường ngắn nhất thuộc một ghép cặp tối ưu.`;
+        if (facts.claimType === 'dijkstra_init') return prefix + 'đã khoanh các đỉnh nên không được khởi tạo lại giữa lượt chạy. Hãy tiếp tục từ các nhãn đã cố định.';
+        return prefix + `dãy đi có ${gradeValue(facts.got)} đỉnh phân biệt, cần ít nhất ${gradeValue(facts.minimum)} để tạo chu trình. Hãy kiểm tra lại điều kiện của loại đường.`;
+      case 'BO_SOT': {
+        if (facts.claimType === 'odd_vertices') {
+          const missing = gradeRows(facts.missingOdd).map((v) => `${v.vertex} (bậc ${v.degree})`).join(', ');
+          const extra = gradeRows(facts.extraOdd).map((v) => `${v.vertex} (bậc ${gradeValue(v.degree)})`).join(', ');
+          return prefix + (missing ? `còn thiếu đỉnh bậc lẻ ${missing}. ` : '') + (extra ? `Đã liệt kê thừa ${extra}. ` : '')
+            + `Tập đỉnh bậc lẻ đúng là ${gradeValue(facts.displayExpected)}. Hãy liệt kê mỗi đỉnh bậc lẻ đúng một lần.`;
+        }
+        if (facts.claimType === 'dijkstra_select') return prefix + `chưa ghi các nhãn cần cập nhật tại ${gradeValue(facts.missingVertices)} trước khi khoanh tiếp. Hãy bổ sung các nhãn này từ đỉnh vừa khoanh.`;
+        return prefix + (gradeValue(facts.missingEdges) ? `đường còn thiếu cạnh ${gradeValue(facts.missingEdges)}` : `đường còn thiếu đỉnh ${gradeValue(facts.missingVertices)}`)
+          + (facts.position === undefined ? '' : ` khi kết thúc dãy ở vị trí ${facts.position}`)
+          + '. Hãy bổ sung các phần tử này rồi kiểm tra lại toàn bộ dãy đi.';
+      }
+      case 'CANH_KHONG_TON_TAI': return prefix + (facts.reason === 'unknown_vertex' || (!facts.fromLabel && !facts.viaLabel)
+        ? `đỉnh ${facts.vertexLabel} không có trong đồ thị${position}` : `không có cạnh ${pair} nối các đỉnh được nêu${position}`)
+        + '. Hãy sửa đoạn đi này theo các cạnh có trong hình.';
+      case 'LAP': return prefix + (facts.reason === 'repeated_vertex' ? `đỉnh ${facts.vertexLabel} đã xuất hiện trước đó${position}`
+        : facts.claimType === 'postman_duplicate' ? `cặp ${facts.fromLabel}–${facts.toLabel} dùng lại đỉnh lẻ đã ghép`
+          : `cạnh ${pair} đã được đi qua trước đó${position}`)
+        + '. Hãy chọn lại đường để không lặp phần tử mà loại đường này chỉ cho đi qua một lần.';
+      case 'NHAM_THUAT_TOAN': return prefix + `chuỗi khoanh khớp ${Array.isArray(facts.matchedAlgorithms) ? facts.matchedAlgorithms.map((m) => m === 'prim' ? 'Prim' : 'láng giềng gần nhất').join(' và ') : ''} (chọn cạnh nhỏ nhất), thay vì nhãn nhỏ nhất của Dijkstra; ` + gradeSelection(facts);
+      case 'SAI_LUA_CHON':
+        if (facts.claimType === 'dijkstra_select') return prefix + gradeSelection(facts);
+        if (facts.claimType === 'nn_step') return prefix + (facts.gotFromLabel !== facts.fromLabel
+          ? `đang ở ${facts.fromLabel} nhưng bài đi từ ${facts.gotFromLabel}. Hãy tiếp tục từ ${facts.fromLabel}.`
+          : `từ ${facts.fromLabel}, bài chọn ${gradeValue(facts.displayGot)} với trọng số ${gradeValue(facts.chosenWeight)}; phải chọn ${gradeValue(facts.displayExpected)} với trọng số nhỏ nhất ${gradeValue(facts.minimumWeight)} trong các đỉnh chưa thăm. Hãy chọn lại láng giềng gần nhất.`);
+        return prefix + comparison + '. Hãy chọn lại cặp lẻ hoặc cạnh có chi phí nhỏ nhất hợp lệ.';
+      case 'KET_LUAN_KHONG_SUY_RA':
+        if (facts.claimType === 'dijkstra_label') return prefix + `nhãn đúng tại ${facts.vertexLabel} là ${gradeValue(facts.displayExpected)}, nhưng ${facts.viaLabel} không phải đỉnh liền trước cho nhãn đó. Hãy truy vết qua một đỉnh cho đúng nhãn này.`;
+        if (facts.claimType === 'walk') return prefix + `đường đã nêu có độ dài ${gradeValue(facts.displayGot)}, trong khi độ dài ngắn nhất là ${gradeValue(facts.displayExpected)}. Hãy truy vết lại theo các nhãn ngắn nhất.`;
+        return prefix + comparison + '. Hãy sửa kết luận theo kết quả đã kiểm tra.';
+      case 'HIEU_SAI_DE':
+        if (facts.reason === 'not_closed') return prefix + `dãy kết thúc tại ${facts.endLabel}${position}, chưa quay về ${facts.startLabel} như yêu cầu chu trình. Hãy khép kín về đỉnh xuất phát.`;
+        if (facts.reason === 'wrong_end') return prefix + `đề yêu cầu kết thúc tại ${gradeValue(facts.displayExpected)}, bài kết thúc tại ${gradeValue(facts.displayGot)}${position}. Hãy sửa đỉnh cuối.`;
+        if (facts.reason === 'wrong_start' || facts.claimType === 'dijkstra_init') return prefix + `đề yêu cầu xuất phát từ ${gradeValue(facts.displayExpected)}, bài xuất phát từ ${gradeValue(facts.displayGot)}${position}. Hãy bắt đầu lại ở ${gradeValue(facts.displayExpected)}.`;
+        return prefix + 'bài đưa ra đường đi trong khi đề yêu cầu chu trình. Hãy đi đủ các phần tử bắt buộc rồi quay về đỉnh đầu.';
+    }
+  },
+};
 
 export const validationMessages = {
   object: 'Phải là một đối tượng.',
