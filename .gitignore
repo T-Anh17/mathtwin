@@ -1,0 +1,13 @@
+# AI agent workflow files (local only)
+CLAUDE.md
+AGENTS.md
+.claude/
+docs/prompts/
+
+# Dependencies & build
+node_modules/
+dist/
+coverage/
+*.log
+.env
+.env.*
