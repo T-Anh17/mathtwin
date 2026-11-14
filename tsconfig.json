@@ -9,8 +9,9 @@
     "verbatimModuleSyntax": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "lib": ["ES2022"],
+    "lib": ["ES2022", "DOM"],
+    "paths": { "@mathtwin/core": ["./packages/core/src/index.ts"] },
     "noEmit": true
   },
-  "include": ["packages/core/src/**/*.ts", "packages/core/test/**/*.ts", "vitest.config.ts"]
+  "include": ["packages/*/src/**/*.ts", "packages/*/test/**/*.ts", "vitest.config.ts"]
 }
