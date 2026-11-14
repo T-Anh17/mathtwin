@@ -1,0 +1,16 @@
+{
+  "description": "Trong tam giác, đi A–B mới dùng e1; còn e2 = BC và e3 = CA. Bước 1 trình bày đường Euler như vậy bỏ sót hai cạnh.",
+  "grade": {
+    "verdict": "SAI",
+    "firstErrorStep": 1,
+    "errorCode": "BO_SOT",
+    "facts": {
+      "edgeIds": [
+        "e2",
+        "e3"
+      ],
+      "walkVertexCount": 2,
+      "expectedEdges": 1
+    }
+  }
+}

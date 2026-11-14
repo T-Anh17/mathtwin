@@ -1,0 +1,8 @@
+{
+  "description": "Tam giác có bậc 2 ở mọi đỉnh. Chu trình A–C–B–A đi mỗi cạnh đúng một lần, ngược chiều thứ tự ưu tiên vẫn đúng.",
+  "grade": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "description": "Chỉ giải cầu Königsberg: bậc A = 5, B = 3, C = 3, D = 3, tổng 14 ứng với 7 cạnh; có 4 đỉnh lẻ nên dù liên thông vẫn không có đường hay chu trình Euler.",
+  "solutionAnswer": {
+    "exists": false
+  }
+}

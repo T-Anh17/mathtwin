@@ -1,0 +1,36 @@
+{
+  "graph": {
+    "directed": false,
+    "vertices": [
+      {
+        "id": "A",
+        "label": "A"
+      },
+      {
+        "id": "B",
+        "label": "B"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1",
+        "u": "A",
+        "v": "A"
+      },
+      {
+        "id": "e2",
+        "u": "A",
+        "v": "A"
+      },
+      {
+        "id": "e3",
+        "u": "A",
+        "v": "B"
+      }
+    ]
+  },
+  "task": {
+    "type": "degree"
+  },
+  "questionFormat": "tu_luan"
+}

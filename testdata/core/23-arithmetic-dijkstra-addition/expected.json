@@ -1,0 +1,15 @@
+{
+  "description": "Khoanh A rồi C là đúng vì nhãn C = 1 nhỏ hơn B = 8. Bước 3 qua cạnh CB trọng số 3 phải gán B = 1 + 3 = 4, học sinh ghi 2.",
+  "grade": {
+    "verdict": "SAI",
+    "firstErrorStep": 3,
+    "errorCode": "SAI_PHEP_TINH",
+    "facts": {
+      "expected": 4,
+      "got": 2,
+      "viaDistance": 1,
+      "weight": 3,
+      "nC": 1
+    }
+  }
+}

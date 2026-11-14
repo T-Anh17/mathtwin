@@ -1,0 +1,15 @@
+{
+  "description": "Thứ tự A,B,D,C khớp Prim (sau AB chọn BD đồng hạng AC) và láng giềng từ B đến D. Dijkstra sau A,B có C = 3, D = 4 nên sai đầu tiên khi chọn D ở bước 3.",
+  "grade": {
+    "verdict": "SAI",
+    "firstErrorStep": 3,
+    "errorCode": "NHAM_THUAT_TOAN",
+    "facts": {
+      "labels": {
+        "C": 3,
+        "D": 4
+      },
+      "chosenLabel": 4
+    }
+  }
+}

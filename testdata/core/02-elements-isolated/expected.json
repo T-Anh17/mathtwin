@@ -1,0 +1,8 @@
+{
+  "description": "Đỉnh cô lập vẫn được đếm: đồ thị A–B–C và D cô lập có 4 đỉnh, 2 cạnh; bậc D bằng 0 và đồ thị không liên thông.",
+  "grade": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

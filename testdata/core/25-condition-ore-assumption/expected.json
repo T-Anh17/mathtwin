@@ -1,0 +1,16 @@
+{
+  "description": "Ở ngũ giác, A và C không kề và có tổng bậc 2 + 2 = 4 < 5. Khẳng định thỏa Ore ở bước 1 sai điều kiện, dù đồ thị thực tế có chu trình Hamilton.",
+  "grade": {
+    "verdict": "SAI",
+    "firstErrorStep": 1,
+    "errorCode": "SAI_DIEU_KIEN",
+    "facts": {
+      "expected": false,
+      "got": true,
+      "vertexCount": 5,
+      "oreViolation": {
+        "sum": 4
+      }
+    }
+  }
+}

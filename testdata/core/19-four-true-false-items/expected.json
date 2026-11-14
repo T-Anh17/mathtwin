@@ -1,0 +1,8 @@
+{
+  "description": "Đồ thị A–B–C có 3 đỉnh, 2 cạnh, liên thông và không có chu trình Hamilton vì hai đầu bậc 1; bốn ý lần lượt đúng, sai, đúng, sai.",
+  "grade": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

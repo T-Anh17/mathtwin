@@ -1,0 +1,14 @@
+{
+  "description": "Tam giác có đúng một cạnh AB. Đường Euler A–B–A ở bước 1 dùng lại AB khi trở về A (chỉ số 2); báo lặp trước khi xét các cạnh chưa đi.",
+  "grade": {
+    "verdict": "SAI",
+    "firstErrorStep": 1,
+    "errorCode": "LAP",
+    "facts": {
+      "index": 2,
+      "from": "B",
+      "to": "A",
+      "walkVertexCount": 3
+    }
+  }
+}

@@ -1,0 +1,30 @@
+[
+  {
+    "step": 1,
+    "type": "statement",
+    "raw": "Ý a đúng.",
+    "id": "a",
+    "value": true
+  },
+  {
+    "step": 2,
+    "type": "statement",
+    "raw": "Ý b sai.",
+    "id": "b",
+    "value": false
+  },
+  {
+    "step": 3,
+    "type": "statement",
+    "raw": "Ý c đúng.",
+    "id": "c",
+    "value": true
+  },
+  {
+    "step": 4,
+    "type": "statement",
+    "raw": "Ý d sai.",
+    "id": "d",
+    "value": false
+  }
+]

@@ -1,0 +1,17 @@
+[
+  {
+    "step": 1,
+    "type": "theorem",
+    "raw": "Không thỏa điều kiện Dirac.",
+    "name": "dirac",
+    "holds": false
+  },
+  {
+    "step": 2,
+    "type": "hamilton_exists",
+    "raw": "Vì không thỏa Dirac nên không có chu trình Hamilton.",
+    "kind": "cycle",
+    "value": false,
+    "reason": "dirac"
+  }
+]

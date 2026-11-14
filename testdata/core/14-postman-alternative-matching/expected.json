@@ -1,0 +1,8 @@
+{
+  "description": "K4 trọng số 1 có 4 đỉnh lẻ, tổng cạnh 6. Ghép AD và CB cũng tối ưu như AB và CD: thêm 1 + 1 = 2, tổng hành trình 8.",
+  "grade": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

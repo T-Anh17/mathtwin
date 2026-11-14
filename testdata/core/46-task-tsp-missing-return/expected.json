@@ -1,0 +1,13 @@
+{
+  "description": "Tam giác trọng số 1 yêu cầu chu trình TSP xuất phát A. A–B–C thăm đủ đỉnh nhưng thiếu quay về A; bước 1 hiểu sai yêu cầu chu trình, không phải lỗi chọn cạnh hay tính tổng.",
+  "grade": {
+    "verdict": "SAI",
+    "firstErrorStep": 1,
+    "errorCode": "HIEU_SAI_DE",
+    "facts": {
+      "reason": "not_closed",
+      "walkVertexCount": 3,
+      "expectedEdges": 2
+    }
+  }
+}

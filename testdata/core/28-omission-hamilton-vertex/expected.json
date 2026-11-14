@@ -1,0 +1,14 @@
+{
+  "description": "Hình vuông có 4 đỉnh (bước 1 đúng); A–B–C chỉ thăm 3 đỉnh và bỏ D, nên không phải đường Hamilton ở bước 2.",
+  "grade": {
+    "verdict": "SAI",
+    "firstErrorStep": 2,
+    "errorCode": "BO_SOT",
+    "facts": {
+      "vertices": [
+        "D"
+      ],
+      "walkVertexCount": 3
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "description": "Câu trả lời ngắn hỏi riêng bậc A trong tam giác: có hai cạnh AB, AC nên đáp số 2 đúng dù không có bước giải.",
+  "grade": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

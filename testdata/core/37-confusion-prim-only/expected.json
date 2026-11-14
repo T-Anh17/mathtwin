@@ -1,0 +1,15 @@
+{
+  "description": "Thứ tự A,B,D,C,E,F là Prim: cạnh chọn lần lượt 1,3,1,5,1; không phải láng giềng vì từ C phải chọn F (6) thay E (10). Dijkstra sai ở bước 3 do C = 3 < D = 4.",
+  "grade": {
+    "verdict": "SAI",
+    "firstErrorStep": 3,
+    "errorCode": "NHAM_THUAT_TOAN",
+    "facts": {
+      "labels": {
+        "C": 3,
+        "D": 4
+      },
+      "chosenLabel": 4
+    }
+  }
+}

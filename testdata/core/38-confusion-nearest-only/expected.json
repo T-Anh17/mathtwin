@@ -1,0 +1,16 @@
+{
+  "description": "Thứ tự A,B,D,C,E đi láng giềng gần nhất từ đỉnh vừa chọn. Prim và Dijkstra đều phải chọn E sau A,B vì cạnh AE = 2 và nhãn E = 2; chọn D có nhãn 4 tại bước 3 là nhầm thuật toán.",
+  "grade": {
+    "verdict": "SAI",
+    "firstErrorStep": 3,
+    "errorCode": "NHAM_THUAT_TOAN",
+    "facts": {
+      "labels": {
+        "E": 2,
+        "C": 3,
+        "D": 4
+      },
+      "chosenLabel": 4
+    }
+  }
+}

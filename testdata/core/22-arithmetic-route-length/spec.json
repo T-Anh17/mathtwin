@@ -1,0 +1,39 @@
+{
+  "graph": {
+    "directed": false,
+    "vertices": [
+      {
+        "id": "A",
+        "label": "A"
+      },
+      {
+        "id": "B",
+        "label": "B"
+      },
+      {
+        "id": "C",
+        "label": "C"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1",
+        "u": "A",
+        "v": "B",
+        "w": 2
+      },
+      {
+        "id": "e2",
+        "u": "B",
+        "v": "C",
+        "w": 3
+      }
+    ]
+  },
+  "task": {
+    "type": "path",
+    "from": "A",
+    "to": "C"
+  },
+  "questionFormat": "tu_luan"
+}

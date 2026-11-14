@@ -1,0 +1,6 @@
+{
+  "description": "Chỉ giải: A–B–C có A,C bậc 1, không thể có chu trình Hamilton vì trong chu trình mỗi đỉnh cần hai láng giềng phân biệt. Không tồn tại chu trình dù có đường Hamilton.",
+  "solutionAnswer": {
+    "exists": false
+  }
+}

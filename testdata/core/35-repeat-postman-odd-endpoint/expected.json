@@ -1,0 +1,16 @@
+{
+  "description": "Ở K4 đơn vị, lặp AD là ghép một cặp lẻ hợp lệ. Bước 2 ghép tiếp AC dùng lại đầu lẻ A đã ghép, dù riêng AC cũng có thể thuộc một ghép tối ưu khác; không tạo thành ghép cặp hoàn hảo.",
+  "grade": {
+    "verdict": "SAI",
+    "firstErrorStep": 2,
+    "errorCode": "LAP",
+    "facts": {
+      "from": "A",
+      "to": "C",
+      "paired": [
+        "A",
+        "D"
+      ]
+    }
+  }
+}

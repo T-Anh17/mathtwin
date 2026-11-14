@@ -1,0 +1,12 @@
+{
+  "description": "Chỉ giải: khuyên tại A cộng 2, hai cạnh AB cộng thêm 2 nên bậc A = 4; B = 2, I = 0. Tổng 6 = 2 × 3 cạnh và không có đỉnh lẻ.",
+  "solutionAnswer": {
+    "degrees": {
+      "A": 4,
+      "B": 2,
+      "I": 0
+    },
+    "degreeSum": 6,
+    "oddVertices": []
+  }
+}

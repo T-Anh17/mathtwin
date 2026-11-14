@@ -1,0 +1,12 @@
+{
+  "description": "Đếm đúng 4 đỉnh ở bước 1 không chứng minh liên thông: AB và CD tách rời. Bước 2 khẳng định liên thông trái cấu trúc nên kết luận không suy ra.",
+  "grade": {
+    "verdict": "SAI",
+    "firstErrorStep": 2,
+    "errorCode": "KET_LUAN_KHONG_SUY_RA",
+    "facts": {
+      "expected": false,
+      "got": true
+    }
+  }
+}

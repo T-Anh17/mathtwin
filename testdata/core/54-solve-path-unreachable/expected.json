@@ -1,0 +1,6 @@
+{
+  "description": "Chỉ giải: chỉ có cạnh AB, còn C cô lập nên không tồn tại đường từ A tới C; đây là bài vô nghiệm, không phải bài làm sai.",
+  "solutionAnswer": {
+    "exists": false
+  }
+}

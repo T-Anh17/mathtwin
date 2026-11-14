@@ -1,0 +1,18 @@
+{
+  "graph": {
+    "directed": false,
+    "vertices": [],
+    "edges": []
+  },
+  "task": {
+    "type": "degree_sequence",
+    "sequence": [
+      2,
+      3,
+      4,
+      3
+    ],
+    "simple": false
+  },
+  "questionFormat": "tu_luan"
+}

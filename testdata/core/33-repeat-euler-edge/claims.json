@@ -1,0 +1,13 @@
+[
+  {
+    "step": 1,
+    "type": "walk",
+    "raw": "Đi A–B–A là đường Euler.",
+    "kind": "euler_path",
+    "vertices": [
+      "A",
+      "B",
+      "A"
+    ]
+  }
+]

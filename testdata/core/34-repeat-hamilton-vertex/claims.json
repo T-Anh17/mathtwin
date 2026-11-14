@@ -1,0 +1,15 @@
+[
+  {
+    "step": 1,
+    "type": "walk",
+    "raw": "Đường Hamilton A–B–C–B–A.",
+    "kind": "hamilton_path",
+    "vertices": [
+      "A",
+      "B",
+      "C",
+      "B",
+      "A"
+    ]
+  }
+]

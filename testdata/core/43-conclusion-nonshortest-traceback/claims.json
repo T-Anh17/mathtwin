@@ -1,0 +1,20 @@
+[
+  {
+    "step": 1,
+    "type": "shortest_length",
+    "raw": "Khoảng cách ngắn nhất A–C bằng 2.",
+    "from": "A",
+    "to": "C",
+    "value": 2
+  },
+  {
+    "step": 2,
+    "type": "walk",
+    "raw": "Đường ngắn nhất là đi thẳng A–C.",
+    "kind": "path",
+    "vertices": [
+      "A",
+      "C"
+    ]
+  }
+]

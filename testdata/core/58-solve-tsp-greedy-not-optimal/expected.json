@@ -1,0 +1,26 @@
+{
+  "description": "Chỉ giải TSP: ưu tiên B khi AB = AC = 1, láng giềng đi A–B–C–D–A dài 1+2+4+9=16. Ba chu trình không kể đảo chiều có tổng 16 (ABCD), 9 (ABDC), 15 (ACBD); tối ưu 9, chênh 7.",
+  "solutionAnswer": {
+    "nearestNeighbor": [
+      {
+        "start": "A",
+        "answer": {
+          "exists": true,
+          "length": 16
+        }
+      }
+    ],
+    "optimal": {
+      "exists": true,
+      "length": 9
+    },
+    "comparison": [
+      {
+        "start": "A",
+        "nearestLength": 16,
+        "optimalLength": 9,
+        "gap": 7
+      }
+    ]
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "description": "Có đề tính bậc trên A–B–C nhưng bài làm đọc được rỗng, không có mệnh đề hay đáp số để kiểm tra. Trả không đủ căn cứ và không gán bước sai hay mã lỗi.",
+  "grade": {
+    "verdict": "KHONG_DU_CAN_CU",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

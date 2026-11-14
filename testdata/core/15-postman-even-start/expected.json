@@ -1,0 +1,8 @@
+{
+  "description": "A–B trọng số 2, B–C trọng số 3: A, C lẻ nhưng B chẵn và là điểm xuất phát. Lặp A–B–C thêm 5; B–A–B–C–B dài 10 và quay về B.",
+  "grade": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

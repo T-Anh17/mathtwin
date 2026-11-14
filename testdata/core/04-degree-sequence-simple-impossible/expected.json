@@ -1,0 +1,6 @@
+{
+  "description": "Dãy [2,3,4,3] không thể là dãy bậc đơn đồ thị: có 4 đỉnh nên bậc tối đa 3, nhưng dãy chứa 4; tổng chẵn 12 chưa đủ.",
+  "solutionAnswer": {
+    "exists": false
+  }
+}

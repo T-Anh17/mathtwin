@@ -1,0 +1,16 @@
+{
+  "description": "Khoanh A đầu tiên đúng. Bước 2 khoanh lại A đã chốt là sai lựa chọn; tập ứng viên khi đó là B,C có nhãn 1, dù nhãn A vẫn là 0.",
+  "grade": {
+    "verdict": "SAI",
+    "firstErrorStep": 2,
+    "errorCode": "SAI_LUA_CHON",
+    "facts": {
+      "labels": {
+        "A": 0,
+        "B": 1,
+        "C": 1
+      },
+      "chosenLabel": 0
+    }
+  }
+}

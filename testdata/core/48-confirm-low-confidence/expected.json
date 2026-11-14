@@ -1,0 +1,12 @@
+{
+  "description": "Bậc A phải là 4 vì khuyên cộng 2 và hai cạnh AB cộng 2. Số đọc được là 3 nhưng độ tin cậy 0,6 < 0,85 nên cần xác nhận ở bước 1, không kết luận sai.",
+  "grade": {
+    "verdict": "CAN_XAC_NHAN",
+    "firstErrorStep": 1,
+    "errorCode": null,
+    "facts": {
+      "expected": 4,
+      "got": 3
+    }
+  }
+}

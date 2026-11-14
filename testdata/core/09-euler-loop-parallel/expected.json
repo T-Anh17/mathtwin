@@ -1,0 +1,8 @@
+{
+  "description": "Bậc A = 4, B = 2; I cô lập được bỏ qua khi xét Euler. B–A–A–B dùng b, khuyên l, rồi a đúng một lần và khép kín.",
+  "grade": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

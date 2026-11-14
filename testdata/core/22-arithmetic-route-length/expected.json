@@ -1,0 +1,12 @@
+{
+  "description": "Đếm 2 cạnh đúng ở bước 1; bước 2 ghi độ dài A–B–C bằng 4 là sai phép cộng: 2 + 3 = 5.",
+  "grade": {
+    "verdict": "SAI",
+    "firstErrorStep": 2,
+    "errorCode": "SAI_PHEP_TINH",
+    "facts": {
+      "expected": 5,
+      "got": 4
+    }
+  }
+}

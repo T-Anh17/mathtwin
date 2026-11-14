@@ -1,0 +1,12 @@
+{
+  "description": "Bước 1 đếm đúng 3 đỉnh. Bước 2 tính khuyên chỉ một lần nên ghi bậc A = 3, đúng phải là 2 + 1 + 1 = 4. Bước 3 đếm sai 99 cạnh không thay bước sai đầu tiên.",
+  "grade": {
+    "verdict": "SAI",
+    "firstErrorStep": 2,
+    "errorCode": "SAI_PHEP_TINH",
+    "facts": {
+      "expected": 4,
+      "got": 3
+    }
+  }
+}

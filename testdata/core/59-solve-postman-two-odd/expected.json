@@ -1,0 +1,9 @@
+{
+  "description": "Chỉ giải người đưa thư xuất phát B chẵn: cạnh gốc tổng 2+3=5, chỉ A,C lẻ nên phải lặp đường A–B–C dài 5. Chu trình tối ưu từ B dài 10; không ép xuất phát tại đỉnh lẻ.",
+  "solutionAnswer": {
+    "exists": true,
+    "baseLength": 5,
+    "duplicateLength": 5,
+    "length": 10
+  }
+}

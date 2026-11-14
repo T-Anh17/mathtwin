@@ -1,0 +1,12 @@
+{
+  "description": "Láng giềng gần nhất từ A phải chọn B hoặc C vì cùng trọng số 1. Bước 1 chọn D theo cạnh 9 là sai lựa chọn; không có đồng hạng nào cho phép D.",
+  "grade": {
+    "verdict": "SAI",
+    "firstErrorStep": 1,
+    "errorCode": "SAI_LUA_CHON",
+    "facts": {
+      "minimumWeight": 1,
+      "chosenWeight": 9
+    }
+  }
+}

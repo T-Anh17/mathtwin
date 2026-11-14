@@ -1,0 +1,6 @@
+{
+  "description": "Cho phép khuyên thì dãy [2,3,4,3] tồn tại vì tổng 12 chẵn. Ví dụ các cạnh 1–2, 1–3, 2–3, 2–4, hai cạnh 3–4 cho đúng bậc 2,3,4,3; kiểm tra đồ thị dựng lại theo bậc, không buộc một cách dựng.",
+  "solutionAnswer": {
+    "exists": true
+  }
+}

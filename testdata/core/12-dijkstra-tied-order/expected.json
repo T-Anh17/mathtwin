@@ -1,0 +1,8 @@
+{
+  "description": "Sau A, B và C cùng nhãn 1. Chọn C trước hợp lệ; qua C gán D = 1 + 3 = 4; sau đó B rồi D. Khoảng cách A–D là 4 ở cả hai đường.",
+  "grade": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

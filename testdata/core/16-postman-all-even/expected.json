@@ -1,0 +1,8 @@
+{
+  "description": "Tam giác trọng số AB = 2, BC = 3, CA = 4 có mọi bậc chẵn; đi A–C–B–A phủ hết cạnh, không lặp thêm, tổng 9.",
+  "grade": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

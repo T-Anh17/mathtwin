@@ -1,0 +1,14 @@
+{
+  "description": "Đề buộc người đưa thư xuất phát B. A–B–C–B–A tuy kín và phủ đủ cạnh nhưng xuất phát A nên sai yêu cầu ngay bước 1, tại chỉ số 0; không được bỏ qua điểm xuất phát chẵn B.",
+  "grade": {
+    "verdict": "SAI",
+    "firstErrorStep": 1,
+    "errorCode": "HIEU_SAI_DE",
+    "facts": {
+      "expected": "B",
+      "got": "A",
+      "index": 0,
+      "walkVertexCount": 5
+    }
+  }
+}

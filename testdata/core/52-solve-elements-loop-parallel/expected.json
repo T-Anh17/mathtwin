@@ -1,0 +1,17 @@
+{
+  "description": "Chỉ giải: A,B,I là 3 đỉnh, l,a,b là 3 cạnh; l là khuyên, a,b song song và I cô lập. Vì có khuyên và đa cạnh nên không đơn, là đa đồ thị.",
+  "solutionAnswer": {
+    "vertexCount": 3,
+    "edgeCount": 3,
+    "loops": [
+      "l"
+    ],
+    "isolatedVertices": [
+      "I"
+    ],
+    "hasLoops": true,
+    "hasParallelEdges": true,
+    "simple": false,
+    "multigraph": true
+  }
+}

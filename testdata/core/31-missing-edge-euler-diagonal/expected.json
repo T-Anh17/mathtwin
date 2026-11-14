@@ -1,0 +1,14 @@
+{
+  "description": "Hình vuông có 4 cạnh nên bước 1 đúng. Bước 2 ghi A–C–D–A: ngay AC là đường chéo không có trong đồ thị; lỗi này xuất hiện trước việc xét phủ hết cạnh Euler.",
+  "grade": {
+    "verdict": "SAI",
+    "firstErrorStep": 2,
+    "errorCode": "CANH_KHONG_TON_TAI",
+    "facts": {
+      "from": "A",
+      "to": "C",
+      "index": 1,
+      "walkVertexCount": 4
+    }
+  }
+}

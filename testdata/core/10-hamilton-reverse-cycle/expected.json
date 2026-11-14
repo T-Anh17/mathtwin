@@ -1,0 +1,8 @@
+{
+  "description": "Ngũ giác có chu trình A–E–D–C–B–A. Mỗi đỉnh xuất hiện đúng một lần trước khi quay về A; đảo chiều chu trình vẫn là lời giải đúng.",
+  "grade": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

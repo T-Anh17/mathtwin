@@ -1,0 +1,14 @@
+{
+  "description": "A–B–C không có cạnh AC. Đường A–C ở bước 1 dùng cạnh không tồn tại ngay tại lần chuyển đầu tiên (chỉ số 1).",
+  "grade": {
+    "verdict": "SAI",
+    "firstErrorStep": 1,
+    "errorCode": "CANH_KHONG_TON_TAI",
+    "facts": {
+      "from": "A",
+      "to": "C",
+      "index": 1,
+      "walkVertexCount": 2
+    }
+  }
+}

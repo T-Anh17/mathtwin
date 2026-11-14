@@ -1,0 +1,14 @@
+{
+  "description": "Sau A, nhãn B = 1 đúng nhưng học sinh bước 2 ghi đi qua C. Hình thoi không có cạnh CB nên tiền nhiệm đó dùng cạnh không tồn tại; con số đúng không cứu được lập luận.",
+  "grade": {
+    "verdict": "SAI",
+    "firstErrorStep": 2,
+    "errorCode": "CANH_KHONG_TON_TAI",
+    "facts": {
+      "vertex": "B",
+      "via": "C",
+      "expected": 1,
+      "got": 1
+    }
+  }
+}

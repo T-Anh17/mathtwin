@@ -1,0 +1,8 @@
+{
+  "description": "Hai khuyên tại A đóng góp 4 vào bậc A; thêm AB được bậc A = 5, B = 1, tổng 6 = 2 × 3 cạnh; cả A và B đều lẻ.",
+  "grade": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

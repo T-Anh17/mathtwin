@@ -1,0 +1,9 @@
+{
+  "description": "Chỉ giải trên K4 trọng số 1: cả 4 đỉnh bậc 3 lẻ; mọi ghép 2 cặp đều tốn 1+1=2. Tổng cạnh gốc 6, cộng đường lặp 2 thành hành trình tối ưu 8.",
+  "solutionAnswer": {
+    "exists": true,
+    "baseLength": 6,
+    "duplicateLength": 2,
+    "length": 8
+  }
+}

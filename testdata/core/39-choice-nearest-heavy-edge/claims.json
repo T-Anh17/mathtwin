@@ -1,0 +1,9 @@
+[
+  {
+    "step": 1,
+    "type": "nn_step",
+    "raw": "Từ A chọn D.",
+    "from": "A",
+    "to": "D"
+  }
+]

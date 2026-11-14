@@ -1,0 +1,26 @@
+[
+  {
+    "step": 1,
+    "type": "dijkstra_select",
+    "raw": "Khoanh đỉnh A.",
+    "v": "A"
+  },
+  {
+    "step": 2,
+    "type": "dijkstra_select",
+    "raw": "Khoanh đỉnh B.",
+    "v": "B"
+  },
+  {
+    "step": 3,
+    "type": "dijkstra_select",
+    "raw": "Khoanh đỉnh D.",
+    "v": "D"
+  },
+  {
+    "step": 4,
+    "type": "dijkstra_select",
+    "raw": "Khoanh đỉnh C.",
+    "v": "C"
+  }
+]

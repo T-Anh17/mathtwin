@@ -1,0 +1,13 @@
+[
+  {
+    "step": 1,
+    "type": "walk",
+    "raw": "Đi từ A qua C đến D.",
+    "kind": "path",
+    "vertices": [
+      "A",
+      "C",
+      "D"
+    ]
+  }
+]

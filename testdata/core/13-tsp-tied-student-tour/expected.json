@@ -1,0 +1,8 @@
+{
+  "description": "A–B và A–C cùng trọng số 1; học sinh chọn C, rồi B (2), D (3), về A (9), tổng 15. Đây là lượt láng giềng hợp lệ dù ưu tiên B cho tổng 16 và tối ưu thật là 9.",
+  "grade": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

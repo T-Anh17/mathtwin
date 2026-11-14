@@ -1,0 +1,12 @@
+{
+  "description": "Chỉ ghi đáp số 6 trong khi A–B–C dài 2 + 3 = 5 < 9. Vẫn chấm sai đáp số ở bước 1 và ghi thiếu bước giải; không suy diễn lỗi phép tính khi không có phép tính được viết.",
+  "grade": {
+    "verdict": "SAI",
+    "firstErrorStep": 1,
+    "errorCode": "KET_LUAN_KHONG_SUY_RA",
+    "facts": {
+      "expected": 5,
+      "got": 6
+    }
+  }
+}

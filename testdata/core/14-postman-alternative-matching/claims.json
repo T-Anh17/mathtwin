@@ -1,0 +1,26 @@
+[
+  {
+    "step": 1,
+    "type": "postman_duplicate",
+    "raw": "Lặp cạnh AD.",
+    "vertices": [
+      "A",
+      "D"
+    ]
+  },
+  {
+    "step": 2,
+    "type": "postman_duplicate",
+    "raw": "Lặp cạnh CB.",
+    "vertices": [
+      "C",
+      "B"
+    ]
+  },
+  {
+    "step": 3,
+    "type": "final_answer",
+    "raw": "Độ dài người đưa thư là 8.",
+    "value": 8
+  }
+]

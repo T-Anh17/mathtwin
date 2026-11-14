@@ -1,0 +1,14 @@
+[
+  {
+    "step": 1,
+    "type": "vertex_count",
+    "raw": "Có 3 đỉnh A, B, I.",
+    "value": 3
+  },
+  {
+    "step": 2,
+    "type": "edge_count",
+    "raw": "Có 3 cạnh l, a, b.",
+    "value": 3
+  }
+]

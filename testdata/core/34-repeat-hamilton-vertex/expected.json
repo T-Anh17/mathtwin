@@ -1,0 +1,13 @@
+{
+  "description": "Đường A–B–C–B–A trên hình vuông có các cạnh hợp lệ, nhưng B xuất hiện lần hai ở chỉ số 3. Bước 1 sai vì lặp đỉnh Hamilton, trước khi xét D bị bỏ sót.",
+  "grade": {
+    "verdict": "SAI",
+    "firstErrorStep": 1,
+    "errorCode": "LAP",
+    "facts": {
+      "vertex": "B",
+      "index": 3,
+      "walkVertexCount": 5
+    }
+  }
+}

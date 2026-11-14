@@ -1,0 +1,13 @@
+{
+  "description": "Đề hỏi chu trình Euler nhưng học sinh đưa đường A–B–C dùng đủ hai cạnh mà không về A. Bước 1 hiểu sai yêu cầu khép kín; thực tế đồ thị này không có chu trình Euler.",
+  "grade": {
+    "verdict": "SAI",
+    "firstErrorStep": 1,
+    "errorCode": "HIEU_SAI_DE",
+    "facts": {
+      "reason": "not_closed",
+      "walkVertexCount": 3,
+      "expectedEdges": 2
+    }
+  }
+}

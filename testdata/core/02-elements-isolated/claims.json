@@ -1,0 +1,27 @@
+[
+  {
+    "step": 1,
+    "type": "vertex_count",
+    "raw": "Có 4 đỉnh.",
+    "value": 4
+  },
+  {
+    "step": 2,
+    "type": "edge_count",
+    "raw": "Có 2 cạnh.",
+    "value": 2
+  },
+  {
+    "step": 3,
+    "type": "degree",
+    "raw": "D có bậc 0.",
+    "v": "D",
+    "value": 0
+  },
+  {
+    "step": 4,
+    "type": "connected",
+    "raw": "Đồ thị không liên thông.",
+    "value": false
+  }
+]

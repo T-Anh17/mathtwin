@@ -1,0 +1,8 @@
+{
+  "description": "AB và CD là hai thành phần tách rời; học sinh kết luận không liên thông là đúng dù mỗi thành phần riêng vẫn liên thông.",
+  "grade": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

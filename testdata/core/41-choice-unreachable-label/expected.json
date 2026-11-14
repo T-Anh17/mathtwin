@@ -1,0 +1,16 @@
+{
+  "description": "Sau khoanh A, B và C có nhãn 1 còn D chưa được cập nhật (vô cực). Chọn D ngay bước 2 không hợp lệ và chuỗi A,D cũng không khớp Prim hay láng giềng vì không có cạnh AD.",
+  "grade": {
+    "verdict": "SAI",
+    "firstErrorStep": 2,
+    "errorCode": "SAI_LUA_CHON",
+    "facts": {
+      "labels": {
+        "B": 1,
+        "C": 1,
+        "D": null
+      },
+      "chosenLabel": null
+    }
+  }
+}

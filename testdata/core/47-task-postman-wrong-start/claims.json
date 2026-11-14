@@ -1,0 +1,15 @@
+[
+  {
+    "step": 1,
+    "type": "walk",
+    "raw": "Xuất phát A, đi A–B–C–B–A.",
+    "kind": "postman_tour",
+    "vertices": [
+      "A",
+      "B",
+      "C",
+      "B",
+      "A"
+    ]
+  }
+]

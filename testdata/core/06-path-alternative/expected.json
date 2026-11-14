@@ -1,0 +1,8 @@
+{
+  "description": "Chấp nhận đường khác ví dụ ưu tiên: hình thoi có cả A–B–D và A–C–D. Học sinh đi A–C–D, hai cạnh đều có nên đúng.",
+  "grade": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

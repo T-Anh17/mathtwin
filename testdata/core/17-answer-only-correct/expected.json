@@ -1,0 +1,8 @@
+{
+  "description": "Chỉ ghi đáp số 5 cho đường ngắn nhất A–C: qua B dài 2 + 3 = 5, nhỏ hơn cạnh thẳng 9. Theo mục 6.1.5 vẫn chấm đúng đáp số, kèm lưu ý thiếu bước giải.",
+  "grade": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "description": "Sau khoanh A phải cập nhật B = C = 1. Học sinh đã mở khối cập nhật nhưng chỉ ghi B; chuyển sang khoanh B ở bước 3 khi chưa ghi C là bỏ sót C, dù B là lựa chọn đồng hạng hợp lệ.",
+  "grade": {
+    "verdict": "SAI",
+    "firstErrorStep": 3,
+    "errorCode": "BO_SOT",
+    "facts": {
+      "vertices": [
+        "C"
+      ],
+      "labels": {
+        "B": 1,
+        "C": 1
+      }
+    }
+  }
+}

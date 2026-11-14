@@ -1,0 +1,8 @@
+{
+  "description": "A–B–C có đường Hamilton C–B–A nhưng không có chu trình vì A, C bậc 1. Phân biệt đường với chu trình và chấp nhận chiều đi ngược.",
+  "grade": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

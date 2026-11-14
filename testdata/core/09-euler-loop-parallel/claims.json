@@ -1,0 +1,33 @@
+[
+  {
+    "step": 1,
+    "type": "degree",
+    "raw": "Khuyên tính hai: bậc A bằng 4.",
+    "v": "A",
+    "value": 4
+  },
+  {
+    "step": 2,
+    "type": "degree",
+    "raw": "Bậc B bằng 2.",
+    "v": "B",
+    "value": 2
+  },
+  {
+    "step": 3,
+    "type": "walk",
+    "raw": "Chu trình B–A–A–B dùng b, l, a.",
+    "kind": "euler_circuit",
+    "vertices": [
+      "B",
+      "A",
+      "A",
+      "B"
+    ],
+    "edgeIds": [
+      "b",
+      "l",
+      "a"
+    ]
+  }
+]

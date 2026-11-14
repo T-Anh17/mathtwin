@@ -1,0 +1,12 @@
+{
+  "description": "Bước 1 tính đúng khoảng cách A–C = 2 qua B với AB = BC = 1. Bước 2 lại truy vết cạnh thẳng AC dài 5; cạnh tồn tại nhưng đường này không ngắn nhất nên kết luận không suy ra.",
+  "grade": {
+    "verdict": "SAI",
+    "firstErrorStep": 2,
+    "errorCode": "KET_LUAN_KHONG_SUY_RA",
+    "facts": {
+      "expected": 2,
+      "got": 5
+    }
+  }
+}

@@ -1,0 +1,31 @@
+[
+  {
+    "step": 1,
+    "type": "postman_duplicate",
+    "raw": "Lặp đường A–B–C dài 5.",
+    "vertices": [
+      "A",
+      "B",
+      "C"
+    ]
+  },
+  {
+    "step": 2,
+    "type": "walk",
+    "raw": "Xuất phát B, đi B–A–B–C–B.",
+    "kind": "postman_tour",
+    "vertices": [
+      "B",
+      "A",
+      "B",
+      "C",
+      "B"
+    ]
+  },
+  {
+    "step": 3,
+    "type": "final_answer",
+    "raw": "Tổng bằng 10.",
+    "value": 10
+  }
+]

@@ -1,0 +1,12 @@
+{
+  "description": "Hai tam giác rời nhau có 0 đỉnh lẻ nhưng 2 thành phần chứa cạnh. Bước 1 nói không liên thông đúng; bước 2 kết luận có chu trình Euler vì mọi bậc chẵn là thiếu điều kiện liên thông.",
+  "grade": {
+    "verdict": "SAI",
+    "firstErrorStep": 2,
+    "errorCode": "SAI_DIEU_KIEN",
+    "facts": {
+      "oddCount": 0,
+      "componentCount": 2
+    }
+  }
+}

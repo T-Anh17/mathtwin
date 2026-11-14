@@ -1,0 +1,8 @@
+{
+  "description": "Ở A–B–C chỉ phương án A đúng vì bậc B = 2; các phương án 3 cạnh, 2 đỉnh, không liên thông đều sai. Chọn A đúng.",
+  "grade": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

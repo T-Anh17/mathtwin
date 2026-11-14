@@ -1,0 +1,20 @@
+[
+  {
+    "step": 1,
+    "type": "postman_duplicate",
+    "raw": "Lặp AD.",
+    "vertices": [
+      "A",
+      "D"
+    ]
+  },
+  {
+    "step": 2,
+    "type": "postman_duplicate",
+    "raw": "Lặp tiếp AC.",
+    "vertices": [
+      "A",
+      "C"
+    ]
+  }
+]

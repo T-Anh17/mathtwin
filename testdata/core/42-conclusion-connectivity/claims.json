@@ -1,0 +1,14 @@
+[
+  {
+    "step": 1,
+    "type": "vertex_count",
+    "raw": "Có 4 đỉnh.",
+    "value": 4
+  },
+  {
+    "step": 2,
+    "type": "connected",
+    "raw": "Do có 4 đỉnh nên đồ thị liên thông.",
+    "value": true
+  }
+]

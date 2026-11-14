@@ -1,0 +1,9 @@
+[
+  {
+    "step": 1,
+    "type": "theorem",
+    "raw": "Ngũ giác thỏa điều kiện Ore.",
+    "name": "ore",
+    "holds": true
+  }
+]

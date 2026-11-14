@@ -1,0 +1,8 @@
+{
+  "description": "Nhận diện đa đồ thị có khuyên và đỉnh cô lập: A, B, I là 3 đỉnh; khuyên l và hai cạnh a, b là 3 cạnh, dù a và b cùng hai đầu.",
+  "grade": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

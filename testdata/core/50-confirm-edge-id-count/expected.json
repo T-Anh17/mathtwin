@@ -1,0 +1,13 @@
+{
+  "description": "Chuỗi đỉnh A–B–C có 2 lần chuyển nhưng danh sách cạnh chỉ đọc được e1 (1 cạnh). Dữ liệu đọc không khớp nên cần xác nhận edgeIds ở bước 1, không tự kết luận lỗi toán.",
+  "grade": {
+    "verdict": "CAN_XAC_NHAN",
+    "firstErrorStep": 1,
+    "errorCode": null,
+    "facts": {
+      "expected": 2,
+      "got": 1,
+      "reason": "edge_count_mismatch"
+    }
+  }
+}

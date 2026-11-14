@@ -1,0 +1,15 @@
+{
+  "description": "Ngũ giác có mọi bậc 2 < 5/2 nên không thỏa Dirac (bước 1 đúng), nhưng vẫn có chu trình quanh ngũ giác. Bước 2 dùng điều kiện đủ như điều kiện cần để phủ nhận Hamilton là sai.",
+  "grade": {
+    "verdict": "SAI",
+    "firstErrorStep": 2,
+    "errorCode": "SAI_DIEU_KIEN",
+    "facts": {
+      "expected": true,
+      "got": false,
+      "reasonValid": false,
+      "vertexCount": 5,
+      "threshold": 2.5
+    }
+  }
+}
