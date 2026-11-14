@@ -138,3 +138,96 @@ thị sinh từ walk (bảo đảm có Euler walk), 200 đa đồ thị nhỏ đ
 cạn cạnh, và 1.000 đồ thị đơn/đa đối chiếu Hamilton với vét cạn hoán vị,
 có và không có ràng buộc đầu/cuối. Dữ liệu sinh có tối đa 8 đỉnh.
 Vitest dùng worker threads để chạy được trong môi trường chặn tạo tiến trình con.
+
+## Dijkstra, TSP và người đưa thư (Lô 1.3)
+
+```ts
+import { solveDijkstra, solveTsp, solvePostman } from '@mathtwin/core';
+
+const shortest = solveDijkstra(graph, { from: 'A', to: 'D' });
+const tsp = solveTsp(graph, { method: 'both', start: 'A' });
+const postman = solvePostman(graph, { start: 'B' });
+```
+
+Các solver nhận đồ thị đã được kiểm tra cấu trúc bằng `validateSpec`, không
+thay đổi đầu vào. Chúng kiểm tra thêm giới hạn 20 đỉnh, trọng số hữu hạn
+lớn hơn 0 trên mọi cạnh và các đỉnh đầu/cuối được truyền vào; vi phạm ném
+`RangeError`. Không mặc định trọng số bị thiếu thành 1. Khuyên không giúp
+đi tới đỉnh khác. Khi tính đường ngắn nhất hoặc TSP, dùng cạnh song song
+nhẹ nhất; nếu bằng nhau, dùng cạnh đầu tiên trong dữ liệu.
+
+- `solveDijkstra(graph, { from, to })` trả `DijkstraSolution`, mở rộng
+  `Solution` với `state` cuối và `trace`. `answer` là
+  `{ exists: true, length, walk }` hoặc `{ exists: false, reason: 'unreachable' }`.
+  Mỗi trace ghi `selected`, tập đồng hạng nhỏ nhất `tied`, `updates`, cùng
+  snapshot `labels` và `settled` sau bước đó. Mỗi cập nhật ghi
+  `{ v, old, candidate, new, via, edgeId, viaDistance, weight }`, kể cả khi
+  nhãn không giảm. `null` biểu diễn ∞; không đưa `Infinity` vào JSON kết quả.
+  Dừng ngay khi khoanh đích, không cập nhật các láng giềng của đích.
+  Các nhãn còn lại lúc này có thể chưa được cố định.
+- `createDijkstraState(graph, source, target?)`,
+  `dijkstraCandidates(graph, state)` và
+  `advanceDijkstra(graph, state, selected)` cho phép mô phỏng theo mọi
+  lựa chọn đồng hạng hợp lệ. Hàm chuyển trả `{ state, trace }` mới, không
+  sửa trạng thái cũ; chọn đỉnh ngoài tập đồng hạng ném `RangeError`.
+  Dùng trạng thái do các hàm này tạo ra trên cùng một đồ thị. Bỏ `target`
+  để tiếp tục đến khi không còn nhãn hữu hạn chưa khoanh. Solver mẫu luôn
+  chọn đỉnh đồng hạng đầu tiên theo thứ tự đỉnh đầu vào; nhãn bằng nhau
+  không thay đỉnh trước đã chọn. Đây chưa phải API chấm bài.
+- `solveTsp(graph, options?)` mặc định `{ method: 'both' }`. Trả
+  `TspSolution` với `answer.nearestNeighbor?`, `answer.optimal?`,
+  `answer.comparison?` và `trace`. `nearestNeighbor` là danh sách
+  `{ start, answer }`; bỏ `start` chạy từ **mọi đỉnh** theo thứ tự đầu vào.
+  `optimal` dùng Held–Karp; bỏ `start` chọn đỉnh đầu tiên vì xoay hành trình
+  không đổi độ dài. Chỉ tính phương pháp được yêu cầu.
+- Mỗi đáp án hành trình là `{ exists: true, length, walk }` hoặc
+  `{ exists: false, reason, partialWalk?, partialLength? }`. Gần nhất chọn
+  đỉnh chưa thăm có cạnh nhẹ nhất và ghi trace
+  `{ type: 'nearest_neighbor', start, from, to, tied, edgeId, weight, length, closing }`.
+  Ưu tiên đỉnh theo thứ tự đầu vào khi đồng hạng. Bước quay về được ghi
+  riêng với `closing: true`. Có thể thất bại vì `no_neighbor` hoặc
+  `no_return` ngay cả khi vẫn tồn tại hành trình khác. Không tự thêm cạnh
+  theo khoảng cách đường ngắn nhất vào đồ thị thiếu cạnh.
+- Held–Karp dùng trạng thái tập đỉnh chưa thăm và đỉnh hiện tại, ghi trace
+  `{ type: 'held_karp', start, statesVisited }`, không lưu toàn bộ bảng DP.
+  Các hành trình tối ưu bằng nhau được chọn theo thứ tự đỉnh đầu vào.
+  `both` so sánh từng kết quả gần nhất với tối ưu qua
+  `{ start, nearestLength, optimalLength, gap }`; giá trị không tồn tại là
+  `null`, đồng thời nêu rõ gần nhất không bảo đảm tối ưu.
+- `solvePostman(graph, { start })` tìm **hành trình khép kín** đi qua mọi
+  cạnh ít nhất một lần và quay về đúng `start`, kể cả khi `start` bậc chẵn.
+  Trả `PostmanSolution` với `matching`, `trace` và đáp án
+  `{ exists: true, walk, length, baseLength, duplicateLength, duplicates }`
+  hoặc `{ exists: false, reason }`. Chỉ xét liên thông trên phần có cạnh;
+  từ chối `start` cô lập khi vẫn còn cạnh và từ chối nhiều thành phần có cạnh.
+- Người đưa thư dùng Floyd–Warshall, DP bitmask ghép cặp đỉnh bậc lẻ,
+  nhân đôi đường ngắn nhất được ghép, rồi gọi Hierholzer. Khi ghép cặp
+  đồng hạng, xét các đỉnh bậc lẻ theo thứ tự đầu vào. Floyd–Warshall giữ
+  đường đã có nếu bằng độ dài, xét đỉnh trung gian theo thứ tự đầu vào.
+  Mọi cạnh gốc, kể cả cạnh song song nặng hơn và khuyên, đều được tính
+  vào `baseLength` và đi qua trong kết quả.
+- `walk.edgeIds` của người đưa thư là **mã cạnh gốc**, có thể lặp lại.
+  `duplicates` ghi `{ id, originalEdgeId }` cho từng bản sao với mã riêng
+  không trùng mã cạnh đầu vào. Trace gồm bậc/đỉnh lẻ, ma trận khoảng cách
+  giữa các đỉnh lẻ, ghép cặp kèm đường đi và chi phí, các bản sao, trace
+  Euler trên đồ thị tăng cường, và phép cộng tổng chi phí. Trong trace
+  Euler, `edgeId`/`via` là mã cạnh tăng cường; dùng `duplicates` để quy về
+  cạnh gốc. Highlights và walk cuối đã quy về cạnh gốc để tô màu.
+
+Quy ước ca biên: Dijkstra từ một đỉnh tới chính nó có độ dài 0; không tới
+được đích trả `exists: false`. TSP không đỉnh không có hành trình (danh
+sách gần nhất rỗng); một đỉnh có hành trình dài 0, không cần đi khuyên;
+hai đỉnh đi và quay lại cùng cạnh nhẹ nhất. Đây là quy ước hành trình TSP,
+khác quy ước chu trình Hamilton tối thiểu 3 đỉnh của Lô 1.2. Người đưa thư
+không cạnh trả walk `[start]` với chi phí 0; nếu có khuyên thì vẫn phải đi
+qua mọi khuyên. Các trường thêm cho kết quả/trace được xuất thành kiểu
+cụ thể, không thay đổi `Task`, `Solution`, `Claim` hay `GradeResult`.
+
+Kiểm thử Lô 1.3 dùng seed cố định: 1.000 đồ thị có tối đa 8 đỉnh so
+Dijkstra với vét cạn đường đi (thêm mô phỏng chọn đồng hạng theo thứ tự
+ngược), 1.000 đồ thị tối đa 8 đỉnh so Held–Karp với vét cạn hoán vị, và
+300 đa đồ thị nhỏ so người đưa thư với vét cạn trạng thái
+`(đỉnh hiện tại, tập cạnh đã đi)`. Test còn kiểm tra trace, hoàn nguyên
+Euler trên đồ thị tăng cường, ca 20 đỉnh cho Held–Karp/ghép cặp, ví dụ
+gần nhất không tối ưu, 2/4 đỉnh lẻ với điểm đầu bậc chẵn, khuyên/đa cạnh,
+đồ thị thiếu cạnh, dữ liệu bất biến, tên tiếng Việt và JSON kết quả.

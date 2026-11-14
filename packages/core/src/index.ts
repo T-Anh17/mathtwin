@@ -5,4 +5,7 @@ export * from './graph/walk.js';
 export * from './graph/hamilton.js';
 export * from './solvers/euler.js';
 export * from './solvers/hamilton.js';
+export * from './solvers/dijkstra.js';
+export * from './solvers/tsp.js';
+export * from './solvers/postman.js';
 export { validateSpec } from './validate.js';

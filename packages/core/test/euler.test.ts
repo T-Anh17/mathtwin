@@ -19,6 +19,12 @@ function assertEuler(input: Graph, solution: EulerSolution, options: EulerOption
   }, options.start === undefined ? {} : { start: options.start }).ok).toBe(true);
   expect(solution.steps.map(({ index }) => index)).toEqual(solution.steps.map((_, i) => i + 1));
   expect(solution.steps.every(({ text }) => text.length > 0)).toBe(true);
+  expect(solution.steps.map(({ kind: stepKind }) => stepKind)).toEqual([
+    ...input.vertices.map(() => 'degree'), 'euler_conditions', 'euler_walk', 'conclusion',
+  ]);
+  expect(solution.steps.find(({ kind: stepKind }) => stepKind === 'euler_walk')).toMatchObject({
+    data: solution.trace, highlight: { vertices: walk.vertices, edges: walk.edgeIds },
+  });
 }
 
 describe('Euler solver', () => {
@@ -137,9 +143,9 @@ describe('Euler solver', () => {
     };
     const result = solveEuler(input);
     expect(result.steps[0]?.text).toBe('Bậc của đỉnh Nhà là 1.');
-    expect(result.steps.find(({ kind }) => kind === 'euler_traverse')).toMatchObject({
-      text: 'Đi từ Nhà đến Trường qua cạnh đường a chưa dùng; đánh dấu cạnh này đã dùng.',
-      data: { from: 'v1', to: 'v2', edgeId: 'e1' }, highlight: { vertices: ['v1', 'v2'], edges: ['e1'] },
+    expect(result.steps.find(({ kind }) => kind === 'euler_walk')).toMatchObject({
+      text: 'Một đường đi Euler là: Nhà → Trường. Các cạnh theo thứ tự: đường a.',
+      data: result.trace, highlight: { vertices: ['v1', 'v2'], edges: ['e1'] },
     });
     expect(result.notes[0]).toContain('Khuyên');
   });

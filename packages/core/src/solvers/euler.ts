@@ -105,18 +105,10 @@ export function solveEuler(graph: Graph, options: EulerOptions = { want: 'any' }
     vertices.reverse();
     edgeIds.reverse();
   }
-  for (const event of trace) {
-    if (event.type === 'start') {
-      add('euler_start', eulerTemplates.start(label(event.vertex)), event, { vertices: [event.vertex] });
-    } else if (event.type === 'traverse') {
-      add('euler_traverse', eulerTemplates.traverse(label(event.from), label(event.to), names.get(event.edgeId)!), event,
-        { vertices: [event.from, event.to], edges: [event.edgeId] });
-    } else {
-      add('euler_backtrack', eulerTemplates.backtrack(label(event.vertex)), event, { vertices: [event.vertex] });
-    }
-  }
   const kind = analysis.oddVertices.length === 0 ? 'circuit' : 'path';
   const walk = { vertices, edgeIds };
-  add('conclusion', eulerTemplates.success(kind, vertices.map(label), edgeIds.length), walk, { vertices, edges: edgeIds });
+  add('euler_walk', eulerTemplates.walk(kind, vertices.map(label), edgeIds.map((id) => names.get(id)!)), trace,
+    { vertices, edges: edgeIds });
+  add('conclusion', eulerTemplates.success(kind, edgeIds.length), walk, { vertices, edges: edgeIds });
   return finish({ exists: true, kind, walk });
 }
