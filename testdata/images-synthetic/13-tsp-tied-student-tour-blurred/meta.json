@@ -1,0 +1,14 @@
+{
+  "source": "printed",
+  "capture": "straight",
+  "blurred": true,
+  "questionFormat": "tu_luan",
+  "synthetic": true,
+  "variant": "blurred",
+  "coreFixture": "13-tsp-tied-student-tour",
+  "artifactHashes": {
+    "svgSha256": "6d9b9c0dd94ce6b0395412aadbcd38ba527d825f730fff2b7d1218a9843eb67d",
+    "pngSha256": "59ef531d6cf8d16c8975fd3c807aacf294af6e73736000bae7d952d4889c6809"
+  },
+  "notes": "Ảnh tổng hợp (blurred), không phải ảnh chụp thật. Nét bút giả bằng đường cong và font, không đại diện chữ viết tay thật."
+}

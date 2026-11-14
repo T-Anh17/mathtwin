@@ -1,0 +1,14 @@
+{
+  "source": "handwritten",
+  "capture": "straight",
+  "blurred": false,
+  "questionFormat": "tra_loi_ngan",
+  "synthetic": true,
+  "variant": "handwritten",
+  "coreFixture": "18-short-answer-degree",
+  "artifactHashes": {
+    "svgSha256": "4f069f08bdacdd9cd91642c9550e7c4a1c241de520b6c922721dc961ccd4746f",
+    "pngSha256": "bfcb5a60b23b8070d23f278348c623c87ac1f7d24652d0fd03ad02fad6c46e26"
+  },
+  "notes": "Ảnh tổng hợp (handwritten), không phải ảnh chụp thật. Nét bút giả bằng đường cong và font, không đại diện chữ viết tay thật."
+}

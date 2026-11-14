@@ -1,0 +1,14 @@
+{
+  "source": "printed",
+  "capture": "straight",
+  "blurred": false,
+  "questionFormat": "tu_luan",
+  "synthetic": true,
+  "variant": "low-resolution",
+  "coreFixture": "10-hamilton-reverse-cycle",
+  "artifactHashes": {
+    "svgSha256": "806432ff7164b6dedd5954ac8c4eb1a3203f7606610ed6ffd10cbe5411819c7e",
+    "pngSha256": "b82723f2f34e13f96ff0d388446e847b9958564c6423449253766184c167e1aa"
+  },
+  "notes": "Ảnh tổng hợp (low-resolution), không phải ảnh chụp thật. Nét bút giả bằng đường cong và font, không đại diện chữ viết tay thật."
+}

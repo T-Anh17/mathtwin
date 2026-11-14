@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="900" viewBox="0 0 1000 900">
+<metadata>{&quot;graph&quot;:{&quot;directed&quot;:false,&quot;vertices&quot;:[{&quot;id&quot;:&quot;A&quot;,&quot;label&quot;:&quot;A&quot;},{&quot;id&quot;:&quot;B&quot;,&quot;label&quot;:&quot;B&quot;},{&quot;id&quot;:&quot;C&quot;,&quot;label&quot;:&quot;C&quot;}],&quot;edges&quot;:[{&quot;id&quot;:&quot;e1&quot;,&quot;u&quot;:&quot;A&quot;,&quot;v&quot;:&quot;B&quot;},{&quot;id&quot;:&quot;e2&quot;,&quot;u&quot;:&quot;B&quot;,&quot;v&quot;:&quot;C&quot;}]},&quot;task&quot;:{&quot;type&quot;:&quot;statements&quot;,&quot;items&quot;:[{&quot;id&quot;:&quot;a&quot;,&quot;text&quot;:&quot;Đồ thị có 3 đỉnh.&quot;,&quot;check&quot;:{&quot;type&quot;:&quot;vertex_count&quot;,&quot;value&quot;:3}},{&quot;id&quot;:&quot;b&quot;,&quot;text&quot;:&quot;Đồ thị có 3 cạnh.&quot;,&quot;check&quot;:{&quot;type&quot;:&quot;edge_count&quot;,&quot;value&quot;:3}},{&quot;id&quot;:&quot;c&quot;,&quot;text&quot;:&quot;Đồ thị liên thông.&quot;,&quot;check&quot;:{&quot;type&quot;:&quot;connected&quot;,&quot;value&quot;:true}},{&quot;id&quot;:&quot;d&quot;,&quot;text&quot;:&quot;Đồ thị có chu trình Hamilton.&quot;,&quot;check&quot;:{&quot;type&quot;:&quot;hamilton_exists&quot;,&quot;kind&quot;:&quot;cycle&quot;,&quot;value&quot;:true}}]},&quot;questionFormat&quot;:&quot;dung_sai&quot;}</metadata>
+<rect width="1000" height="900" fill="white"/>
+<g font-family="Arial, sans-serif" fill="#111">
+<text x="38" y="40" font-size="21">Cho đồ thị vô hướng như hình. Đúng / sai từng ý.</text>
+<text x="38" y="70" font-size="21">Xét các phát biểu sau trên đồ thị:</text>
+<text x="38" y="100" font-size="21">a) Đồ thị có 3 đỉnh.</text>
+<text x="38" y="130" font-size="21">b) Đồ thị có 3 cạnh.</text>
+<text x="38" y="160" font-size="21">c) Đồ thị liên thông.</text>
+<text x="38" y="190" font-size="21">d) Đồ thị có chu trình Hamilton.</text>
+<path d="M 500 340 Q 595.2627944162882 505, 690.5255888325765 670" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round"/>
+<path d="M 690.5255888325765 670 Q 500.00000000000006 670, 309.47441116742357 670.0000000000001" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round"/>
+<circle cx="500" cy="340" r="20" fill="white" stroke="#111" stroke-width="2"/><text x="500" y="347" text-anchor="middle" font-size="22">A</text>
+<circle cx="690.5255888325765" cy="670" r="20" fill="white" stroke="#111" stroke-width="2"/><text x="690.5255888325765" y="677" text-anchor="middle" font-size="22">B</text>
+<circle cx="309.47441116742357" cy="670.0000000000001" r="20" fill="white" stroke="#111" stroke-width="2"/><text x="309.47441116742357" y="677.0000000000001" text-anchor="middle" font-size="22">C</text>
+</g></svg>

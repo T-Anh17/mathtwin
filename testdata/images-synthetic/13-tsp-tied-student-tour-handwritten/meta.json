@@ -1,0 +1,14 @@
+{
+  "source": "handwritten",
+  "capture": "straight",
+  "blurred": false,
+  "questionFormat": "tu_luan",
+  "synthetic": true,
+  "variant": "handwritten",
+  "coreFixture": "13-tsp-tied-student-tour",
+  "artifactHashes": {
+    "svgSha256": "62502f6fcbb31fdf693d806d06ebea345ec3103c3cf1e7b6573d2731c7d02ed4",
+    "pngSha256": "b2b75b11a2d7d50fdb3418d96f6a4bb7bb7e9667684e1d361d89b8b1e57f896b"
+  },
+  "notes": "Ảnh tổng hợp (handwritten), không phải ảnh chụp thật. Nét bút giả bằng đường cong và font, không đại diện chữ viết tay thật."
+}

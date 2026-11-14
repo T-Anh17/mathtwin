@@ -1,0 +1,14 @@
+{
+  "source": "handwritten",
+  "capture": "straight",
+  "blurred": false,
+  "questionFormat": "tu_luan",
+  "synthetic": true,
+  "variant": "handwritten",
+  "coreFixture": "09-euler-loop-parallel",
+  "artifactHashes": {
+    "svgSha256": "b9453312ecd86db32d36bebf54d5fccc14715261d0cc27a34a88b28fecabcc87",
+    "pngSha256": "221186bce63e416c374642a7fc44f0ebad6a70b07f3766ba08f8ecb85ce6e477"
+  },
+  "notes": "Ảnh tổng hợp (handwritten), không phải ảnh chụp thật. Nét bút giả bằng đường cong và font, không đại diện chữ viết tay thật."
+}

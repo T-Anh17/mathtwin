@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="900" viewBox="0 0 1000 900">
+<metadata>{&quot;graph&quot;:{&quot;directed&quot;:false,&quot;vertices&quot;:[{&quot;id&quot;:&quot;A&quot;,&quot;label&quot;:&quot;A&quot;},{&quot;id&quot;:&quot;B&quot;,&quot;label&quot;:&quot;B&quot;},{&quot;id&quot;:&quot;C&quot;,&quot;label&quot;:&quot;C&quot;},{&quot;id&quot;:&quot;D&quot;,&quot;label&quot;:&quot;D&quot;}],&quot;edges&quot;:[{&quot;id&quot;:&quot;e1&quot;,&quot;u&quot;:&quot;A&quot;,&quot;v&quot;:&quot;B&quot;,&quot;w&quot;:1},{&quot;id&quot;:&quot;e2&quot;,&quot;u&quot;:&quot;A&quot;,&quot;v&quot;:&quot;C&quot;,&quot;w&quot;:1},{&quot;id&quot;:&quot;e3&quot;,&quot;u&quot;:&quot;A&quot;,&quot;v&quot;:&quot;D&quot;,&quot;w&quot;:9},{&quot;id&quot;:&quot;e4&quot;,&quot;u&quot;:&quot;B&quot;,&quot;v&quot;:&quot;C&quot;,&quot;w&quot;:2},{&quot;id&quot;:&quot;e5&quot;,&quot;u&quot;:&quot;B&quot;,&quot;v&quot;:&quot;D&quot;,&quot;w&quot;:3},{&quot;id&quot;:&quot;e6&quot;,&quot;u&quot;:&quot;C&quot;,&quot;v&quot;:&quot;D&quot;,&quot;w&quot;:4}]},&quot;task&quot;:{&quot;type&quot;:&quot;tsp&quot;,&quot;start&quot;:&quot;A&quot;,&quot;method&quot;:&quot;nearest_neighbor&quot;},&quot;questionFormat&quot;:&quot;tu_luan&quot;}</metadata>
+<rect width="1000" height="900" fill="white"/>
+<g font-family="Arial, sans-serif" fill="#111">
+<text x="38" y="40" font-size="21">Cho đồ thị vô hướng như hình. Tự luận.</text>
+<text x="38" y="70" font-size="21">Bài toán người du lịch: dùng láng giềng gần nhất từ A.</text>
+<path d="M 500 340 Q 610 450, 720 560" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round"/>
+<path d="M 500 340 Q 500 560, 500 780" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round"/>
+<path d="M 500 340 Q 390 450, 280 560" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round"/>
+<path d="M 720 560 Q 610 670, 500 780" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round"/>
+<path d="M 720 560 Q 500 560, 280 560" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round"/>
+<path d="M 500 780 Q 390 670, 280 560" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round"/><rect x="578.4000000000001" y="416.40000000000003" width="28" height="28" rx="5" fill="white"/><text x="592.4000000000001" y="437.40000000000003" text-anchor="middle" font-size="22">1</text>
+<rect x="486.00000000000006" y="508.79999999999995" width="28" height="28" rx="5" fill="white"/><text x="500.00000000000006" y="529.8" text-anchor="middle" font-size="22">1</text>
+<rect x="393.6000000000001" y="416.40000000000003" width="28" height="28" rx="5" fill="white"/><text x="407.6000000000001" y="437.40000000000003" text-anchor="middle" font-size="22">9</text>
+<rect x="613.6000000000001" y="636.4000000000001" width="28" height="28" rx="5" fill="white"/><text x="627.6000000000001" y="657.4000000000001" text-anchor="middle" font-size="22">2</text>
+<rect x="521.2" y="544" width="28" height="28" rx="5" fill="white"/><text x="535.2" y="565" text-anchor="middle" font-size="22">3</text>
+<rect x="393.6000000000001" y="671.6" width="28" height="28" rx="5" fill="white"/><text x="407.6000000000001" y="692.6" text-anchor="middle" font-size="22">4</text>
+<circle cx="500" cy="340" r="20" fill="white" stroke="#111" stroke-width="2"/><text x="500" y="347" text-anchor="middle" font-size="22">A</text>
+<circle cx="720" cy="560" r="20" fill="white" stroke="#111" stroke-width="2"/><text x="720" y="567" text-anchor="middle" font-size="22">B</text>
+<circle cx="500" cy="780" r="20" fill="white" stroke="#111" stroke-width="2"/><text x="500" y="787" text-anchor="middle" font-size="22">C</text>
+<circle cx="280" cy="560" r="20" fill="white" stroke="#111" stroke-width="2"/><text x="280" y="567" text-anchor="middle" font-size="22">D</text>
+</g></svg>

@@ -13,3 +13,6 @@ coverage/
 .env
 .env.*
 *.tsbuildinfo
+
+# Fixture-only evaluation reports
+/reports/.fake/

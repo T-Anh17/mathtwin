@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="900" viewBox="0 0 1000 900">
+<metadata>{&quot;graph&quot;:{&quot;directed&quot;:false,&quot;vertices&quot;:[{&quot;id&quot;:&quot;A&quot;,&quot;label&quot;:&quot;A&quot;},{&quot;id&quot;:&quot;B&quot;,&quot;label&quot;:&quot;B&quot;},{&quot;id&quot;:&quot;I&quot;,&quot;label&quot;:&quot;I&quot;}],&quot;edges&quot;:[{&quot;id&quot;:&quot;l&quot;,&quot;u&quot;:&quot;A&quot;,&quot;v&quot;:&quot;A&quot;,&quot;name&quot;:&quot;khuyên m&quot;},{&quot;id&quot;:&quot;a&quot;,&quot;u&quot;:&quot;A&quot;,&quot;v&quot;:&quot;B&quot;,&quot;name&quot;:&quot;a&quot;},{&quot;id&quot;:&quot;b&quot;,&quot;u&quot;:&quot;A&quot;,&quot;v&quot;:&quot;B&quot;,&quot;name&quot;:&quot;b&quot;}]},&quot;task&quot;:{&quot;type&quot;:&quot;euler&quot;,&quot;want&quot;:&quot;circuit&quot;},&quot;questionFormat&quot;:&quot;tu_luan&quot;}</metadata>
+<rect width="1000" height="900" fill="white"/>
+<g font-family="Arial, sans-serif" fill="#111">
+<text x="38" y="40" font-size="21">Cho đồ thị vô hướng như hình. Tự luận.</text>
+<text x="38" y="70" font-size="21">Tìm chu trình Euler.</text>
+<path d="M 500 340 C 555 262, 445 262, 500 340" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round"/>
+<path d="M 500 340 Q 638.5640646055101 480, 690.5255888325765 670" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round"/>
+<path d="M 500 340 Q 551.9615242270663 530, 690.5255888325765 670" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round"/><rect x="442" y="257.7" width="116" height="28" rx="5" fill="white"/><text x="500" y="278.7" text-anchor="middle" font-size="22">khuyên m</text>
+<rect x="587.1171261458711" y="450.4200000000001" width="28" height="28" rx="5" fill="white"/><text x="601.1171261458711" y="471.4200000000001" text-anchor="middle" font-size="22">a</text>
+<rect x="544.9243684734932" y="474.78000000000003" width="28" height="28" rx="5" fill="white"/><text x="558.9243684734932" y="495.78000000000003" text-anchor="middle" font-size="22">b</text>
+<circle cx="500" cy="340" r="20" fill="white" stroke="#111" stroke-width="2"/><text x="500" y="347" text-anchor="middle" font-size="22">A</text>
+<circle cx="690.5255888325765" cy="670" r="20" fill="white" stroke="#111" stroke-width="2"/><text x="690.5255888325765" y="677" text-anchor="middle" font-size="22">B</text>
+<circle cx="309.47441116742357" cy="670.0000000000001" r="20" fill="white" stroke="#111" stroke-width="2"/><text x="309.47441116742357" y="677.0000000000001" text-anchor="middle" font-size="22">I</text>
+</g></svg>

@@ -1,0 +1,14 @@
+{
+  "source": "printed",
+  "capture": "tilted",
+  "blurred": false,
+  "questionFormat": "tu_luan",
+  "synthetic": true,
+  "variant": "tilted",
+  "coreFixture": "07-connectivity-components",
+  "artifactHashes": {
+    "svgSha256": "09a3db95d534efc77110525174b4ef32603b37d99f28266a28bcb6dcfaa62b5b",
+    "pngSha256": "4ca94c52c7133cdd622f1c13a720bc64db3ec0bba7006e4df4d19b603735aa6b"
+  },
+  "notes": "Ảnh tổng hợp (tilted), không phải ảnh chụp thật. Nét bút giả bằng đường cong và font, không đại diện chữ viết tay thật."
+}

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="900" viewBox="0 0 1000 900">
+<metadata>{&quot;graph&quot;:{&quot;directed&quot;:false,&quot;vertices&quot;:[{&quot;id&quot;:&quot;A&quot;,&quot;label&quot;:&quot;A&quot;},{&quot;id&quot;:&quot;B&quot;,&quot;label&quot;:&quot;B&quot;},{&quot;id&quot;:&quot;C&quot;,&quot;label&quot;:&quot;C&quot;},{&quot;id&quot;:&quot;D&quot;,&quot;label&quot;:&quot;D&quot;}],&quot;edges&quot;:[{&quot;id&quot;:&quot;e1&quot;,&quot;u&quot;:&quot;A&quot;,&quot;v&quot;:&quot;B&quot;},{&quot;id&quot;:&quot;e2&quot;,&quot;u&quot;:&quot;C&quot;,&quot;v&quot;:&quot;D&quot;}]},&quot;task&quot;:{&quot;type&quot;:&quot;connectivity&quot;},&quot;questionFormat&quot;:&quot;tu_luan&quot;}</metadata>
+<rect width="1000" height="900" fill="white"/>
+<g font-family="Arial, sans-serif" fill="#111">
+<text x="38" y="40" font-size="21">Cho đồ thị vô hướng như hình. Tự luận.</text>
+<text x="38" y="70" font-size="21">Xét tính liên thông của đồ thị đã cho.</text>
+<path d="M 500 340 Q 610 450, 720 560" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round"/>
+<path d="M 500 780 Q 390 670, 280 560" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round"/>
+<circle cx="500" cy="340" r="20" fill="white" stroke="#111" stroke-width="2"/><text x="500" y="347" text-anchor="middle" font-size="22">A</text>
+<circle cx="720" cy="560" r="20" fill="white" stroke="#111" stroke-width="2"/><text x="720" y="567" text-anchor="middle" font-size="22">B</text>
+<circle cx="500" cy="780" r="20" fill="white" stroke="#111" stroke-width="2"/><text x="500" y="787" text-anchor="middle" font-size="22">C</text>
+<circle cx="280" cy="560" r="20" fill="white" stroke="#111" stroke-width="2"/><text x="280" y="567" text-anchor="middle" font-size="22">D</text>
+</g></svg>

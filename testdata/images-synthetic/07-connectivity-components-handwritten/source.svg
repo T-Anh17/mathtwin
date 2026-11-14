@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="900" viewBox="0 0 1000 900">
+<metadata>{&quot;graph&quot;:{&quot;directed&quot;:false,&quot;vertices&quot;:[{&quot;id&quot;:&quot;A&quot;,&quot;label&quot;:&quot;A&quot;},{&quot;id&quot;:&quot;B&quot;,&quot;label&quot;:&quot;B&quot;},{&quot;id&quot;:&quot;C&quot;,&quot;label&quot;:&quot;C&quot;},{&quot;id&quot;:&quot;D&quot;,&quot;label&quot;:&quot;D&quot;}],&quot;edges&quot;:[{&quot;id&quot;:&quot;e1&quot;,&quot;u&quot;:&quot;A&quot;,&quot;v&quot;:&quot;B&quot;},{&quot;id&quot;:&quot;e2&quot;,&quot;u&quot;:&quot;C&quot;,&quot;v&quot;:&quot;D&quot;}]},&quot;task&quot;:{&quot;type&quot;:&quot;connectivity&quot;},&quot;questionFormat&quot;:&quot;tu_luan&quot;}</metadata>
+<rect width="1000" height="900" fill="white"/>
+<g font-family="Comic Sans MS, Segoe Print, sans-serif" fill="#111">
+<text x="38" y="40" font-size="21">Cho đồ thị vô hướng như hình. Tự luận.</text>
+<text x="38" y="70" font-size="21">Xét tính liên thông của đồ thị đã cho.</text>
+<path d="M 500 345 Q 602.8036790443612 459.10558175082207, 715.2053786266843 563.7695112717165" fill="none" stroke="#222" stroke-width="2.8" stroke-linecap="round"/>
+<path d="M 497.27989444555317 780.6836860910391 Q 395.5186766532346 663.9403748659604, 283.25143920078557 557.2613536988787" fill="none" stroke="#222" stroke-width="2.8" stroke-linecap="round"/>
+<circle cx="500" cy="345" r="20" fill="white" stroke="#111" stroke-width="2.8"/><text x="500" y="352" text-anchor="middle" font-size="22">A</text>
+<circle cx="715.2053786266843" cy="563.7695112717165" r="20" fill="white" stroke="#111" stroke-width="2.8"/><text x="715.2053786266843" y="570.7695112717165" text-anchor="middle" font-size="22">B</text>
+<circle cx="497.27989444555317" cy="780.6836860910391" r="20" fill="white" stroke="#111" stroke-width="2.8"/><text x="497.27989444555317" y="787.6836860910391" text-anchor="middle" font-size="22">C</text>
+<circle cx="283.25143920078557" cy="557.2613536988787" r="20" fill="white" stroke="#111" stroke-width="2.8"/><text x="283.25143920078557" y="564.2613536988787" text-anchor="middle" font-size="22">D</text>
+</g></svg>

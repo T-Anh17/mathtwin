@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="900" viewBox="0 0 1000 900">
+<metadata>{&quot;graph&quot;:{&quot;directed&quot;:false,&quot;vertices&quot;:[{&quot;id&quot;:&quot;A&quot;,&quot;label&quot;:&quot;A&quot;},{&quot;id&quot;:&quot;B&quot;,&quot;label&quot;:&quot;B&quot;},{&quot;id&quot;:&quot;C&quot;,&quot;label&quot;:&quot;C&quot;}],&quot;edges&quot;:[{&quot;id&quot;:&quot;e1&quot;,&quot;u&quot;:&quot;A&quot;,&quot;v&quot;:&quot;B&quot;},{&quot;id&quot;:&quot;e2&quot;,&quot;u&quot;:&quot;B&quot;,&quot;v&quot;:&quot;C&quot;},{&quot;id&quot;:&quot;e3&quot;,&quot;u&quot;:&quot;C&quot;,&quot;v&quot;:&quot;A&quot;}]},&quot;task&quot;:{&quot;type&quot;:&quot;degree&quot;,&quot;vertices&quot;:[&quot;A&quot;]},&quot;questionFormat&quot;:&quot;tra_loi_ngan&quot;}</metadata>
+<rect width="1000" height="900" fill="white"/>
+<g font-family="Comic Sans MS, Segoe Print, sans-serif" fill="#111">
+<text x="38" y="40" font-size="21">Cho đồ thị vô hướng như hình. Trả lời ngắn.</text>
+<text x="38" y="70" font-size="21">Tính bậc của A trong đồ thị.</text>
+<path d="M 500 345 Q 587.0043293045263 512.6958834761251, 685.7309674592609 673.7695112717165" fill="none" stroke="#222" stroke-width="2.8" stroke-linecap="round"/>
+<path d="M 685.7309674592609 673.7695112717165 Q 496.3018663550699 664.9524604027787, 306.75430561297674 670.6836860910392" fill="none" stroke="#222" stroke-width="2.8" stroke-linecap="round"/>
+<path d="M 306.75430561297674 670.6836860910392 Q 404.3480632454321 508.41793656808204, 500 345" fill="none" stroke="#222" stroke-width="2.8" stroke-linecap="round"/>
+<circle cx="500" cy="345" r="20" fill="white" stroke="#111" stroke-width="2.8"/><text x="500" y="352" text-anchor="middle" font-size="22">A</text>
+<circle cx="685.7309674592609" cy="673.7695112717165" r="20" fill="white" stroke="#111" stroke-width="2.8"/><text x="685.7309674592609" y="680.7695112717165" text-anchor="middle" font-size="22">B</text>
+<circle cx="306.75430561297674" cy="670.6836860910392" r="20" fill="white" stroke="#111" stroke-width="2.8"/><text x="306.75430561297674" y="677.6836860910392" text-anchor="middle" font-size="22">C</text>
+</g></svg>

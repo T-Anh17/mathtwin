@@ -1,0 +1,14 @@
+{
+  "source": "printed",
+  "capture": "straight",
+  "blurred": false,
+  "questionFormat": "tra_loi_ngan",
+  "synthetic": true,
+  "variant": "low-resolution",
+  "coreFixture": "18-short-answer-degree",
+  "artifactHashes": {
+    "svgSha256": "08fc9ee61a9c302a13505e1771d66a002a1fba9dc16ebd34de711f9e618648f0",
+    "pngSha256": "033bbb99662f13aad8343a8e91b43401719884b680f5b4c6465912e9da67f37b"
+  },
+  "notes": "Ảnh tổng hợp (low-resolution), không phải ảnh chụp thật. Nét bút giả bằng đường cong và font, không đại diện chữ viết tay thật."
+}

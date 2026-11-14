@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="900" viewBox="0 0 1000 900">
+<metadata>{&quot;graph&quot;:{&quot;directed&quot;:false,&quot;vertices&quot;:[{&quot;id&quot;:&quot;A&quot;,&quot;label&quot;:&quot;A&quot;},{&quot;id&quot;:&quot;B&quot;,&quot;label&quot;:&quot;B&quot;},{&quot;id&quot;:&quot;I&quot;,&quot;label&quot;:&quot;I&quot;}],&quot;edges&quot;:[{&quot;id&quot;:&quot;l&quot;,&quot;u&quot;:&quot;A&quot;,&quot;v&quot;:&quot;A&quot;,&quot;name&quot;:&quot;khuyên m&quot;},{&quot;id&quot;:&quot;a&quot;,&quot;u&quot;:&quot;A&quot;,&quot;v&quot;:&quot;B&quot;,&quot;name&quot;:&quot;a&quot;},{&quot;id&quot;:&quot;b&quot;,&quot;u&quot;:&quot;A&quot;,&quot;v&quot;:&quot;B&quot;,&quot;name&quot;:&quot;b&quot;}]},&quot;task&quot;:{&quot;type&quot;:&quot;elements&quot;},&quot;questionFormat&quot;:&quot;tu_luan&quot;}</metadata>
+<rect width="1000" height="900" fill="white"/>
+<g font-family="Comic Sans MS, Segoe Print, sans-serif" fill="#111">
+<text x="38" y="40" font-size="21">Cho đồ thị vô hướng như hình. Tự luận.</text>
+<text x="38" y="70" font-size="21">Liệt kê các đỉnh, các cạnh và nhận biết khuyên, cạnh song song.</text>
+<path d="M 500 345 C 555 267, 445 267, 500 345" fill="none" stroke="#222" stroke-width="2.8" stroke-linecap="round"/>
+<path d="M 500 345 Q 630.0654384340367 488.3694749002311, 685.7309674592609 673.7695112717165" fill="none" stroke="#222" stroke-width="2.8" stroke-linecap="round"/>
+<path d="M 500 345 Q 548.3489858432969 534.5333534737326, 685.7309674592609 673.7695112717165" fill="none" stroke="#222" stroke-width="2.8" stroke-linecap="round"/><rect x="442" y="262.7" width="116" height="28" rx="5" fill="white"/><text x="500" y="283.7" text-anchor="middle" font-size="22">khuyên m</text>
+<rect x="582.1308242648763" y="456.84454995972345" width="28" height="28" rx="5" fill="white"/><text x="596.1308242648763" y="477.84454995972345" text-anchor="middle" font-size="22">a</text>
+<rect x="542.3185685626679" y="479.3355916007334" width="28" height="28" rx="5" fill="white"/><text x="556.3185685626679" y="500.3355916007334" text-anchor="middle" font-size="22">b</text>
+<circle cx="500" cy="345" r="20" fill="white" stroke="#111" stroke-width="2.8"/><text x="500" y="352" text-anchor="middle" font-size="22">A</text>
+<circle cx="685.7309674592609" cy="673.7695112717165" r="20" fill="white" stroke="#111" stroke-width="2.8"/><text x="685.7309674592609" y="680.7695112717165" text-anchor="middle" font-size="22">B</text>
+<circle cx="306.75430561297674" cy="670.6836860910392" r="20" fill="white" stroke="#111" stroke-width="2.8"/><text x="306.75430561297674" y="677.6836860910392" text-anchor="middle" font-size="22">I</text>
+</g></svg>

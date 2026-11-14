@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="900" viewBox="0 0 1000 900">
+<metadata>{&quot;graph&quot;:{&quot;directed&quot;:false,&quot;vertices&quot;:[{&quot;id&quot;:&quot;A&quot;,&quot;label&quot;:&quot;A&quot;},{&quot;id&quot;:&quot;B&quot;,&quot;label&quot;:&quot;B&quot;},{&quot;id&quot;:&quot;C&quot;,&quot;label&quot;:&quot;C&quot;},{&quot;id&quot;:&quot;D&quot;,&quot;label&quot;:&quot;D&quot;},{&quot;id&quot;:&quot;E&quot;,&quot;label&quot;:&quot;E&quot;}],&quot;edges&quot;:[{&quot;id&quot;:&quot;e1&quot;,&quot;u&quot;:&quot;A&quot;,&quot;v&quot;:&quot;B&quot;},{&quot;id&quot;:&quot;e2&quot;,&quot;u&quot;:&quot;B&quot;,&quot;v&quot;:&quot;C&quot;},{&quot;id&quot;:&quot;e3&quot;,&quot;u&quot;:&quot;C&quot;,&quot;v&quot;:&quot;D&quot;},{&quot;id&quot;:&quot;e4&quot;,&quot;u&quot;:&quot;D&quot;,&quot;v&quot;:&quot;E&quot;},{&quot;id&quot;:&quot;e5&quot;,&quot;u&quot;:&quot;E&quot;,&quot;v&quot;:&quot;A&quot;}]},&quot;task&quot;:{&quot;type&quot;:&quot;hamilton&quot;,&quot;want&quot;:&quot;cycle&quot;,&quot;start&quot;:&quot;A&quot;},&quot;questionFormat&quot;:&quot;tu_luan&quot;}</metadata>
+<rect width="1000" height="900" fill="white"/>
+<g font-family="Comic Sans MS, Segoe Print, sans-serif" fill="#111">
+<text x="38" y="40" font-size="21">Cho đồ thị vô hướng như hình. Tự luận.</text>
+<text x="38" y="70" font-size="21">Tìm chu trình Hamilton từ A.</text>
+<path d="M 500 345 Q 598.2230969838029 425.8104695008596, 704.4378122116182 495.7857725092281" fill="none" stroke="#222" stroke-width="2.8" stroke-linecap="round"/>
+<path d="M 704.4378122116182 495.7857725092281 Q 658.5879557975339 615.0063615278125, 626.5926499498972 738.6674248535276" fill="none" stroke="#222" stroke-width="2.8" stroke-linecap="round"/>
+<path d="M 626.5926499498972 738.6674248535276 Q 500.2809577851428 735.827402150326, 373.9386836964415 735.2450924613671" fill="none" stroke="#222" stroke-width="2.8" stroke-linecap="round"/>
+<path d="M 373.9386836964415 735.2450924613671 Q 328.8639546009515 613.0532059770327, 295.3322926687043 487.20323190594377" fill="none" stroke="#222" stroke-width="2.8" stroke-linecap="round"/>
+<path d="M 295.3322926687043 487.20323190594377 Q 393.2889018836495 409.8016143696991, 500 345" fill="none" stroke="#222" stroke-width="2.8" stroke-linecap="round"/>
+<circle cx="500" cy="345" r="20" fill="white" stroke="#111" stroke-width="2.8"/><text x="500" y="352" text-anchor="middle" font-size="22">A</text>
+<circle cx="704.4378122116182" cy="495.7857725092281" r="20" fill="white" stroke="#111" stroke-width="2.8"/><text x="704.4378122116182" y="502.7857725092281" text-anchor="middle" font-size="22">B</text>
+<circle cx="626.5926499498972" cy="738.6674248535276" r="20" fill="white" stroke="#111" stroke-width="2.8"/><text x="626.5926499498972" y="745.6674248535276" text-anchor="middle" font-size="22">C</text>
+<circle cx="373.9386836964415" cy="735.2450924613671" r="20" fill="white" stroke="#111" stroke-width="2.8"/><text x="373.9386836964415" y="742.2450924613671" text-anchor="middle" font-size="22">D</text>
+<circle cx="295.3322926687043" cy="487.20323190594377" r="20" fill="white" stroke="#111" stroke-width="2.8"/><text x="295.3322926687043" y="494.20323190594377" text-anchor="middle" font-size="22">E</text>
+</g></svg>

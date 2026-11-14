@@ -1,0 +1,44 @@
+{
+  "graph": {
+    "directed": false,
+    "vertices": [
+      {
+        "id": "A",
+        "label": "A"
+      },
+      {
+        "id": "B",
+        "label": "B"
+      },
+      {
+        "id": "I",
+        "label": "I"
+      }
+    ],
+    "edges": [
+      {
+        "id": "l",
+        "u": "A",
+        "v": "A",
+        "name": "khuyên m"
+      },
+      {
+        "id": "a",
+        "u": "A",
+        "v": "B",
+        "name": "a"
+      },
+      {
+        "id": "b",
+        "u": "A",
+        "v": "B",
+        "name": "b"
+      }
+    ]
+  },
+  "task": {
+    "type": "euler",
+    "want": "circuit"
+  },
+  "questionFormat": "tu_luan"
+}

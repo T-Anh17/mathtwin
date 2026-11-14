@@ -1,0 +1,14 @@
+{
+  "source": "printed",
+  "capture": "straight",
+  "blurred": true,
+  "questionFormat": "dung_sai",
+  "synthetic": true,
+  "variant": "blurred",
+  "coreFixture": "19-four-true-false-items",
+  "artifactHashes": {
+    "svgSha256": "b145706a4c0032332dbe2491cfac9dc8f74263f2ecb9d69f32e86811bea1313a",
+    "pngSha256": "666d82ed1cadee390ff1ccb8f039b07e67ce5d63116a23afa170b276b8b9053e"
+  },
+  "notes": "Ảnh tổng hợp (blurred), không phải ảnh chụp thật. Nét bút giả bằng đường cong và font, không đại diện chữ viết tay thật."
+}

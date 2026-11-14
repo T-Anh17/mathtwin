@@ -1,0 +1,70 @@
+{
+  "graph": {
+    "directed": false,
+    "vertices": [
+      {
+        "id": "A",
+        "label": "A"
+      },
+      {
+        "id": "B",
+        "label": "B"
+      },
+      {
+        "id": "C",
+        "label": "C"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1",
+        "u": "A",
+        "v": "B"
+      },
+      {
+        "id": "e2",
+        "u": "B",
+        "v": "C"
+      }
+    ]
+  },
+  "task": {
+    "type": "statements",
+    "items": [
+      {
+        "id": "a",
+        "text": "Đồ thị có 3 đỉnh.",
+        "check": {
+          "type": "vertex_count",
+          "value": 3
+        }
+      },
+      {
+        "id": "b",
+        "text": "Đồ thị có 3 cạnh.",
+        "check": {
+          "type": "edge_count",
+          "value": 3
+        }
+      },
+      {
+        "id": "c",
+        "text": "Đồ thị liên thông.",
+        "check": {
+          "type": "connected",
+          "value": true
+        }
+      },
+      {
+        "id": "d",
+        "text": "Đồ thị có chu trình Hamilton.",
+        "check": {
+          "type": "hamilton_exists",
+          "kind": "cycle",
+          "value": true
+        }
+      }
+    ]
+  },
+  "questionFormat": "dung_sai"
+}

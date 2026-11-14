@@ -7,12 +7,16 @@
     "node": ">=22.12"
   },
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "tools/*"
   ],
   "scripts": {
     "build": "npm run build --workspaces --if-present",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "test": "npm run typecheck && vitest run"
+    "test": "npm run typecheck && vitest run",
+    "eval:read": "npm run build && node tools/eval/dist/cli.js",
+    "eval:generate": "npm run build && node tools/eval/dist/generate-cli.js",
+    "eval:validate": "npm run build && node tools/eval/dist/validate-cli.js"
   },
   "devDependencies": {
     "fast-check": "^4.10.2",

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="900" viewBox="0 0 1000 900">
+<metadata>{&quot;graph&quot;:{&quot;directed&quot;:false,&quot;vertices&quot;:[{&quot;id&quot;:&quot;A&quot;,&quot;label&quot;:&quot;A&quot;},{&quot;id&quot;:&quot;B&quot;,&quot;label&quot;:&quot;B&quot;},{&quot;id&quot;:&quot;C&quot;,&quot;label&quot;:&quot;C&quot;}],&quot;edges&quot;:[{&quot;id&quot;:&quot;e1&quot;,&quot;u&quot;:&quot;A&quot;,&quot;v&quot;:&quot;B&quot;},{&quot;id&quot;:&quot;e2&quot;,&quot;u&quot;:&quot;B&quot;,&quot;v&quot;:&quot;C&quot;},{&quot;id&quot;:&quot;e3&quot;,&quot;u&quot;:&quot;C&quot;,&quot;v&quot;:&quot;A&quot;}]},&quot;task&quot;:{&quot;type&quot;:&quot;degree&quot;,&quot;vertices&quot;:[&quot;A&quot;]},&quot;questionFormat&quot;:&quot;tra_loi_ngan&quot;}</metadata>
+<rect width="1000" height="900" fill="white"/>
+<g font-family="Arial, sans-serif" fill="#111">
+<text x="38" y="40" font-size="21">Cho đồ thị vô hướng như hình. Trả lời ngắn.</text>
+<text x="38" y="70" font-size="21">Tính bậc của A trong đồ thị.</text>
+<path d="M 500 340 Q 595.2627944162882 505, 690.5255888325765 670" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round"/>
+<path d="M 690.5255888325765 670 Q 500.00000000000006 670, 309.47441116742357 670.0000000000001" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round"/>
+<path d="M 309.47441116742357 670.0000000000001 Q 404.7372055837118 505.00000000000006, 500 340" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round"/>
+<circle cx="500" cy="340" r="20" fill="white" stroke="#111" stroke-width="2"/><text x="500" y="347" text-anchor="middle" font-size="22">A</text>
+<circle cx="690.5255888325765" cy="670" r="20" fill="white" stroke="#111" stroke-width="2"/><text x="690.5255888325765" y="677" text-anchor="middle" font-size="22">B</text>
+<circle cx="309.47441116742357" cy="670.0000000000001" r="20" fill="white" stroke="#111" stroke-width="2"/><text x="309.47441116742357" y="677.0000000000001" text-anchor="middle" font-size="22">C</text>
+</g></svg>

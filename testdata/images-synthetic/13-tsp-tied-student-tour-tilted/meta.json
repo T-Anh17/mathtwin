@@ -1,0 +1,14 @@
+{
+  "source": "printed",
+  "capture": "tilted",
+  "blurred": false,
+  "questionFormat": "tu_luan",
+  "synthetic": true,
+  "variant": "tilted",
+  "coreFixture": "13-tsp-tied-student-tour",
+  "artifactHashes": {
+    "svgSha256": "6d9b9c0dd94ce6b0395412aadbcd38ba527d825f730fff2b7d1218a9843eb67d",
+    "pngSha256": "28b3c33d18aee4d3749a1650b7e62245b4e700354d5af5cbc1b8cc0fc3d75703"
+  },
+  "notes": "Ảnh tổng hợp (tilted), không phải ảnh chụp thật. Nét bút giả bằng đường cong và font, không đại diện chữ viết tay thật."
+}

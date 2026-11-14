@@ -1,0 +1,14 @@
+{
+  "source": "printed",
+  "capture": "straight",
+  "blurred": false,
+  "questionFormat": "trac_nghiem",
+  "synthetic": true,
+  "variant": "low-resolution",
+  "coreFixture": "20-four-choice-question",
+  "artifactHashes": {
+    "svgSha256": "eba234867583d36b49b1dac0d6400afc5573ae867577949e6d8787296c6a3e9d",
+    "pngSha256": "3d9c002168222f4200465feb05c6fee45c6ee20c287fae947893fc81fc118d68"
+  },
+  "notes": "Ảnh tổng hợp (low-resolution), không phải ảnh chụp thật. Nét bút giả bằng đường cong và font, không đại diện chữ viết tay thật."
+}

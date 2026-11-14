@@ -22,3 +22,24 @@ export interface VisionReader {
   read(images: PreparedImage[], pass: 'edges' | 'neighbors', signal?: AbortSignal): Promise<{ draft: ReadDraft; usage: ReadUsage }>;
 }
 export type NormalizedRead = Pick<ReadOutcome, 'spec' | 'graph' | 'graphUncertain' | 'issues'>;
+
+export type ReadErrorType = 'weight' | 'missing_edge' | 'extra_edge' | 'loop' | 'parallel_edge'
+  | 'vertex_label' | 'edge_name' | 'task' | 'question_format' | 'graph';
+export interface ReadDifference {
+  item: string;
+  type: ReadErrorType;
+  predicted: unknown;
+  expected: unknown;
+  tags?: ReadErrorType[];
+}
+export interface ReadComparison {
+  completeCorrect: boolean;
+  graphCorrect: boolean;
+  fullyFlagged: boolean;
+  silentError: boolean;
+  graphSilentError: boolean;
+  coverage: { precise: number; coarse: number; none: number };
+  extraFlags: number;
+  differences: ReadDifference[];
+  errorCounts: Partial<Record<ReadErrorType, number>>;
+}

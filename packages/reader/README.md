@@ -1,4 +1,4 @@
-# @mathtwin/reader — Lô 2.1
+# @mathtwin/reader — Lô 2.1–2.2
 
 Nền chung đọc đề, TypeScript thuần chạy trên trình duyệt và Node. Chỉ phụ thuộc
 `@mathtwin/core` và `zod`; không đọc file, gọi mạng, tải model hay lưu ảnh.
@@ -6,7 +6,7 @@ Nền chung đọc đề, TypeScript thuần chạy trên trình duyệt và Nod
 API xuất từ `src/index.ts`: `ReadDraftSchema`, `TaskDraftSchema`,
 `StatementCheckDraftSchema`, `normalizeDraft`, `reconcile`, `readProblem`,
 `applyConfirmation`, `completeWithQuestion`, `QuestionDraftSchema`/`QuestionDraft`
-và các interface. `compareRead` thuộc Lô 2.2.
+và các interface. `compareRead` được bổ sung ở Lô 2.2.
 `test/fixtures.ts` cung cấp `FakeVisionReader`, ảnh RGBA một pixel và draft mẫu.
 
 Chạy từ gốc repo:
@@ -103,3 +103,15 @@ Vitest dùng nguồn core qua alias, nên `npm test` không cần build trước
   trường task xóa trường; thay loại task có thể cần xác nhận nhiều trường cùng
   lúc. Xóa cờ đã xác nhận và cờ cạnh/đỉnh đã xóa; cập nhật candidate đầu tiên
   của các cờ còn lại; luôn kiểm `validateSpec` trước khi trả ra.
+## Đánh giá bản đọc (Lô 2.2)
+
+`compareRead(outcome, truth)` trả `ReadComparison`: `completeCorrect`, `graphCorrect`,
+`fullyFlagged`, `silentError`, `graphSilentError`, `coverage`, `extraFlags`, `differences`, `errorCounts`.
+Đồ thị được so theo nhãn đỉnh và multiset cạnh vô hướng, bỏ qua id/thứ tự.
+Khi `spec` bị chặn vì thiếu câu hỏi, `graphCorrect` vẫn dùng `outcome.graph`;
+`completeCorrect` luôn yêu cầu `spec !== null`. Theo review vòng 1, mỗi sai lệch được
+xếp đúng một mức `precise` (cờ đúng phần tử với candidate đúng), `coarse` (cờ/issue
+yêu cầu xem lại phần liên quan), hoặc `none`. Blocking câu hỏi không phủ lỗi đồ thị.
+`silentError` xét mọi sai lệch `none`; `graphSilentError` chỉ xét phần đồ thị.
+`fullyFlagged` là không có `none`; báo cáo chỉ đếm bài sai trong tỉ lệ gắn cờ đủ.
+Xem [CLI đánh giá](../../tools/eval/README.md).
