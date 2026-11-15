@@ -1,0 +1,590 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MathTwin · Wireframe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+<style>
+/* ===== TOKEN MATHTWIN — bản dựng chép nguyên khối này sang apps/mobile/src/tokens.css ===== */
+:root {
+  color-scheme: light;
+  /* FONT: một họ, Be Vietnam Pro (OFL, thiết kế cho tiếng Việt). Bản app tự đóng gói file font. */
+  --app-font: "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
+  /* MÀU NHẤN, nền sáng: xanh mực đêm */
+  --primary: #1f2d55;
+  --primary-hover: #34416a;
+  --primary-foreground: #ffffff;
+  --primary-light: rgb(31 45 85 / 0.06);
+  /* MÀU THƯƠNG HIỆU PHỤ: đồng hổ phách. Chỉ cho logo, đường đi tô trên đồ thị, điểm nhấn nhỏ — không cho nút. */
+  --brand-amber: #c8892b;
+  --brand-amber-soft: #f6ead6;
+  --background: #f5f2eb;   /* giấy ấm */
+  --surface: #fffdf9;
+  --foreground: #23242b;
+  --muted: #6b665c;
+  --border: #efe9de;
+  --border-strong: #e3dbcc;
+  --item-hover: #f5f2eb;
+  --secondary: #ece7dc;
+  --secondary-hover: #e2dccf;
+  --button-hover: #f1ede4;
+  --ring-focus: rgb(31 45 85 / 0.1);
+  --border-focus: var(--primary);
+  --elevation-popover: 0 10px 15px -3px rgb(35 30 20 / 0.1), 0 4px 6px -4px rgb(35 30 20 / 0.1);
+  --elevation-modal: 0 20px 25px -5px rgb(35 30 20 / 0.12), 0 8px 10px -6px rgb(35 30 20 / 0.1);
+  /* Bốn kết quả chấm = màu mang nghĩa */
+  --success-bg: #ecfdf5; --success: #007a55;          /* ĐÚNG */
+  --error-bg: #fef2f2; --error-strong: #c10007; --error: #fb2c36; --error-border: #ffc9c9; /* SAI */
+  --warning-bg: #fffbeb; --warning: #bb4d00;          /* CẦN XÁC NHẬN */
+  --neutral-bg: #f1eee7; --neutral: #52525c;          /* KHÔNG ĐỦ CĂN CỨ */
+  --radius: 12px;
+}
+/* Nấc Xám của wireframe: tắt màu nhấn và màu trạng thái */
+:root[data-mau="xam"] {
+  --primary: #2c2c2c; --primary-hover: #444; --primary-light: rgb(0 0 0 / 0.05); --ring-focus: rgb(0 0 0 / 0.08);
+  --brand-amber: #8a8a8a; --brand-amber-soft: #ececec;
+  --success-bg: #f1f1f1; --success: #444; --error-bg: #f1f1f1; --error-strong: #222; --error: #555; --error-border: #ccc;
+  --warning-bg: #f1f1f1; --warning: #444; --neutral-bg: #f1f1f1; --neutral: #555;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: var(--app-font); color: var(--foreground); background: #e9e6df; -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; }
+img { display: block; max-width: 100%; }
+
+/* ===== COMPONENT (tên class giữ nguyên khi dựng) ===== */
+.phone { width: 375px; min-height: 812px; margin: 24px auto; border-radius: 36px; overflow: hidden; background: var(--background);
+  box-shadow: 0 0 0 10px #1b1b1f, 0 30px 60px -20px rgb(0 0 0 / .35); position: relative; display: flex; flex-direction: column; }
+body[data-frame] .phone { margin: 0; border-radius: 0; box-shadow: none; }
+.status-bar { height: 36px; display: flex; align-items: center; justify-content: space-between; padding: 0 22px; font-size: 12px; font-weight: 600; }
+.screen { flex: 1; display: flex; flex-direction: column; }
+.content { padding: 8px 16px 24px; display: flex; flex-direction: column; gap: 16px; flex: 1; }
+.topbar { display: flex; align-items: center; gap: 8px; height: 52px; padding: 0 8px 0 4px; }
+.topbar h1 { font-size: 17px; font-weight: 600; margin: 0; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.icon-btn { width: 44px; height: 44px; display: grid; place-items: center; border: 0; background: transparent; border-radius: 12px; color: var(--foreground); cursor: pointer; }
+.icon-btn:hover { background: var(--button-hover); }
+.icon-btn svg { width: 22px; height: 22px; }
+.page-title { font-size: 20px; font-weight: 700; margin: 0; letter-spacing: -0.01em; }
+.section-title { font-size: 15px; font-weight: 600; margin: 0; }
+.muted { color: var(--muted); }
+.text-sm { font-size: 14px; line-height: 1.5; }
+.text-xs { font-size: 12px; line-height: 1.4; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 16px; }
+.btn { height: 48px; padding: 0 20px; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  font-size: 15px; font-weight: 600; cursor: pointer; border: 1px solid transparent; white-space: nowrap; }
+.btn svg { width: 20px; height: 20px; }
+.btn-primary { background: var(--primary); color: var(--primary-foreground); }
+.btn-primary:hover { background: var(--primary-hover); }
+.btn-outline { background: var(--surface); border-color: var(--border-strong); color: var(--foreground); }
+.btn-outline:hover { background: var(--button-hover); }
+.btn-ghost { background: transparent; color: var(--primary); padding: 0 8px; height: 40px; }
+.btn-block { width: 100%; }
+.btn-hero { height: 64px; border-radius: 20px; font-size: 17px; }
+.btn-hero svg { width: 24px; height: 24px; }
+.badge { display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.badge svg { width: 14px; height: 14px; }
+.v-ok { background: var(--success-bg); color: var(--success); }
+.v-wrong { background: var(--error-bg); color: var(--error-strong); }
+.v-confirm { background: var(--warning-bg); color: var(--warning); }
+.v-none { background: var(--neutral-bg); color: var(--neutral); }
+.chip { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 999px; background: var(--surface);
+  border: 1px solid var(--border-strong); font-size: 13px; font-weight: 500; white-space: nowrap; }
+.chip svg { width: 14px; height: 14px; }
+.chip-ready { color: var(--success); }
+.list { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+.list-row { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-top: 1px solid var(--border); cursor: pointer; }
+.list-row:first-child { border-top: 0; }
+.list-row:hover { background: var(--item-hover); }
+.row-icon { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; flex-shrink: 0; }
+.row-icon svg { width: 20px; height: 20px; }
+.row-main { flex: 1; min-width: 0; }
+.row-title { font-size: 15px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row-meta { font-size: 13px; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bottom-nav { height: 72px; display: grid; grid-template-columns: repeat(3, 1fr); background: var(--surface); border-top: 1px solid var(--border); padding-bottom: 8px; }
+.bottom-nav a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 12px; font-weight: 500; color: var(--muted); text-decoration: none; }
+.bottom-nav a svg { width: 22px; height: 22px; }
+.bottom-nav a[aria-current] { color: var(--primary); font-weight: 600; }
+.sticky-actions { position: sticky; bottom: 0; padding: 12px 16px 20px; background: linear-gradient(to top, var(--background) 75%, transparent); display: flex; gap: 12px; }
+.photo { position: relative; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); background: #fff; }
+.photo img { width: 100%; }
+.mark { position: absolute; border: 2.5px solid var(--error); border-radius: 10px; box-shadow: 0 0 0 4px rgb(251 44 54 / .14); }
+.mark-confirm { border-color: var(--warning); box-shadow: 0 0 0 4px rgb(187 77 0 / .14); }
+.mark-tag { position: absolute; transform: translateY(-100%); margin-top: -6px; background: var(--error-strong); color: #fff; font-size: 11px; font-weight: 600;
+  padding: 3px 8px; border-radius: 999px; white-space: nowrap; }
+.crop { height: 120px; background-repeat: no-repeat; border-radius: 12px; border: 1px solid var(--border); position: relative; }
+.verdict { display: flex; gap: 12px; align-items: flex-start; padding: 16px; border-radius: 16px; }
+.verdict-icon { width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; flex-shrink: 0; background: rgb(255 255 255 / .7); }
+.verdict-icon svg { width: 24px; height: 24px; }
+.verdict h2 { margin: 0; font-size: 20px; font-weight: 700; }
+.verdict p { margin: 4px 0 0; font-size: 14px; line-height: 1.5; }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 8px 12px; font-size: 14px; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; font-weight: 500; }
+.math { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+.strike-num { text-decoration: line-through; color: var(--error-strong); }
+.fix-num { color: var(--success); font-weight: 700; }
+.step-list { display: flex; flex-direction: column; }
+.step { display: grid; grid-template-columns: 28px 1fr; gap: 12px; padding: 12px 0; position: relative; }
+.step::before { content: ""; position: absolute; left: 13px; top: 40px; bottom: -12px; width: 2px; background: var(--border-strong); }
+.step:last-child::before { display: none; }
+.step-dot { width: 28px; height: 28px; border-radius: 999px; display: grid; place-items: center; font-size: 13px; font-weight: 700; z-index: 1; }
+.step-dot svg { width: 16px; height: 16px; }
+.step-ok .step-dot { background: var(--success-bg); color: var(--success); }
+.step-bad .step-dot { background: var(--error-strong); color: #fff; }
+.step-later { opacity: .45; }
+.step-later .step-dot { background: var(--secondary); color: var(--muted); }
+.step-text { font-size: 15px; line-height: 1.5; }
+.step-bad .step-text { font-weight: 600; }
+.question-card { display: flex; flex-direction: column; gap: 12px; }
+.options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.option { height: 72px; border-radius: 16px; border: 1.5px solid var(--border-strong); background: var(--surface); font-size: 28px; font-weight: 700; cursor: pointer; }
+.option[aria-pressed="true"] { border-color: var(--border-focus); box-shadow: 0 0 0 3px var(--ring-focus); }
+.progress-dots { display: flex; gap: 6px; }
+.progress-dots i { flex: 1; height: 4px; border-radius: 4px; background: var(--secondary); }
+.progress-dots i.on { background: var(--primary); }
+.graph-svg line, .graph-svg path { stroke: var(--foreground); stroke-width: 2; fill: none; }
+.graph-svg .hl { stroke: var(--brand-amber); stroke-width: 4; }
+.graph-svg .unsure { stroke: var(--warning); stroke-width: 3; stroke-dasharray: 6 5; }
+.graph-svg circle { fill: var(--surface); stroke: var(--foreground); stroke-width: 2; }
+.graph-svg text { font: 600 14px var(--app-font); fill: var(--foreground); text-anchor: middle; dominant-baseline: central; }
+.graph-svg .w { font-size: 12px; fill: var(--muted); }
+.graph-svg .w-unsure { fill: var(--warning); font-weight: 700; }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; background: var(--surface); border-radius: 24px 24px 0 0; box-shadow: var(--elevation-modal);
+  padding: 8px 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+.sheet-handle { width: 40px; height: 4px; border-radius: 4px; background: var(--border-strong); margin: 4px auto 4px; }
+.skeleton { background: linear-gradient(90deg, var(--secondary) 0%, #f3efe7 50%, var(--secondary) 100%); background-size: 200% 100%; animation: sk 1.4s infinite; border-radius: 8px; }
+@keyframes sk { to { background-position: -200% 0; } }
+.stage { display: flex; align-items: center; gap: 12px; font-size: 14px; padding: 10px 0; }
+.stage svg { width: 20px; height: 20px; }
+.stage-done { color: var(--success); }
+.stage-now { font-weight: 600; }
+.stage-wait { color: var(--muted); }
+.bar { height: 6px; border-radius: 6px; background: var(--secondary); overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--primary); border-radius: 6px; }
+.empty { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; padding: 32px 16px; }
+.empty-icon { width: 56px; height: 56px; border-radius: 18px; display: grid; place-items: center; background: var(--secondary); color: var(--muted); }
+.banner { display: flex; gap: 12px; padding: 14px 16px; border-radius: 14px; font-size: 14px; line-height: 1.5; }
+.banner svg { width: 20px; height: 20px; flex-shrink: 0; margin-top: 1px; }
+.banner-error { background: var(--error-bg); color: var(--error-strong); border: 1px solid var(--error-border); }
+.banner-info { background: var(--primary-light); color: var(--primary); }
+.hero-card { background: var(--primary); color: var(--primary-foreground); border-radius: 24px; padding: 20px; display: flex; flex-direction: column; gap: 16px; position: relative; overflow: hidden; }
+.hero-card .btn { background: var(--surface); color: var(--primary); }
+.hero-card p { margin: 0; font-size: 14px; opacity: .85; line-height: 1.5; }
+.hero-card h2 { margin: 0; font-size: 22px; font-weight: 700; line-height: 1.3; }
+.hero-deco { position: absolute; right: -18px; top: -18px; opacity: .22; }
+.fab { position: absolute; right: 16px; bottom: 88px; height: 56px; padding: 0 20px; border-radius: 18px; box-shadow: var(--elevation-popover); }
+.seg { display: flex; padding: 3px; gap: 2px; background: var(--secondary); border-radius: 12px; }
+.seg button { flex: 1; height: 36px; border: 0; border-radius: 9px; background: transparent; font-size: 14px; font-weight: 500; color: var(--muted); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--foreground); box-shadow: 0 1px 2px rgb(0 0 0 / .08); }
+
+/* ===== BẢNG THƯƠNG HIỆU ===== */
+.brand-board { max-width: 1040px; margin: 24px auto 48px; padding: 0 16px; display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); }
+.brand-board .card { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.brand-board h3 { margin: 0; font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.wide { grid-column: 1 / -1; }
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+.sw { border-radius: 14px; overflow: hidden; border: 1px solid var(--border); background: var(--surface); }
+.sw i { display: block; height: 64px; }
+.sw div { padding: 8px 10px; font-size: 12px; line-height: 1.4; }
+.sw b { display: block; font-size: 13px; }
+.wordmark { font-weight: 700; font-size: 34px; letter-spacing: -0.03em; color: var(--primary); display: flex; align-items: center; gap: 12px; }
+.wordmark span { color: var(--brand-amber); }
+.tagline { font-size: 15px; color: var(--muted); }
+
+/* ===== THANH WIREFRAME (không thuộc bản thiết kế) ===== */
+.wf-bar { position: relative; z-index: 50; display: flex; align-items: center; gap: 24px; height: 56px; padding: 0 16px; overflow-x: auto; white-space: nowrap; background: #fff; border-bottom: 1px solid #e5e5e5; color: #737373; font: 14px/1 system-ui, -apple-system, sans-serif; }
+.wf-group { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.wf-set { display: flex; align-items: center; gap: 2px; flex-shrink: 0; padding: 3px; border-radius: 10px; background: #f4f4f5; }
+.wf-set a { position: relative; display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px; border-radius: 7px; color: #737373; text-decoration: none; }
+.wf-set a:hover { color: #171717; }
+.wf-set a[aria-current="page"] { background: #fff; color: #171717; font-weight: 500; box-shadow: 0 1px 2px rgb(0 0 0 / .08), 0 0 0 1px rgb(0 0 0 / .04); }
+[data-wf-param="v"] a { justify-content: center; min-width: 32px; padding: 0 10px; }
+[data-wf-param="v"] a[data-recommended]::after { content: ""; position: absolute; top: 5px; right: 5px; width: 5px; height: 5px; border-radius: 50%; background: #1f2d55; }
+.wf-switch { display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0; color: #737373; text-decoration: none; }
+.wf-switch i { position: relative; width: 36px; height: 20px; border-radius: 10px; background: #e4e4e7; }
+.wf-switch i::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgb(0 0 0 / .2); }
+.wf-switch[aria-checked="true"] i { background: #171717; }
+.wf-switch[aria-checked="true"] i::after { translate: 16px 0; }
+.wf-menu { flex-shrink: 0; }
+.wf-menu summary { display: flex; align-items: center; gap: 6px; height: 36px; padding: 0 10px; border-radius: 8px; cursor: pointer; list-style: none; }
+.wf-menu summary::-webkit-details-marker { display: none; }
+.wf-menu summary:hover, .wf-menu[open] summary { background: #f4f4f5; }
+.wf-menu b { color: #171717; font-weight: 500; }
+.wf-menu svg { width: 16px; height: 16px; }
+.wf-popover { position: fixed; z-index: 60; display: grid; min-width: 168px; padding: 4px; background: #fff; border: 1px solid #e5e5e5; border-radius: 10px; box-shadow: 0 8px 24px rgb(0 0 0 / .08); }
+.wf-popover a { display: flex; align-items: center; height: 34px; padding: 0 10px; border-radius: 6px; color: #404040; text-decoration: none; }
+.wf-popover a:hover, .wf-popover a[aria-current="page"] { background: #f4f4f5; color: #171717; }
+.wf-reason { border-bottom: 1px solid #e5e5e5; background: #fafafa; color: #404040; font: 13px/1.5 system-ui, -apple-system, sans-serif; }
+.wf-reason summary { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; min-height: 44px; padding: 8px 16px; cursor: pointer; list-style: none; }
+.wf-reason summary::-webkit-details-marker { display: none; }
+.wf-reason-name { color: #171717; font-weight: 600; white-space: nowrap; }
+.wf-reason-tag { flex-shrink: 0; height: 20px; padding: 0 8px; border-radius: 10px; background: #eef0f6; color: #1f2d55; font-size: 12px; font-weight: 500; line-height: 20px; }
+.wf-reason-why { flex: 1; min-width: 0; overflow: hidden; color: #525252; text-overflow: ellipsis; white-space: nowrap; }
+.wf-reason[open] .wf-reason-why { white-space: normal; }
+.wf-reason-toggle { display: inline-flex; flex-shrink: 0; align-items: center; gap: 4px; height: 28px; margin-left: auto; padding: 0 8px; border-radius: 6px; color: #171717; font-weight: 500; }
+.wf-reason-toggle svg { width: 16px; height: 16px; }
+.wf-reason-body { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 4px 16px 16px; }
+.wf-reason-cols { display: grid; max-width: 1120px; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 16px 32px; }
+.wf-reason h3 { display: flex; align-items: center; gap: 6px; margin: 0 0 4px; color: #171717; font-size: 12px; font-weight: 600; }
+.wf-reason h3 i { width: 6px; height: 6px; border-radius: 50%; background: #a3a3a3; }
+.wf-reason h3 i[data-tone="uu"] { background: #16a34a; }
+.wf-reason h3 i[data-tone="nhuoc"] { background: #d97706; }
+.wf-reason ul { display: grid; gap: 2px; margin: 0; padding-left: 16px; }
+.wf-reason p { margin: 0; }
+.wf-reason-tips { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-top: 12px; border-top: 1px solid #ebebeb; }
+.wf-reason-tips h3 { margin: 0 4px 0 0; }
+.wf-reason-tips button { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border: 1px solid #e5e5e5; border-radius: 8px; background: #fff; color: #262626; font: inherit; white-space: nowrap; cursor: pointer; }
+.wf-reason-tips button[data-copied] { color: #16a34a; }
+@media (max-width: 767px) { .wf-reason-why { order: 1; flex-basis: 100%; } .wf-reason-toggle span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); } }
+[data-wf-block] { position: relative; }
+[data-wf-block]::before { content: attr(data-wf-block); position: absolute; top: 4px; left: 4px; z-index: 5; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 9px; background: #1f1f1f; color: #fff; font: 11px system-ui; }
+[data-wf-block][data-wf-block-out]::before { top: auto; bottom: 100%; }
+body[data-frame] .wf-bar, body[data-frame] .wf-reason { display: none; }
+@media (max-width: 420px) { .phone { margin: 0 auto; border-radius: 0; box-shadow: none; } }
+</style>
+</head>
+<body>
+<nav class="wf-bar" aria-label="Wireframe">
+  <span class="wf-set" data-wf-param="man">
+    <a data-value="thuong-hieu">Thương hiệu</a><a data-value="trang-chu">Trang chủ</a><a data-value="xac-nhan">Xác nhận đề</a><a data-value="ket-qua">Kết quả</a>
+  </span>
+  <div class="wf-group" data-wf-options>
+    <span class="wf-label">Phương án</span>
+    <span class="wf-set" data-wf-param="v"></span>
+  </div>
+  <a class="wf-switch" data-wf-toggle="mau" data-on="mau" data-off="xam" role="switch">Màu <i></i></a>
+  <details class="wf-menu" data-wf-state>
+    <summary><span>Trạng thái:</span><b data-wf-current="tt"></b><i data-lucide="chevron-down"></i></summary>
+    <div class="wf-popover" data-wf-param="tt"><a data-value="du-lieu">Có dữ liệu</a><a data-value="dang-tai">Đang tải</a><a data-value="rong">Rỗng</a><a data-value="loi">Lỗi</a></div>
+  </details>
+</nav>
+<details class="wf-reason" data-wf-reason></details>
+<main id="wf-design"></main>
+
+<script>
+const params = new URLSearchParams(location.search);
+const OPTIONS = {
+  "thuong-hieu": [],
+  "trang-chu": [
+    { v: "a", name: "A · Nút chụp là nhân vật chính", rec: true,
+      why: "Học sinh mở app để chấm một bài, nên nút Chụp bài chiếm khối to nhất, trong vùng ngón cái.",
+      pros: ["Một chạm là vào việc chính", "Trạng thái model (sẵn sàng / chưa tải) nằm ngay trên nút, không phải đoán", "Lịch sử gần đây vừa đủ 3 dòng"],
+      cons: ["Màn trống trải khi chưa có lịch sử"], when: "App mở chủ yếu để chấm bài mới." },
+    { v: "b", name: "B · Lịch sử trước, nút chụp nổi",
+      why: "Danh sách bài đã chấm chiếm màn, nút chụp nổi ở góc dưới.",
+      pros: ["Giáo viên chấm nhiều bài liên tiếp thấy ngay cả loạt", "Lọc theo kết quả để xem lại bài sai"],
+      cons: ["Học sinh lần đầu vào thấy màn rỗng, nút chụp nhỏ hơn", "Nút nổi che dòng cuối danh sách"], when: "Người dùng chính là giáo viên chấm nhiều bài." },
+  ],
+  "xac-nhan": [
+    { v: "a", name: "A · Ảnh trên, đồ thị dưới",
+      why: "Đặt ảnh gốc và đồ thị máy đọc chồng lên nhau để người dùng tự dò.",
+      pros: ["Thấy toàn bộ đồ thị đã đọc cùng lúc", "Hợp khi muốn sửa nhiều chỗ"],
+      cons: ["Màn 375px chia đôi thì cả ảnh lẫn đồ thị đều nhỏ", "Người dùng phải tự tìm chỗ khác nhau"], when: "Đồ thị nhỏ, ít chỗ chưa chắc." },
+    { v: "b", name: "B · Hỏi từng chỗ một", rec: true,
+      why: "Máy chỉ hỏi đúng chỗ chưa chắc, kèm ảnh phóng to vùng đó; trả lời bằng một chạm.",
+      pros: ["Đúng quy tắc 'không chắc thì hỏi lại đúng chỗ'", "Ảnh cắt phóng to đọc được nét viết tay", "Nút to vừa ngón cái"],
+      cons: ["Không thấy cả đồ thị cùng lúc (có nút xem)", "Nhiều chỗ chưa chắc thì nhiều lượt hỏi"], when: "Điện thoại, đọc viết tay hay có 1–3 chỗ chưa chắc." },
+  ],
+  "ket-qua": [
+    { v: "a", name: "A · Kết luận + khoanh trên ảnh", rec: true,
+      why: "Người dùng đến để biết đúng hay sai và sai ở đâu: kết luận đứng đầu, khoanh đỏ ngay trên ảnh bài làm của chính họ.",
+      pros: ["Thấy chỗ sai trên nét chữ của mình, không phải đọc lại", "Con số đúng đặt cạnh con số sai", "Nút Xem lời giải luôn dưới ngón cái"],
+      cons: ["Ảnh dài phải cuộn; ảnh cắt chỉ hiện vùng quanh bước sai"], when: "Mặc định cho mọi kết quả SAI." },
+    { v: "b", name: "B · Chuỗi bước như dòng thời gian",
+      why: "Đi lại từng bước học sinh đã viết: đúng, đúng, sai — các bước sau mờ đi.",
+      pros: ["Thấy rõ 'đến đâu thì sai'", "Hợp bài dài nhiều bước (Dijkstra, Euler)"],
+      cons: ["Không thấy nét chữ gốc nếu không bấm", "Bước bị đọc nhầm khó nhận ra"], when: "Bài nhiều bước, chữ đã đọc chắc." },
+    { v: "c", name: "C · Ảnh toàn màn + tấm kéo",
+      why: "Ảnh bài làm chiếm cả màn, kết luận nằm trong tấm kéo lên từ đáy như app bản đồ.",
+      pros: ["Ảnh to nhất, phóng to tự do", "Cảm giác 'soi bài' cao cấp"],
+      cons: ["Kết luận nằm thấp, dễ bị che", "Tấm kéo là thao tác học sinh phải học"], when: "Giáo viên muốn soi kỹ bài viết tay." },
+    { v: "d", name: "D · A gọn chữ",
+      why: "Như A, mỗi khối chỉ giữ thứ dùng để hiểu chỗ sai: bước, con số đúng, một câu vì sao.",
+      pros: ["Đọc trong 3 giây"], cons: ["Bỏ phần 'loại lỗi' sang lời giải"], when: "Học sinh chỉ cần biết sửa số nào." },
+    { v: "e", name: "E · A bỏ lặp",
+      why: "Như A, bỏ tiêu đề lặp: kết luận không nhắc lại bước sai mà khối dưới đã nói.",
+      pros: ["Mỗi thông tin một chỗ"], cons: ["Kết luận ngắn hơn, kém tự đứng một mình khi chia sẻ ảnh màn"], when: "Màn ngắn, ít cuộn." },
+  ],
+};
+const TIPS = { "thuong-hieu": ["Màu mực đậm hơn", "Thử nhấn xanh lục bảo", "Logo đơn giản hơn"],
+  "trang-chu": ["Bỏ khối 3", "Nút chụp to hơn nữa", "Thêm lời chào theo giờ"],
+  "xac-nhan": ["Ảnh cắt to hơn", "Thêm nút 'Đúng hết rồi'", "Bỏ khối 4"],
+  "ket-qua": ["Đưa khối 3 lên trên khối 2", "Kết luận nhỏ lại", "Thoáng hơn giữa các khối"] };
+
+const man = params.get("man") || "ket-qua";
+const opts = OPTIONS[man];
+const recommended = (opts.find(o => o.rec) || opts[0] || { v: "" }).v;
+const state = { man, v: params.get("v") || recommended, mau: params.get("mau") || "xam", tt: params.get("tt") || "du-lieu" };
+if (opts.length && !opts.some(o => o.v === state.v)) state.v = recommended;
+document.documentElement.dataset.mau = man === "thuong-hieu" ? "mau" : state.mau;
+if (params.has("frame")) document.body.dataset.frame = "1";
+
+// Thanh công cụ
+const vSet = document.querySelector('[data-wf-param="v"]');
+vSet.innerHTML = opts.map(o => `<a data-value="${o.v}" title="${o.name}${o.rec ? " (khuyên dùng)" : ""}" ${o.rec ? "data-recommended" : ""}>${o.v.toUpperCase()}</a>`).join("");
+if (!opts.length) { document.querySelector("[data-wf-options]").style.display = "none"; document.querySelector(".wf-switch").style.display = "none"; document.querySelector("[data-wf-state]").style.display = "none"; }
+for (const set of document.querySelectorAll("[data-wf-param]")) {
+  const key = set.dataset.wfParam;
+  for (const link of set.querySelectorAll("a")) {
+    const next = { ...state, [key]: link.dataset.value };
+    if (key === "man") next.v = "";
+    link.href = `?${new URLSearchParams(Object.entries(next).filter(([, v]) => v))}`;
+    if (state[key] === link.dataset.value) {
+      link.setAttribute("aria-current", "page");
+      const cur = document.querySelector(`[data-wf-current="${key}"]`); if (cur) cur.textContent = link.textContent;
+    }
+  }
+}
+const toggle = document.querySelector("[data-wf-toggle]");
+const on = state.mau === "mau";
+toggle.setAttribute("aria-checked", String(on));
+toggle.href = `?${new URLSearchParams({ ...state, mau: on ? "xam" : "mau" })}`;
+const menu = document.querySelector(".wf-menu");
+menu.addEventListener("toggle", () => { const r = menu.querySelector("summary").getBoundingClientRect(); Object.assign(menu.querySelector(".wf-popover").style, { top: `${r.bottom + 6}px`, left: `${r.left}px` }); });
+document.addEventListener("click", e => { if (!menu.contains(e.target)) menu.open = false; });
+document.addEventListener("keydown", e => { if (e.key === "Escape") menu.open = false; });
+
+// Khung lý do
+const opt = opts.find(o => o.v === state.v);
+const reason = document.querySelector("[data-wf-reason]");
+if (opt) {
+  reason.innerHTML = `<summary><span class="wf-reason-name">${opt.name}</span>${opt.rec ? '<span class="wf-reason-tag">Khuyên dùng</span>' : ""}
+    <span class="wf-reason-why">${opt.why}</span><span class="wf-reason-toggle"><span>Ưu, nhược</span><i data-lucide="chevron-down"></i></span></summary>
+    <div class="wf-reason-body"><div class="wf-reason-cols">
+      <section><h3><i data-tone="uu"></i>Ưu</h3><ul>${opt.pros.map(p => `<li>${p}</li>`).join("")}</ul></section>
+      <section><h3><i data-tone="nhuoc"></i>Nhược</h3><ul>${opt.cons.map(p => `<li>${p}</li>`).join("")}</ul></section>
+      <section><h3><i></i>Hợp khi</h3><p>${opt.when}</p></section></div>
+      <div class="wf-reason-tips"><h3>Gợi ý góp ý</h3>${TIPS[man].map(t => `<button type="button" data-copy="${t}">${t}</button>`).join("")}</div></div>`;
+} else {
+  reason.innerHTML = `<summary><span class="wf-reason-name">Bộ nhận diện MathTwin · hướng "Mực & giấy"</span><span class="wf-reason-why">Nền giấy ấm, xanh mực đêm cho mọi thứ bấm được, đồng hổ phách chỉ cho logo và đường đi tô trên đồ thị.</span>
+    <span class="wf-reason-toggle"><span>Góp ý</span><i data-lucide="chevron-down"></i></span></summary>
+    <div class="wf-reason-body"><div class="wf-reason-tips"><h3>Gợi ý góp ý</h3>${TIPS[man].map(t => `<button type="button" data-copy="${t}">${t}</button>`).join("")}</div></div>`;
+}
+for (const b of document.querySelectorAll("[data-copy]")) b.addEventListener("click", async () => { try { await navigator.clipboard.writeText(b.dataset.copy); } catch {} b.setAttribute("data-copied", ""); setTimeout(() => b.removeAttribute("data-copied"), 1500); });
+
+// ====== NỘI DUNG ======
+const LOGO = (size = 40, ink = "var(--primary)", amber = "var(--brand-amber)", paper = "var(--surface)") => `
+<svg width="${size}" height="${size}" viewBox="0 0 48 48" aria-hidden="true">
+  <path d="M14 30 C 20 14, 28 14, 34 30" stroke="${ink}" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+  <path d="M14 30 L 34 30" stroke="${amber}" stroke-width="3.2" stroke-linecap="round"/>
+  <circle cx="14" cy="30" r="7" fill="${ink}"/><circle cx="34" cy="30" r="7" fill="${paper}" stroke="${ink}" stroke-width="3.2"/>
+  <circle cx="34" cy="30" r="2.6" fill="${amber}"/>
+</svg>`;
+const statusBar = `<div class="status-bar"><span>9:41</span><span style="display:flex;gap:6px;align-items:center"><i data-lucide="wifi-off" style="width:14px;height:14px"></i><i data-lucide="battery-full" style="width:18px;height:18px"></i></span></div>`;
+const phone = inner => `<div class="phone">${statusBar}<div class="screen">${inner}</div></div>`;
+const nav = active => `<nav class="bottom-nav" data-wf-block="9">
+  <a ${active === "home" ? 'aria-current="page"' : ""}><i data-lucide="camera"></i>Chấm bài</a>
+  <a ${active === "history" ? 'aria-current="page"' : ""}><i data-lucide="history"></i>Lịch sử</a>
+  <a ${active === "settings" ? 'aria-current="page"' : ""}><i data-lucide="settings-2"></i>Cài đặt</a></nav>`;
+const HISTORY = [
+  { icon: "circle-x", cls: "v-wrong", label: "SAI", title: "Người đưa thư · xuất phát từ A", meta: "Bước 4 · sai phép cộng · 14:20 hôm nay" },
+  { icon: "circle-check", cls: "v-ok", label: "ĐÚNG", title: "Dijkstra · đường ngắn nhất A → E", meta: "Hôm qua, 20:05" },
+  { icon: "circle-help", cls: "v-confirm", label: "CẦN XÁC NHẬN", title: "Chu trình Hamilton trên đồ thị 7 đỉnh có hai cạnh song song", meta: "12/11 · còn 1 chỗ chờ bạn trả lời" },
+  { icon: "file-question", cls: "v-none", label: "THIẾU", title: "Người du lịch · láng giềng gần nhất", meta: "10/11 · thiếu trang 2 của bài làm" },
+];
+const historyRows = (rows) => `<div class="list">${rows.map(r => `<div class="list-row">
+  <div class="row-icon ${r.cls}"><i data-lucide="${r.icon}"></i></div>
+  <div class="row-main"><div class="row-title">${r.title}</div><div class="row-meta">${r.meta}</div></div>
+  <span class="badge ${r.cls}">${r.label}</span></div>`).join("")}</div>`;
+
+const PHOTO_BOX = { left: 6.2, top: 69.6, width: 19.5, height: 3.4 };
+function photoWithMark(extra = "") {
+  return `<div class="photo"><img src="bai-lam.png" alt="Ảnh bài làm viết tay" />
+    <div class="mark" style="left:${PHOTO_BOX.left}%;top:${PHOTO_BOX.top}%;width:${PHOTO_BOX.width}%;height:${PHOTO_BOX.height}%"></div>
+    <div class="mark-tag" style="left:${PHOTO_BOX.left}%;top:${PHOTO_BOX.top}%">Bước sai đầu tiên</div>${extra}</div>`;
+}
+function crop(xPct, yPct, zoom, h = 120, markStyle = "") {
+  return `<div class="crop" style="height:${h}px;background-image:url(bai-lam.png);background-size:${zoom}% auto;background-position:${xPct}% ${yPct}%">${markStyle}</div>`;
+}
+const graph = ({ highlight = false, unsure = false, size = 220 } = {}) => `
+<svg class="graph-svg" viewBox="0 0 220 200" width="100%" style="max-width:${size}px;display:block;margin:auto">
+  <line x1="110" y1="22" x2="30" y2="100"/><line x1="110" y1="22" x2="190" y2="100" class="${highlight ? "hl" : ""}"/>
+  <line x1="110" y1="22" x2="110" y2="178"/><line x1="30" y1="100" x2="190" y2="100"/>
+  <line x1="30" y1="100" x2="110" y2="178" class="${highlight ? "hl" : ""}"/><line x1="190" y1="100" x2="110" y2="178" class="${unsure ? "unsure" : ""}"/>
+  <text class="w" x="62" y="52">1</text><text class="w" x="158" y="52">1</text><text class="w" x="120" y="70">1</text><text class="w" x="150" y="92">1</text>
+  <text class="w" x="62" y="148">1</text><text class="w ${unsure ? "w-unsure" : ""}" x="${unsure ? 162 : 158}" y="148">${unsure ? "1 ?" : "1"}</text>
+  <circle cx="110" cy="22" r="14"/><text x="110" y="22">A</text><circle cx="30" cy="100" r="14"/><text x="30" y="100">D</text>
+  <circle cx="190" cy="100" r="14"/><text x="190" y="100">B</text><circle cx="110" cy="178" r="14"/><text x="110" y="178">C</text>
+</svg>`;
+
+const LOADING = (title) => phone(`<div class="topbar"><button class="icon-btn" aria-label="Huỷ"><i data-lucide="x"></i></button><h1>${title}</h1></div>
+  <div class="content">
+    <div class="card" data-wf-block="1" style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline"><span class="section-title">Đang chấm trên máy</span><span class="text-sm muted math">38 giây</span></div>
+      <div class="bar"><i style="width:55%"></i></div>
+      <div>
+        <div class="stage stage-done"><i data-lucide="circle-check"></i>Đọc đề và đồ thị</div>
+        <div class="stage stage-now"><i data-lucide="loader-circle"></i>Đọc bài làm viết tay · trang 1/1</div>
+        <div class="stage stage-wait"><i data-lucide="circle-dashed"></i>Chấm từng bước</div>
+      </div>
+      <p class="text-xs muted" style="margin:0">Mọi thứ chạy ngay trên điện thoại, ảnh không gửi đi đâu. Máy tầm trung mất khoảng 30–70 giây.</p>
+    </div>
+    <div class="skeleton" style="height:180px;border-radius:16px" data-wf-block="2"></div>
+  </div>`);
+
+function renderHome(v, tt) {
+  const ready = tt !== "loi";
+  const modelChip = ready ? `<span class="chip chip-ready"><i data-lucide="shield-check"></i>Sẵn sàng · không cần mạng</span>`
+    : `<span class="chip" style="color:var(--warning)"><i data-lucide="download"></i>Chưa tải bộ đọc bài</span>`;
+  const header = `<div class="topbar" style="padding:0 12px 0 16px" data-wf-block="1"><div style="display:flex;align-items:center;gap:8px;flex:1">${LOGO(30)}<span style="font-weight:700;font-size:18px;letter-spacing:-.02em;color:var(--primary)">Math<span style="color:var(--brand-amber)">Twin</span></span></div></div>`;
+  if (tt === "dang-tai") return LOADING("Bài người đưa thư");
+  const rows = tt === "rong" ? "" : historyRows(HISTORY.slice(0, 3));
+  const emptyHist = `<div class="card empty"><div class="empty-icon"><i data-lucide="notebook-pen"></i></div><div class="section-title">Chưa chấm bài nào</div><p class="text-sm muted" style="margin:0">Chụp đề và bài làm viết tay, MathTwin chỉ ra bước sai đầu tiên.</p></div>`;
+  if (v === "a") {
+    return phone(`${header}<div class="content">
+      <div class="hero-card" data-wf-block="2"><div class="hero-deco">${LOGO(140, "#fff", "#fff", "transparent")}</div>
+        <div>${modelChip.replace('class="chip', 'class="chip" style="background:rgb(255 255 255 / .12);border-color:rgb(255 255 255 / .2);color:#fff" data-x="')}</div>
+        <div><h2>Chụp bài, biết ngay sai ở bước nào</h2><p style="margin-top:6px">Đề + bài làm viết tay. Chấm theo đúng cách bạn giải.</p></div>
+        <button class="btn btn-hero btn-block" ${ready ? "" : "disabled style='opacity:.6'"}><i data-lucide="camera"></i>Chụp bài</button>
+        ${ready ? "" : `<button class="btn btn-block" style="background:rgb(255 255 255 / .12);color:#fff;height:44px">Tải bộ đọc bài · 1,8 GB</button>`}
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between" data-wf-block="3"><span class="section-title">Gần đây</span>${tt === "rong" ? "" : '<button class="btn btn-ghost">Xem tất cả</button>'}</div>
+      ${tt === "rong" ? emptyHist : rows}
+      <button class="btn btn-outline btn-block" data-wf-block="4"><i data-lucide="pencil-ruler"></i>Nhập đề bằng tay</button>
+    </div>${nav("home")}`);
+  }
+  return phone(`${header}<div class="content" style="padding-bottom:96px">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap" data-wf-block="2">${modelChip}</div>
+    <div class="seg" data-wf-block="3"><button aria-pressed="true">Tất cả</button><button>Sai</button><button>Chờ trả lời</button></div>
+    ${tt === "rong" ? emptyHist : historyRows(HISTORY)}
+  </div><button class="btn btn-primary fab" data-wf-block="4"><i data-lucide="camera"></i>Chụp bài</button>${nav("home")}`);
+}
+
+function renderConfirm(v, tt) {
+  const top = `<div class="topbar"><button class="icon-btn" aria-label="Quay lại"><i data-lucide="chevron-left"></i></button><h1>Kiểm tra đề máy đã đọc</h1></div>`;
+  if (tt === "dang-tai") return LOADING("Đang đọc đề");
+  if (tt === "loi") return phone(`${top}<div class="content"><div class="banner banner-error" data-wf-block="1"><i data-lucide="image-off"></i><div><b>Ảnh bị mờ ở vùng hình vẽ.</b><br/>Máy không đọc chắc được trọng số các cạnh. Chụp lại gần hơn, đủ sáng, hoặc nhập đồ thị bằng tay.</div></div>
+    <div class="photo" data-wf-block="2" style="filter:blur(1.5px)"><img src="bai-lam.png" alt="" /></div></div>
+    <div class="sticky-actions"><button class="btn btn-outline" style="flex:1">Nhập tay</button><button class="btn btn-primary" style="flex:1"><i data-lucide="camera"></i>Chụp lại</button></div>`);
+  if (tt === "rong") return phone(`${top}<div class="content"><div class="card empty" data-wf-block="1"><div class="empty-icon" style="background:var(--success-bg);color:var(--success)"><i data-lucide="circle-check-big"></i></div><div class="section-title">Máy đọc chắc mọi chỗ</div><p class="text-sm muted" style="margin:0">4 đỉnh, 6 cạnh, mọi trọng số đều rõ. Vẫn có thể xem lại trước khi chấm.</p></div>
+    <div class="card" data-wf-block="2">${graph()}</div></div>
+    <div class="sticky-actions"><button class="btn btn-outline" style="flex:1">Sửa</button><button class="btn btn-primary" style="flex:2">Chấm bài<i data-lucide="arrow-right"></i></button></div>`);
+  if (v === "a") {
+    return phone(`${top}<div class="content">
+      <div class="photo" data-wf-block="1" style="max-height:230px"><img src="bai-lam.png" alt="Ảnh đề" style="margin-top:-20%"/>
+        <div class="mark mark-confirm" style="left:62%;top:51%;width:9%;height:6%"></div></div>
+      <div class="card" data-wf-block="2"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span class="section-title">Máy đọc được</span><span class="text-xs muted">4 đỉnh · 6 cạnh</span></div>${graph({ unsure: true, size: 200 })}</div>
+      <div class="card" data-wf-block="3" style="display:flex;flex-direction:column;gap:10px">
+        <div class="text-sm"><b>Cạnh B–C</b> có trọng số <b class="math">1</b> hay <b class="math">7</b>?</div>
+        <div style="display:flex;gap:8px"><button class="btn btn-outline" style="flex:1">1</button><button class="btn btn-outline" style="flex:1">7</button><button class="btn btn-outline" style="flex:1"><i data-lucide="pencil"></i>Khác</button></div>
+      </div></div>
+      <div class="sticky-actions"><button class="btn btn-primary btn-block">Xác nhận và chấm</button></div>`);
+  }
+  return phone(`${top}<div class="content">
+    <div data-wf-block="1" style="display:flex;flex-direction:column;gap:8px"><div class="text-sm muted">Chỗ chưa chắc 1 / 2</div><div class="progress-dots"><i class="on"></i><i></i></div></div>
+    <div class="card question-card" data-wf-block="2">
+      <div class="section-title" style="font-size:17px">Trọng số cạnh B–C là bao nhiêu?</div>
+      ${crop(72, 41, 330, 150, `<div class="mark mark-confirm" style="left:40%;top:30%;width:22%;height:40%"></div>`)}
+      <p class="text-xs muted" style="margin:0">Nét số này giống cả 1 lẫn 7. Chọn đúng số bạn đã chép từ đề.</p>
+      <div class="options"><button class="option math" aria-pressed="true">1</button><button class="option math">7</button></div>
+      <button class="btn btn-ghost" style="align-self:center"><i data-lucide="pencil"></i>Số khác</button>
+    </div>
+    <details class="card" data-wf-block="3"><summary class="text-sm" style="cursor:pointer;font-weight:500">Xem cả đồ thị máy đã đọc</summary><div style="margin-top:12px">${graph({ unsure: true, size: 200 })}</div></details>
+  </div>
+  <div class="sticky-actions"><button class="btn btn-outline" style="flex:1">Bỏ qua</button><button class="btn btn-primary" style="flex:2">Tiếp<i data-lucide="arrow-right"></i></button></div>`);
+}
+
+function renderResult(v, tt) {
+  const top = `<div class="topbar"><button class="icon-btn" aria-label="Quay lại"><i data-lucide="chevron-left"></i></button><h1>Người đưa thư · từ A</h1><button class="icon-btn" aria-label="Chấm lại"><i data-lucide="rotate-ccw"></i></button></div>`;
+  if (tt === "dang-tai") return LOADING("Người đưa thư · từ A");
+  if (tt === "loi") return phone(`${top}<div class="content">
+    <div class="verdict v-none" data-wf-block="1"><div class="verdict-icon"><i data-lucide="file-question"></i></div><div><h2>Chưa đủ căn cứ để chấm</h2><p>Ảnh chỉ có đáp số, không thấy các bước giải. Chụp thêm trang có lời giải, hoặc nhập các bước bằng tay.</p></div></div>
+    <div class="photo" data-wf-block="2" style="max-height:260px"><img src="bai-lam.png" alt="" style="margin-top:-58%"/></div></div>
+    <div class="sticky-actions"><button class="btn btn-outline" style="flex:1">Nhập tay</button><button class="btn btn-primary" style="flex:1"><i data-lucide="camera"></i>Chụp thêm trang</button></div>`);
+  if (tt === "rong") return phone(`${top}<div class="content">
+    <div class="verdict v-ok" data-wf-block="1"><div class="verdict-icon"><i data-lucide="circle-check-big"></i></div><div><h2>Đúng</h2><p>Mọi bước hợp lệ. Hành trình ngắn nhất dài <b class="math">8</b>.</p></div></div>
+    <div class="card" data-wf-block="2"><div class="section-title" style="margin-bottom:8px">Lưu ý của dạng bài</div><p class="text-sm" style="margin:0">Khi cả 4 đỉnh đều bậc lẻ, phải thử đủ 3 cách ghép cặp và lấy cách có tổng nhỏ nhất.</p></div></div>
+    <div class="sticky-actions"><button class="btn btn-outline btn-block">Xem lời giải chuẩn</button></div>`);
+  const verdictFull = `<div class="verdict v-wrong" data-wf-block="1"><div class="verdict-icon"><i data-lucide="circle-x"></i></div><div><h2>Sai ở bước 4</h2><p>Hướng đi đúng, nhưng phép cộng cuối bị sai nên tổng quãng đường lệch 1.</p></div></div>`;
+  const verdictShort = `<div class="verdict v-wrong" data-wf-block="1"><div class="verdict-icon"><i data-lucide="circle-x"></i></div><div><h2>Sai ở bước 4</h2></div></div>`;
+  const errorCard = (short) => `<div class="card" data-wf-block="3" style="display:flex;flex-direction:column;gap:12px">
+      <div class="text-xs muted">Bạn viết</div>
+      <div class="math" style="font-size:20px;font-weight:600">Tổng = 6 + 2 = <span class="strike-num">9</span> <span class="fix-num">→ 8</span></div>
+      ${short ? "" : `<dl class="kv"><dt>Loại lỗi</dt><dd>Sai phép tính</dd><dt>Vì sao</dt><dd style="font-weight:400">6 cạnh, mỗi cạnh dài 1, cộng 2 cạnh đi lặp: 6 + 2 = 8.</dd></dl>`}
+      ${short ? `<p class="text-sm" style="margin:0">6 + 2 = 8. Các bước trước đều đúng.</p>` : ""}
+    </div>`;
+  const okSteps = `<div class="card" data-wf-block="4"><div class="section-title" style="margin-bottom:4px">Các bước trước đều đúng</div><p class="text-sm muted" style="margin:0">Liệt kê đỉnh bậc lẻ · ghép cặp (A, B), (C, D) · lặp lại hai cạnh đó.</p></div>`;
+  const actions = `<div class="sticky-actions"><button class="btn btn-outline" style="flex:1"><i data-lucide="lightbulb"></i>Gợi ý</button><button class="btn btn-primary" style="flex:2"><i data-lucide="book-open"></i>Xem lời giải</button></div>`;
+  if (v === "a" || v === "d" || v === "e") {
+    const short = v === "d";
+    return phone(`${top}<div class="content">${v === "e" ? verdictShort : verdictFull}
+      <div data-wf-block="2">${crop(6, 74, 250, 150, `<div class="mark" style="left:9%;top:34%;width:66%;height:30%"></div>`)}<button class="btn btn-ghost" style="margin-top:4px;padding:0"><i data-lucide="image"></i>Xem cả trang bài làm</button></div>
+      ${errorCard(short)}${v === "d" ? "" : okSteps}</div>${actions}`);
+  }
+  if (v === "b") {
+    return phone(`${top}<div class="content">${verdictShort}
+      <div class="card" data-wf-block="2"><div class="step-list">
+        <div class="step step-ok"><div class="step-dot"><i data-lucide="check"></i></div><div class="step-text">Các đỉnh bậc lẻ: A, B, C, D.</div></div>
+        <div class="step step-ok"><div class="step-dot"><i data-lucide="check"></i></div><div class="step-text">Ghép cặp: (A, B); (C, D).</div></div>
+        <div class="step step-ok"><div class="step-dot"><i data-lucide="check"></i></div><div class="step-text">Lặp lại cạnh (A, B), (C, D).</div></div>
+        <div class="step step-bad"><div class="step-dot">4</div><div class="step-text math">Tổng = 6 + 2 = <span class="strike-num">9</span><div class="text-sm" style="font-weight:400;color:var(--error-strong);margin-top:4px">Sai phép tính: 6 + 2 = 8.</div>
+          <button class="btn btn-ghost" style="padding:0;height:36px;margin-top:2px"><i data-lucide="image"></i>Xem trên ảnh</button></div></div>
+      </div></div>
+      <p class="text-xs muted" style="margin:0" data-wf-block="3">Dòng bị gạch xoá trong bài không được tính.</p></div>${actions}`);
+  }
+  return phone(`<div style="position:relative;flex:1;display:flex;flex-direction:column">${top}
+    <div data-wf-block="2" style="flex:1;overflow:hidden;padding:0 8px">${photoWithMark()}</div>
+    <div class="sheet" data-wf-block="1"><div class="sheet-handle"></div>
+      <div style="display:flex;align-items:center;gap:10px"><span class="badge v-wrong"><i data-lucide="circle-x"></i>SAI</span><span class="section-title">Bước 4 · sai phép tính</span></div>
+      <div class="math" style="font-size:20px;font-weight:600">6 + 2 = <span class="strike-num">9</span> <span class="fix-num">→ 8</span></div>
+      <div style="display:flex;gap:12px"><button class="btn btn-outline" style="flex:1">Gợi ý</button><button class="btn btn-primary" style="flex:2">Xem lời giải</button></div>
+    </div></div>`);
+}
+
+function renderBrand() {
+  const sw = (name, hex, role, dark) => `<div class="sw"><i style="background:${hex}"></i><div><b>${name}</b>${hex}<br/><span class="muted">${role}</span></div></div>`;
+  return `<div class="brand-board">
+    <div class="card wide" style="flex-direction:row;flex-wrap:wrap;align-items:center;gap:24px">
+      <div class="wordmark">${LOGO(64)}<div>Math<span>Twin</span></div></div>
+      <div style="flex:1;min-width:220px"><div style="font-weight:600;font-size:18px">Gia sư đồ thị, chạy ngay trên máy</div><div class="tagline">Hai đỉnh nối nhau: bài của bạn và lời giải chuẩn, đặt cạnh nhau. Nét đồng là đường đi đúng.</div></div>
+    </div>
+    <div class="card"><h3>Icon app</h3><div style="display:flex;gap:16px;align-items:end">
+      <div style="width:96px;height:96px;border-radius:24px;background:var(--primary);display:grid;place-items:center">${LOGO(72, "#fffdf9", "var(--brand-amber)", "var(--primary)")}</div>
+      <div style="width:64px;height:64px;border-radius:16px;background:var(--primary);display:grid;place-items:center">${LOGO(48, "#fffdf9", "var(--brand-amber)", "var(--primary)")}</div>
+      <div style="width:40px;height:40px;border-radius:10px;background:var(--primary);display:grid;place-items:center">${LOGO(30, "#fffdf9", "var(--brand-amber)", "var(--primary)")}</div>
+      <div style="width:64px;height:64px;border-radius:16px;background:var(--brand-amber-soft);display:grid;place-items:center">${LOGO(48)}</div></div>
+      <p class="text-xs muted" style="margin:0">Nền mực, hai đỉnh màu giấy, cạnh đồng. Bản sáng cho thông báo, màn chào.</p></div>
+    <div class="card"><h3>Chữ · Be Vietnam Pro</h3>
+      <div style="font-size:24px;font-weight:700;letter-spacing:-.01em">Sai ở bước 4</div>
+      <div style="font-size:17px;font-weight:600">Trọng số cạnh B–C là bao nhiêu?</div>
+      <div class="text-sm">Đường đi ngắn nhất từ A đến E đi qua đỉnh Đ, độ dài được cập nhật ở từng bước — kiểm tra dấu: ữ ợ ằ ẫ ỷ.</div>
+      <div class="math" style="font-size:20px;font-weight:600">0 1 1 ∞ · 6 + 2 = 8 · 11 / 12</div>
+      <p class="text-xs muted" style="margin:0">Một họ chữ, phân vai bằng độ đậm 400 / 500 / 600 / 700. Số dùng kiểu đều cột cho bảng Dijkstra.</p></div>
+    <div class="card wide"><h3>Màu</h3><div class="swatches">
+      ${sw("Mực", "#1f2d55", "Nút chính, mục đang chọn, link")}${sw("Đồng", "#c8892b", "Logo, đường đi đúng trên đồ thị")}${sw("Giấy", "#f5f2eb", "Nền trang")}${sw("Trang", "#fffdf9", "Nền card")}
+      ${sw("Chữ", "#23242b", "Chữ chính")}${sw("Chữ phụ", "#6b665c", "Nhãn, mô tả · 5,1:1 trên giấy")}${sw("Đường tóc", "#efe9de", "Viền card")}${sw("Viền ô", "#e3dbcc", "Viền nút viền, ô nhập")}
+    </div></div>
+    <div class="card"><h3>Bốn kết quả chấm</h3><div style="display:flex;flex-wrap:wrap;gap:8px">
+      <span class="badge v-ok"><i data-lucide="circle-check"></i>ĐÚNG</span><span class="badge v-wrong"><i data-lucide="circle-x"></i>SAI</span>
+      <span class="badge v-confirm"><i data-lucide="circle-help"></i>CẦN XÁC NHẬN</span><span class="badge v-none"><i data-lucide="file-question"></i>KHÔNG ĐỦ CĂN CỨ</span></div>
+      <p class="text-xs muted" style="margin:0">Màu mang nghĩa, tách khỏi màu thương hiệu: đỏ chỉ dùng cho chỗ sai, không cho nút.</p></div>
+    <div class="card"><h3>Nét đồ thị</h3>${graph({ highlight: true, unsure: true, size: 200 })}<p class="text-xs muted" style="margin:0">Nét mực cho cạnh, nét đồng đậm cho đường đi đúng, nét đứt hổ phách cho chỗ máy đọc chưa chắc.</p></div>
+    <div class="card"><h3>Nút</h3><div style="display:flex;flex-direction:column;gap:10px"><button class="btn btn-primary"><i data-lucide="camera"></i>Chụp bài</button><button class="btn btn-outline"><i data-lucide="lightbulb"></i>Gợi ý</button><button class="btn btn-ghost">Xem tất cả</button></div></div>
+  </div>`;
+}
+
+const root = document.getElementById("wf-design");
+root.innerHTML = man === "thuong-hieu" ? renderBrand()
+  : man === "trang-chu" ? renderHome(state.v, state.tt)
+  : man === "xac-nhan" ? renderConfirm(state.v, state.tt)
+  : renderResult(state.v, state.tt);
+
+new MutationObserver(() => { if (document.querySelector("i[data-lucide]")) lucide.createIcons(); }).observe(document.body, { childList: true, subtree: true });
+lucide.createIcons();
+function placeBlockNumbers() {
+  const hit = (a, b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+  for (const block of document.querySelectorAll("[data-wf-block]")) {
+    const r = block.getBoundingClientRect(); const n = { left: r.left + 4, top: r.top + 4, right: r.left + 22, bottom: r.top + 22 };
+    const rects = [...block.querySelectorAll("svg, img, button")].map(x => x.getBoundingClientRect());
+    const w = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
+    for (let t = w.nextNode(); t; t = w.nextNode()) { if (!t.textContent.trim()) continue; const rg = document.createRange(); rg.selectNodeContents(t); rects.push(...rg.getClientRects()); }
+    block.toggleAttribute("data-wf-block-out", rects.some(x => x.width > 0 && hit(x, n)));
+  }
+}
+requestAnimationFrame(() => requestAnimationFrame(placeBlockNumbers));
+addEventListener("resize", placeBlockNumbers);
+</script>
+</body>
+</html>
