@@ -135,6 +135,85 @@ describe('Android benchmark flow with fake native plugin (no device/model/networ
     const result = await runner.run(image, { ...config, passes: 1 }, signal());
     expect(result.errorCode).toBe('server_killed'); expect(result.memory?.peakMemoryMb).toBe(2300);
   });
+  it.each(['graph', 'lines'] as const)('recovers memory_pressure and trim level from cancelled native startup in %s mode', async (mode) => {
+    const { runner, plugin, http, setState } = fake();
+    mock.mocked(plugin.start).mockImplementation(async () => {
+      setState({ alive: false, memoryPressure: { callback: 'onTrimMemory', trimLevel: 15 } });
+      throw { code: 'aborted' };
+    });
+    const result = await runner.run(image, { ...config, mode }, signal());
+    expect(result.errorCode).toBe('memory_pressure');
+    expect(result.memory?.memoryPressure).toEqual({ callback: 'onTrimMemory', trimLevel: 15 });
+    expect(http.post).not.toHaveBeenCalled(); expect(plugin.stop).toHaveBeenCalled();
+  });
+  it.each(['graph', 'lines'] as const)('detects pressure before sending any %s request, even while process teardown is pending', async (mode) => {
+    const { runner, http, setState } = fake();
+    setState({ alive: true, memoryPressure: { callback: 'onLowMemory', trimLevel: null } });
+    const result = await runner.run(image, { ...config, mode }, signal());
+    expect(result.errorCode).toBe('memory_pressure'); expect(http.post).not.toHaveBeenCalled();
+  });
+  it.each(['graph', 'lines'] as const)('preserves pressure metadata across HTTP rejection, non-200 and late success in %s mode', async (mode) => {
+    for (const transport of ['reject', 'non-200', 'late-success']) {
+      const { runner, http, setState } = fake();
+      mock.mocked(http.post).mockImplementation(async () => {
+        setState({ alive: false, exitCode: 137, peakMemoryMb: 2400, cpuVariant: 'android_armv8.6_1',
+          memoryPressure: { callback: 'onTrimMemory', trimLevel: 80 } });
+        if (transport === 'reject') throw new Error('connection reset');
+        return { status: transport === 'non-200' ? 503 : 200, data: response(JSON.stringify(mode === 'graph' ? graph : { lines: [] })) };
+      });
+      const result = await runner.run(image, { ...config, mode, passes: 1 }, signal());
+      expect(result.errorCode, transport).toBe('memory_pressure');
+      expect(result.memory).toMatchObject({ peakMemoryMb: 2400, memoryPressure: { callback: 'onTrimMemory', trimLevel: 80 } });
+      const exported = JSON.parse(exportReport({ version: 1, device, results: [result] })) as { results: unknown[] };
+      expect(exported.results[0]).toMatchObject({ errorCode: 'memory_pressure', config: { cpuVariant: 'android_armv8.6_1' },
+        memory: { memoryPressure: { callback: 'onTrimMemory', trimLevel: 80 } } });
+    }
+  });
+  it.each(['graph', 'lines'] as const)('polls pressure during a hung %s request and ends the batch before loading the next image', async (mode) => {
+    mock.useFakeTimers();
+    try {
+      const { runner, plugin, http, setState } = fake();
+      mock.mocked(http.post).mockImplementation(async () => {
+        setState({ alive: false, cpuVariant: 'android_armv8.6_1', memoryPressure: { callback: 'onLowMemory', trimLevel: null } });
+        return new Promise(() => {});
+      });
+      const results: string[] = [];
+      const run = runBatch({ dataset: { name: 'set', entries: [{ id: 'one', file: '1.png' }, { id: 'two', file: '2.png' }] } },
+        { ...config, mode }, plugin, runner, signal(), (result) => {
+          results.push(result.errorCode!);
+          expect(result.memory?.memoryPressure).toEqual({ callback: 'onLowMemory', trimLevel: null });
+        });
+      await mock.advanceTimersByTimeAsync(250); await run;
+      expect(results).toEqual(['memory_pressure']); expect(plugin.datasetImage).toHaveBeenCalledTimes(1);
+      expect(plugin.stop).toHaveBeenCalled();
+      expect(plugin.setBenchmarkState).toHaveBeenLastCalledWith({ running: false, backgroundIdleMinutes: 5 });
+    } finally { mock.useRealTimers(); }
+  });
+  it.each(['aborted', 'timeout'] as const)('keeps explicit %s distinct from a pressure-free server stop', async (cause) => {
+    mock.useFakeTimers();
+    try {
+      const { runner, http, setState } = fake(); const abort = new AbortController();
+      mock.mocked(http.post).mockImplementation(async () => {
+        if (cause === 'aborted') abort.abort();
+        return new Promise(() => {});
+      });
+      const run = runner.run(image, config, abort.signal);
+      await mock.advanceTimersByTimeAsync(cause === 'timeout' ? 300_000 : 0);
+      setState({ alive: false });
+      expect((await run).errorCode).toBe(cause);
+    } finally { mock.useRealTimers(); }
+  });
+  it.each(['reject', 'non-200', 'server-exit'] as const)('does not infer memory pressure from a pressure-free %s failure', async (transport) => {
+    const { runner, http, setState } = fake();
+    mock.mocked(http.post).mockImplementation(async () => {
+      if (transport === 'server-exit') setState({ alive: false, exitCode: 1 });
+      if (transport !== 'non-200') throw new Error('connection reset');
+      return { status: 503, data: {} };
+    });
+    const result = await runner.run(image, { ...config, passes: 1 }, signal());
+    expect(result.errorCode).toBe(transport === 'server-exit' ? 'server_exit' : 'http_error');
+    expect(result.memory?.memoryPressure).toBeUndefined();
+  });
   it('rejects invalid runtime/session configuration before sending an image', async () => {
     const { runner, http, plugin } = fake();
     expect((await runner.run(image, { ...config, threads: 0 }, signal())).errorCode).toBe('native_error');

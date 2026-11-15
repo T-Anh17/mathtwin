@@ -22,6 +22,7 @@ internal class ServerRuntime(private val context: Context, private val store: Mo
     @Volatile private var highWaterKb: Long? = null
     @Volatile private var rssKb: Long? = null
     @Volatile private var cpuVariant: String? = null
+    private var memoryPressure: JSONObject? = null
     private val cpuBackendLine = Regex("^load_backend: loaded CPU backend from [^\\r\\n]+/libggml-cpu-(android_armv(?:8\\.0_1|8\\.2_[12]|8\\.6_1|9\\.0_1|9\\.2_[12]))\\.so$")
 
     fun status(): JSONObject = synchronized(lock) {
@@ -30,6 +31,7 @@ internal class ServerRuntime(private val context: Context, private val store: Mo
             highWaterKb?.let { result.put("peakMemoryMb", it / 1024.0) }
             rssKb?.let { result.put("rssMemoryMb", it / 1024.0) }
             cpuVariant?.let { result.put("cpuVariant", it) }
+            memoryPressure?.let { result.put("memoryPressure", JSONObject(it.toString())) }
             process?.takeIf { !it.isAlive }?.let { result.put("exitCode", it.exitValue()) }
         }
     }
@@ -47,20 +49,30 @@ internal class ServerRuntime(private val context: Context, private val store: Mo
             }
         } catch (_: Exception) { /* Unavailable means absent, never fabricated as zero. */ }
     }
-    fun stop() {
+    fun recordMemoryPressure(callback: String, trimLevel: Int?, cancelStart: () -> Unit) = synchronized(lock) {
+        memoryPressure = JSONObject().put("callback", callback).put("trimLevel", trimLevel ?: JSONObject.NULL)
         generation.incrementAndGet()
-        val old = synchronized(lock) { process.also { process = null; session = null; pid = null; configuration = "" } }
+        // A concurrent start cannot clear the marker between publishing it and cancelling its token.
+        cancelStart()
+    }
+    fun stop() {
+        // Keep the cause and measured metadata until an explicit new start, including repeated cleanup stops.
+        val old = synchronized(lock) { generation.incrementAndGet(); process.also { process = null; session = null; pid = null; configuration = "" } }
         old?.let { it.destroy(); if (!it.waitFor(500, TimeUnit.MILLISECONDS)) { it.destroyForcibly(); it.waitFor(500, TimeUnit.MILLISECONDS) } }
     }
     fun start(model: String, threads: Int, cancelled: () -> Boolean): JSONObject {
         if (cancelled()) throw MobileFailure("aborted")
         val wanted = "$model:$threads"
         synchronized(lock) {
-            if (process?.isAlive == true && configuration == wanted && session != null)
+            if (memoryPressure == null && process?.isAlive == true && configuration == wanted && session != null)
                 return JSONObject(session.toString()).put("reused", true).put("loadMs", 0).put("verifyMs", 0)
         }
         stop()
-        val token = generation.get()
+        val token = synchronized(lock) {
+            if (cancelled()) throw MobileFailure(if (memoryPressure != null) "memory_pressure" else "aborted")
+            memoryPressure = null; highWaterKb = null; rssKb = null; cpuVariant = null
+            generation.get()
+        }
         val verifyBegan = SystemClock.elapsedRealtime()
         val files = store.verifiedFiles(model)
         val verifyMs = SystemClock.elapsedRealtime() - verifyBegan
@@ -147,7 +159,10 @@ internal class ServerRuntime(private val context: Context, private val store: Mo
                 JSONObject().put("port", port).put("apiKey", key).put("reused", false)
                     .put("loadMs", SystemClock.elapsedRealtime() - began).put("verifyMs", verifyMs).also { session = it }
             }
-        } catch (e: Exception) { stop(); throw e }
+        } catch (e: Exception) {
+            val failure = synchronized(lock) { if (memoryPressure != null) MobileFailure("memory_pressure") else e }
+            stop(); throw failure
+        }
         finally { pidFile.delete() }
     }
 }

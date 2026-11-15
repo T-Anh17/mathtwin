@@ -25,6 +25,7 @@ export const vi = {
     read_failed: 'Không đọc được ảnh.', text_only: 'Model này chỉ đọc chữ.', busy: 'Đang có tác vụ khác.',
     aborted: 'Đã hủy.', timeout: 'Hết thời gian chờ.', server_exit: 'Tiến trình model đã dừng.',
     server_killed: 'Hệ điều hành đã giết tiến trình model (có thể thiếu RAM).',
+    memory_pressure: 'Android báo thiếu bộ nhớ; đã dừng model và loạt đo.',
     exec_blocked: 'Android chặn chạy llama-server. Dừng thử nghiệm và báo reviewer để xem xét JNI.',
     invalid_json: 'Kết quả JSON không hợp lệ.', missing_probs: 'Thiếu xác suất token; không thể tính độ tin cậy.',
     truncated: 'Kết quả bị cắt ngắn.', http_error: 'Lỗi kết nối tới model trong máy.',

@@ -169,6 +169,11 @@ Các mục không có tọa độ được liệt kê trong kết quả; không 
   bắt đầu tính khoảng rảnh từ lúc kết thúc, không cắt bộ đo đang chạy dù đã ở nền lâu.
   Lượt đang chạy phát hiện child chết;
   exit 137/9 báo `server_killed` (có thể OOM, không khẳng định nguyên nhân nếu OS không cho bằng chứng).
+  Khi callback thiếu RAM chủ động dừng server, ảnh đang đo ghi `errorCode: memory_pressure` và
+  `memory.memoryPressure: { callback, trimLevel }`; `onTrimMemory` giữ nguyên mức Android gửi,
+  `onLowMemory` ghi `trimLevel: null` vì callback không có mức. Nguyên nhân được ghi trước khi hủy/dừng,
+  giữ qua cleanup tới lần nạp mới; không đổi thành `aborted`/`server_exit`/`http_error`.
+  `memory_pressure` dừng cả loạt, không nạp ảnh kế tiếp. Hủy chủ động và timeout vẫn có mã riêng.
   Khi `exec_blocked`, dừng bộ đo và báo cần reviewer xem phương án JNI; không tự chuyển kiến trúc.
 - Parser/prompt/confidence/top-k/resize dùng package TS thuần của Lô 2.4; không import adapter Node.
   Thiếu logprobs, JSON lỗi hay bị cắt trả mã lỗi; không dùng điểm đúng/sai bài làm để chọn cách đọc.

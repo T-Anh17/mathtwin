@@ -94,6 +94,44 @@ describe('app export to desktop evaluation', () => {
     expect(report!.summary.failedImages).toEqual([{ id: 'hw', code: 'server_killed' }]);
     expect(report!.phoneMeasurements).toMatchObject({ targetEligible: false });
   });
+  it.each(['graph', 'lines'] as const)('counts memory_pressure separately in %s reports and preserves callback/trim and actual CPU variant', async (mode) => {
+    const { root, file, result, save } = await setup();
+    const failed: ImageResult = { ...result, config: { ...result.config, mode }, errorCode: 'memory_pressure',
+      usage: { engine, passes: 0, latencyMs: 0 },
+      memory: { alive: false, cpuVariant: 'android_armv8.6_1', memoryPressure: { callback: 'onTrimMemory', trimLevel: 15 } } };
+    delete failed.linePasses;
+    await save([failed, { ...failed, id: 'real', memory: { ...failed.memory!, memoryPressure: { callback: 'onLowMemory', trimLevel: null } } },
+      { ...failed, id: 'print', errorCode: 'server_exit', memory: { alive: false, cpuVariant: 'android_armv8.6_1' } }]);
+    const { report, basename } = (await evaluateDevice(file, root, '2026-11-15', options))[0]!;
+    expect(report.summary).toMatchObject({ evaluatedImages: 3, memoryPressureCount: 2 });
+    expect(report.summary.failedImages.map((r) => r.code)).toEqual(['memory_pressure', 'memory_pressure', 'server_exit']);
+    expect(report.groups.synthetic_handwriting.memoryPressureCount).toBe(1);
+    expect(report.groups.handwritten.memoryPressureCount).toBe(1);
+    expect(report.groups.printed.memoryPressureCount).toBe(0);
+    expect(report.rows[0]?.memoryPressure).toEqual({ callback: 'onTrimMemory', trimLevel: 15 });
+    expect(report.rows[1]?.memoryPressure).toEqual({ callback: 'onLowMemory', trimLevel: null });
+    if (mode === 'graph') expect(report.summary).toMatchObject({ correct: 0, fullyFlagged: 3 });
+    else expect(report.summary.textByPass['1']!.lineRecall).toBe(0);
+    const markdown = await readFile(join(root, 'reports', `${basename}.md`), 'utf8');
+    expect(markdown).toContain('Biến thể CPU thực nạp (cpuVariant): android_armv8.6_1.');
+    expect(markdown).toContain('Số ảnh dừng do memory_pressure: 2.');
+    expect(markdown).toContain('hw: onTrimMemory; trimLevel: 15.');
+    expect(markdown).toContain('real: onLowMemory; trimLevel: không có (onLowMemory).');
+    const json = JSON.parse(await readFile(join(root, 'reports', `${basename}.json`), 'utf8')) as unknown;
+    expect(json).toMatchObject({ configuration: { cpuVariant: 'android_armv8.6_1' }, summary: { memoryPressureCount: 2 },
+      rows: [{ memoryPressure: { callback: 'onTrimMemory', trimLevel: 15 } }, { memoryPressure: { callback: 'onLowMemory', trimLevel: null } }, {}] });
+  });
+  it('rejects pressure metadata with a missing, invalid or invented trim level', async () => {
+    const { root, file, result, save } = await setup();
+    await save([{ ...result, errorCode: 'memory_pressure' }]);
+    const json = JSON.parse(await readFile(file, 'utf8')) as { results: Record<string, unknown>[] };
+    for (const memoryPressure of [undefined, {}, { callback: 'other', trimLevel: 15 }, { callback: 'onTrimMemory', trimLevel: null },
+      { callback: 'onTrimMemory', trimLevel: -1 }, { callback: 'onTrimMemory', trimLevel: 1.5 }, { callback: 'onLowMemory', trimLevel: 80 }]) {
+      json.results[0]!.memory = { memoryPressure };
+      await writeFile(file, JSON.stringify(json));
+      await expect(evaluateDevice(file, root, '2026-11-15', options)).rejects.toThrow('không hợp lệ');
+    }
+  });
   it('preserves a Dijkstra statement source through export and graph comparison', async () => {
     const { root, file, result, save } = await setup();
     const statementSpec: ProblemSpec = { ...spec, questionFormat: 'dung_sai', task: { type: 'statements', items: Array.from({ length: 4 }, (_, i) =>

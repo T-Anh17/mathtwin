@@ -26,7 +26,7 @@ export async function runBatch(source: ImageSource, config: BenchmarkConfig, plu
     if (signal.aborted) break;
     const result = await runner.run(image, config, signal);
     onResult(result);
-    if (result.errorCode && ['exec_blocked', 'aborted', 'server_killed', 'server_exit', 'model_missing', 'low_ram', 'native_error', 'text_only', 'timeout', 'cpu_backend_unknown'].includes(result.errorCode)) break;
+    if (result.errorCode && ['exec_blocked', 'aborted', 'memory_pressure', 'server_killed', 'server_exit', 'model_missing', 'low_ram', 'native_error', 'text_only', 'timeout', 'cpu_backend_unknown'].includes(result.errorCode)) break;
   }
   } finally { await plugin.setBenchmarkState({ running: false, backgroundIdleMinutes: config.backgroundIdleMinutes }); }
 }

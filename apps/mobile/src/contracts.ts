@@ -7,7 +7,8 @@ export interface DeviceInfo {
 }
 export interface ModelState { model: Model; bytes: number; downloadedBytes: number; ready: boolean }
 export interface Session { port: number; apiKey: string; reused: boolean; loadMs: number; verifyMs?: number }
-export interface ServerState { alive: boolean; peakMemoryMb?: number; rssMemoryMb?: number; exitCode?: number; cpuVariant?: string }
+export interface MemoryPressure { callback: 'onTrimMemory' | 'onLowMemory'; trimLevel: number | null }
+export interface ServerState { alive: boolean; peakMemoryMb?: number; rssMemoryMb?: number; exitCode?: number; cpuVariant?: string; memoryPressure?: MemoryPressure }
 export interface BenchmarkConfig { model: Model; passes: 1 | 2; mode: 'graph' | 'lines'; threads: number; minRamGb: number; allowLowRam: boolean; backgroundIdleMinutes: number }
 export interface DatasetEntry { id: string; file: string }
 export interface MobilePlugin {

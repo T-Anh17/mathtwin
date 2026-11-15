@@ -4,6 +4,7 @@ import type { ImageMeta } from './dataset.js';
 export interface EvaluationRow {
   id: string; meta: ImageMeta; comparison?: ReadComparison; usage: ReadUsage; nodeLatencyMs?: number; issueCodes: string[];
   textComparisons?: TextComparison[]; errorCode?: string;
+  memoryPressure?: { callback: 'onTrimMemory' | 'onLowMemory'; trimLevel: number | null };
   deviceTiming?: { totalMs: number; modelLoadMs: number; modelVerifyMs: number; reusedModel: boolean };
 }
 export function percentile(values: number[], p: number): number | null {
@@ -53,6 +54,7 @@ export function summarize(all: EvaluationRow[]) {
     graphSilentErrors: rows.filter((r) => r.comparison.graphSilentError).map((r) => r.id), coverage,
     extraFlagsPerProblem: total === 0 ? null : rows.reduce((n, r) => n + r.comparison.extraFlags, 0) / total,
     evaluatedImages: all.length, failedImages: all.filter((r) => r.errorCode).map((r) => ({ id: r.id, code: r.errorCode })),
+    memoryPressureCount: all.filter((r) => r.errorCode === 'memory_pressure').length,
     textByPass: Object.fromEntries(Array.from({ length: Math.max(0, ...all.map((r) => r.textComparisons?.length ?? 0)) }, (_, i) =>
       [String(i + 1), summarizeTextPass(all.flatMap((r) => r.textComparisons?.[i] ? [r.textComparisons[i]!] : []))])),
     nodeLatencyMs: { p50: percentile(all.flatMap((r) => r.nodeLatencyMs === undefined ? [] : [r.nodeLatencyMs]), 0.5), p90: percentile(all.flatMap((r) => r.nodeLatencyMs === undefined ? [] : [r.nodeLatencyMs]), 0.9) },
@@ -95,6 +97,7 @@ export function renderReport(report: EvaluationReport): string {
     `Độ trễ Node p50/p90 (ms, gồm đọc và chuẩn hóa, không gồm giải mã ảnh): ${ms(report.summary.nodeLatencyMs.p50)} / ${ms(report.summary.nodeLatencyMs.p90)}.`,
     `Bộ nhớ đỉnh do reader đo (MB): ${report.summary.peakMemoryMb ?? 'chưa đo'}. Dung lượng model tải (byte): ${report.downloadBytes ?? 'chưa đo'}.`,
     ...(report.phoneMeasurements ? [`Thiết bị và runtime: ${JSON.stringify(report.phoneMeasurements)}`, `Cấu hình: ${JSON.stringify(report.configuration)}`,
+      `Biến thể CPU thực nạp (cpuVariant): ${report.configuration?.cpuVariant ?? 'chưa ghi nhận'}.`,
       `Tổng trên điện thoại p50/p90 (ms): ${ms(report.summary.deviceTotalMs.p50)} / ${ms(report.summary.deviceTotalMs.p90)}.`,
       `Server prompt + prediction p50/p90 (ms): ${ms(report.summary.serverMs.p50)} / ${ms(report.summary.serverMs.p90)}.`,
       `Thời gian nạp model (ms), nạp mới / dùng lại: ${JSON.stringify(report.summary.modelLoadMs.cold)} / ${JSON.stringify(report.summary.modelLoadMs.reused)}.`,
@@ -108,7 +111,10 @@ export function renderReport(report: EvaluationReport): string {
   }
   lines.push('', 'CER/WER cộng lỗi và mẫu số trên toàn nhóm; không lấy trung bình phần trăm. Recall dòng đòi hỏi khớp nguyên dòng đúng thứ tự. Mỗi lượt được báo cáo riêng, không chọn lượt tốt nhất bằng truth.', '',
     `Ảnh đã đánh giá: ${report.summary.evaluatedImages}; lỗi xử lý: ${report.summary.failedImages.length}.`,
-    ...report.summary.failedImages.map((r) => `- ${r.id}: ${r.code}`), '', '## Lỗi theo loại và nguồn', '',
+    `Số ảnh dừng do memory_pressure: ${report.summary.memoryPressureCount}.`,
+    ...report.summary.failedImages.map((r) => `- ${r.id}: ${r.code}`),
+    ...report.rows.filter((r) => r.errorCode === 'memory_pressure' && r.memoryPressure).map((r) =>
+      `- ${r.id}: ${r.memoryPressure!.callback}; trimLevel: ${r.memoryPressure!.trimLevel ?? 'không có (onLowMemory)'}.`), '', '## Lỗi theo loại và nguồn', '',
     '| Nhóm | Loại lỗi | Số phần tử lệch |', '| --- | --- | ---: |');
   for (const [name, group] of Object.entries({ all: report.summary, ...report.groups })) {
     for (const [type, count] of Object.entries(group.errors)) lines.push(`| ${name} | ${type} | ${count} |`);

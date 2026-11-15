@@ -29,7 +29,11 @@ class MathTwinPlugin : Plugin() {
     private val cancellation = AtomicLong(0)
     override fun load() {
         store = ModelStore(context); server = ServerRuntime(context, store)
-        lifecycle = BenchmarkLifecycle(activity) { requestStop() }
+        lifecycle = BenchmarkLifecycle(activity, { requestStop() }, { callback, level ->
+            // Publish the cause before cancellation or asynchronous process teardown can be observed.
+            server.recordMemoryPressure(callback, level) { cancellation.incrementAndGet() }
+            controls.execute { server.stop() }
+        })
         cleanCameraFiles()
     }
     private fun requestStop() {

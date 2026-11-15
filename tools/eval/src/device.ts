@@ -111,6 +111,12 @@ export async function evaluateDevice(file: string, root: string, date: string, o
     const row: EvaluationRow = { id, meta: sample.meta, usage: u, issueCodes: [],
       deviceTiming: { totalMs: number(result.totalMs), modelLoadMs: number(result.modelLoadMs), modelVerifyMs: number(result.modelVerifyMs), reusedModel: bool(result.reusedModel) },
       ...(errorCode === undefined ? {} : { errorCode }) };
+    if (errorCode === 'memory_pressure') {
+      const pressure = record(record(result.memory).memoryPressure);
+      if (pressure.callback !== 'onTrimMemory' && pressure.callback !== 'onLowMemory') return invalid();
+      if (pressure.callback === 'onLowMemory' ? pressure.trimLevel !== null : !Number.isInteger(pressure.trimLevel)) invalid();
+      row.memoryPressure = { callback: pressure.callback, trimLevel: pressure.trimLevel === null ? null : number(pressure.trimLevel) };
+    }
     if (config.mode === 'graph') {
       // A late process failure can leave a previous/partial outcome on the app result.
       // Keep the run failed rather than counting that payload as an accepted graph.

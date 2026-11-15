@@ -8,7 +8,8 @@ import android.os.Looper
 import android.view.WindowManager
 
 /** Main-thread lifecycle policy; temporary camera/file-picker Activities do not invalidate a warm server. */
-internal class BenchmarkLifecycle(private val activity: Activity, private val stopServer: () -> Unit) : ComponentCallbacks2 {
+internal class BenchmarkLifecycle(private val activity: Activity, private val stopServer: () -> Unit,
+    private val memoryPressure: (String, Int?) -> Unit) : ComponentCallbacks2 {
     private val handler = Handler(Looper.getMainLooper())
     private var foreground = true
     private var measuring = false
@@ -30,10 +31,10 @@ internal class BenchmarkLifecycle(private val activity: Activity, private val st
     }
     override fun onTrimMemory(level: Int) {
         if (level == ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL || level >= ComponentCallbacks2.TRIM_MEMORY_COMPLETE) {
-            stopServer(); setState(false, idleMinutes)
+            memoryPressure("onTrimMemory", level); setState(false, idleMinutes)
         }
     }
-    override fun onLowMemory() { stopServer(); setState(false, idleMinutes) }
+    override fun onLowMemory() { memoryPressure("onLowMemory", null); setState(false, idleMinutes) }
     override fun onConfigurationChanged(configuration: Configuration) {}
     fun close() {
         handler.removeCallbacks(idleStop)

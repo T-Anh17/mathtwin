@@ -60,6 +60,13 @@ Ghép theo id trên cả ba bộ; `--set` lọc theo bộ sau khi ghép. Id khô
 
 Kết quả: `reports/read-device-<ngày UTC>-<hash>.md` và `.json`. Hash gồm nội dung file, bộ chọn, cấu hình, limit và ngưỡng nên các lần đo khác không ghi đè nhau. Chạy lại đúng cùng đầu vào thay đúng cặp báo cáo. Không chứa pixel/draft/khóa server; không đọc file ảnh khi nhập JSON. Ghi thiết bị, runtime/commit, backend, `cpuVariant` nếu app trả, cấu hình, độ trễ tổng/server p50/p90, thời gian nạp mới/dùng lại, RAM đỉnh và lỗi. Không gán thời gian tính chỉ số trên PC thành thời gian điện thoại. RAM < 6 GB có `targetEligible: false`: chỉ chứng minh chạy được hay không. Thiếu ảnh viết tay thật vẫn chưa đủ căn cứ cho kết luận nghiệm thu.
 
+Markdown ghi riêng `cpuVariant` thực nạp (thiếu thì ghi chưa ghi nhận). JSON có
+`summary.memoryPressureCount` và cùng bộ đếm theo từng nhóm ảnh; đây là số ảnh có
+`errorCode: memory_pressure`, vẫn nằm trong `failedImages` và mẫu số đánh giá.
+Mỗi row lỗi này giữ `memoryPressure: { callback, trimLevel }` từ `memory.memoryPressure`
+của app, Markdown liệt kê tương ứng. `onTrimMemory` phải có mức trim nguyên không âm;
+`onLowMemory` phải có `trimLevel: null`, không suy đoán một mức Android không gửi.
+
 ## Định nghĩa chỉ số chữ
 
 `compareText` trong reader là hàm thuần, không dùng API Node và không dùng lời giải để chọn cách đọc. Chuẩn hóa NFC, trim và gom khoảng trắng trong mỗi dòng; giữ hoa/thường, dấu, dấu câu và thứ tự. Ghép dòng bằng một dấu cách để tính CER/WER. Bảng đọc trái sang phải từng hàng (mỗi hàng là một dòng), nhãn rời trong hình theo trên xuống dưới rồi trái sang phải. Dòng `struck: true` luôn bị loại khỏi reference các chỉ số chữ, dù còn đọc được hay `text: null`. Dự đoán được reader đánh dấu `struck: true` cũng không phải nội dung bài làm.

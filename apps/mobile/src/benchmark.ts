@@ -9,6 +9,11 @@ import manifest from '../../../tools/models/manifest.json';
 
 const engineFor = (model: 'a' | 'b'): string => model === 'a' ? 'offline:paddleocr-vl-1.5' : 'offline:qwen3-vl-2b';
 function check(signal: AbortSignal): void { if (signal.aborted) throw { code: 'aborted' }; }
+function serverFailure(state: ServerState): string | undefined {
+  if (state.memoryPressure) return 'memory_pressure';
+  if (!state.alive) return state.exitCode === 137 || state.exitCode === 9 ? 'server_killed' : 'server_exit';
+  return undefined;
+}
 function validateConfig(c: BenchmarkConfig): void {
   if (!['a', 'b'].includes(c.model) || ![1, 2].includes(c.passes) || !['graph', 'lines'].includes(c.mode)
     || !Number.isInteger(c.threads) || c.threads < 1 || c.threads > 256 || !Number.isFinite(c.minRamGb) || c.minRamGb < 1 || c.minRamGb > 64
@@ -30,6 +35,7 @@ export class Benchmark {
     let timeout: ReturnType<typeof setTimeout> | undefined;
     let onAbort: (() => void) | undefined;
     let failure: string | undefined;
+    let startAttempted = false;
     let currentMemory: ServerState | undefined;
     let pendingPoll = false;
     let rejectFatal: (reason: unknown) => void = () => {};
@@ -43,7 +49,7 @@ export class Benchmark {
       pendingPoll = true;
       try {
         currentMemory = await this.plugin.status();
-        if (!currentMemory.alive) fail(currentMemory.exitCode === 137 || currentMemory.exitCode === 9 ? 'server_killed' : 'server_exit');
+        const code = serverFailure(currentMemory); if (code) fail(code);
       } catch { fail('server_exit'); } finally { pendingPoll = false; }
     };
     try {
@@ -55,27 +61,29 @@ export class Benchmark {
       const device = await guard(this.plugin.device());
       if (device.totalRamBytes < config.minRamGb * 1e9 && !config.allowLowRam) throw { code: 'low_ram' };
       const decoded = await guard(this.decode(image.dataUrl)); check(signal);
+      startAttempted = true;
       const session = await guard(this.plugin.start(config));
       validateSession(session);
       result.modelLoadMs = session.loadMs; result.reusedModel = session.reused;
       result.modelVerifyMs = session.verifyMs ?? 0;
       await updateMemory();
+      if (failure) throw { code: failure };
       timer = setInterval(() => { void updateMemory(); }, 250);
       const complete = async (mode: ReadMode): Promise<{ completion: ReturnType<typeof parseCompletion>; usage: ReadUsage }> => {
-        check(signal); const began = this.now();
+        check(signal); if (failure) throw { code: failure }; const began = this.now();
         let response: { status: number; data: unknown };
         try {
           response = await guard(this.http.post({ url: `http://127.0.0.1:${session.port}/v1/chat/completions`,
             headers: { Authorization: `Bearer ${session.apiKey}`, 'Content-Type': 'application/json' },
             data: completionRequest(config.model, mode, [decoded.encoded]), connectTimeout: 5000, readTimeout: 180_000, disableRedirects: true }));
+          if (response.status !== 200) throw { code: 'http_error' };
         } catch (e) {
           if (failure || signal.aborted) throw e;
           // A killed process often rejects HTTP before the next polling tick. Preserve the real cause.
           currentMemory = await guard(this.plugin.status());
-          if (!currentMemory.alive) throw { code: currentMemory.exitCode === 137 || currentMemory.exitCode === 9 ? 'server_killed' : 'server_exit' };
+          const code = serverFailure(currentMemory); if (code) throw { code };
           throw { code: 'http_error' };
         }
-        if (response.status !== 200) throw { code: 'http_error' };
         const completion = parseCompletion(response.data);
         const usage: ReadUsage = { engine, passes: 1, latencyMs: this.now() - began,
           sentImages: [{ originalWidth: decoded.original.width, originalHeight: decoded.original.height, width: decoded.resized.width, height: decoded.resized.height }],
@@ -86,7 +94,7 @@ export class Benchmark {
         const reader: VisionReader = { engine, read: async (_images, pass) => {
           try { const { completion, usage } = await complete(pass);
             return { draft: graphResult(completion, 0.1, [decoded.original]), usage };
-          } catch (e) { failure = errorCode(e); throw e; }
+          } catch (e) { failure ??= errorCode(e); throw e; }
         } };
         result.outcome = await guard(readProblem([decoded.original], { reader, passes: config.passes, signal }));
         result.usage = result.outcome.usage;
@@ -103,9 +111,15 @@ export class Benchmark {
       }
       // Do not accept a late HTTP success from a server that died during the request.
       currentMemory = await guard(this.plugin.status());
-      if (!currentMemory.alive) throw { code: currentMemory.exitCode === 137 || currentMemory.exitCode === 9 ? 'server_killed' : 'server_exit' };
+      const code = serverFailure(currentMemory); if (code) throw { code };
       if (failure) throw { code: failure };
     } catch (e) {
+      // Startup cancellation and HTTP can settle before a polling tick. Native pressure is latched
+      // before teardown and survives stop(), so recover its cause/trim metadata before cleanup.
+      if (startAttempted && !signal.aborted && failure !== 'timeout') {
+        try { currentMemory = await this.plugin.status(); if (currentMemory.memoryPressure) failure = 'memory_pressure'; }
+        catch { /* Preserve the already observed failure if status is unavailable. */ }
+      }
       result.errorCode = signal.aborted ? 'aborted' : failure ?? errorCode(e);
       await this.plugin.stop().catch(() => {});
     } finally {
