@@ -144,8 +144,10 @@ export function exportReport(report: BenchmarkReport): string {
     backgroundIdleMinutes: r.config.backgroundIdleMinutes, backend: 'CPU', cpuVariant: r.memory?.cpuVariant },
     imageSource: r.imageSource, captureMethod: r.captureMethod,
     outcome: r.outcome, linePasses: r.linePasses, usage: r.usage, totalMs: r.totalMs, modelLoadMs: r.modelLoadMs,
-    modelVerifyMs: r.modelVerifyMs, reusedModel: r.reusedModel, memory: r.memory, errorCode: r.errorCode })) }, (key, value: unknown) => {
-      if (['pixels', 'dataUrl', 'encoded', 'source', 'apiKey', 'port', 'image', 'images'].includes(key)) return undefined;
+    modelVerifyMs: r.modelVerifyMs, reusedModel: r.reusedModel, memory: r.memory, errorCode: r.errorCode })) }, function (this: unknown, key, value: unknown) {
+      // StatementCheck.source is a semantic vertex reference, required for desktop comparison.
+      if (key === 'source' && !(this !== null && typeof this === 'object' && 'type' in this && this.type === 'dijkstra_label')) return undefined;
+      if (['pixels', 'dataUrl', 'encoded', 'apiKey', 'port', 'image', 'images'].includes(key)) return undefined;
       return value;
     }, 2);
 }

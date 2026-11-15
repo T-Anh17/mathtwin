@@ -1,0 +1,41 @@
+[
+  {
+    "text": "Cho đồ thị vô hướng. Trả lời ngắn.",
+    "region": "question"
+  },
+  {
+    "text": "Tính bậc của A trong đồ thị.",
+    "region": "question"
+  },
+  {
+    "text": "A",
+    "region": "figure"
+  },
+  {
+    "text": "C",
+    "region": "figure"
+  },
+  {
+    "text": "B",
+    "region": "figure"
+  },
+  {
+    "text": "Đếm các đầu cạnh tại A, em được bậc 2.",
+    "region": "solution"
+  },
+  {
+    "text": null,
+    "region": "solution",
+    "struck": true,
+    "box": [
+      102.20859239819556,
+      859.3631236678486,
+      232.66766521978357,
+      894.009414929388
+    ]
+  },
+  {
+    "text": "Tổng bậc = 2 × số cạnh = 2 × 3 = 7.",
+    "region": "solution"
+  }
+]

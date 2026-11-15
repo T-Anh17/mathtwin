@@ -1,0 +1,57 @@
+[
+  {
+    "text": "Cho đồ thị vô hướng. Tự luận.",
+    "region": "question"
+  },
+  {
+    "text": "Liệt kê các đỉnh, các cạnh và nhận biết khuyên, cạnh song song.",
+    "region": "question"
+  },
+  {
+    "text": "khuyên m",
+    "region": "figure"
+  },
+  {
+    "text": "A",
+    "region": "figure"
+  },
+  {
+    "text": "a",
+    "region": "figure"
+  },
+  {
+    "text": "b",
+    "region": "figure"
+  },
+  {
+    "text": "I",
+    "region": "figure"
+  },
+  {
+    "text": "B",
+    "region": "figure"
+  },
+  {
+    "text": "Các đỉnh là A, B, I.",
+    "region": "solution"
+  },
+  {
+    "text": "Số cạnh = 5.",
+    "region": "solution",
+    "struck": true,
+    "box": [
+      71,
+      884,
+      201,
+      909
+    ]
+  },
+  {
+    "text": "Đồ thị có 3 cạnh.",
+    "region": "solution"
+  },
+  {
+    "text": "Số khuyên là 1.",
+    "region": "solution"
+  }
+]

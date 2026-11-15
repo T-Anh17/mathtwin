@@ -1,0 +1,30 @@
+[
+  {
+    "text": "Cho đồ thị vô hướng như hình. Tự luận.",
+    "region": "question"
+  },
+  {
+    "text": "Tìm chu trình Hamilton từ A.",
+    "region": "question"
+  },
+  {
+    "text": "A",
+    "region": "figure"
+  },
+  {
+    "text": "E",
+    "region": "figure"
+  },
+  {
+    "text": "B",
+    "region": "figure"
+  },
+  {
+    "text": "D",
+    "region": "figure"
+  },
+  {
+    "text": "C",
+    "region": "figure"
+  }
+]

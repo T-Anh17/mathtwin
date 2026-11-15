@@ -1,0 +1,27 @@
+{
+  "source": "synthetic_handwriting",
+  "capture": "straight",
+  "blurred": false,
+  "questionFormat": "tra_loi_ngan",
+  "synthetic": true,
+  "variant": "dancing-straight",
+  "coreFixture": "18-short-answer-degree",
+  "hasSolution": true,
+  "studentErrors": [
+    {
+      "kind": "arithmetic",
+      "written": "Tổng bậc = 2 × số cạnh = 2 × 3 = 7.",
+      "expected": "Tổng bậc = 2 × số cạnh = 2 × 3 = 6.",
+      "description": "Tính sai tổng bậc ở kết quả cuối."
+    }
+  ],
+  "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
+  "handwritingHashes": {
+    "truth.json": "c3ea9d3a0853c9ab0957435b2c3e071be28a95c7aeb1442f7d5d9f305802a3b7",
+    "lines.json": "24071a5342357566268910b1796112c0498b3f766993872f6c3c789779365245",
+    "source.svg": "d0a15fa5801207c8302a6f0b8e0ca47907099c9798b962135f73a2cd4613c1bb",
+    "layout.json": "59391c231b20e1e7c25cec4d685197ea3c2c7a566574fbd19fdb7a1ecac7e1f8",
+    "cancellation.json": "d774749b1fe37ec762e4144b956a8e8fe3c3ab3885cf3ea6f08cdd51a3c2f84c",
+    "1.png": "d9fde6dcde716486946a61649032facf323fd3fee798e0fc17e2c552ac7a7d0e"
+  }
+}

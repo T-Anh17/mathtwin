@@ -1,0 +1,116 @@
+[
+  {
+    "text": "Cho đồ thị vô hướng. Tự luận.",
+    "x": 60,
+    "y": 28,
+    "region": "question",
+    "size": 29
+  },
+  {
+    "text": "Bài toán người du lịch: dùng láng giềng gần nhất từ A.",
+    "x": 60,
+    "y": 67,
+    "region": "question",
+    "size": 29
+  },
+  {
+    "text": "A",
+    "x": 491,
+    "y": 298,
+    "size": 27,
+    "region": "figure"
+  },
+  {
+    "text": "9",
+    "x": 420.0310532585513,
+    "y": 363.3732293012596,
+    "size": 28,
+    "region": "figure"
+  },
+  {
+    "text": "1",
+    "x": 585.4358526804816,
+    "y": 371.30863477359924,
+    "size": 28,
+    "region": "figure"
+  },
+  {
+    "text": "1",
+    "x": 510.43261938717427,
+    "y": 449.04063513849326,
+    "size": 28,
+    "region": "figure"
+  },
+  {
+    "text": "3",
+    "x": 566.8680982353765,
+    "y": 503.1376894683741,
+    "size": 28,
+    "region": "figure"
+  },
+  {
+    "text": "D",
+    "x": 271.30217384733606,
+    "y": 514.2015604357059,
+    "size": 27,
+    "region": "figure"
+  },
+  {
+    "text": "B",
+    "x": 721.6248615619285,
+    "y": 519.4183109273162,
+    "size": 27,
+    "region": "figure"
+  },
+  {
+    "text": "2",
+    "x": 652.5669750591726,
+    "y": 590.7608116731566,
+    "size": 28,
+    "region": "figure"
+  },
+  {
+    "text": "4",
+    "x": 425.21631572185845,
+    "y": 644.8437345209727,
+    "size": 28,
+    "region": "figure"
+  },
+  {
+    "text": "C",
+    "x": 498.7622389878206,
+    "y": 738.8046423546177,
+    "size": 27,
+    "region": "figure"
+  },
+  {
+    "text": "Mỗi bước em chọn đỉnh chưa thăm ở gần nhất.",
+    "x": 75,
+    "y": 840,
+    "region": "solution",
+    "size": 28
+  },
+  {
+    "text": "A → B → C → D → A",
+    "x": 75,
+    "y": 884,
+    "region": "solution",
+    "size": 28
+  },
+  {
+    "text": "Độ dài = 18.",
+    "x": 75,
+    "y": 928,
+    "size": 28,
+    "region": "solution",
+    "struck": "opaque",
+    "lineIndex": 14
+  },
+  {
+    "text": "Độ dài = 1 + 2 + 4 + 9 = 17.",
+    "x": 75,
+    "y": 972,
+    "region": "solution",
+    "size": 28
+  }
+]

@@ -1,0 +1,50 @@
+[
+  {
+    "text": "Cho đồ thị vô hướng như hình. Tự luận.",
+    "region": "question"
+  },
+  {
+    "text": "Tìm hành trình người đưa thư ngắn nhất xuất phát từ A, quay về điểm đầu.",
+    "region": "question"
+  },
+  {
+    "text": "A",
+    "region": "figure"
+  },
+  {
+    "text": "1",
+    "region": "figure"
+  },
+  {
+    "text": "1",
+    "region": "figure"
+  },
+  {
+    "text": "1",
+    "region": "figure"
+  },
+  {
+    "text": "D",
+    "region": "figure"
+  },
+  {
+    "text": "B",
+    "region": "figure"
+  },
+  {
+    "text": "1",
+    "region": "figure"
+  },
+  {
+    "text": "1",
+    "region": "figure"
+  },
+  {
+    "text": "1",
+    "region": "figure"
+  },
+  {
+    "text": "C",
+    "region": "figure"
+  }
+]

@@ -1,0 +1,81 @@
+[
+  {
+    "text": "Cho đồ thị vô hướng. Tự luận.",
+    "region": "question"
+  },
+  {
+    "text": "Tìm hành trình người đưa thư ngắn nhất xuất phát từ A, quay về điểm",
+    "region": "question"
+  },
+  {
+    "text": "đầu.",
+    "region": "question"
+  },
+  {
+    "text": "A",
+    "region": "figure"
+  },
+  {
+    "text": "1",
+    "region": "figure"
+  },
+  {
+    "text": "1",
+    "region": "figure"
+  },
+  {
+    "text": "1",
+    "region": "figure"
+  },
+  {
+    "text": "1",
+    "region": "figure"
+  },
+  {
+    "text": "D",
+    "region": "figure"
+  },
+  {
+    "text": "B",
+    "region": "figure"
+  },
+  {
+    "text": "1",
+    "region": "figure"
+  },
+  {
+    "text": "1",
+    "region": "figure"
+  },
+  {
+    "text": "C",
+    "region": "figure"
+  },
+  {
+    "text": "Em liệt kê các đỉnh có bậc lẻ: A, B, C, D.",
+    "region": "solution"
+  },
+  {
+    "text": "Ghép cặp: (A, B); (C, D).",
+    "region": "solution"
+  },
+  {
+    "text": "Lặp lại cạnh (A, B), (C, D) để ghép các đỉnh lẻ.",
+    "region": "solution"
+  },
+  {
+    "text": "Tổng quãng đường = 10.",
+    "region": "solution",
+    "struck": true,
+    "box": [
+      71,
+      972,
+      318,
+      1001
+    ]
+  },
+  {
+    "text": "Tổng = 6 + 2 = 9.",
+    "region": "solution"
+  }
+]

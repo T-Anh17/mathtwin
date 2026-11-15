@@ -1,0 +1,45 @@
+[
+  {
+    "text": "Cho đồ thị vô hướng. Tự luận.",
+    "region": "question"
+  },
+  {
+    "text": "Xét tính liên thông của đồ thị đã cho.",
+    "region": "question"
+  },
+  {
+    "text": "A",
+    "region": "figure"
+  },
+  {
+    "text": "D",
+    "region": "figure"
+  },
+  {
+    "text": "B",
+    "region": "figure"
+  },
+  {
+    "text": "C",
+    "region": "figure"
+  },
+  {
+    "text": "Em chia các đỉnh thành 2 nhóm liên thông.",
+    "region": "solution"
+  },
+  {
+    "text": "Đồ thị không có thành phần liên thông.",
+    "region": "solution",
+    "struck": true,
+    "box": [
+      71,
+      884,
+      465,
+      912
+    ]
+  },
+  {
+    "text": "Đồ thị liên thông.",
+    "region": "solution"
+  }
+]

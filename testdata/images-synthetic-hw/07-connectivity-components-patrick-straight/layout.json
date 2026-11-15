@@ -1,0 +1,67 @@
+[
+  {
+    "text": "Cho đồ thị vô hướng. Tự luận.",
+    "x": 60,
+    "y": 28,
+    "region": "question",
+    "size": 29
+  },
+  {
+    "text": "Xét tính liên thông của đồ thị đã cho.",
+    "x": 60,
+    "y": 67,
+    "region": "question",
+    "size": 29
+  },
+  {
+    "text": "A",
+    "x": 491,
+    "y": 298,
+    "size": 27,
+    "region": "figure"
+  },
+  {
+    "text": "D",
+    "x": 271.30217384733606,
+    "y": 514.2015604357059,
+    "size": 27,
+    "region": "figure"
+  },
+  {
+    "text": "B",
+    "x": 721.6248615619285,
+    "y": 519.4183109273162,
+    "size": 27,
+    "region": "figure"
+  },
+  {
+    "text": "C",
+    "x": 498.7622389878206,
+    "y": 738.8046423546177,
+    "size": 27,
+    "region": "figure"
+  },
+  {
+    "text": "Có 2 thành phần liên thông.",
+    "x": 75,
+    "y": 840,
+    "region": "solution",
+    "size": 28
+  },
+  {
+    "text": "Đồ thị không có thành phần liên thông.",
+    "x": 75,
+    "y": 884,
+    "size": 28,
+    "region": "solution",
+    "struck": "single",
+    "lineIndex": 7
+  },
+  {
+    "text": "Đồ thị không liên thông.",
+    "x": 75,
+    "y": 928,
+    "region": "solution",
+    "size": 28
+  }
+]

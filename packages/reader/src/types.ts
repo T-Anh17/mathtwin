@@ -29,6 +29,7 @@ export interface VisionReader {
 }
 export interface TextLine {
   text: string;
+  struck?: boolean;
   box?: [number, number, number, number];
   conf: number;
   alternatives: string[];

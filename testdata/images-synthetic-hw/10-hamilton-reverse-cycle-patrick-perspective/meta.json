@@ -1,0 +1,27 @@
+{
+  "source": "synthetic_handwriting",
+  "capture": "tilted",
+  "blurred": false,
+  "questionFormat": "tu_luan",
+  "synthetic": true,
+  "variant": "patrick-perspective",
+  "coreFixture": "10-hamilton-reverse-cycle",
+  "hasSolution": true,
+  "studentErrors": [
+    {
+      "kind": "vertex",
+      "written": "A → A → C → D → E → A",
+      "expected": "A → B → C → D → E → A",
+      "description": "Lặp đỉnh đầu ở giữa chu trình Hamilton và bỏ một đỉnh."
+    }
+  ],
+  "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
+  "handwritingHashes": {
+    "truth.json": "3377181720224abd3a5a28213210cb28d1e018460d5ba1b9162d03450effc521",
+    "lines.json": "511871a8ad1317d88ef667ec8846ef88f1c8c3ff1867e33f79408605ccb36603",
+    "source.svg": "437413b5764ae104991da8f84ace6d8b4eaa6fc188f255e8681e4bff19448eb6",
+    "layout.json": "03afee352317b954619f7babb03c3927382aae327d59bcaae774fc491adf03d7",
+    "cancellation.json": "493ab809ae0893c9e7bb6ad8dfa99dea91a718f32e7a3abe5e312d3dbec14412",
+    "1.png": "f7310822436a45e959ec5aa32a5f6b8308f94132367599d56acc6cdb32768531"
+  }
+}

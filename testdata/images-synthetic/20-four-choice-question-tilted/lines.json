@@ -1,0 +1,38 @@
+[
+  {
+    "text": "Cho đồ thị vô hướng như hình. Trắc nghiệm: chọn phát biểu đúng.",
+    "region": "question"
+  },
+  {
+    "text": "Xét các phát biểu sau trên đồ thị:",
+    "region": "question"
+  },
+  {
+    "text": "A) Bậc B bằng 2.",
+    "region": "question"
+  },
+  {
+    "text": "B) Có 3 cạnh.",
+    "region": "question"
+  },
+  {
+    "text": "C) Có 2 đỉnh.",
+    "region": "question"
+  },
+  {
+    "text": "D) Không liên thông.",
+    "region": "question"
+  },
+  {
+    "text": "A",
+    "region": "figure"
+  },
+  {
+    "text": "B",
+    "region": "figure"
+  },
+  {
+    "text": "C",
+    "region": "figure"
+  }
+]

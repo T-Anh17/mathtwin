@@ -135,8 +135,10 @@ adb push '<thư mục bộ đo đã có>/synthetic' /sdcard/Android/data/vn.math
 ```
 
 Nhập `synthetic` rồi bấm **Nhập bộ đo**. Chỉ nạp ảnh khi đến lượt xử lý, không đưa cả thư mục vào RAM.
-Kết quả giữ theo id, không cần `truth.json` trên điện thoại. Đóng gói bộ tổng hợp và tính chỉ số từ file
-xuất là **Lô 2.6**, chưa triển khai tại đây.
+Kết quả giữ theo id, không cần `truth.json` trên điện thoại. Đóng gói bằng
+`npm run eval:pack -- --set synthetic-hw`; dùng thư mục `.build-cache/datasets/synthetic-hw` và nhập tên `synthetic-hw`.
+Máy tính tính chỉ số bằng `npm run eval:read -- --from-device <file.json> --mode both`.
+Xem [hướng dẫn bộ đo, truth và chỉ số](../../tools/eval/README.md).
 
 Mỗi ảnh hiển thị kết quả graph/lines, cờ, tổng thời gian, thời gian kiểm file, thời gian nạp model,
 timings prompt/prediction, RAM đỉnh server hoặc mã lỗi. Graph vẽ khuyên/đa cạnh; các cạnh chưa chắc

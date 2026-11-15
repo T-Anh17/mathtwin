@@ -1,0 +1,42 @@
+[
+  {
+    "text": "Cho đồ thị vô hướng như hình. Tự luận.",
+    "region": "question"
+  },
+  {
+    "text": "Dùng Dijkstra tìm đường đi ngắn nhất từ A đến D.",
+    "region": "question"
+  },
+  {
+    "text": "A",
+    "region": "figure"
+  },
+  {
+    "text": "1",
+    "region": "figure"
+  },
+  {
+    "text": "1",
+    "region": "figure"
+  },
+  {
+    "text": "D",
+    "region": "figure"
+  },
+  {
+    "text": "3",
+    "region": "figure"
+  },
+  {
+    "text": "B",
+    "region": "figure"
+  },
+  {
+    "text": "3",
+    "region": "figure"
+  },
+  {
+    "text": "C",
+    "region": "figure"
+  }
+]

@@ -1,0 +1,57 @@
+[
+  {
+    "text": "Cho đồ thị vô hướng. Đúng / sai từng ý.",
+    "region": "question"
+  },
+  {
+    "text": "Xét các phát biểu sau trên đồ thị:",
+    "region": "question"
+  },
+  {
+    "text": "a) Đồ thị có 3 đỉnh.",
+    "region": "question"
+  },
+  {
+    "text": "b) Đồ thị có 3 cạnh.",
+    "region": "question"
+  },
+  {
+    "text": "c) Đồ thị liên thông.",
+    "region": "question"
+  },
+  {
+    "text": "d) Đồ thị có chu trình Hamilton.",
+    "region": "question"
+  },
+  {
+    "text": "A",
+    "region": "figure"
+  },
+  {
+    "text": "C",
+    "region": "figure"
+  },
+  {
+    "text": "B",
+    "region": "figure"
+  },
+  {
+    "text": "b) Đ",
+    "region": "solution",
+    "struck": true,
+    "box": [
+      71,
+      840,
+      123,
+      863
+    ]
+  },
+  {
+    "text": "a) S b) S c) Đ d) S",
+    "region": "solution"
+  },
+  {
+    "text": "Em xét lần lượt số đỉnh, số cạnh rồi các ý còn lại.",
+    "region": "solution"
+  }
+]

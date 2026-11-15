@@ -1,0 +1,35 @@
+import { copyFile, mkdir, readdir, unlink, writeFile } from 'node:fs/promises';
+import { join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { parseArgs } from 'node:util';
+import { loadCases, setFolders } from './dataset.js';
+import type { DatasetSet } from './dataset.js';
+import { repositoryRoot } from './cli.js';
+
+/** App protocol v1 accepts a single image per id. Fail rather than silently dropping pages. */
+export async function packDataset(set: DatasetSet, root = repositoryRoot): Promise<string> {
+  const cases = await loadCases(join(root, 'testdata', setFolders[set]));
+  if (!cases.length || cases.some((c) => c.files.length !== 1 || !/^[a-zA-Z0-9_.-]+$/.test(c.id))) throw new Error('Bộ đo cần id an toàn và đúng một ảnh mỗi đề; không bỏ trang.');
+  const output = join(root, '.build-cache/datasets', set);
+  await mkdir(output, { recursive: true });
+  // Only remove generated flat files in the fixed output directory; never touch corpus or images from users.
+  for (const entry of await readdir(output, { withFileTypes: true })) {
+    if (!entry.isFile() || !(entry.name === 'ids.json' || /^sample-\d+\.(png|jpg|jpeg)$/i.test(entry.name))) throw new Error('Thư mục xuất có file lạ.');
+  }
+  for (const name of await readdir(output)) await unlink(join(output, name));
+  const ids: { id: string; file: string }[] = [];
+  for (const [i, sample] of cases.entries()) {
+    const source = sample.files[0]!; const extension = source.split('.').at(-1)!.toLowerCase();
+    const file = `sample-${String(i + 1).padStart(3, '0')}.${extension}`;
+    await copyFile(join(sample.directory, source), join(output, file));
+    ids.push({ id: sample.id, file });
+  }
+  await writeFile(join(output, 'ids.json'), `${JSON.stringify(ids, null, 2)}\n`);
+  return output;
+}
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  const { values } = parseArgs({ options: { set: { type: 'string', default: 'synthetic-hw' } } });
+  if (!Object.hasOwn(setFolders, values.set!)) throw new Error('Chọn synthetic, synthetic-hw hoặc real.');
+  packDataset(values.set as DatasetSet).then((directory) => console.log(`Bộ đo cho app: ${directory}`))
+    .catch(() => { console.error('Không đóng gói được bộ đo; kiểm tra id, trang và thư mục xuất.'); process.exitCode = 1; });
+}

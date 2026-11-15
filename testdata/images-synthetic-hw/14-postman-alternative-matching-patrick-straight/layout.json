@@ -1,0 +1,130 @@
+[
+  {
+    "text": "Cho đồ thị vô hướng. Tự luận.",
+    "x": 60,
+    "y": 28,
+    "region": "question",
+    "size": 29
+  },
+  {
+    "text": "Tìm hành trình người đưa thư ngắn nhất xuất phát từ A, quay về điểm",
+    "x": 60,
+    "y": 67,
+    "region": "question",
+    "size": 29
+  },
+  {
+    "text": "đầu.",
+    "x": 60,
+    "y": 106,
+    "region": "question",
+    "size": 29
+  },
+  {
+    "text": "A",
+    "x": 491,
+    "y": 298,
+    "size": 27,
+    "region": "figure"
+  },
+  {
+    "text": "1",
+    "x": 420.0310532585513,
+    "y": 363.3732293012596,
+    "size": 28,
+    "region": "figure"
+  },
+  {
+    "text": "1",
+    "x": 585.4358526804816,
+    "y": 371.30863477359924,
+    "size": 28,
+    "region": "figure"
+  },
+  {
+    "text": "1",
+    "x": 510.43261938717427,
+    "y": 449.04063513849326,
+    "size": 28,
+    "region": "figure"
+  },
+  {
+    "text": "1",
+    "x": 566.8680982353765,
+    "y": 503.1376894683741,
+    "size": 28,
+    "region": "figure"
+  },
+  {
+    "text": "D",
+    "x": 271.30217384733606,
+    "y": 514.2015604357059,
+    "size": 27,
+    "region": "figure"
+  },
+  {
+    "text": "B",
+    "x": 721.6248615619285,
+    "y": 519.4183109273162,
+    "size": 27,
+    "region": "figure"
+  },
+  {
+    "text": "1",
+    "x": 652.5669750591726,
+    "y": 590.7608116731566,
+    "size": 28,
+    "region": "figure"
+  },
+  {
+    "text": "1",
+    "x": 425.21631572185845,
+    "y": 644.8437345209727,
+    "size": 28,
+    "region": "figure"
+  },
+  {
+    "text": "C",
+    "x": 498.7622389878206,
+    "y": 738.8046423546177,
+    "size": 27,
+    "region": "figure"
+  },
+  {
+    "text": "Các đỉnh bậc lẻ: A, B, C, D.",
+    "x": 75,
+    "y": 840,
+    "region": "solution",
+    "size": 28
+  },
+  {
+    "text": "Ghép cặp: (A, B); (C, D).",
+    "x": 75,
+    "y": 884,
+    "region": "solution",
+    "size": 28
+  },
+  {
+    "text": "Lặp lại cạnh (A, B), (C, D) để ghép các đỉnh lẻ.",
+    "x": 75,
+    "y": 928,
+    "region": "solution",
+    "size": 28
+  },
+  {
+    "text": "Tổng quãng đường = 10.",
+    "x": 75,
+    "y": 972,
+    "size": 28,
+    "region": "solution",
+    "struck": "single",
+    "lineIndex": 16
+  },
+  {
+    "text": "Tổng = 6 + 2 = 8.",
+    "x": 75,
+    "y": 1016,
+    "region": "solution",
+    "size": 28
+  }
+]

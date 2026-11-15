@@ -1,0 +1,34 @@
+[
+  {
+    "text": "Cho đồ thị vô hướng như hình. Tự luận.",
+    "region": "question"
+  },
+  {
+    "text": "Liệt kê các đỉnh, các cạnh và nhận biết khuyên, cạnh song song.",
+    "region": "question"
+  },
+  {
+    "text": "khuyên m",
+    "region": "figure"
+  },
+  {
+    "text": "A",
+    "region": "figure"
+  },
+  {
+    "text": "a",
+    "region": "figure"
+  },
+  {
+    "text": "b",
+    "region": "figure"
+  },
+  {
+    "text": "I",
+    "region": "figure"
+  },
+  {
+    "text": "B",
+    "region": "figure"
+  }
+]

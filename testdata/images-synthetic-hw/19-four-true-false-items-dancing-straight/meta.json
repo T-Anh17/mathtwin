@@ -1,0 +1,27 @@
+{
+  "source": "synthetic_handwriting",
+  "capture": "straight",
+  "blurred": false,
+  "questionFormat": "dung_sai",
+  "synthetic": true,
+  "variant": "dancing-straight",
+  "coreFixture": "19-four-true-false-items",
+  "hasSolution": true,
+  "studentErrors": [
+    {
+      "kind": "conclusion",
+      "written": "a) S b) S c) Đ d) S",
+      "expected": "a) Đ b) S c) Đ d) S",
+      "description": "Đánh dấu sai ý đầu của câu đúng/sai."
+    }
+  ],
+  "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
+  "handwritingHashes": {
+    "truth.json": "927e2d5f68e01205c8ae844084b02680e022d649f4dac2d552c97a184eac8314",
+    "lines.json": "dee4b896db9147bb84d6adf8f71fbbd5a59f81df09bf8112f1b87093f26fb6a2",
+    "source.svg": "e808b7f8054f83e68675f44a7086f129a1d4d0fc0b9f8ef7ecc0085a1575732a",
+    "layout.json": "4e9eeea3e4f144c3ceef43b1df7282ee55a7eb0e0cf6755bbc4e6aebf0392728",
+    "cancellation.json": "aee00022722a9f0be060d5fa537cd7f7c126ec429d683384bb6c1d6a1533b994",
+    "1.png": "18d8f0de8ffcc53d909ae74cd875ddc646f4f1dca83fcc34cac18f8224c528ac"
+  }
+}

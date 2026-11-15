@@ -17,6 +17,7 @@
     "test": "npm run typecheck && vitest run",
     "eval:read": "npm run build && node tools/eval/dist/cli.js",
     "eval:generate": "npm run build && node tools/eval/dist/generate-cli.js",
+    "eval:pack": "npm run build && node tools/eval/dist/pack.js",
     "eval:validate": "npm run build && node tools/eval/dist/validate-cli.js",
     "models:fetch": "npm run build --workspace @mathtwin/models && node tools/models/dist/cli.js",
     "mobile:build": "node apps/mobile/scripts/build.mjs",

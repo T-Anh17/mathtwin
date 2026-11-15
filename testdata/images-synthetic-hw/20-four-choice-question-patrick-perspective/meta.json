@@ -1,0 +1,27 @@
+{
+  "source": "synthetic_handwriting",
+  "capture": "tilted",
+  "blurred": false,
+  "questionFormat": "trac_nghiem",
+  "synthetic": true,
+  "variant": "patrick-perspective",
+  "coreFixture": "20-four-choice-question",
+  "hasSolution": true,
+  "studentErrors": [
+    {
+      "kind": "conclusion",
+      "written": "Chọn C.",
+      "expected": "Chọn A.",
+      "description": "Chọn phương án sai thay vì phát biểu đúng."
+    }
+  ],
+  "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
+  "handwritingHashes": {
+    "truth.json": "0aefcb268f8ec394e926c6e65bfe4b6de6d0a39682651db9d9471255a78eeefd",
+    "lines.json": "0ce1543e38cd7edb5c4ace20593d50f0703639e8d1317a608b0672fbc00478d5",
+    "source.svg": "e808b7f8054f83e68675f44a7086f129a1d4d0fc0b9f8ef7ecc0085a1575732a",
+    "layout.json": "b8fe7fcb55030022b86e60799e66f4d1c88d3103b8004989b90c8f0b5cde1c03",
+    "cancellation.json": "efe3747021697befb8e89fca2412963b09bd492d931a05db44863c6c6bab7261",
+    "1.png": "99b7404638553addd87df5c42503488b23809b291d28c20db555a9d115038901"
+  }
+}

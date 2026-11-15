@@ -1,0 +1,70 @@
+{
+  "graph": {
+    "directed": false,
+    "vertices": [
+      {
+        "id": "A",
+        "label": "A"
+      },
+      {
+        "id": "B",
+        "label": "B"
+      },
+      {
+        "id": "C",
+        "label": "C"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1",
+        "u": "A",
+        "v": "B"
+      },
+      {
+        "id": "e2",
+        "u": "B",
+        "v": "C"
+      }
+    ]
+  },
+  "task": {
+    "type": "statements",
+    "items": [
+      {
+        "id": "A",
+        "text": "Bậc B bằng 2.",
+        "check": {
+          "type": "degree",
+          "v": "B",
+          "value": 2
+        }
+      },
+      {
+        "id": "B",
+        "text": "Có 3 cạnh.",
+        "check": {
+          "type": "edge_count",
+          "value": 3
+        }
+      },
+      {
+        "id": "C",
+        "text": "Có 2 đỉnh.",
+        "check": {
+          "type": "vertex_count",
+          "value": 2
+        }
+      },
+      {
+        "id": "D",
+        "text": "Không liên thông.",
+        "check": {
+          "type": "connected",
+          "value": false
+        }
+      }
+    ]
+  },
+  "questionFormat": "trac_nghiem"
+}

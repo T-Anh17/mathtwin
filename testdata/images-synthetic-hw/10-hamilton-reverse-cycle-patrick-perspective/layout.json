@@ -1,0 +1,81 @@
+[
+  {
+    "text": "Cho đồ thị vô hướng. Tự luận.",
+    "x": 60,
+    "y": 28,
+    "region": "question",
+    "size": 29
+  },
+  {
+    "text": "Tìm chu trình Hamilton từ A.",
+    "x": 60,
+    "y": 67,
+    "region": "question",
+    "size": 29
+  },
+  {
+    "text": "A",
+    "x": 491,
+    "y": 298,
+    "size": 27,
+    "region": "figure"
+  },
+  {
+    "text": "B",
+    "x": 710.612577728338,
+    "y": 449.88948719295297,
+    "size": 27,
+    "region": "figure"
+  },
+  {
+    "text": "E",
+    "x": 277.1241135728218,
+    "y": 450.5115865747038,
+    "size": 27,
+    "region": "figure"
+  },
+  {
+    "text": "C",
+    "x": 631.013920753627,
+    "y": 695.8334660889809,
+    "size": 27,
+    "region": "figure"
+  },
+  {
+    "text": "D",
+    "x": 364.0504920815296,
+    "y": 696.2303841700691,
+    "size": 27,
+    "region": "figure"
+  },
+  {
+    "text": "Em thử khép một vòng Hamilton qua tất cả đỉnh.",
+    "x": 75,
+    "y": 840,
+    "region": "solution",
+    "size": 28
+  },
+  {
+    "text": "A → B → C → D",
+    "x": 75,
+    "y": 884,
+    "size": 28,
+    "region": "solution",
+    "struck": "opaque",
+    "lineIndex": 8
+  },
+  {
+    "text": "A → A → C → D → E → A",
+    "x": 75,
+    "y": 928,
+    "region": "solution",
+    "size": 28
+  },
+  {
+    "text": "Quay về đỉnh xuất phát sau khi đi qua các đỉnh.",
+    "x": 75,
+    "y": 972,
+    "region": "solution",
+    "size": 28
+  }
+]

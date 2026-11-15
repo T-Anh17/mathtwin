@@ -49,8 +49,8 @@ describe('stored synthetic corpus provenance', () => {
 
 describe('evaluation CLI and data boundary', () => {
   it('accepts documented flags and rejects unsupported engines and invalid limits/passes', () => {
-    expect(readOptions(['--engine', 'fake'])).toEqual({ engine: 'fake', set: 'synthetic', passes: 2 });
-    expect(readOptions(['--engine', 'fake', '--passes', '1', '--set', 'real', '--limit', '2', '--confirm'])).toEqual({ engine: 'fake', set: 'real', passes: 1, limit: 2 });
+    expect(readOptions(['--engine', 'fake'])).toMatchObject({ engine: 'fake', set: 'synthetic', passes: 2, mode: 'graph', threshold: 0.85 });
+    expect(readOptions(['--engine', 'fake', '--passes', '1', '--set', 'real', '--limit', '2', '--confirm'])).toMatchObject({ engine: 'fake', set: 'real', passes: 1, limit: 2 });
     for (const args of [['--engine', 'cloud'], ['--engine', 'model', '--confirm'], ['--engine', 'fake', '--passes', '3'],
       ['--engine', 'fake', '--limit', '0'], ['--engine', 'fake', '--limit', '2.5'], ['--engine', 'fake', '--set', 'other'], []]) expect(() => readOptions(args)).toThrow();
   });
@@ -102,12 +102,12 @@ describe('report aggregation', () => {
       comparison: { completeCorrect: true, graphCorrect: true, fullyFlagged: true, silentError: false, graphSilentError: false,
         coverage: { precise: 0, coarse: 0, none: 0 }, extraFlags: 1, differences: [], errorCounts: {} } };
     const flagged: EvaluationRow = { ...structuredClone(base), id: 'blocked', meta: { ...base.meta, capture: 'tilted', blurred: true }, nodeLatencyMs: 20,
-      comparison: { ...base.comparison, completeCorrect: false, fullyFlagged: true, coverage: { precise: 1, coarse: 1, none: 0 } } };
+      comparison: { ...base.comparison!, completeCorrect: false, fullyFlagged: true, coverage: { precise: 1, coarse: 1, none: 0 } } };
     const silent: EvaluationRow = { ...structuredClone(base), id: 'silent', nodeLatencyMs: 30,
-      comparison: { ...base.comparison, completeCorrect: false, graphCorrect: false, fullyFlagged: false, silentError: true, graphSilentError: true,
+      comparison: { ...base.comparison!, completeCorrect: false, graphCorrect: false, fullyFlagged: false, silentError: true, graphSilentError: true,
         coverage: { precise: 0, coarse: 0, none: 1 }, errorCounts: { weight: 1 } } };
     const questionOnly: EvaluationRow = { ...structuredClone(base), id: 'question-only', nodeLatencyMs: 40,
-      comparison: { ...base.comparison, completeCorrect: false, fullyFlagged: false, silentError: true,
+      comparison: { ...base.comparison!, completeCorrect: false, fullyFlagged: false, silentError: true,
         coverage: { precise: 0, coarse: 0, none: 1 }, errorCounts: { question_format: 1 } } };
     const report = makeReport('fake', 'synthetic', 2, '2026-11-15', [base, flagged, silent, questionOnly]);
     expect(report.summary).toMatchObject({ total: 4, incorrect: 3, fullyFlagged: 1, flaggedRate: 1 / 3,

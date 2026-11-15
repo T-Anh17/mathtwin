@@ -1,0 +1,85 @@
+[
+  {
+    "text": "Cho đồ thị vô hướng. Tự luận.",
+    "region": "question"
+  },
+  {
+    "text": "Dùng Dijkstra tìm đường đi ngắn nhất từ A đến D.",
+    "region": "question"
+  },
+  {
+    "text": "A",
+    "region": "figure"
+  },
+  {
+    "text": "1",
+    "region": "figure"
+  },
+  {
+    "text": "1",
+    "region": "figure"
+  },
+  {
+    "text": "3",
+    "region": "figure"
+  },
+  {
+    "text": "D",
+    "region": "figure"
+  },
+  {
+    "text": "B",
+    "region": "figure"
+  },
+  {
+    "text": "3",
+    "region": "figure"
+  },
+  {
+    "text": "C",
+    "region": "figure"
+  },
+  {
+    "text": "Chọn A B C D",
+    "region": "table"
+  },
+  {
+    "text": "A 0 1 1 ∞",
+    "region": "table"
+  },
+  {
+    "text": "B 0 1 1 4",
+    "region": "table"
+  },
+  {
+    "text": "C 0 1 1 4",
+    "region": "table"
+  },
+  {
+    "text": "D 0 1 1 4",
+    "region": "table"
+  },
+  {
+    "text": "A → B → D",
+    "region": "solution"
+  },
+  {
+    "text": null,
+    "region": "solution",
+    "struck": true,
+    "box": [
+      105.0278868455791,
+      1129.2914918111933,
+      290.8777096362864,
+      1161.619041836177
+    ]
+  },
+  {
+    "text": "Đường đi có độ dài 5.",
+    "region": "solution"
+  },
+  {
+    "text": "Qua cạnh BD, em đổi nhãn D.",
+    "region": "solution"
+  }
+]

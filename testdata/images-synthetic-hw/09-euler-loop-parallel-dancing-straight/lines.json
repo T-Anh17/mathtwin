@@ -1,0 +1,57 @@
+[
+  {
+    "text": "Cho đồ thị vô hướng. Tự luận.",
+    "region": "question"
+  },
+  {
+    "text": "Tìm chu trình Euler.",
+    "region": "question"
+  },
+  {
+    "text": "khuyên m",
+    "region": "figure"
+  },
+  {
+    "text": "A",
+    "region": "figure"
+  },
+  {
+    "text": "a",
+    "region": "figure"
+  },
+  {
+    "text": "b",
+    "region": "figure"
+  },
+  {
+    "text": "I",
+    "region": "figure"
+  },
+  {
+    "text": "B",
+    "region": "figure"
+  },
+  {
+    "text": "Em đếm được 0 đỉnh có bậc lẻ.",
+    "region": "solution"
+  },
+  {
+    "text": "A → A → B",
+    "region": "solution",
+    "struck": true,
+    "box": [
+      71,
+      884,
+      190,
+      907
+    ]
+  },
+  {
+    "text": "A → A → B → A → A",
+    "region": "solution"
+  },
+  {
+    "text": "Em đi lần lượt qua cạnh AA (khuyên m) rồi AB (a).",
+    "region": "solution"
+  }
+]

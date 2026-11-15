@@ -1,0 +1,88 @@
+[
+  {
+    "text": "Cho đồ thị vô hướng. Tự luận.",
+    "x": 60,
+    "y": 28,
+    "region": "question",
+    "size": 29
+  },
+  {
+    "text": "Tìm chu trình Euler.",
+    "x": 60,
+    "y": 67,
+    "region": "question",
+    "size": 29
+  },
+  {
+    "text": "khuyên m",
+    "x": 504,
+    "y": 210,
+    "size": 28,
+    "region": "figure"
+  },
+  {
+    "text": "A",
+    "x": 491,
+    "y": 298,
+    "size": 27,
+    "region": "figure"
+  },
+  {
+    "text": "a",
+    "x": 606.229507170347,
+    "y": 392.4785358686454,
+    "size": 28,
+    "region": "figure"
+  },
+  {
+    "text": "b",
+    "x": 549.3605576400535,
+    "y": 426.33535751283694,
+    "size": 28,
+    "region": "figure"
+  },
+  {
+    "text": "I",
+    "x": 303.90652313632194,
+    "y": 626.3046423546178,
+    "size": 27,
+    "region": "figure"
+  },
+  {
+    "text": "B",
+    "x": 691.4805774134271,
+    "y": 631.9183109273162,
+    "size": 27,
+    "region": "figure"
+  },
+  {
+    "text": "Em đếm được 0 đỉnh có bậc lẻ.",
+    "x": 75,
+    "y": 840,
+    "region": "solution",
+    "size": 28
+  },
+  {
+    "text": "A → A → B",
+    "x": 75,
+    "y": 884,
+    "size": 28,
+    "region": "solution",
+    "struck": "single",
+    "lineIndex": 9
+  },
+  {
+    "text": "A → A → B → A → A",
+    "x": 75,
+    "y": 928,
+    "region": "solution",
+    "size": 28
+  },
+  {
+    "text": "Em đi lần lượt qua cạnh AA (khuyên m) rồi AB (a).",
+    "x": 75,
+    "y": 972,
+    "region": "solution",
+    "size": 28
+  }
+]

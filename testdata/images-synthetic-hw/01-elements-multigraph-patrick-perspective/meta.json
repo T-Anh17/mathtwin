@@ -1,0 +1,27 @@
+{
+  "source": "synthetic_handwriting",
+  "capture": "tilted",
+  "blurred": false,
+  "questionFormat": "tu_luan",
+  "synthetic": true,
+  "variant": "patrick-perspective",
+  "coreFixture": "01-elements-multigraph",
+  "hasSolution": true,
+  "studentErrors": [
+    {
+      "kind": "conclusion",
+      "written": "Đồ thị có 4 cạnh.",
+      "expected": "Đồ thị có 3 cạnh.",
+      "description": "Đếm thừa một cạnh của đồ thị."
+    }
+  ],
+  "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
+  "handwritingHashes": {
+    "truth.json": "0069ccff943f7a43e5ceae44926843dfb1ba8c0f18b34237cebe93ffa9006554",
+    "lines.json": "a462d663e498fb21cdd62383e08d19c55624b8301be798996fa24648a326be45",
+    "source.svg": "a231477bb81e70e61fb4696154358087875340af46cd6d80c0013c52554c9f16",
+    "layout.json": "1bc2166efa6dd7aa07bca38d9cd59eb71568d4292787aa61720184b3239873e9",
+    "cancellation.json": "f44fc50b4c2aad48f3685c3adc8749e7d52917b70173e5d0ea99a3d587e9ffcf",
+    "1.png": "61655d0668dcb2354e42a207e39e3d7d6644a2e108bce4322339cc5d077ae7de"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "source": "synthetic_handwriting",
+  "capture": "tilted",
+  "blurred": false,
+  "questionFormat": "tu_luan",
+  "synthetic": true,
+  "variant": "patrick-perspective",
+  "coreFixture": "12-dijkstra-tied-order",
+  "hasSolution": true,
+  "studentErrors": [
+    {
+      "kind": "arithmetic",
+      "written": "Đường đi có độ dài 5.",
+      "expected": "Đường đi có độ dài 4.",
+      "description": "Cộng sai độ dài dù bảng nhãn cho kết quả khác."
+    }
+  ],
+  "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
+  "handwritingHashes": {
+    "truth.json": "3314c460293b9cafc1213ecdfafce738edbcd457f932ec88f3e68b64fa079ee4",
+    "lines.json": "1fc3587189d396c3ccd638af8c8f0c03986f2b75347f7ffcb2619c5189b490fd",
+    "source.svg": "9e922cc30a69761746f45940438519d360ee6b3e4f913583d30bc181ddcc0076",
+    "layout.json": "0aa9f0efe09200f0c67501af1a0f6bef22405410fc3d1b0956a2ca150eccacc5",
+    "cancellation.json": "5767e842caef9dc499c49ff99993da1d9d86d5831bd1a8ae6ffc5ea65b097317",
+    "1.png": "6d8c761e0c064070afc624e58fb95e11f6ac35cba3590606cebae4d9eaed913e"
+  }
+}

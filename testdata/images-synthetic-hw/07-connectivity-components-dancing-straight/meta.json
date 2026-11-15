@@ -1,0 +1,27 @@
+{
+  "source": "synthetic_handwriting",
+  "capture": "straight",
+  "blurred": false,
+  "questionFormat": "tu_luan",
+  "synthetic": true,
+  "variant": "dancing-straight",
+  "coreFixture": "07-connectivity-components",
+  "hasSolution": true,
+  "studentErrors": [
+    {
+      "kind": "conclusion",
+      "written": "Đồ thị liên thông.",
+      "expected": "Đồ thị không liên thông.",
+      "description": "Kết luận liên thông trái với các thành phần đã tìm."
+    }
+  ],
+  "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
+  "handwritingHashes": {
+    "truth.json": "128472d4acdaf2264568a7a2ca7f402545ccc6afd24d16ae1aaa6138c9aeb4d0",
+    "lines.json": "582491862f88d91b31bfbcdb40058306b7a1aac63d32055599666f9e288e0e7e",
+    "source.svg": "ab692f2e08a8050c17a18595e08f4875065d1b295c4d2594064577a3f8d26acd",
+    "layout.json": "f663841c54ad5dafe0624ace11c5ce7d2c6de3ce30f5caeffae13c3506b9ec2d",
+    "cancellation.json": "ee924433fdb85704472ba685bffd97d78f907228edd6c3969cd7c19e879bbc4c",
+    "1.png": "df1ef51ed7a4f40f44245617a47e1276e19c68beb34e46eb46ea5c69e42186f9"
+  }
+}

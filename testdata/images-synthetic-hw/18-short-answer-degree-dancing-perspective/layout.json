@@ -1,0 +1,60 @@
+[
+  {
+    "text": "Cho đồ thị vô hướng. Trả lời ngắn.",
+    "x": 60,
+    "y": 28,
+    "region": "question",
+    "size": 29
+  },
+  {
+    "text": "Tính bậc của A trong đồ thị.",
+    "x": 60,
+    "y": 67,
+    "region": "question",
+    "size": 29
+  },
+  {
+    "text": "A",
+    "x": 491,
+    "y": 298,
+    "size": 27,
+    "region": "figure"
+  },
+  {
+    "text": "C",
+    "x": 303.90652313632194,
+    "y": 626.3046423546178,
+    "size": 27,
+    "region": "figure"
+  },
+  {
+    "text": "B",
+    "x": 691.4805774134271,
+    "y": 631.9183109273162,
+    "size": 27,
+    "region": "figure"
+  },
+  {
+    "text": "Bậc của A bằng 2.",
+    "x": 75,
+    "y": 840,
+    "region": "solution",
+    "size": 28
+  },
+  {
+    "text": "Tổng bậc = 8.",
+    "x": 75,
+    "y": 884,
+    "size": 28,
+    "region": "solution",
+    "struck": "opaque",
+    "lineIndex": 6
+  },
+  {
+    "text": "Tổng bậc = 2 × số cạnh = 2 × 3 = 6.",
+    "x": 75,
+    "y": 928,
+    "region": "solution",
+    "size": 28
+  }
+]

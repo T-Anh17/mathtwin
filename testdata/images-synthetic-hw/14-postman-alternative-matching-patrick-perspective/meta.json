@@ -1,0 +1,27 @@
+{
+  "source": "synthetic_handwriting",
+  "capture": "tilted",
+  "blurred": false,
+  "questionFormat": "tu_luan",
+  "synthetic": true,
+  "variant": "patrick-perspective",
+  "coreFixture": "14-postman-alternative-matching",
+  "hasSolution": true,
+  "studentErrors": [
+    {
+      "kind": "arithmetic",
+      "written": "Tổng = 6 + 2 = 9.",
+      "expected": "Tổng = 6 + 2 = 8.",
+      "description": "Cộng sai tổng độ dài ban đầu và các cạnh lặp."
+    }
+  ],
+  "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
+  "handwritingHashes": {
+    "truth.json": "c5653ea96c05548ee0d7563197eb079f135389084a6367c9fa3c6ec836100a4a",
+    "lines.json": "baedb151c1bf633ecf2bbc57f04baabecc55b47df648bef747d84e536e1cebec",
+    "source.svg": "ff44107953871573708008dd81fa9f5c94a28d16f005980901de27659ea1a63c",
+    "layout.json": "7def7a618119085db0e1a5881dddbdb0cc45ec2f42d83a1eae8f6610ff1f9bac",
+    "cancellation.json": "f23dcd2a76fb9fe0aaee0192e10c51269649ba433fff41b9bb34d6b1b4724b33",
+    "1.png": "035f0c22e4cecd4ce8b76fc09c1e594825b6bd584585f392afc77497fed3a4ae"
+  }
+}

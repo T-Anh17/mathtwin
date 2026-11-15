@@ -1,0 +1,27 @@
+{
+  "source": "synthetic_handwriting",
+  "capture": "tilted",
+  "blurred": false,
+  "questionFormat": "tu_luan",
+  "synthetic": true,
+  "variant": "patrick-perspective",
+  "coreFixture": "13-tsp-tied-student-tour",
+  "hasSolution": true,
+  "studentErrors": [
+    {
+      "kind": "arithmetic",
+      "written": "Độ dài = 1 + 2 + 4 + 9 = 17.",
+      "expected": "Độ dài = 1 + 2 + 4 + 9 = 16.",
+      "description": "Cộng sai tổng trọng số của tour."
+    }
+  ],
+  "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
+  "handwritingHashes": {
+    "truth.json": "3aecbecc43b527d7d9865130069829de717488fcac9caa75fc237b2e421e4fb4",
+    "lines.json": "ee5e20d71d68eeadc7a892ef11e2ee798e2ab1b80df858d54faed3d859855115",
+    "source.svg": "ff44107953871573708008dd81fa9f5c94a28d16f005980901de27659ea1a63c",
+    "layout.json": "d70a16cb0b5d0f2cce97ff027bcf5dc6b94213814a9edbd9a7912e748876e3f7",
+    "cancellation.json": "e25954d10fefdf3a09ba3281d5fc883e5121e5e14b06a722baf979d1454d71e0",
+    "1.png": "eac60671e8db1d19cb1335f4e5b4c4e016926a7e9f9e4ec378bc94ccac35e78c"
+  }
+}

@@ -1,4 +1,5 @@
 import type { Graph, ProblemSpec, Task } from '@mathtwin/core';
+import type { TruthLine } from '@mathtwin/reader';
 import { checkedTruth } from './dataset.js';
 
 export const syntheticFixtures = [
@@ -10,7 +11,7 @@ export const variants = ['clean', 'tilted', 'blurred', 'low-resolution', 'handwr
 export type SyntheticVariant = typeof variants[number];
 const escape = (value: string): string => value.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' })[c]!);
 
-function questionLines(task: Task, graph: Graph): string[] {
+export function questionLines(task: Task, graph: Graph): string[] {
   const label = (id: string): string => graph.vertices.find((v) => v.id === id)!.label;
   switch (task.type) {
     case 'elements': return ['Liệt kê các đỉnh, các cạnh và nhận biết khuyên, cạnh song song.'];
@@ -35,7 +36,7 @@ function wrap(text: string, length = 88): string[] {
   if (line) lines.push(line);
   return lines;
 }
-export function buildSyntheticCase(input: ProblemSpec, variant: SyntheticVariant): { truth: ProblemSpec; svg: string } {
+export function buildSyntheticCase(input: ProblemSpec, variant: SyntheticVariant): { truth: ProblemSpec; svg: string; lines: TruthLine[] } {
   // One validated model supplies BOTH renderer and truth. No second graph/edge list is maintained.
   const truth = structuredClone(input); delete truth.uncertain;
   checkedTruth(truth, 'synthetic');
@@ -47,7 +48,9 @@ export function buildSyntheticCase(input: ProblemSpec, variant: SyntheticVariant
       y: 560 + 220 * Math.sin(angle) + (pen ? Math.cos(i * 7) * 5 : 0) }];
   }));
   const paths: string[] = []; const labels: string[] = [];
+  const figureLines: { text: string; x: number; y: number }[] = [];
   const annotation = (x: number, y: number, text: string): string => {
+    figureLines.push({ text, x, y });
     const width = Math.max(28, text.length * 13 + 12);
     return `<rect x="${x - width / 2}" y="${y - 16}" width="${width}" height="28" rx="5" fill="white"/><text x="${x}" y="${y + 5}" text-anchor="middle" font-size="22">${escape(text)}</text>`;
   };
@@ -90,5 +93,9 @@ ${text.map((line, i) => `<text x="38" y="${40 + i * 30}" font-size="21">${escape
 ${paths.join('\n')}${labels.join('\n')}
 ${graph.vertices.map((v) => { const p = points.get(v.id)!; return `<circle cx="${p.x}" cy="${p.y}" r="20" fill="white" stroke="#111" stroke-width="${pen ? 2.8 : 2}"/><text x="${p.x}" y="${p.y + 7}" text-anchor="middle" font-size="22">${escape(v.label)}</text>`; }).join('\n')}
 </g></svg>`;
-  return { truth, svg };
+  for (const vertex of graph.vertices) { const point = points.get(vertex.id)!; figureLines.push({ text: vertex.label, ...point }); }
+  figureLines.sort((a, b) => a.y - b.y || a.x - b.x);
+  const lines: TruthLine[] = [...text.map((text) => ({ text: text.normalize('NFC'), region: 'question' as const })),
+    ...figureLines.map(({ text }) => ({ text: text.normalize('NFC'), region: 'figure' as const }))];
+  return { truth, svg, lines };
 }

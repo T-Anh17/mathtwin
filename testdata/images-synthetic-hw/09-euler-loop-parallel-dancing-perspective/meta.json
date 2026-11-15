@@ -1,0 +1,20 @@
+{
+  "source": "synthetic_handwriting",
+  "capture": "tilted",
+  "blurred": false,
+  "questionFormat": "tu_luan",
+  "synthetic": true,
+  "variant": "dancing-perspective",
+  "coreFixture": "09-euler-loop-parallel",
+  "hasSolution": true,
+  "studentErrors": [],
+  "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
+  "handwritingHashes": {
+    "truth.json": "ae4c84d4b9f797aaf527da84f56d4bc56da5e7191ccc6ba36ba97ad941cf7306",
+    "lines.json": "24c59d02a88cf2b8a97abee001c5ad4576134b30163a1bdee0ed9d4b04bb6d82",
+    "source.svg": "a231477bb81e70e61fb4696154358087875340af46cd6d80c0013c52554c9f16",
+    "layout.json": "9d90122f6879945ecc079215c5853db30fa8e1bbe16ae06daf27b13ff77e5278",
+    "cancellation.json": "4469597e2c690805bbf8d27e9bfa335094b8bc806e7cd10041af3bbcb49f100c",
+    "1.png": "f1f1e8f5c6c5051bca6affb9b8703ca0dae288030a29efb5945aaa6a413baada"
+  }
+}

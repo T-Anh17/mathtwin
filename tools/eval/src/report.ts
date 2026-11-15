@@ -1,13 +1,43 @@
-import type { ReadComparison, ReadUsage } from '@mathtwin/reader';
+import type { ReadComparison, ReadUsage, TextComparison, TextMetrics, EditScore } from '@mathtwin/reader';
 import type { ImageMeta } from './dataset.js';
 
-export interface EvaluationRow { id: string; meta: ImageMeta; comparison: ReadComparison; usage: ReadUsage; nodeLatencyMs: number; issueCodes: string[] }
+export interface EvaluationRow {
+  id: string; meta: ImageMeta; comparison?: ReadComparison; usage: ReadUsage; nodeLatencyMs?: number; issueCodes: string[];
+  textComparisons?: TextComparison[]; errorCode?: string;
+  deviceTiming?: { totalMs: number; modelLoadMs: number; modelVerifyMs: number; reusedModel: boolean };
+}
 export function percentile(values: number[], p: number): number | null {
   if (values.length === 0) return null;
   const sorted = [...values].sort((a, b) => a - b);
   return sorted[Math.max(0, Math.ceil(p * sorted.length) - 1)]!;
 }
-export function summarize(rows: EvaluationRow[]) {
+export function summarizeText(comparisons: TextMetrics[]) {
+  const sum = (field: 'cer' | 'wer' | 'cerWithoutDiacritics' | 'digits' | 'vertexLabels'): EditScore => {
+    const errors = comparisons.reduce((n, c) => n + c[field].errors, 0);
+    const reference = comparisons.reduce((n, c) => n + c[field].reference, 0);
+    return { errors, reference, rate: reference ? errors / reference : null };
+  };
+  const referenceLines = comparisons.reduce((n, c) => n + c.referenceLines, 0);
+  const predictedLines = comparisons.reduce((n, c) => n + c.predictedLines, 0);
+  const correctLines = comparisons.reduce((n, c) => n + c.correctLines, 0);
+  const silentLines = comparisons.reduce((n, c) => n + c.silentLines, 0);
+  const struckReferenceLines = comparisons.reduce((n, c) => n + c.struckReferenceLines, 0);
+  const struckReadAsContent = comparisons.reduce((n, c) => n + c.struckReadAsContent, 0);
+  const struckUnassessable = comparisons.reduce((n, c) => n + c.struckUnassessable, 0);
+  const digitScore = sum('digits'); const labelScore = sum('vertexLabels');
+  return { samples: comparisons.length, cer: sum('cer'), wer: sum('wer'), cerWithoutDiacritics: sum('cerWithoutDiacritics'),
+    digits: { ...digitScore, accuracy: digitScore.rate === null ? null : Math.max(0, 1 - digitScore.rate) },
+    vertexLabels: { ...labelScore, accuracy: labelScore.rate === null ? null : Math.max(0, 1 - labelScore.rate) },
+    referenceLines, predictedLines, correctLines, lineRecall: referenceLines ? correctLines / referenceLines : null,
+    silentLines, silentLineRate: predictedLines ? silentLines / predictedLines : null,
+    struckReferenceLines, struckReadAsContent, struckUnassessable };
+}
+function summarizeTextPass(comparisons: TextComparison[]) {
+  return { ...summarizeText(comparisons), byRegion: Object.fromEntries((['question', 'figure', 'table', 'solution'] as const).map((region) =>
+    [region, summarizeText(comparisons.map((c) => c.byRegion[region]).filter((c) => c.referenceLines > 0 || c.predictedLines > 0 || c.struckReferenceLines > 0))])) };
+}
+export function summarize(all: EvaluationRow[]) {
+  const rows = all.filter((r): r is EvaluationRow & { comparison: ReadComparison } => r.comparison !== undefined);
   const total = rows.length; const correct = rows.filter((r) => r.comparison.completeCorrect).length;
   const incorrect = total - correct;
   const flagged = rows.filter((r) => !r.comparison.completeCorrect && r.comparison.fullyFlagged).length;
@@ -22,26 +52,35 @@ export function summarize(rows: EvaluationRow[]) {
     silentErrors: rows.filter((r) => r.comparison.silentError).map((r) => r.id),
     graphSilentErrors: rows.filter((r) => r.comparison.graphSilentError).map((r) => r.id), coverage,
     extraFlagsPerProblem: total === 0 ? null : rows.reduce((n, r) => n + r.comparison.extraFlags, 0) / total,
-    nodeLatencyMs: { p50: percentile(rows.map((r) => r.nodeLatencyMs), 0.5), p90: percentile(rows.map((r) => r.nodeLatencyMs), 0.9) },
-    readerLatencyMs: { p50: percentile(rows.map((r) => r.usage.latencyMs), 0.5), p90: percentile(rows.map((r) => r.usage.latencyMs), 0.9) },
-    peakMemoryMb: rows.some((r) => r.usage.peakMemoryMb !== undefined) ? Math.max(...rows.map((r) => r.usage.peakMemoryMb ?? 0)) : null, errors };
+    evaluatedImages: all.length, failedImages: all.filter((r) => r.errorCode).map((r) => ({ id: r.id, code: r.errorCode })),
+    textByPass: Object.fromEntries(Array.from({ length: Math.max(0, ...all.map((r) => r.textComparisons?.length ?? 0)) }, (_, i) =>
+      [String(i + 1), summarizeTextPass(all.flatMap((r) => r.textComparisons?.[i] ? [r.textComparisons[i]!] : []))])),
+    nodeLatencyMs: { p50: percentile(all.flatMap((r) => r.nodeLatencyMs === undefined ? [] : [r.nodeLatencyMs]), 0.5), p90: percentile(all.flatMap((r) => r.nodeLatencyMs === undefined ? [] : [r.nodeLatencyMs]), 0.9) },
+    readerLatencyMs: { p50: percentile(all.map((r) => r.usage.latencyMs), 0.5), p90: percentile(all.map((r) => r.usage.latencyMs), 0.9) },
+    deviceTotalMs: { p50: percentile(all.flatMap((r) => r.deviceTiming ? [r.deviceTiming.totalMs] : []), 0.5), p90: percentile(all.flatMap((r) => r.deviceTiming ? [r.deviceTiming.totalMs] : []), 0.9) },
+    serverMs: { p50: percentile(all.flatMap((r) => r.usage.serverTimings ? [r.usage.serverTimings.promptMs + r.usage.serverTimings.predictedMs] : []), 0.5), p90: percentile(all.flatMap((r) => r.usage.serverTimings ? [r.usage.serverTimings.promptMs + r.usage.serverTimings.predictedMs] : []), 0.9) },
+    modelLoadMs: { cold: all.filter((r) => r.deviceTiming && !r.deviceTiming.reusedModel).map((r) => r.deviceTiming!.modelLoadMs), reused: all.filter((r) => r.deviceTiming?.reusedModel).map((r) => r.deviceTiming!.modelLoadMs) },
+    peakMemoryMb: all.some((r) => r.usage.peakMemoryMb !== undefined) ? Math.max(...all.map((r) => r.usage.peakMemoryMb ?? 0)) : null, errors };
 }
-export function makeReport(engine: string, set: string, passes: 1 | 2, date: string, rows: EvaluationRow[]) {
+export interface ReportContext { mode?: 'graph' | 'lines' | 'both'; phoneMeasurements?: Record<string, unknown>; configuration?: Record<string, unknown> }
+export function makeReport(engine: string, set: string, passes: 1 | 2, date: string, rows: EvaluationRow[], context: ReportContext = {}) {
   const groups = {
     printed: summarize(rows.filter((r) => r.meta.source === 'printed')),
-    handwritten: summarize(rows.filter((r) => r.meta.source === 'handwritten')),
+    handwritten: summarize(rows.filter((r) => r.meta.source === 'handwritten' && !r.meta.synthetic)),
+    synthetic_handwriting: summarize(rows.filter((r) => r.meta.source === 'synthetic_handwriting')),
+    legacy_synthetic_pen: summarize(rows.filter((r) => r.meta.source === 'handwritten' && r.meta.synthetic)),
     tilted: summarize(rows.filter((r) => r.meta.capture === 'tilted')),
     blurred: summarize(rows.filter((r) => r.meta.blurred)),
   };
-  return { engine, set, passes, date, fixtureOnly: engine === 'fake', downloadBytes: 0,
-    phoneMeasurements: null, summary: summarize(rows), groups, rows };
+  return { engine, set, passes, date, mode: context.mode ?? 'graph', fixtureOnly: engine === 'fake', downloadBytes: engine === 'fake' ? 0 : null,
+    configuration: context.configuration ?? null, phoneMeasurements: context.phoneMeasurements ?? null, summary: summarize(rows), groups, rows };
 }
 export type EvaluationReport = ReturnType<typeof makeReport>;
 export function renderReport(report: EvaluationReport): string {
   const percent = (value: number | null): string => value === null ? 'N/A' : `${(value * 100).toFixed(1)}%`;
   const ms = (value: number | null): string => value === null ? 'N/A' : value.toFixed(3);
   const lines = [`# Đánh giá đọc đề — ${report.engine} — ${report.date}`, '',
-    `Bộ: ${report.set}; lượt đọc: ${report.passes}; môi trường: Node.`, '',
+    `Bộ: ${report.set}; lượt đọc: ${report.passes}; chế độ: ${report.mode}; môi trường: ${report.phoneMeasurements ? 'Android (file xuất từ app)' : 'Node'}.`, '',
     ...(report.fixtureOnly ? ['**Reader giả dùng nhãn chuẩn, không đọc pixel. Các số này chỉ kiểm tra pipeline, không chứng minh chất lượng nhận dạng.**', ''] : []),
     '| Nhóm | Số đề | Đúng hoàn toàn | Chỉ đồ thị | Sai gắn cờ đủ / số sai | Sai thầm lặng toàn bài | Sai thầm lặng chỉ đồ thị | Cờ thừa/đề |',
     '| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |'];
@@ -54,8 +93,22 @@ export function renderReport(report: EvaluationReport): string {
     `| ${name} | ${group.coverage.precise} | ${group.coverage.coarse} | ${group.coverage.none} |`);
   lines.push('', 'Mỗi phần tử lệch chỉ được tính một mức: precise (đúng mục và candidate), coarse (yêu cầu xem lại phần liên quan), none (không được phủ). Ưu tiên precise trước coarse. Có none là sai thầm lặng; chỉ số chỉ đồ thị bỏ qua phần câu hỏi.', '',
     `Độ trễ Node p50/p90 (ms, gồm đọc và chuẩn hóa, không gồm giải mã ảnh): ${ms(report.summary.nodeLatencyMs.p50)} / ${ms(report.summary.nodeLatencyMs.p90)}.`,
-    `Bộ nhớ đỉnh do reader đo (MB): ${report.summary.peakMemoryMb ?? 'chưa đo'}. Dung lượng model tải: ${report.downloadBytes} byte.`,
-    'Điện thoại thật: chưa có số đo. Không suy ra ngưỡng 15 giây từ số đo Node.', '', '## Lỗi theo loại và nguồn', '',
+    `Bộ nhớ đỉnh do reader đo (MB): ${report.summary.peakMemoryMb ?? 'chưa đo'}. Dung lượng model tải (byte): ${report.downloadBytes ?? 'chưa đo'}.`,
+    ...(report.phoneMeasurements ? [`Thiết bị và runtime: ${JSON.stringify(report.phoneMeasurements)}`, `Cấu hình: ${JSON.stringify(report.configuration)}`,
+      `Tổng trên điện thoại p50/p90 (ms): ${ms(report.summary.deviceTotalMs.p50)} / ${ms(report.summary.deviceTotalMs.p90)}.`,
+      `Server prompt + prediction p50/p90 (ms): ${ms(report.summary.serverMs.p50)} / ${ms(report.summary.serverMs.p90)}.`,
+      `Thời gian nạp model (ms), nạp mới / dùng lại: ${JSON.stringify(report.summary.modelLoadMs.cold)} / ${JSON.stringify(report.summary.modelLoadMs.reused)}.`,
+      'Thiết bị RAM < 6 GB chỉ chứng minh chạy được hay không; chưa dùng để kết luận cho máy mục tiêu.']
+      : ['Điện thoại thật: chưa có số đo. Không suy ra ngưỡng 15 giây từ số đo Node.']), '', '## Chỉ số chữ theo lượt', '',
+    '| Nhóm | Lượt | Vùng | Số ảnh | CER | WER | CER bỏ dấu | Đúng số | Đúng nhãn | Recall dòng | Sai thầm lặng/dòng dự đoán | Gạch xóa chép thành nội dung | Gạch xóa chưa đánh giá được |',
+    '| --- | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |');
+  for (const [name, group] of Object.entries({ all: report.summary, ...report.groups })) for (const [pass, text] of Object.entries(group.textByPass)) {
+    for (const [region, bucket] of Object.entries({ all: text, ...text.byRegion })) lines.push(
+      `| ${name} | ${pass} | ${region} | ${bucket.samples} | ${percent(bucket.cer.rate)} | ${percent(bucket.wer.rate)} | ${percent(bucket.cerWithoutDiacritics.rate)} | ${percent(bucket.digits.accuracy)} | ${percent(bucket.vertexLabels.accuracy)} | ${percent(bucket.lineRecall)} | ${bucket.silentLines}/${bucket.predictedLines} (${percent(bucket.silentLineRate)}) | ${bucket.struckReadAsContent} | ${bucket.struckUnassessable} |`);
+  }
+  lines.push('', 'CER/WER cộng lỗi và mẫu số trên toàn nhóm; không lấy trung bình phần trăm. Recall dòng đòi hỏi khớp nguyên dòng đúng thứ tự. Mỗi lượt được báo cáo riêng, không chọn lượt tốt nhất bằng truth.', '',
+    `Ảnh đã đánh giá: ${report.summary.evaluatedImages}; lỗi xử lý: ${report.summary.failedImages.length}.`,
+    ...report.summary.failedImages.map((r) => `- ${r.id}: ${r.code}`), '', '## Lỗi theo loại và nguồn', '',
     '| Nhóm | Loại lỗi | Số phần tử lệch |', '| --- | --- | ---: |');
   for (const [name, group] of Object.entries({ all: report.summary, ...report.groups })) {
     for (const [type, count] of Object.entries(group.errors)) lines.push(`| ${name} | ${type} | ${count} |`);

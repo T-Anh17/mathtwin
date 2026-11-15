@@ -1,0 +1,57 @@
+[
+  {
+    "text": "Cho đồ thị vô hướng. Tự luận.",
+    "region": "question"
+  },
+  {
+    "text": "Tìm chu trình Euler.",
+    "region": "question"
+  },
+  {
+    "text": "khuyên m",
+    "region": "figure"
+  },
+  {
+    "text": "A",
+    "region": "figure"
+  },
+  {
+    "text": "a",
+    "region": "figure"
+  },
+  {
+    "text": "b",
+    "region": "figure"
+  },
+  {
+    "text": "I",
+    "region": "figure"
+  },
+  {
+    "text": "B",
+    "region": "figure"
+  },
+  {
+    "text": "Có 0 đỉnh bậc lẻ.",
+    "region": "solution"
+  },
+  {
+    "text": null,
+    "region": "solution",
+    "struck": true,
+    "box": [
+      102.20859239819556,
+      859.3631236678486,
+      211.23704861229064,
+      886.523490844855
+    ]
+  },
+  {
+    "text": "A → A → B → A",
+    "region": "solution"
+  },
+  {
+    "text": "Đường Euler bắt đầu qua cạnh AA (khuyên m) rồi AB (a).",
+    "region": "solution"
+  }
+]

@@ -1,0 +1,27 @@
+{
+  "source": "synthetic_handwriting",
+  "capture": "straight",
+  "blurred": false,
+  "questionFormat": "tu_luan",
+  "synthetic": true,
+  "variant": "dancing-straight",
+  "coreFixture": "09-euler-loop-parallel",
+  "hasSolution": true,
+  "studentErrors": [
+    {
+      "kind": "vertex",
+      "written": "A → A → B → A → A",
+      "expected": "A → A → B → A",
+      "description": "Viết thêm một đỉnh cuối, làm đường Euler thừa một bước."
+    }
+  ],
+  "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
+  "handwritingHashes": {
+    "truth.json": "ae4c84d4b9f797aaf527da84f56d4bc56da5e7191ccc6ba36ba97ad941cf7306",
+    "lines.json": "5b60d681abd86e8ffb100c3c8b032ceb22b43d658bc090331c7038765ea4a88b",
+    "source.svg": "a231477bb81e70e61fb4696154358087875340af46cd6d80c0013c52554c9f16",
+    "layout.json": "cf396663828e62851b31f40d2bd16ad3251288d4320a68112a4556b9583af05b",
+    "cancellation.json": "52332411b6cb3cc6f3bde0bdde5cd52502ee7ce4719c2791e52f0e2982bb921f",
+    "1.png": "4707ffb3911a5129dec6575d41c289fcf64ecce7b37cb59c97660f099365f85a"
+  }
+}

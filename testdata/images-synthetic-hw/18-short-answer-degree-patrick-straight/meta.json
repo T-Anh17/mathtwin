@@ -1,0 +1,20 @@
+{
+  "source": "synthetic_handwriting",
+  "capture": "straight",
+  "blurred": false,
+  "questionFormat": "tra_loi_ngan",
+  "synthetic": true,
+  "variant": "patrick-straight",
+  "coreFixture": "18-short-answer-degree",
+  "hasSolution": true,
+  "studentErrors": [],
+  "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
+  "handwritingHashes": {
+    "truth.json": "c3ea9d3a0853c9ab0957435b2c3e071be28a95c7aeb1442f7d5d9f305802a3b7",
+    "lines.json": "bb4fb79ff564bb3046b4f9993024617735c90a151ebcc10f485ecf5858206baa",
+    "source.svg": "d0a15fa5801207c8302a6f0b8e0ca47907099c9798b962135f73a2cd4613c1bb",
+    "layout.json": "0317459330de6cd391609286908281c645c2f8677132d86de461d2b06ac3393b",
+    "cancellation.json": "8cc4bb7b589d9503d8b6470bd0fbf241d25f1dd98b6dcdbc90beb176e59e7214",
+    "1.png": "507821836d0f31dd79bc402d806b25f2f4bb4060fabf52cb431508f6c31a78a9"
+  }
+}

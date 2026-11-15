@@ -1,0 +1,22 @@
+[
+  {
+    "text": "Cho đồ thị vô hướng như hình. Trả lời ngắn.",
+    "region": "question"
+  },
+  {
+    "text": "Tính bậc của A trong đồ thị.",
+    "region": "question"
+  },
+  {
+    "text": "A",
+    "region": "figure"
+  },
+  {
+    "text": "B",
+    "region": "figure"
+  },
+  {
+    "text": "C",
+    "region": "figure"
+  }
+]

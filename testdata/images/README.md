@@ -9,10 +9,11 @@ testdata/images/de-001/
   1.jpg
   2.jpg           # nếu đề nhiều trang; đánh số liên tiếp từ 1
   truth.json
+  lines.json      # bắt buộc khi đo đọc chữ, gồm đề và/hoặc bài làm
   meta.json
 ```
 
-Nhận JPG/JPEG/PNG; có thể trộn định dạng giữa các trang. Ảnh được đọc theo số trang (1, 2, …, 10), xoay EXIF và giải mã RGBA tại máy. Không đặt ảnh bài làm vào bộ này. Chỉ đưa ảnh đã cho phép sử dụng vào repo; bỏ thông tin cá nhân.
+Nhận JPG/JPEG/PNG; có thể trộn định dạng giữa các trang. Ảnh được đọc theo số trang (1, 2, …, 10), xoay EXIF và giải mã RGBA tại máy. Có thể chứa đề, bài làm hoặc cả hai để đo chữ; `truth.json` vẫn là đề gốc gắn với bài làm đó. Chỉ đưa ảnh đã cho phép sử dụng vào repo; bỏ thông tin cá nhân. Mặc định giữ ảnh bài làm học sinh ngoài repo; không đưa ảnh thật vào commit khi chưa được cho phép rõ ràng.
 
 ## Gán nhãn chuẩn
 
@@ -61,5 +62,32 @@ npm run eval:validate -- synthetic
 ```
 
 Lệnh gọi `validateSpec(truth).ok` của core cho từng nhãn, kiểm không có `uncertain`, metadata và thứ tự trang. Trả mã lỗi nếu bất kỳ nhãn nào không hợp lệ. Bộ thật rỗng được báo `0 đề`; chạy đánh giá bộ rỗng sẽ thất bại, không tạo kết quả độ chính xác giả.
+
+## Gán nhãn chữ viết tay `lines.json`
+
+Giáo viên chép lại **đúng chữ nhìn thấy**, không sửa số hay lập luận sai của học sinh theo lời giải. `lines.json` là mảng `{text, region, struck?, box?}` chuẩn NFC theo thứ tự trang và thứ tự đọc trên xuống dưới, trái sang phải:
+
+```json
+[
+  {"text":"Tìm đường đi ngắn nhất từ A đến C.","region":"question"},
+  {"text":"A","region":"figure"},
+  {"text":"Chọn A B C","region":"table"},
+  {"text":"A 0 7 ∞","region":"table"},
+  {"text":"A → B → C","region":"solution"},
+  {"text":"Đường đi có độ dài 9.","region":"solution"},
+  {"text":"Nháp: 7","region":"solution","struck":true,"box":[70,315,270,360]},
+  {"text":null,"region":"solution","struck":true,"box":[70,375,270,420]}
+]
+```
+
+`region` chỉ nhận `question`, `figure`, `solution`, `table`. Mỗi hàng bảng là một dòng, ô trong hàng cách nhau bằng dấu cách; không ghi từng ô thành một dòng. Nhãn/trọng số rời trong hình ghi riêng, theo trên xuống dưới rồi trái sang phải.
+
+Chữ đã gạch không còn là bài làm: tách thành **dòng riêng** với `struck: true`, không ghép vào dòng đang có hiệu lực. Gạch một nét còn đọc rõ thì chép nguyên văn chữ dưới nét gạch; bôi kín không đọc được thì dùng `text: null`, tuyệt đối không đoán chữ cũ. Null chỉ hợp lệ khi `struck: true`. Thêm `box: [x1,y1,x2,y2]` bao vùng gạch, theo pixel ảnh gốc đã xoay EXIF (trái < phải, trên < dưới). Với chữ xen giữa một dòng, tách phần đang có hiệu lực và phần gạch thành các mục riêng theo thứ tự đọc, rồi giữ cùng quy ước cho kết quả dự đoán khi đo.
+
+`compareText` mặc định bỏ mọi reference `struck` khỏi CER/WER, số/nhãn và recall. `struckReadAsContent` đếm vùng gạch được chép như chữ bình thường; bôi kín cần box truth và box dự đoán để đo chỉ số này. Khi thiếu box thì ghi `struckUnassessable`, không gán chữ hoặc conf giả. Ngoài vùng gạch, chữ không thể gán nhãn chắc chắn thì chưa dùng trang đó để tính chỉ số. Có thể dùng `[]` cho trang thực sự không có chữ; không dùng để thay cho nhãn chưa làm.
+
+Lưu UTF-8 NFC, không nhập dòng trống; `eval:validate` kiểm các điều kiện này nếu có `lines.json`. Khi chạy `--mode lines|both`, thiếu file này sẽ báo lỗi. Nhờ giáo viên thứ hai kiểm tra dấu tiếng Việt, chữ số, nhãn đỉnh, thứ tự và các chữ gạch xóa. Không lấy bản đọc tự động làm truth trước khi đối chiếu độc lập.
+
+App v1 đo một ảnh mỗi id. Khi đóng gói bộ nhiều trang, tách từng trang ra id riêng và lặp truth đề; mỗi id có lines của đúng trang đó. Đo graph chỉ chọn ảnh chứa đủ thông tin đề và hình, không lấy riêng trang lời giải để kết luận chất lượng đọc đồ thị. Xem [đóng gói và nhập kết quả thiết bị](../../tools/eval/README.md).
 
 Đánh giá thử pipeline: `npm run eval:read -- --engine fake --set real`. Reader `fake` dùng trực tiếp nhãn chuẩn, không đọc pixel; kết quả của nó không phải số đo OCR. Xem [hướng dẫn CLI](../../tools/eval/README.md).

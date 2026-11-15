@@ -1,0 +1,53 @@
+[
+  {
+    "text": "Cho đồ thị vô hướng. Tự luận.",
+    "region": "question"
+  },
+  {
+    "text": "Tìm chu trình Hamilton từ A.",
+    "region": "question"
+  },
+  {
+    "text": "A",
+    "region": "figure"
+  },
+  {
+    "text": "B",
+    "region": "figure"
+  },
+  {
+    "text": "E",
+    "region": "figure"
+  },
+  {
+    "text": "C",
+    "region": "figure"
+  },
+  {
+    "text": "D",
+    "region": "figure"
+  },
+  {
+    "text": "Em tìm chu trình đi qua mọi đỉnh.",
+    "region": "solution"
+  },
+  {
+    "text": "A → B → C → D",
+    "region": "solution",
+    "struck": true,
+    "box": [
+      71,
+      884,
+      220,
+      904
+    ]
+  },
+  {
+    "text": "A → B → C → D → E → A",
+    "region": "solution"
+  },
+  {
+    "text": "Quay về đỉnh xuất phát sau khi đi qua các đỉnh.",
+    "region": "solution"
+  }
+]

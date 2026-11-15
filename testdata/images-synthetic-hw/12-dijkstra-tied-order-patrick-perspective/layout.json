@@ -1,0 +1,277 @@
+[
+  {
+    "text": "Cho đồ thị vô hướng. Tự luận.",
+    "x": 60,
+    "y": 28,
+    "region": "question",
+    "size": 29
+  },
+  {
+    "text": "Dùng Dijkstra tìm đường đi ngắn nhất từ A đến D.",
+    "x": 60,
+    "y": 67,
+    "region": "question",
+    "size": 29
+  },
+  {
+    "text": "A",
+    "x": 491,
+    "y": 298,
+    "size": 27,
+    "region": "figure"
+  },
+  {
+    "text": "1",
+    "x": 585.4358526804816,
+    "y": 371.30863477359924,
+    "size": 28,
+    "region": "figure"
+  },
+  {
+    "text": "1",
+    "x": 510.43261938717427,
+    "y": 449.04063513849326,
+    "size": 28,
+    "region": "figure"
+  },
+  {
+    "text": "3",
+    "x": 566.8834929257164,
+    "y": 501.8129155562058,
+    "size": 28,
+    "region": "figure"
+  },
+  {
+    "text": "D",
+    "x": 271.30217384733606,
+    "y": 514.2015604357059,
+    "size": 27,
+    "region": "figure"
+  },
+  {
+    "text": "B",
+    "x": 721.6248615619285,
+    "y": 519.4183109273162,
+    "size": 27,
+    "region": "figure"
+  },
+  {
+    "text": "3",
+    "x": 424.2061293894609,
+    "y": 645.8598605792739,
+    "size": 28,
+    "region": "figure"
+  },
+  {
+    "text": "C",
+    "x": 498.7622389878206,
+    "y": 738.8046423546177,
+    "size": 27,
+    "region": "figure"
+  },
+  {
+    "text": "Chọn",
+    "x": 80,
+    "y": 885,
+    "region": "table",
+    "size": 27
+  },
+  {
+    "text": "A",
+    "x": 220,
+    "y": 885,
+    "region": "table",
+    "size": 27
+  },
+  {
+    "text": "B",
+    "x": 360,
+    "y": 885,
+    "region": "table",
+    "size": 27
+  },
+  {
+    "text": "C",
+    "x": 500,
+    "y": 885,
+    "region": "table",
+    "size": 27
+  },
+  {
+    "text": "D",
+    "x": 640,
+    "y": 885,
+    "region": "table",
+    "size": 27
+  },
+  {
+    "text": "A",
+    "x": 80,
+    "y": 931,
+    "region": "table",
+    "size": 27
+  },
+  {
+    "text": "0",
+    "x": 220,
+    "y": 931,
+    "region": "table",
+    "size": 27
+  },
+  {
+    "text": "1",
+    "x": 360,
+    "y": 931,
+    "region": "table",
+    "size": 27
+  },
+  {
+    "text": "1",
+    "x": 500,
+    "y": 931,
+    "region": "table",
+    "size": 27
+  },
+  {
+    "text": "∞",
+    "x": 640,
+    "y": 931,
+    "region": "table",
+    "size": 27
+  },
+  {
+    "text": "B",
+    "x": 80,
+    "y": 977,
+    "region": "table",
+    "size": 27
+  },
+  {
+    "text": "0",
+    "x": 220,
+    "y": 977,
+    "region": "table",
+    "size": 27
+  },
+  {
+    "text": "1",
+    "x": 360,
+    "y": 977,
+    "region": "table",
+    "size": 27
+  },
+  {
+    "text": "1",
+    "x": 500,
+    "y": 977,
+    "region": "table",
+    "size": 27
+  },
+  {
+    "text": "4",
+    "x": 640,
+    "y": 977,
+    "region": "table",
+    "size": 27
+  },
+  {
+    "text": "C",
+    "x": 80,
+    "y": 1023,
+    "region": "table",
+    "size": 27
+  },
+  {
+    "text": "0",
+    "x": 220,
+    "y": 1023,
+    "region": "table",
+    "size": 27
+  },
+  {
+    "text": "1",
+    "x": 360,
+    "y": 1023,
+    "region": "table",
+    "size": 27
+  },
+  {
+    "text": "1",
+    "x": 500,
+    "y": 1023,
+    "region": "table",
+    "size": 27
+  },
+  {
+    "text": "4",
+    "x": 640,
+    "y": 1023,
+    "region": "table",
+    "size": 27
+  },
+  {
+    "text": "D",
+    "x": 80,
+    "y": 1069,
+    "region": "table",
+    "size": 27
+  },
+  {
+    "text": "0",
+    "x": 220,
+    "y": 1069,
+    "region": "table",
+    "size": 27
+  },
+  {
+    "text": "1",
+    "x": 360,
+    "y": 1069,
+    "region": "table",
+    "size": 27
+  },
+  {
+    "text": "1",
+    "x": 500,
+    "y": 1069,
+    "region": "table",
+    "size": 27
+  },
+  {
+    "text": "4",
+    "x": 640,
+    "y": 1069,
+    "region": "table",
+    "size": 27
+  },
+  {
+    "text": "A → B → D",
+    "x": 75,
+    "y": 1130,
+    "region": "solution",
+    "size": 28
+  },
+  {
+    "text": "Độ dài đường đi = 6.",
+    "x": 75,
+    "y": 1174,
+    "size": 28,
+    "region": "solution",
+    "struck": "opaque",
+    "lineIndex": 16
+  },
+  {
+    "text": "Đường đi có độ dài 5.",
+    "x": 75,
+    "y": 1218,
+    "region": "solution",
+    "size": 28
+  },
+  {
+    "text": "Qua cạnh BD, em đổi nhãn D.",
+    "x": 75,
+    "y": 1262,
+    "region": "solution",
+    "size": 28
+  }
+]

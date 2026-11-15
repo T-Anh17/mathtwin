@@ -1,0 +1,57 @@
+[
+  {
+    "text": "Cho đồ thị vô hướng. Trắc nghiệm.",
+    "region": "question"
+  },
+  {
+    "text": "Xét các phát biểu sau trên đồ thị:",
+    "region": "question"
+  },
+  {
+    "text": "A) Bậc B bằng 2.",
+    "region": "question"
+  },
+  {
+    "text": "B) Có 3 cạnh.",
+    "region": "question"
+  },
+  {
+    "text": "C) Có 2 đỉnh.",
+    "region": "question"
+  },
+  {
+    "text": "D) Không liên thông.",
+    "region": "question"
+  },
+  {
+    "text": "A",
+    "region": "figure"
+  },
+  {
+    "text": "C",
+    "region": "figure"
+  },
+  {
+    "text": "B",
+    "region": "figure"
+  },
+  {
+    "text": null,
+    "region": "solution",
+    "struck": true,
+    "box": [
+      101.777434075526,
+      818.0826314661113,
+      177.425406886983,
+      845.2999435493196
+    ]
+  },
+  {
+    "text": "Chọn C.",
+    "region": "solution"
+  },
+  {
+    "text": "Em chọn đáp án sau khi đếm các cạnh tại B.",
+    "region": "solution"
+  }
+]
