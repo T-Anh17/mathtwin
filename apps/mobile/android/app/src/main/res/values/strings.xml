@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">MathTwin</string>
+    <string name="title_activity_main">MathTwin</string>
+    <string name="package_name">vn.mathtwin.app</string>
+    <string name="custom_url_scheme">vn.mathtwin.app</string>
+</resources>

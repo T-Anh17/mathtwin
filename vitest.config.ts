@@ -7,6 +7,6 @@ export default defineConfig({
   },
   test: {
     pool: 'threads',
-    include: ['packages/*/test/**/*.test.ts', 'tools/*/test/**/*.test.ts'],
+    include: ['packages/*/test/**/*.test.ts', 'tools/*/test/**/*.test.ts', 'apps/*/test/**/*.test.ts'],
   },
 });

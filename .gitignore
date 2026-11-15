@@ -19,3 +19,14 @@ coverage/
 
 # Local model weights and llama.cpp binaries
 /.models/
+
+# Android / local tool caches
+/.build-cache/
+apps/mobile/android/.gradle/
+apps/mobile/android/**/build/
+apps/mobile/android/local.properties
+apps/mobile/android/app/src/main/assets/public/
+apps/mobile/android/app/src/main/assets/capacitor*.json
+apps/mobile/android/app/src/main/assets/model-manifest.json
+apps/mobile/android/app/src/main/assets/llama-LICENSE.txt
+apps/mobile/android/app/src/main/jniLibs/

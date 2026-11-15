@@ -29,3 +29,8 @@ npm run build
 `npm test` kiểm tra kiểu strict và chạy Vitest (gồm kiểm thử thuộc tính bằng
 fast-check). Lô 1.1 cung cấp kiểu dữ liệu, kiểm tra đề và các hàm đồ thị cơ bản;
 xem [API hiện có của core](packages/core/README.md).
+
+## App Android
+
+Khung Capacitor 8 và màn Đo: [apps/mobile/README.md](apps/mobile/README.md).
+`npm run mobile:build` build APK debug riêng; không cài lên thiết bị hoặc tải model.
