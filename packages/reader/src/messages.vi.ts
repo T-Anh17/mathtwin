@@ -21,3 +21,8 @@ export const confirmationMessages = {
   invalid: 'Xác nhận tạo ra đề không hợp lệ.',
   unknown: 'Mục xác nhận không tồn tại hoặc không có định dạng được hỗ trợ.',
 };
+export const localReaderMessages = {
+  failed: 'Không thể đọc ảnh; hãy kiểm tra model, kết nối llama-server và xác suất token.',
+  textOnly: 'PaddleOCR hiện chỉ hỗ trợ đọc chữ theo dòng; chưa hỗ trợ dựng cấu trúc đồ thị.',
+  busy: 'Bộ đọc đang xử lý một lượt khác; hãy chờ lượt đó kết thúc.',
+};

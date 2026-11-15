@@ -11,12 +11,13 @@
     "tools/*"
   ],
   "scripts": {
-    "build": "npm run build --workspaces --if-present",
+    "build": "npm run build --workspace @mathtwin/core --workspace @mathtwin/reader --workspace @mathtwin/reader-llamacpp-shared --workspace @mathtwin/reader-llamacpp --workspace @mathtwin/eval --workspace @mathtwin/models",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "npm run typecheck && vitest run",
     "eval:read": "npm run build && node tools/eval/dist/cli.js",
     "eval:generate": "npm run build && node tools/eval/dist/generate-cli.js",
-    "eval:validate": "npm run build && node tools/eval/dist/validate-cli.js"
+    "eval:validate": "npm run build && node tools/eval/dist/validate-cli.js",
+    "models:fetch": "npm run build --workspace @mathtwin/models && node tools/models/dist/cli.js"
   },
   "devDependencies": {
     "fast-check": "^4.10.2",

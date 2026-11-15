@@ -61,8 +61,10 @@ export type QuestionDraft = z.infer<typeof QuestionDraftSchema>;
 export const ReadDraftSchema = object({
   representation: z.enum(['figure', 'table', 'matrix', 'text', 'mixed']),
   directed: z.boolean(),
-  vertices: z.array(object({ label, conf: confidence, box: z.tuple([number, number, number, number]).optional() })),
-  edges: z.array(object({ u: label, v: label, w: number.nullable(), wAlternatives: z.array(number), name: z.string().nullable(), conf: confidence })),
+  vertices: z.array(object({ label, conf: confidence, alternatives: z.array(label).optional(), box: z.tuple([number, number, number, number]).optional() })),
+  edges: z.array(object({ u: label, v: label, w: number.nullable(), wAlternatives: z.array(number),
+    wConf: confidence.optional(), uConf: confidence.optional(), vConf: confidence.optional(),
+    uAlternatives: z.array(label).optional(), vAlternatives: z.array(label).optional(), name: z.string().nullable(), conf: confidence })),
   statedFacts: object({ vertexCount: number.int().nonnegative().nullable(), edgeCount: number.int().nonnegative().nullable(), weightUnit: z.string().nullable() }),
   question: QuestionDraftSchema.nullable(),
   unreadable: z.array(object({ what: z.string(), note: z.string() })),

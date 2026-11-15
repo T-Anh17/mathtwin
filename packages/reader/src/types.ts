@@ -7,7 +7,13 @@ export type ReadIssueCode =
   | 'count_mismatch' | 'unmapped_option' | 'unsupported_task' | 'unreadable_region'
   | 'missing_question' | 'needs_postprocessing' | 'invalid_spec' | 'read_failed';
 export interface ReadIssue { code: ReadIssueCode; severity: 'blocking' | 'warning'; item?: string; message: string }
-export interface ReadUsage { passes: number; latencyMs: number; engine: string; peakMemoryMb?: number }
+export interface ServerTimings { promptMs: number; predictedMs: number; promptTokens: number; predictedTokens: number }
+export interface SentImageSize { originalWidth: number; originalHeight: number; width: number; height: number }
+export interface ReadUsage {
+  passes: number; latencyMs: number; engine: string; peakMemoryMb?: number;
+  serverTimings?: ServerTimings;
+  sentImages?: SentImageSize[];
+}
 export type ReadUncertainty = NonNullable<ProblemSpec['uncertain']>[number];
 export interface ReadOutcome {
   spec: ProblemSpec | null;
@@ -20,6 +26,17 @@ export interface ReadOutcome {
 export interface VisionReader {
   readonly engine: string;
   read(images: PreparedImage[], pass: 'edges' | 'neighbors', signal?: AbortSignal): Promise<{ draft: ReadDraft; usage: ReadUsage }>;
+}
+export interface TextLine {
+  text: string;
+  box?: [number, number, number, number];
+  conf: number;
+  alternatives: string[];
+  region?: 'question' | 'figure' | 'solution' | 'table';
+}
+export interface TextReader {
+  readonly engine: string;
+  readLines(images: PreparedImage[], signal?: AbortSignal): Promise<{ lines: TextLine[]; usage: ReadUsage }>;
 }
 export type NormalizedRead = Pick<ReadOutcome, 'spec' | 'graph' | 'graphUncertain' | 'issues'>;
 

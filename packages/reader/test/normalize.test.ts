@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import fc from 'fast-check';
 import { validateSpec } from '@mathtwin/core';
 import type { Task } from '@mathtwin/core';
-import { normalizeDraft, normalizeLabel, ReadDraftSchema, StatementCheckDraftSchema } from '../src/index.js';
+import { applyConfirmation, normalizeDraft, normalizeLabel, ReadDraftSchema, StatementCheckDraftSchema } from '../src/index.js';
 import { draft } from './fixtures.js';
 
 describe('ReadDraft schema', () => {
@@ -21,6 +21,16 @@ describe('ReadDraft schema', () => {
     expect(ReadDraftSchema.safeParse(d).success).toBe(false);
     expect(normalizeDraft(d).spec).toBeNull();
   });
+  it.each(['wConf', 'uConf', 'vConf'] as const)('validates optional edge %s in [0,1]', (field) => {
+    for (const value of [0, 0.4, 1]) {
+      const d = draft(); d.edges[0]![field] = value;
+      expect(ReadDraftSchema.safeParse(d).success).toBe(true);
+    }
+    for (const value of [-0.01, 1.01, NaN, Infinity]) {
+      const d = draft(); d.edges[0]![field] = value;
+      expect(ReadDraftSchema.safeParse(d).success).toBe(false);
+    }
+  });
   it('requires source/start in independent algorithm statements', () => {
     expect(StatementCheckDraftSchema.safeParse({ type: 'dijkstra_label', v: 'A', value: 0 }).success).toBe(false);
     expect(StatementCheckDraftSchema.safeParse({ type: 'nn_step', from: 'A', to: 'B' }).success).toBe(false);
@@ -28,6 +38,37 @@ describe('ReadDraft schema', () => {
 });
 
 describe('normalizeDraft', () => {
+  it('flags low field scores even with no alternatives, without using weight confidence as existence confidence', () => {
+    const d = draft();
+    d.edges[0]!.wConf = 0.4; d.edges[0]!.uConf = 0.5; d.edges[0]!.vConf = 0.6;
+    const result = normalizeDraft(d);
+    expect(result.spec?.uncertain).toEqual([
+      { item: 'e1.w', candidates: [2] }, { item: 'e1.u', candidates: ['A'] }, { item: 'e1.v', candidates: ['B'] },
+    ]);
+  });
+  it('keeps missing-weight behavior for null with low wConf and does not flag high field scores', () => {
+    const d = draft(); d.edges[0]!.w = null; d.edges[0]!.wConf = 0.4;
+    d.edges[1]!.wConf = 0.85; d.edges[1]!.uConf = 1; d.edges[1]!.vConf = 0.96;
+    const result = normalizeDraft(d);
+    expect(result.spec).toBeNull();
+    expect(result.issues).toContainEqual(expect.objectContaining({ code: 'missing_weight', severity: 'blocking', item: 'e1.w' }));
+    expect(result.graphUncertain).toEqual([{ item: 'e1.w', candidates: [null] }]);
+  });
+  it('keeps only existing, normalized endpoint candidates and they can be applied as confirmations', () => {
+    const d = draft(); d.edges[0]!.uAlternatives = ['8', ' b ', 'B']; d.edges[0]!.vAlternatives = ['9', ' c ', 'C'];
+    const result = normalizeDraft(d);
+    expect(result.spec?.uncertain).toEqual([{ item: 'e1.u', candidates: ['A', 'B'] }, { item: 'e1.v', candidates: ['B', 'C'] }]);
+    const confirmed = applyConfirmation(result.spec!, { 'e1.u': 'B', 'e1.v': 'C' });
+    expect(confirmed.graph.edges[0]).toMatchObject({ u: 'B', v: 'C' });
+    expect(confirmed.uncertain).toEqual([]); expect(validateSpec(confirmed).ok).toBe(true);
+    expect(d.edges[0]!.uAlternatives).toEqual(['8', ' b ', 'B']);
+  });
+  it('drops unknown endpoint alternatives without adding flags, while retaining low-confidence flags', () => {
+    const d = draft(); d.edges[0]!.uAlternatives = ['8']; d.edges[0]!.vAlternatives = ['9'];
+    expect(normalizeDraft(d).spec?.uncertain).toEqual([]);
+    d.edges[0]!.uConf = 0.4; d.edges[0]!.vConf = 0.4;
+    expect(normalizeDraft(d).spec?.uncertain).toEqual([{ item: 'e1.u', candidates: ['A'] }, { item: 'e1.v', candidates: ['B'] }]);
+  });
   it('canonicalizes subscripts, case, whitespace and Unicode without losing Vietnamese accents', () => {
     const d = draft();
     d.vertices = ['v₁', 'V1', ' v1 ', 'Đỉnh Á', 'ĐỈNH Á'].map((label) => ({ label, conf: 0.95 }));

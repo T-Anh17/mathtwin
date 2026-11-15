@@ -23,6 +23,7 @@ export async function readProblem(images: PreparedImage[], deps: { reader: Visio
   const { reader, signal } = deps;
   const drafts: ReadDraft[] = [];
   const usage: ReadUsage = { passes: 0, latencyMs: 0, engine: reader.engine };
+  let completeServerTimings = true;
   const failure = (code: 'read_failed' | 'invalid_spec' = 'read_failed'): ReadOutcome => {
     const retained = drafts.length === 0 ? { graph: null, graphUncertain: [] } : normalizeDraft(drafts[0]!);
     return { spec: null, graph: retained.graph, graphUncertain: retained.graphUncertain,
@@ -41,6 +42,14 @@ export async function readProblem(images: PreparedImage[], deps: { reader: Visio
       if (!Number.isFinite(result.usage.latencyMs) || result.usage.latencyMs < 0
         || (result.usage.peakMemoryMb !== undefined && (!Number.isFinite(result.usage.peakMemoryMb) || result.usage.peakMemoryMb < 0))) return failure();
       usage.latencyMs += result.usage.latencyMs;
+      if (result.usage.serverTimings) {
+        const t = result.usage.serverTimings;
+        if (![t.promptMs, t.predictedMs, t.promptTokens, t.predictedTokens].every((n) => Number.isFinite(n) && n >= 0)) return failure();
+        const prior = usage.serverTimings ?? { promptMs: 0, predictedMs: 0, promptTokens: 0, predictedTokens: 0 };
+        if (completeServerTimings) usage.serverTimings = { promptMs: prior.promptMs + t.promptMs, predictedMs: prior.predictedMs + t.predictedMs,
+          promptTokens: prior.promptTokens + t.promptTokens, predictedTokens: prior.predictedTokens + t.predictedTokens };
+      } else { completeServerTimings = false; delete usage.serverTimings; }
+      if (result.usage.sentImages) usage.sentImages = [...(usage.sentImages ?? []), ...result.usage.sentImages];
       if (result.usage.peakMemoryMb !== undefined) usage.peakMemoryMb = Math.max(usage.peakMemoryMb ?? 0, result.usage.peakMemoryMb);
       const parsed = ReadDraftSchema.safeParse(result.draft);
       if (!parsed.success) return failure('invalid_spec');

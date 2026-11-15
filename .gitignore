@@ -16,3 +16,6 @@ coverage/
 
 # Fixture-only evaluation reports
 /reports/.fake/
+
+# Local model weights and llama.cpp binaries
+/.models/

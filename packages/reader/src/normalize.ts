@@ -40,15 +40,22 @@ export function draftGraph(draft: ReadDraft, vertices = displayVertices([draft])
 export function draftGraphFlags(draft: ReadDraft, graph: Graph): ReadUncertainty[] {
   const holder = { uncertain: [] as ReadUncertainty[] };
   const resolve = referenceMapper(graph);
+  const vertexIds = new Set(graph.vertices.map((vertex) => vertex.id));
+  const endpointCandidates = (alternatives: string[] = []): string[] => alternatives.map(resolve).filter((id) => vertexIds.has(id));
   draft.edges.forEach((edge, i) => {
     const id = graph.edges[i]!.id;
-    if (edge.wAlternatives.length > 0) flag(holder, `${id}.w`, [edge.w, ...edge.wAlternatives]);
+    if (edge.wAlternatives.length > 0 || (edge.w !== null && edge.wConf !== undefined && edge.wConf < CONFIDENCE_THRESHOLD)) {
+      flag(holder, `${id}.w`, [edge.w, ...edge.wAlternatives]);
+    }
+    const uCandidates = endpointCandidates(edge.uAlternatives), vCandidates = endpointCandidates(edge.vAlternatives);
+    if (uCandidates.length || (edge.uConf !== undefined && edge.uConf < CONFIDENCE_THRESHOLD)) flag(holder, `${id}.u`, [resolve(edge.u), ...uCandidates]);
+    if (vCandidates.length || (edge.vConf !== undefined && edge.vConf < CONFIDENCE_THRESHOLD)) flag(holder, `${id}.v`, [resolve(edge.v), ...vCandidates]);
     if (edge.conf < CONFIDENCE_THRESHOLD) flag(holder, id, [true, false]);
   });
-  for (const vertex of draft.vertices) if (vertex.conf < CONFIDENCE_THRESHOLD) {
+  for (const vertex of draft.vertices) if (vertex.conf < CONFIDENCE_THRESHOLD || vertex.alternatives?.length) {
     const id = resolve(vertex.label);
     const item = vertexFlagItem(graph, id);
-    flag(holder, item, item === 'graph' ? [graph] : [id]);
+    flag(holder, item, item === 'graph' ? [graph] : [id, ...(vertex.alternatives ?? []).map(displayLabel)]);
   }
   return holder.uncertain;
 }

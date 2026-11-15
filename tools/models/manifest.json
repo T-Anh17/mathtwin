@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "files": [
+    {
+      "model": "a",
+      "repository": "PaddlePaddle/PaddleOCR-VL-1.5-GGUF",
+      "revision": "cc977c16989848c264d813ec1705cb181b7a21ee",
+      "filename": "PaddleOCR-VL-1.5.gguf",
+      "bytes": 935768992,
+      "sha256": "299051d54faa065abc505cc39b8383ea338fd3020c775ea3e0ba514a7022328c",
+      "license": "Apache-2.0",
+      "licenseUrl": "https://huggingface.co/PaddlePaddle/PaddleOCR-VL-1.5-GGUF/blob/cc977c16989848c264d813ec1705cb181b7a21ee/README.md",
+      "url": "https://huggingface.co/PaddlePaddle/PaddleOCR-VL-1.5-GGUF/resolve/cc977c16989848c264d813ec1705cb181b7a21ee/PaddleOCR-VL-1.5.gguf"
+    },
+    {
+      "model": "a",
+      "repository": "PaddlePaddle/PaddleOCR-VL-1.5-GGUF",
+      "revision": "cc977c16989848c264d813ec1705cb181b7a21ee",
+      "filename": "PaddleOCR-VL-1.5-mmproj.gguf",
+      "bytes": 881770496,
+      "sha256": "e7f1a72400fba517046f90d964e2fa0f4dac7781ee3b1bc5d2022f5f8cecbd87",
+      "license": "Apache-2.0",
+      "licenseUrl": "https://huggingface.co/PaddlePaddle/PaddleOCR-VL-1.5-GGUF/blob/cc977c16989848c264d813ec1705cb181b7a21ee/README.md",
+      "url": "https://huggingface.co/PaddlePaddle/PaddleOCR-VL-1.5-GGUF/resolve/cc977c16989848c264d813ec1705cb181b7a21ee/PaddleOCR-VL-1.5-mmproj.gguf"
+    },
+    {
+      "model": "b",
+      "repository": "Qwen/Qwen3-VL-2B-Instruct-GGUF",
+      "revision": "52d6c8ffea26cc873ac5ad116f8631268d7eb503",
+      "filename": "Qwen3VL-2B-Instruct-Q4_K_M.gguf",
+      "bytes": 1107409952,
+      "sha256": "089d75c52f4b7ffc56ba998ffc50aae89fcafc755f9e7208aacca281dca6c2ae",
+      "license": "Apache-2.0",
+      "licenseUrl": "https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct-GGUF/blob/52d6c8ffea26cc873ac5ad116f8631268d7eb503/README.md",
+      "url": "https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct-GGUF/resolve/52d6c8ffea26cc873ac5ad116f8631268d7eb503/Qwen3VL-2B-Instruct-Q4_K_M.gguf"
+    },
+    {
+      "model": "b",
+      "repository": "Qwen/Qwen3-VL-2B-Instruct-GGUF",
+      "revision": "52d6c8ffea26cc873ac5ad116f8631268d7eb503",
+      "filename": "mmproj-Qwen3VL-2B-Instruct-F16.gguf",
+      "bytes": 819394848,
+      "sha256": "c3d5afbef5287953acd57b4043d2269456e5761a4eaccb3b71b062996970aea5",
+      "license": "Apache-2.0",
+      "licenseUrl": "https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct-GGUF/blob/52d6c8ffea26cc873ac5ad116f8631268d7eb503/README.md",
+      "url": "https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct-GGUF/resolve/52d6c8ffea26cc873ac5ad116f8631268d7eb503/mmproj-Qwen3VL-2B-Instruct-F16.gguf"
+    }
+  ],
+  "llamaCppSource": {
+    "repository": "ggml-org/llama.cpp",
+    "revision": "b12388",
+    "commit": "1c2adc75f619d05efc5d49ce08eaaa96272ebfa2",
+    "url": "https://github.com/ggml-org/llama.cpp.git",
+    "license": "MIT",
+    "licenseUrl": "https://github.com/ggml-org/llama.cpp/blob/1c2adc75f619d05efc5d49ce08eaaa96272ebfa2/LICENSE"
+  }
+}
