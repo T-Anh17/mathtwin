@@ -1,8 +1,50 @@
-# MathTwin Android — Lô 2.5
+# MathTwin Android
 
-Khung app sản phẩm bằng Capacitor 8 + React + TypeScript + Vite, hiện có màn **Model** và **Đo**.
+App bằng Capacitor 8 + React + TypeScript + Vite. UI-1 có Trang chủ, Xác nhận đề, Kết quả,
+Lịch sử và Cài đặt; màn **Model** và **Đo** cũ nằm trong **Cài đặt → Đo hiệu năng (kỹ thuật)**.
 Chỉ Android **arm64-v8a**, Android 8 / API 26 trở lên. Backend CPU; Vulkan, OpenCL và GPU offload tắt.
 Không có model trong APK. Không chạy `adb` hoặc tải trọng số khi chạy `npm test` / `mobile:build`.
+
+## Giao diện
+
+Nguồn đối chiếu: [`docs/design/wireframe.html`](../../docs/design/wireframe.html), nấc Màu:
+Trang chủ A, Xác nhận B, Kết quả A. Mỗi màn có prop `state` gồm `du-lieu`, `dang-tai`, `rong`, `loi`.
+Riêng Kết quả yêu cầu dữ liệu khớp trạng thái bằng union TypeScript: `du-lieu` = sai/cần xác nhận,
+`rong` = đúng, `loi` = không đủ căn cứ; `dang-tai` hiển thị tiến trình chung.
+Các trạng thái được render và kiểm tra bằng `react-dom/server`, không cần thiết bị.
+
+- Đổi màu nhấn trong một khối `:root` của [`src/tokens.css`](src/tokens.css), nhóm `MÀU NHẤN`.
+  Token, bán kính và font được chép nguyên từ wireframe; CSS component giữ ở `src/ui.css`.
+- Đổi họ font tại một dòng `--app-font` trong `src/tokens.css`. Font hiện tại được đóng gói bằng
+  `@fontsource/be-vietnam-pro`, chỉ tập `vietnamese`/`latin` và độ đậm 400/500/600/700, không tải CDN.
+  `lucide-react` pin `0.469.0` để nét và tên icon khớp bản lucide trong wireframe.
+  `src/fonts.css` giữ nguyên `unicode-range` của fontsource để chữ có dấu và chữ Latin dùng đúng tập con.
+  Nếu đổi sang họ khác, cần đóng gói font tương ứng và đổi các font-face trong `src/fonts.css`.
+- Logo dùng đúng SVG `LOGO()` qua `Logo.tsx`, prop `size`, `ink`, `amber`, `paper`.
+  Android dùng adaptive foreground vector, nền mực; icon cũ và splash PNG cũng được thay đồng bộ.
+  Tái tạo PNG bằng `powershell -File apps/mobile/scripts/brand-assets.ps1` (System.Drawing có sẵn trên Windows).
+- Ảnh tổng hợp `src/assets/bai-lam.png` được chép nguyên byte từ wireframe. Vùng cắt và khoanh nằm trong
+  `sample-data.ts`: Kết quả `(6, 74, 250, 150)`, Xác nhận `(72, 41, 330, 150)`.
+- Mọi chữ sản phẩm ở `src/product-messages.vi.ts`; màn Đo tiếp tục dùng `src/messages.vi.ts`.
+- `src/sample-data.ts` ghi rõ dữ liệu mẫu, gồm lịch sử đủ 4 kết quả và trạng thái bộ đọc mẫu.
+  Trang chủ/Cài đặt hiện cùng trạng thái mẫu, không truy vấn hay tải model thật.
+- Điều hướng React state tại `App.tsx`: Chụp bài → Xác nhận đề → Kết quả; Lịch sử mở đúng loại kết quả.
+  Kết quả cần xác nhận dẫn tới màn hỏi từng chỗ; đây là bản dựng UI, không giải hay tự tính số.
+
+Handler rỗng chờ nối nằm trong `emptyProductActions` (`sample-data.ts`), kiểu `ProductActions` ở
+`product-types.ts`:
+
+| Nhóm | Handler |
+| --- | --- |
+| Ảnh và bộ đọc | `onCapture`, `onDownloadReader`, `onRetake`, `onAddPage`, `onViewPage` |
+| Xác nhận / nhập tay | `onChooseOption`, `onOtherNumber`, `onSkip`, `onConfirm`, `onEdit`, `onManualInput` |
+| Kết quả | `onRegrade`, `onHint`, `onSolution` |
+| Dừng | `onCancel` |
+
+`App.tsx` chỉ bọc `onCapture`/`onConfirm`/`onCancel` để chuyển màn mẫu. Chọn đáp án, tải bộ đọc,
+xem ảnh đầy đủ, gợi ý và lời giải chưa nối xử lý. Nút quay lại/thanh dưới và mở màn Đo là điều hướng UI.
+Logic kỹ thuật của `BenchmarkScreen.tsx` giữ nguyên từ màn `App.tsx` trước UI-1;
+`benchmark.css` giới hạn style cho màn đó, thay màu bằng token và thừa hưởng font mới.
 
 ## Build trên Windows
 

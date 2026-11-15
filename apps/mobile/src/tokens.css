@@ -1,0 +1,33 @@
+:root {
+  color-scheme: light;
+  /* FONT: một họ, Be Vietnam Pro (OFL, thiết kế cho tiếng Việt). Bản app tự đóng gói file font. */
+  --app-font: "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
+  /* MÀU NHẤN, nền sáng: xanh mực đêm */
+  --primary: #1f2d55;
+  --primary-hover: #34416a;
+  --primary-foreground: #ffffff;
+  --primary-light: rgb(31 45 85 / 0.06);
+  /* MÀU THƯƠNG HIỆU PHỤ: đồng hổ phách. Chỉ cho logo, đường đi tô trên đồ thị, điểm nhấn nhỏ — không cho nút. */
+  --brand-amber: #c8892b;
+  --brand-amber-soft: #f6ead6;
+  --background: #f5f2eb;   /* giấy ấm */
+  --surface: #fffdf9;
+  --foreground: #23242b;
+  --muted: #6b665c;
+  --border: #efe9de;
+  --border-strong: #e3dbcc;
+  --item-hover: #f5f2eb;
+  --secondary: #ece7dc;
+  --secondary-hover: #e2dccf;
+  --button-hover: #f1ede4;
+  --ring-focus: rgb(31 45 85 / 0.1);
+  --border-focus: var(--primary);
+  --elevation-popover: 0 10px 15px -3px rgb(35 30 20 / 0.1), 0 4px 6px -4px rgb(35 30 20 / 0.1);
+  --elevation-modal: 0 20px 25px -5px rgb(35 30 20 / 0.12), 0 8px 10px -6px rgb(35 30 20 / 0.1);
+  /* Bốn kết quả chấm = màu mang nghĩa */
+  --success-bg: #ecfdf5; --success: #007a55;          /* ĐÚNG */
+  --error-bg: #fef2f2; --error-strong: #c10007; --error: #fb2c36; --error-border: #ffc9c9; /* SAI */
+  --warning-bg: #fffbeb; --warning: #bb4d00;          /* CẦN XÁC NHẬN */
+  --neutral-bg: #f1eee7; --neutral: #52525c;          /* KHÔNG ĐỦ CĂN CỨ */
+  --radius: 12px;
+}
