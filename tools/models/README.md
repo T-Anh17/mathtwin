@@ -1,4 +1,18 @@
-# Manifest model và mã nguồn Android — Lô 2.4 vòng 2
+# Manifest model và mã nguồn Android
+
+## Bổ sung Lô 2.8 — C
+
+Manifest thêm bốn artifact C từ release `duchoa1297/vietocr-onnx`, tag `ocr-v1`:
+detector, VietOCR encoder, decoder, cấu hình; tổng **99.388.430 byte**.
+`npm run models:fetch -- --model c` chỉ xem danh sách, không tải.
+Nhánh tải có xác nhận dùng lại downloader resume/kiểm SHA-256 vào `.models/c/`.
+Trọng số VietOCR có `licenseStatus: weights-unverified`: chỉ dùng để đo,
+chưa đưa vào sản phẩm. Bản JSON gốc 712 byte (không phải model) được lưu trong
+`config/`; hash đã đối chiếu release. Chi tiết tại
+[báo cáo Lô 2.8](../../reports/read-ocr-implementation-2026-11-16.md).
+Quyết định Lô 2.8 cho phép đo C trên PC sau khi review; luồng A/B Android bên dưới giữ nguyên.
+
+## Lịch sử Lô 2.4 vòng 2
 
 Theo quyết định cuối: phép đo dùng app Android ở các lô tiếp, **không tải model về máy tính**, không Termux.
 Manifest [manifest.json](manifest.json) giữ đúng bốn GGUF A/B (revision, byte, SHA-256, license, link);

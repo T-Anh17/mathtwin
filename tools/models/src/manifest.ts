@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 
-export type Model = 'a' | 'b';
+export type Model = 'a' | 'b' | 'c';
 export interface LlamaCppSource { repository: string; revision: string; commit: string; url: string; license: string; licenseUrl: string }
 async function manifestData(): Promise<Record<string, unknown>> {
   const data: unknown = JSON.parse(await readFile(new URL('../manifest.json', import.meta.url), 'utf8'));
@@ -26,6 +26,8 @@ export interface ModelFile {
   license: string;
   licenseUrl: string;
   url: string;
+  licenseStatus?: 'weights-unverified' | 'declared-apache-2.0';
+  note?: string;
 }
 export async function loadManifest(): Promise<ModelFile[]> {
   const data = await manifestData();
@@ -34,13 +36,16 @@ export async function loadManifest(): Promise<ModelFile[]> {
   for (const entry of data.files as unknown[]) {
     if (typeof entry !== 'object' || entry === null) throw new Error('Invalid model file.');
     const e = entry as Record<string, unknown>;
-    if ((e.model !== 'a' && e.model !== 'b')
+    if ((e.model !== 'a' && e.model !== 'b' && e.model !== 'c')
       || typeof e.filename !== 'string' || !/^[\w.-]+$/.test(e.filename) || e.filename === '.' || e.filename === '..'
       || typeof e.bytes !== 'number' || !Number.isSafeInteger(e.bytes) || e.bytes <= 0
       || typeof e.sha256 !== 'string' || !/^[a-f0-9]{64}$/.test(e.sha256)
       || typeof e.repository !== 'string' || typeof e.revision !== 'string'
       || typeof e.license !== 'string' || typeof e.licenseUrl !== 'string'
       || typeof e.url !== 'string' || !e.url.startsWith('https://')) throw new Error('Invalid model file.');
+    if (e.model === 'c' && (e.repository !== 'duchoa1297/vietocr-onnx' || e.revision !== 'ocr-v1'
+      || !['weights-unverified', 'declared-apache-2.0'].includes(String(e.licenseStatus))
+      || typeof e.note !== 'string' || !e.note)) throw new Error('Invalid OCR provenance.');
     files.push(e as unknown as ModelFile);
   }
   return files;

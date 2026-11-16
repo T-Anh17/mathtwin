@@ -13,7 +13,7 @@ export async function fetchModels(args: string[], deps: {
   signal?: AbortSignal;
 } = {}): Promise<void> {
   const { values } = parseArgs({ args, options: { model: { type: 'string' }, confirm: { type: 'boolean', default: false } } });
-  if (values.model !== 'a' && values.model !== 'b' && values.model !== 'llama') throw new Error('Use --model a|b|llama [--confirm].');
+  if (values.model !== 'a' && values.model !== 'b' && values.model !== 'c' && values.model !== 'llama') throw new Error('Use --model a|b|c|llama [--confirm].');
   const log = deps.log ?? console.log;
   if (values.model === 'llama') {
     const source = await loadLlamaCppSource();
@@ -25,6 +25,7 @@ export async function fetchModels(args: string[], deps: {
   const files = (deps.files ?? await loadManifest()).filter((file) => file.model === values.model);
   if (files.length === 0) throw new Error('No files for this model.');
   for (const file of files) log(`${file.model}/${file.filename}: ${file.bytes} byte; SHA-256 ${file.sha256}`);
+  if (files.some((file) => file.licenseStatus === 'weights-unverified')) log('C: trọng số VietOCR chưa xác minh điều khoản riêng; chỉ dùng để đo, chưa đưa vào sản phẩm.');
   log(`Tổng dung lượng: ${files.reduce((total, file) => total + file.bytes, 0)} byte.`);
   if (!values.confirm) { log('Chỉ xem danh sách; chưa tải. Cần --confirm để tải.'); return; }
   const root = deps.root ?? fileURLToPath(new URL('../../../.models/', import.meta.url));

@@ -4,6 +4,8 @@ import type { ImageMeta } from './dataset.js';
 export interface EvaluationRow {
   id: string; meta: ImageMeta; comparison?: ReadComparison; usage: ReadUsage; nodeLatencyMs?: number; issueCodes: string[];
   textComparisons?: TextComparison[]; errorCode?: string;
+  truncatedLineCount?: number;
+  unsupportedSymbolTruthLines?: number;
   memoryPressure?: { callback: 'onTrimMemory' | 'onLowMemory'; trimLevel: number | null };
   deviceTiming?: { totalMs: number; modelLoadMs: number; modelVerifyMs: number; reusedModel: boolean };
 }
@@ -55,6 +57,8 @@ export function summarize(all: EvaluationRow[]) {
     extraFlagsPerProblem: total === 0 ? null : rows.reduce((n, r) => n + r.comparison.extraFlags, 0) / total,
     evaluatedImages: all.length, failedImages: all.filter((r) => r.errorCode).map((r) => ({ id: r.id, code: r.errorCode })),
     memoryPressureCount: all.filter((r) => r.errorCode === 'memory_pressure').length,
+    truncatedLines: all.some((r) => r.truncatedLineCount !== undefined) ? all.reduce((n, r) => n + (r.truncatedLineCount ?? 0), 0) : null,
+    unsupportedSymbolTruthLines: all.some((r) => r.unsupportedSymbolTruthLines !== undefined) ? all.reduce((n, r) => n + (r.unsupportedSymbolTruthLines ?? 0), 0) : null,
     textByPass: Object.fromEntries(Array.from({ length: Math.max(0, ...all.map((r) => r.textComparisons?.length ?? 0)) }, (_, i) =>
       [String(i + 1), summarizeTextPass(all.flatMap((r) => r.textComparisons?.[i] ? [r.textComparisons[i]!] : []))])),
     nodeLatencyMs: { p50: percentile(all.flatMap((r) => r.nodeLatencyMs === undefined ? [] : [r.nodeLatencyMs]), 0.5), p90: percentile(all.flatMap((r) => r.nodeLatencyMs === undefined ? [] : [r.nodeLatencyMs]), 0.9) },
@@ -64,7 +68,7 @@ export function summarize(all: EvaluationRow[]) {
     modelLoadMs: { cold: all.filter((r) => r.deviceTiming && !r.deviceTiming.reusedModel).map((r) => r.deviceTiming!.modelLoadMs), reused: all.filter((r) => r.deviceTiming?.reusedModel).map((r) => r.deviceTiming!.modelLoadMs) },
     peakMemoryMb: all.some((r) => r.usage.peakMemoryMb !== undefined) ? Math.max(...all.map((r) => r.usage.peakMemoryMb ?? 0)) : null, errors };
 }
-export interface ReportContext { mode?: 'graph' | 'lines' | 'both'; phoneMeasurements?: Record<string, unknown>; configuration?: Record<string, unknown> }
+export interface ReportContext { mode?: 'graph' | 'lines' | 'both'; phoneMeasurements?: Record<string, unknown>; configuration?: Record<string, unknown>; unsupportedSymbols?: string[] }
 export function makeReport(engine: string, set: string, passes: 1 | 2, date: string, rows: EvaluationRow[], context: ReportContext = {}) {
   const groups = {
     printed: summarize(rows.filter((r) => r.meta.source === 'printed')),
@@ -75,7 +79,7 @@ export function makeReport(engine: string, set: string, passes: 1 | 2, date: str
     blurred: summarize(rows.filter((r) => r.meta.blurred)),
   };
   return { engine, set, passes, date, mode: context.mode ?? 'graph', fixtureOnly: engine === 'fake', downloadBytes: engine === 'fake' ? 0 : null,
-    configuration: context.configuration ?? null, phoneMeasurements: context.phoneMeasurements ?? null, summary: summarize(rows), groups, rows };
+    configuration: context.configuration ?? null, phoneMeasurements: context.phoneMeasurements ?? null, unsupportedSymbols: context.unsupportedSymbols ?? null, summary: summarize(rows), groups, rows };
 }
 export type EvaluationReport = ReturnType<typeof makeReport>;
 export function renderReport(report: EvaluationReport): string {
@@ -109,7 +113,16 @@ export function renderReport(report: EvaluationReport): string {
     for (const [region, bucket] of Object.entries({ all: text, ...text.byRegion })) lines.push(
       `| ${name} | ${pass} | ${region} | ${bucket.samples} | ${percent(bucket.cer.rate)} | ${percent(bucket.wer.rate)} | ${percent(bucket.cerWithoutDiacritics.rate)} | ${percent(bucket.digits.accuracy)} | ${percent(bucket.vertexLabels.accuracy)} | ${percent(bucket.lineRecall)} | ${bucket.silentLines}/${bucket.predictedLines} (${percent(bucket.silentLineRate)}) | ${bucket.struckReadAsContent} | ${bucket.struckUnassessable} |`);
   }
-  lines.push('', 'CER/WER cộng lỗi và mẫu số trên toàn nhóm; không lấy trung bình phần trăm. Recall dòng đòi hỏi khớp nguyên dòng đúng thứ tự. Mỗi lượt được báo cáo riêng, không chọn lượt tốt nhất bằng truth.', '',
+  lines.push('', 'CER/WER cộng lỗi và mẫu số trên toàn nhóm; không lấy trung bình phần trăm. Recall dòng đòi hỏi khớp nguyên dòng đúng thứ tự. Mỗi lượt được báo cáo riêng, không chọn lượt tốt nhất bằng truth.', '');
+  if (report.unsupportedSymbols !== null) {
+    lines.push('## Giới hạn từ vựng và dòng bị cắt', '',
+      `Ký hiệu ngoài từ vựng: ${report.unsupportedSymbols.join(' ') || 'không có'}.`, '',
+      '| Nhóm | Dòng truncated | Dòng truth chứa ký hiệu ngoài từ vựng |', '| --- | ---: | ---: |');
+    for (const [name, group] of Object.entries({ all: report.summary, ...report.groups })) lines.push(
+      `| ${name} | ${group.truncatedLines ?? 'N/A'} | ${group.unsupportedSymbolTruthLines ?? 'N/A'} |`);
+    lines.push('', 'Đếm mỗi dòng truth có hiệu lực một lần dù chứa nhiều ký hiệu thiếu. Truth giữ nguyên; CER/WER vẫn tính mọi dòng, kể cả dòng chứa ký hiệu thiếu và phần chữ truncated có conf = 0. Các bộ đếm này giúp phân biệt giới hạn từ vựng với lỗi đọc.', '');
+  }
+  lines.push(
     `Ảnh đã đánh giá: ${report.summary.evaluatedImages}; lỗi xử lý: ${report.summary.failedImages.length}.`,
     `Số ảnh dừng do memory_pressure: ${report.summary.memoryPressureCount}.`,
     ...report.summary.failedImages.map((r) => `- ${r.id}: ${r.code}`),

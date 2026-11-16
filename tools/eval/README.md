@@ -52,6 +52,32 @@ adb push .build-cache/datasets/synthetic-hw /sdcard/Android/data/vn.mathtwin.app
 
 Nhập `synthetic-hw` trên màn Đo. Với `--set synthetic`, lệnh đóng gói tương tự. Bộ cũ có 10 ảnh nét bút giả bằng font hệ thống: báo cáo để riêng `legacy_synthetic_pen`, không gộp thành viết tay thật hay bộ font mới.
 
+## Đo C trên Node — Lô 2.8
+
+`npm run eval:read -- --engine offline:vietocr-onnx --mode lines --set synthetic-hw`
+dùng model đã có ở `.models/c/`, không tự tải. Mặc định một lượt; chỉ chấp nhận
+`--passes 1`. Graph/both trả `unsupported_mode`. Cùng bộ dữ liệu, truth và chỉ số
+chữ của A/B; truth không truyền vào bộ nhận dạng. Lỗi đọc vẫn so như chữ rỗng,
+không loại ảnh lỗi khỏi mẫu số. Usage có số dòng, ms tách dòng/nhận dạng.
+Báo cáo dùng tên an toàn trên Windows: `read-eval-offline-vietocr-onnx-<ngày>.md/json`.
+JSON có `unsupportedSymbols`, mỗi row có `truncatedLineCount` và
+`unsupportedSymbolTruthLines`; summary/nhóm có `truncatedLines` và
+`unsupportedSymbolTruthLines`. Markdown có bảng tương ứng. Đếm mỗi dòng truth
+có hiệu lực chứa `→ × ∞ ≥ ≤ ≠` thiếu trong vocab một lần, kể cả khi đọc ảnh lỗi;
+không tính dòng gạch xóa. Không thay ký hiệu trong truth, không bỏ dòng khỏi CER/WER.
+Prefix truncated vẫn vào chỉ số chữ với conf = 0 và không làm thất bại cả trang.
+
+Tùy chọn `--dump-lines` trong chế độ lines/both với `--engine` ghi file
+`reports/.debug/read-eval-<engine>-<ngày>-<set>.json` (gitignore), mỗi record có
+`id`, `pass`, `box` nếu reader trả, `text`, `conf`, `truncated` nếu bị cắt.
+Chỉ bật khi cần soi kết quả: đây là bản ghi nguyên văn dòng theo yêu cầu rõ ràng,
+không chứa pixel. Mặc định không tạo thư mục/file debug. Không áp dụng flag này
+cho `--from-device` hoặc chế độ graph. Chạy lại cùng engine/ngày/set thay file debug.
+
+Độ trễ PC chỉ tham khảo; trọng số VietOCR chỉ dùng đo vì điều khoản riêng chưa xác minh.
+Xem [adapter](../../packages/reader-ocr/README.md) và
+[pipeline chung](../../packages/reader-ocr-shared/README.md).
+
 ## Tính chỉ số từ file xuất của app
 
 Lấy JSON qua đường dẫn app đã báo khi bấm Xuất kết quả (xem [README app](../../apps/mobile/README.md)). `--from-device` đọc định dạng version 1 do `exportReport()` tạo. Mặc định `both`: đánh giá các record graph và lines có trong file; không tự suy ra graph từ chữ hoặc ngược lại. Model, lượt đọc và cấu hình lấy từ file; không truyền `--engine`/`--passes` cùng `--from-device`. Hai lượt lines được báo riêng, không chọn lượt tốt hơn bằng truth.

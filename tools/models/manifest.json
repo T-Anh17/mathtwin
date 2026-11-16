@@ -44,6 +44,86 @@
       "license": "Apache-2.0",
       "licenseUrl": "https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct-GGUF/blob/52d6c8ffea26cc873ac5ad116f8631268d7eb503/README.md",
       "url": "https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct-GGUF/resolve/52d6c8ffea26cc873ac5ad116f8631268d7eb503/mmproj-Qwen3VL-2B-Instruct-F16.gguf"
+    },
+    {
+      "model": "c",
+      "repository": "duchoa1297/vietocr-onnx",
+      "revision": "ocr-v1",
+      "commit": "b6733d5c250bf647cc8e13c303bf6622febee0cf",
+      "filename": "det.onnx",
+      "bytes": 9929594,
+      "sha256": "090f04abcd9d9a7498bc4ebf677e4cb9bdce1fe4197ddb7e529f1ef44e1ff94f",
+      "license": "Apache-2.0",
+      "licenseStatus": "declared-apache-2.0",
+      "licenseUrl": "https://github.com/duchoa1297/vietocr-onnx/blob/ocr-v1/LICENSE",
+      "url": "https://github.com/duchoa1297/vietocr-onnx/releases/download/ocr-v1/det.onnx",
+      "note": "Third-party format conversion; one author, 0 stars at verification (2026-11-16). VietOCR library is Apache-2.0; original vgg_seq2seq weights have no separately stated terms in upstream README. Measurement only; verify with author before product use.",
+      "provenance": {
+        "release": "https://github.com/duchoa1297/vietocr-onnx/releases/tag/ocr-v1",
+        "vietocr": "https://github.com/pbcquoc/vietocr",
+        "paddleocr": "https://github.com/PaddlePaddle/PaddleOCR",
+        "rapidocr": "https://github.com/RapidAI/RapidOCR/tree/v3.9.2"
+      }
+    },
+    {
+      "model": "c",
+      "repository": "duchoa1297/vietocr-onnx",
+      "revision": "ocr-v1",
+      "commit": "b6733d5c250bf647cc8e13c303bf6622febee0cf",
+      "filename": "vietocr_encoder.onnx",
+      "bytes": 84317562,
+      "sha256": "7375c11ad23d52547a344ec5f53adf89db8302f035ceb3f1e67cff2c04069ae7",
+      "license": "Apache-2.0",
+      "licenseStatus": "weights-unverified",
+      "licenseUrl": "https://github.com/duchoa1297/vietocr-onnx/blob/ocr-v1/LICENSE",
+      "url": "https://github.com/duchoa1297/vietocr-onnx/releases/download/ocr-v1/vietocr_encoder.onnx",
+      "note": "Third-party format conversion; one author, 0 stars at verification (2026-11-16). VietOCR library is Apache-2.0; original vgg_seq2seq weights have no separately stated terms in upstream README. Measurement only; verify with author before product use.",
+      "provenance": {
+        "release": "https://github.com/duchoa1297/vietocr-onnx/releases/tag/ocr-v1",
+        "vietocr": "https://github.com/pbcquoc/vietocr",
+        "paddleocr": "https://github.com/PaddlePaddle/PaddleOCR",
+        "rapidocr": "https://github.com/RapidAI/RapidOCR/tree/v3.9.2"
+      }
+    },
+    {
+      "model": "c",
+      "repository": "duchoa1297/vietocr-onnx",
+      "revision": "ocr-v1",
+      "commit": "b6733d5c250bf647cc8e13c303bf6622febee0cf",
+      "filename": "vietocr_decoder.onnx",
+      "bytes": 5140562,
+      "sha256": "73b92cd370563952b345703ecdce84d8374a9f0a7018afee062170efe04f21f5",
+      "license": "Apache-2.0",
+      "licenseStatus": "weights-unverified",
+      "licenseUrl": "https://github.com/duchoa1297/vietocr-onnx/blob/ocr-v1/LICENSE",
+      "url": "https://github.com/duchoa1297/vietocr-onnx/releases/download/ocr-v1/vietocr_decoder.onnx",
+      "note": "Third-party format conversion; one author, 0 stars at verification (2026-11-16). VietOCR library is Apache-2.0; original vgg_seq2seq weights have no separately stated terms in upstream README. Measurement only; verify with author before product use.",
+      "provenance": {
+        "release": "https://github.com/duchoa1297/vietocr-onnx/releases/tag/ocr-v1",
+        "vietocr": "https://github.com/pbcquoc/vietocr",
+        "paddleocr": "https://github.com/PaddlePaddle/PaddleOCR",
+        "rapidocr": "https://github.com/RapidAI/RapidOCR/tree/v3.9.2"
+      }
+    },
+    {
+      "model": "c",
+      "repository": "duchoa1297/vietocr-onnx",
+      "revision": "ocr-v1",
+      "commit": "b6733d5c250bf647cc8e13c303bf6622febee0cf",
+      "filename": "vietocr.json",
+      "bytes": 712,
+      "sha256": "518345b7672fd36e534fb8ffcf6f6599c687793541259170834789fe2f7dd6e6",
+      "license": "Apache-2.0",
+      "licenseStatus": "declared-apache-2.0",
+      "licenseUrl": "https://github.com/duchoa1297/vietocr-onnx/blob/ocr-v1/LICENSE",
+      "url": "https://github.com/duchoa1297/vietocr-onnx/releases/download/ocr-v1/vietocr.json",
+      "note": "Third-party format conversion; one author, 0 stars at verification (2026-11-16). VietOCR library is Apache-2.0; original vgg_seq2seq weights have no separately stated terms in upstream README. Measurement only; verify with author before product use.",
+      "provenance": {
+        "release": "https://github.com/duchoa1297/vietocr-onnx/releases/tag/ocr-v1",
+        "vietocr": "https://github.com/pbcquoc/vietocr",
+        "paddleocr": "https://github.com/PaddlePaddle/PaddleOCR",
+        "rapidocr": "https://github.com/RapidAI/RapidOCR/tree/v3.9.2"
+      }
     }
   ],
   "llamaCppSource": {

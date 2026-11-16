@@ -26,3 +26,13 @@ export const localReaderMessages = {
   textOnly: 'PaddleOCR hiện chỉ hỗ trợ đọc chữ theo dòng; chưa hỗ trợ dựng cấu trúc đồ thị.',
   busy: 'Bộ đọc đang xử lý một lượt khác; hãy chờ lượt đó kết thúc.',
 };
+export const ocrMessages = {
+  unsupported_mode: 'VietOCR chỉ hỗ trợ đọc chữ theo dòng, chưa hỗ trợ đọc đồ thị.',
+  missing_log_probs: 'Model không trả log-prob hợp lệ; không thể tính độ tin cậy của dòng chữ.',
+  invalid_output: 'Đầu ra model OCR không hợp lệ; hãy kiểm tra đúng phiên bản model.',
+  decode_limit: 'Dòng chữ vượt giới hạn giải mã; hãy cắt thành dòng ngắn hơn.',
+  busy: 'Bộ đọc OCR đang xử lý một lượt khác; hãy chờ lượt đó kết thúc.',
+  aborted: 'Đã hủy đọc chữ.',
+  read_failed: 'Không thể đọc chữ; hãy kiểm tra model OCR và ảnh đầu vào.',
+  weightsWarning: 'C: trọng số VietOCR chưa xác minh điều khoản riêng; chỉ dùng để đo, chưa đưa vào sản phẩm.',
+};

@@ -25,16 +25,16 @@ const file: ModelFile = { model: 'a', repository: 'test/fixture', revision: 'fix
   licenseUrl: 'https://example.invalid/LICENSE', url: 'https://example.invalid/fixture' };
 const target = (root: string) => join(root, 'a', file.filename);
 
-it('pins four approved weights and llama.cpp source tag + commit, without a Windows binary', async () => {
+it('pins approved A/B/C artifacts and llama.cpp source tag + commit, without a Windows binary', async () => {
   const files = await loadManifest();
-  expect(files).toHaveLength(4);
+  expect(files).toHaveLength(8);
   expect(files.filter((f) => f.model === 'a').reduce((n, f) => n + f.bytes, 0)).toBe(1_817_539_488);
   expect(files.filter((f) => f.model === 'b').reduce((n, f) => n + f.bytes, 0)).toBe(1_926_804_800);
   expect(await loadLlamaCppSource()).toMatchObject({ revision: 'b12388', commit: '1c2adc75f619d05efc5d49ce08eaaa96272ebfa2', license: 'MIT' });
   for (const f of files) { expect(f.url).toContain(f.revision); expect(f.licenseUrl).toContain(f.revision); }
 });
 
-it.each(['a', 'b'])('without --confirm only lists %s; no network or files', async (model) => {
+it.each(['a', 'b', 'c'])('without --confirm only lists %s; no network or files', async (model) => {
   const root = await directory();
   const fetcher = vi.fn<typeof fetch>();
   const logs: string[] = [];
@@ -47,7 +47,7 @@ it.each(['a', 'b'])('without --confirm only lists %s; no network or files', asyn
 
 it('rejects missing, unknown, misspelled and positional options before downloading', async () => {
   const fetcher = vi.fn<typeof fetch>();
-  for (const args of [[], ['--model', 'c', '--confirm'], ['--model', 'a', '--comfirm'], ['a', '--confirm']]) {
+  for (const args of [[], ['--model', 'd', '--confirm'], ['--model', 'a', '--comfirm'], ['a', '--confirm']]) {
     await expect(fetchModels(args, { fetcher })).rejects.toThrow();
   }
   expect(fetcher).not.toHaveBeenCalled();

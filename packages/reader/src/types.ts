@@ -13,6 +13,9 @@ export interface ReadUsage {
   passes: number; latencyMs: number; engine: string; peakMemoryMb?: number;
   serverTimings?: ServerTimings;
   sentImages?: SentImageSize[];
+  lineCount?: number;
+  detectionMs?: number;
+  recognitionMs?: number;
 }
 export type ReadUncertainty = NonNullable<ProblemSpec['uncertain']>[number];
 export interface ReadOutcome {
