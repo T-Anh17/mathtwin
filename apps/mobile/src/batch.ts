@@ -1,8 +1,8 @@
 import { Benchmark } from './benchmark.js';
-import type { BenchImage, BenchmarkConfig, DatasetEntry, ImageResult, MobilePlugin } from './contracts.js';
+import type { BenchImage, BenchmarkConfig, Dataset, DatasetEntry, ImageResult, MobilePlugin } from './contracts.js';
 import { errorCode } from './messages.vi.js';
 
-export type ImageSource = { images: BenchImage[] } | { dataset: { name: string; entries: DatasetEntry[] } };
+export type ImageSource = { images: BenchImage[] } | { dataset: Dataset };
 /** One image at a time; dataset bytes are released after each awaited run. */
 export async function runBatch(source: ImageSource, config: BenchmarkConfig, plugin: MobilePlugin, runner: Benchmark,
   signal: AbortSignal, onResult: (result: ImageResult) => void): Promise<void> {
@@ -14,7 +14,7 @@ export async function runBatch(source: ImageSource, config: BenchmarkConfig, plu
     if (signal.aborted) break;
     let image: BenchImage;
     try {
-      image = 'dataset' in source ? { id: job.id, imageSource: 'dataset', ...(await plugin.datasetImage({ name: source.dataset.name, file: (job as DatasetEntry).file })) }
+      image = 'dataset' in source ? { id: job.id, imageSource: 'dataset', ...(await plugin.datasetImage({ name: source.dataset.name, file: (job as DatasetEntry).file, location: source.dataset.location })) }
         : job as BenchImage;
     } catch (e) {
       const engine = config.model === 'a' ? 'offline:paddleocr-vl-1.5' : 'offline:qwen3-vl-2b';

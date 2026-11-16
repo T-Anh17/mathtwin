@@ -11,6 +11,7 @@ const engineFor = (model: 'a' | 'b'): string => model === 'a' ? 'offline:paddleo
 function check(signal: AbortSignal): void { if (signal.aborted) throw { code: 'aborted' }; }
 function serverFailure(state: ServerState): string | undefined {
   if (state.memoryPressure) return 'memory_pressure';
+  if (state.errorCode) return state.errorCode;
   if (!state.alive) return state.exitCode === 137 || state.exitCode === 9 ? 'server_killed' : 'server_exit';
   return undefined;
 }
@@ -117,7 +118,11 @@ export class Benchmark {
       // Startup cancellation and HTTP can settle before a polling tick. Native pressure is latched
       // before teardown and survives stop(), so recover its cause/trim metadata before cleanup.
       if (startAttempted && !signal.aborted && failure !== 'timeout') {
-        try { currentMemory = await this.plugin.status(); if (currentMemory.memoryPressure) failure = 'memory_pressure'; }
+        try {
+          currentMemory = await this.plugin.status();
+          if (currentMemory.memoryPressure) failure = 'memory_pressure';
+          else if (currentMemory.errorCode) failure = currentMemory.errorCode;
+        }
         catch { /* Preserve the already observed failure if status is unavailable. */ }
       }
       result.errorCode = signal.aborted ? 'aborted' : failure ?? errorCode(e);
@@ -155,7 +160,7 @@ export function exportReport(report: BenchmarkReport): string {
     totalRamBytes: report.device.totalRamBytes, availableRamBytes: report.device.availableRamBytes, freeStorageBytes: report.device.freeStorageBytes },
   results: report.results.map((r) => ({ id: r.id, engine: r.engine, config: { model: r.config.model, passes: r.config.passes,
     mode: r.config.mode, threads: r.config.threads, minRamGb: r.config.minRamGb, allowLowRam: r.config.allowLowRam,
-    backgroundIdleMinutes: r.config.backgroundIdleMinutes, backend: 'CPU', cpuVariant: r.memory?.cpuVariant },
+    backgroundIdleMinutes: r.config.backgroundIdleMinutes, backend: 'CPU', cpuVariant: r.memory?.cpuVariant, cpuVariantSource: r.memory?.cpuVariantSource },
     imageSource: r.imageSource, captureMethod: r.captureMethod,
     outcome: r.outcome, linePasses: r.linePasses, usage: r.usage, totalMs: r.totalMs, modelLoadMs: r.modelLoadMs,
     modelVerifyMs: r.modelVerifyMs, reusedModel: r.reusedModel, memory: r.memory, errorCode: r.errorCode })) }, function (this: unknown, key, value: unknown) {

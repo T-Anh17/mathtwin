@@ -122,23 +122,52 @@ Lệnh trên chỉ `adb install -r` APK đã build, không build lại. **Không
   thì ghi lại từ đầu. Mất mạng/hủy giữ phần đã nhận; byte thừa hoặc SHA sai thì xóa.
   Chỉ đổi tên sau khi đủ byte và SHA-256 khớp. File đã có cũng được kiểm trước khi khởi động model.
 - Model thực dùng ở `filesDir/models/<a|b>/` trong sandbox riêng. Không cho người dùng nhập URL/model path
-  hoặc tham số dòng lệnh tùy ý. Không đủ dung lượng (có dự phòng 64 MiB) thì chặn tải/import.
+  hoặc tham số dòng lệnh tùy ý. Tải/copy cần đủ dung lượng với dự phòng 64 MiB;
+  nhập bằng rename trong bộ nhớ trong không cần thêm dung lượng cho một bản copy.
 - Mặc định cảnh báo dưới **6 GB RAM vật lý**, có thể đổi ngưỡng trong màn Đo. Cần tích xác nhận
   trước khi chạy trên máy dưới ngưỡng. RAM khả dụng cũng được ghi trong thông tin thiết bị.
   Máy ít RAM chỉ dùng để kiểm chạy được; không suy ra hiệu năng của máy mục tiêu.
 
-Nhà phát triển có thể đưa **file đã có**, không cần tải lại. Ví dụ sau khi được phép dùng thiết bị:
+Nhà phát triển có thể đưa **file đã có**, không cần tải lại. Dùng `/data/local/tmp` làm nơi đẩy tạm,
+rồi `run-as` chép vào `files/import/<a|b>/` trong bộ nhớ trong của app. **Chỉ áp dụng APK debug**
+(`run-as` cần app debuggable). Các lệnh dưới đây do reviewer chạy khi được phép dùng thiết bị.
+Thay đường dẫn file trên máy tính bằng file đã có, giữ nguyên tên GGUF theo manifest.
+
+Android 16 trên vivo V2324HA có hành vi FUSE/bind mount không ổn định: app không đọc được file do shell
+đặt vào vùng ngoài `/sdcard/Android/data/vn.mathtwin.app/files/`, dù shell vẫn thấy file và quyền đọc.
+Vì vậy hướng dẫn nhập model và bộ đo dùng bộ nhớ trong; app vẫn hỗ trợ vùng ngoài làm nguồn dự phòng.
+
+Model A:
 
 ```powershell
-adb shell mkdir -p /sdcard/Android/data/vn.mathtwin.app/files/import/b
-adb push '<file Qwen3VL-2B-Instruct-Q4_K_M.gguf đã có>' /sdcard/Android/data/vn.mathtwin.app/files/import/b/
-adb push '<file mmproj-Qwen3VL-2B-Instruct-F16.gguf đã có>' /sdcard/Android/data/vn.mathtwin.app/files/import/b/
+adb shell run-as vn.mathtwin.app mkdir -p files/import/a
+adb push '<file PaddleOCR-VL-1.5.gguf đã có>' /data/local/tmp/PaddleOCR-VL-1.5.gguf
+adb shell run-as vn.mathtwin.app cp /data/local/tmp/PaddleOCR-VL-1.5.gguf files/import/a/
+adb shell rm /data/local/tmp/PaddleOCR-VL-1.5.gguf
+adb push '<file PaddleOCR-VL-1.5-mmproj.gguf đã có>' /data/local/tmp/PaddleOCR-VL-1.5-mmproj.gguf
+adb shell run-as vn.mathtwin.app cp /data/local/tmp/PaddleOCR-VL-1.5-mmproj.gguf files/import/a/
+adb shell rm /data/local/tmp/PaddleOCR-VL-1.5-mmproj.gguf
 ```
 
-Bấm **Kiểm tra file adb push** cho B. App kiểm SHA/byte nguồn, copy vào vùng riêng, kiểm SHA/byte bản copy.
-Tương tự A dùng `import/a/` và đúng hai filename trong manifest. File sai bị xóa; nguồn hợp lệ giữ lại để
-nhà phát triển tự dọn nếu muốn. Cần dung lượng cho cả nguồn và bản copy. Đường dẫn `/sdcard` có thể
-hiện dưới dạng `/storage/emulated/0` trong kết quả Android.
+Model B:
+
+```powershell
+adb shell run-as vn.mathtwin.app mkdir -p files/import/b
+adb push '<file Qwen3VL-2B-Instruct-Q4_K_M.gguf đã có>' /data/local/tmp/Qwen3VL-2B-Instruct-Q4_K_M.gguf
+adb shell run-as vn.mathtwin.app cp /data/local/tmp/Qwen3VL-2B-Instruct-Q4_K_M.gguf files/import/b/
+adb shell rm /data/local/tmp/Qwen3VL-2B-Instruct-Q4_K_M.gguf
+adb push '<file mmproj-Qwen3VL-2B-Instruct-F16.gguf đã có>' /data/local/tmp/mmproj-Qwen3VL-2B-Instruct-F16.gguf
+adb shell run-as vn.mathtwin.app cp /data/local/tmp/mmproj-Qwen3VL-2B-Instruct-F16.gguf files/import/b/
+adb shell rm /data/local/tmp/mmproj-Qwen3VL-2B-Instruct-F16.gguf
+```
+
+Chỉ chạy từng lệnh `rm` sau khi lệnh `cp` ngay trước thành công. Bước chép từ `/data/local/tmp` vào app
+tạm cần chỗ cho cả hai bản của file đang chép; dọn file tạm trước khi bấm nhập trong app.
+Bấm **Kiểm tra file adb push** cho A/B tương ứng. App chọn từng file nguồn trong
+`filesDir/import/<a|b>/` trước, rồi mới tới `getExternalFilesDir(null)/import/<a|b>/` nếu thiếu file trong.
+Nguồn trong đã kiểm byte/SHA-256 được **rename** tới `filesDir/models/<a|b>/`, tránh một bản copy lớn.
+Nếu rename thất bại, app copy rồi xóa nguồn trong sau khi bản cuối đạt byte/SHA-256.
+Nguồn ngoài vẫn được giữ sau khi copy. File sai bị xóa; model chỉ được đánh dấu sẵn sàng sau kiểm tra bản cuối.
 
 ## Bộ đo và màn Đo
 
@@ -172,11 +201,18 @@ Thư mục bộ đo chứa ảnh và `ids.json` (mảng, id duy nhất, filename
 ```
 
 ```powershell
-adb shell mkdir -p /sdcard/Android/data/vn.mathtwin.app/files/datasets
-adb push '<thư mục bộ đo đã có>/synthetic' /sdcard/Android/data/vn.mathtwin.app/files/datasets/
+adb push .build-cache/datasets/synthetic-hw /data/local/tmp/mathtwin-synthetic-hw
+adb shell run-as vn.mathtwin.app mkdir -p files/datasets/synthetic-hw
+adb shell run-as vn.mathtwin.app cp -r /data/local/tmp/mathtwin-synthetic-hw/. files/datasets/synthetic-hw/
 ```
 
-Nhập `synthetic` rồi bấm **Nhập bộ đo**. Chỉ nạp ảnh khi đến lượt xử lý, không đưa cả thư mục vào RAM.
+Ví dụ này cũng chỉ dành cho APK debug; thư mục tạm `mathtwin-synthetic-hw` phải chưa tồn tại trước khi push
+để tránh lồng thêm thư mục. Đóng gói bộ đo trên máy tính trước khi chạy các lệnh này.
+Nhập `synthetic-hw` rồi bấm **Nhập bộ đo**. App chọn `filesDir/datasets/<tên>` nếu thư mục trong tồn tại;
+chỉ khi không có mới chọn `getExternalFilesDir(null)/datasets/<tên>`. Bộ trong sai/thiếu `ids.json` sẽ báo lỗi,
+không âm thầm chuyển sang bộ ngoài cùng tên. Màn Đo hiện **Bộ nhớ trong (internal)** hoặc
+**Bộ nhớ ngoài (external)**; đo và xem ảnh đều giữ đúng vùng đã chọn.
+Chỉ nạp ảnh khi đến lượt xử lý, không đưa cả thư mục vào RAM.
 Kết quả giữ theo id, không cần `truth.json` trên điện thoại. Đóng gói bằng
 `npm run eval:pack -- --set synthetic-hw`; dùng thư mục `.build-cache/datasets/synthetic-hw` và nhập tên `synthetic-hw`.
 Máy tính tính chỉ số bằng `npm run eval:read -- --from-device <file.json> --mode both`.
@@ -221,20 +257,30 @@ Các mục không có tọa độ được liệt kê trong kết quả; không 
   Thiếu logprobs, JSON lỗi hay bị cắt trả mã lỗi; không dùng điểm đúng/sai bài làm để chọn cách đọc.
 - `LD_LIBRARY_PATH` và working directory của child trỏ `nativeLibraryDir`; ggml tìm các backend tại
   thư mục executable/cwd, không ép một module bằng `GGML_BACKEND_PATH`.
-  Đọc dòng upstream `load_backend: loaded CPU backend from …/libggml-cpu-<variant>.so` đầu tiên
-  trước khi chấp nhận startup, chỉ giữ tên thuộc bảy biến thể đã build trong `status.cpuVariant`.
+  Sau health OK, đọc `/proc/<pid>/maps` của đúng PID server. Chỉ nhận file CPU là con trực tiếp của
+  `nativeLibraryDir`, tên thuộc bảy biến thể đã build; nhiều vùng mapping của cùng file chỉ tính một lần.
+  Phải có đúng một biến thể; maps đọc được nhưng không có hoặc có nhiều biến thể trả `cpu_backend_unknown`.
+  `status.cpuVariantSource` là `maps`. Chỉ khi không đọc được maps (hoặc không lấy được PID) mới dùng
+  dòng upstream `load_backend: loaded CPU backend from …/libggml-cpu-<variant>.so` làm nguồn phụ (`log`).
+  Log vẫn được đối chiếu với maps; hai nguồn lệch hoặc log có hai biến thể khác nhau thì trả
+  `cpu_backend_unknown`, kể cả phát hiện muộn qua `status.errorCode`; màn Đo dừng cả loạt.
   Dùng `--verbosity 4 --no-log-prefix --no-log-timestamps --log-colors off`: tại commit đã pin,
   GGML INFO được ánh xạ sang mức trace 4 và `common_init` mặc định bật tiền tố/thời gian.
-  Các dòng khác bị bỏ, bộ đệm dòng giới hạn 1024 byte, không lưu log ra file/Logcat hoặc chuyển tới UI.
+  Luồng đọc pipe chạy tới EOF, bộ đệm dòng giới hạn 1024 byte; dòng quá dài bị bỏ. Không lưu log thô
+  ra file/Logcat hoặc chuyển tới UI. Xử lý cả dòng cuối không có ký tự xuống dòng.
+  Vòng cũ bắt ngoại lệ bên ngoài toàn bộ vòng đọc: lỗi xử lý một dòng có thể làm luồng kết thúc,
+  bỏ sót dòng backend và khiến pipe đầy về sau. Chưa có bằng chứng đây là nguyên nhân trên vivo.
+  Bản sửa cô lập ngoại lệ/LinkageError từng dòng, tiếp tục đọc; lỗi I/O được thử lại khi child còn chạy.
+  Dùng bộ đệm byte thay cho thao tác StringBuilder để giảm phụ thuộc API JDK/Android ở luồng đọc.
   Không thu được tên backend thì trả `cpu_backend_unknown` và dừng, không bịa tên từ tập lệnh máy.
-  Tên đã nhận không bị ghi đè bởi log của lượt inference sau.
+  Tên đã nhận không bị ghi đè bởi log của lượt inference sau; log lệch được đánh dấu lỗi.
 - Tắt logging Capacitor/WebView debug; không log ảnh/nội dung đề/khóa.
   Không có cloud inference, upload ảnh, tài khoản hay telemetry.
 
 ## Xuất kết quả
 
 Nút **Xuất kết quả** ghi JSON `version:1`, thông tin máy (model/Android/CPU/RAM/storage), từng id,
-engine, cấu hình CPU (gồm `cpuVariant` thực nạp), `imageSource`/`captureMethod`, ReadOutcome hoặc các lượt
+engine, cấu hình CPU (gồm `cpuVariant` thực nạp và `cpuVariantSource: "maps" | "log"`, cũng có trong `memory`), `imageSource`/`captureMethod`, ReadOutcome hoặc các lượt
 lines, usage (gồm kích thước gốc), timings, load/verify/total, RAM và mã lỗi.
 **Không có ảnh, data URL, pixel, đường dẫn nguồn hoặc khóa server.** Có nội dung chữ/đồ thị đã đọc.
 Màn hình trả đường dẫn file trong `Android/data/vn.mathtwin.app/files/results/`.
@@ -255,6 +301,8 @@ không `any`; hai devDependency MIT `@types/react` và `@types/react-dom` đư�
 Test bổ sung kiểm yêu cầu camera hệ thống/cleanup khi thành công, hủy và lỗi, cờ đo/screen-on cả bộ ảnh,
 dọn cờ khi hủy/lỗi, và xuất nguồn ảnh/CPU backend thực nạp bằng plugin giả.
 Build APK là bước riêng, không thuộc `npm test`.
+Chưa có test Kotlin/JVM cho ServerRuntime hoặc ModelStore; thư mục JVM hiện chỉ có test Java mẫu.
+Test TS dùng plugin giả kiểm nguồn CPU trong file xuất và dừng loạt khi maps/log mâu thuẫn.
 
 Tài liệu upstream dùng khi triển khai: [Capacitor Android](https://capacitorjs.com/docs/android),
 [llama.cpp Android tại commit đã pin](https://github.com/ggml-org/llama.cpp/blob/1c2adc75f619d05efc5d49ce08eaaa96272ebfa2/docs/android.md).

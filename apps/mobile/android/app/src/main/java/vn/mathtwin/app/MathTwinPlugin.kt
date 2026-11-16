@@ -12,11 +12,23 @@ import com.getcapacitor.PluginCall
 import com.getcapacitor.PluginMethod
 import com.getcapacitor.annotation.CapacitorPlugin
 import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
 import java.io.File
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
+
+private class DatasetFailure(
+    val reason: String, val id: String? = null, val file: String? = null, val operation: String? = null,
+) : Exception("dataset_invalid") {
+    fun data() = JSObject().apply {
+        put("reason", reason)
+        id?.let { put("id", it) }
+        file?.let { put("file", it) }
+        operation?.let { put("operation", it) }
+    }
+}
 
 @CapacitorPlugin(name = "MathTwin")
 class MathTwinPlugin : Plugin() {
@@ -64,6 +76,7 @@ class MathTwinPlugin : Plugin() {
                 if (exclusive && cancellation.get() != token) throw MobileFailure("aborted")
                 call.resolve(action(token)?.let { JSObject(it.toString()) } ?: JSObject())
             }
+            catch (e: DatasetFailure) { call.reject("dataset_invalid", "dataset_invalid", e.data()) }
             catch (e: MobileFailure) { call.reject(e.code, e.code) }
             catch (_: Exception) { call.reject("native_error", "native_error") }
             finally { if (exclusive) busy.set(false) }
@@ -99,32 +112,48 @@ class MathTwinPlugin : Plugin() {
         controls.execute { try { server.stop(); call.resolve() } catch (_: Exception) { call.reject("server_exit", "server_exit") } }
     }
     private fun safeName(name: String) = name.matches(Regex("[A-Za-z0-9][A-Za-z0-9._-]{0,99}")) && name != "." && name != ".."
-    private fun datasetDir(name: String): File {
-        if (!safeName(name)) throw MobileFailure("dataset_invalid")
-        return File(context.getExternalFilesDir(null), "datasets/$name")
+    private fun datasetDir(name: String, location: String? = null): Pair<File, String> {
+        if (!safeName(name)) throw DatasetFailure("entry_name", file = name)
+        if (location != null && location != "internal" && location != "external") throw DatasetFailure("entry_name", file = name)
+        val internal = File(context.filesDir, "datasets/$name").absoluteFile
+        if (location == "internal" || (location == null && internal.exists())) return internal to "internal"
+        val root = context.getExternalFilesDir(null) ?: throw DatasetFailure("ids_missing", file = "ids.json", operation = "stat")
+        return File(root, "datasets/$name").absoluteFile to "external"
     }
-    private fun datasetEntries(name: String): JSONArray {
-        val dir = datasetDir(name); val ids = File(dir, "ids.json")
-        if (!ids.isFile || ids.length() > 1024 * 1024) throw MobileFailure("dataset_invalid")
-        val entries = JSONArray(ids.readText()); val seen = mutableSetOf<String>()
-        if (entries.length() < 1 || entries.length() > 1000) throw MobileFailure("dataset_invalid")
+    private fun datasetEntries(dir: File): JSONArray {
+        val ids = File(dir, "ids.json")
+        if (!ids.isFile) throw DatasetFailure("ids_missing", file = "ids.json", operation = "stat")
+        if (ids.length() > 1024 * 1024) throw DatasetFailure("ids_too_large", file = "ids.json")
+        val text = try { ids.readText() }
+        catch (_: Exception) { throw DatasetFailure("ids_parse", file = "ids.json", operation = "read") }
+        val entries = try { JSONArray(text) }
+        catch (_: JSONException) { throw DatasetFailure("ids_parse", file = "ids.json", operation = "parse") }
+        val seen = mutableSetOf<String>()
+        if (entries.length() < 1 || entries.length() > 1000) throw DatasetFailure("entry_count", file = "ids.json")
         for (i in 0 until entries.length()) {
-            val e = entries.getJSONObject(i); val id = e.getString("id"); val nameFile = e.getString("file")
-            if (!safeName(id) || !seen.add(id) || !safeName(nameFile) || !nameFile.matches(Regex(".+\\.(png|jpg|jpeg)", RegexOption.IGNORE_CASE)))
-                throw MobileFailure("dataset_invalid")
+            val e = entries.optJSONObject(i) ?: throw DatasetFailure("entry_name", file = "ids.json")
+            val id = e.opt("id") as? String; val nameFile = e.opt("file") as? String
+            if (id == null || nameFile == null || !safeName(id) || !safeName(nameFile) || !nameFile.matches(Regex(".+\\.(png|jpg|jpeg)", RegexOption.IGNORE_CASE)))
+                throw DatasetFailure("entry_name", id, nameFile)
+            if (!seen.add(id)) throw DatasetFailure("duplicate_id", id, nameFile)
             val image = File(dir, nameFile)
-            if (image.canonicalFile.parentFile != dir.canonicalFile || !image.isFile || image.length() > 10 * 1024 * 1024) throw MobileFailure("dataset_invalid")
+            // safeName forbids separators/traversal; compare lexical absolute paths, independent of FUSE aliases.
+            if (image.parentFile != dir) throw DatasetFailure("entry_name", id, nameFile)
+            if (!image.isFile) throw DatasetFailure("image_missing", id, nameFile, "stat")
+            if (image.length() > 10 * 1024 * 1024) throw DatasetFailure("image_too_large", id, nameFile)
         }
         return entries
     }
     @PluginMethod fun dataset(call: PluginCall) = task(call) {
-        JSONObject().put("entries", datasetEntries(call.getString("name") ?: ""))
+        val (dir, location) = datasetDir(call.getString("name") ?: "")
+        JSONObject().put("entries", datasetEntries(dir)).put("location", location)
     }
     @PluginMethod fun datasetImage(call: PluginCall) = task(call) {
         val name = call.getString("name") ?: ""; val filename = call.getString("file") ?: ""
-        val entries = datasetEntries(name)
-        if (!(0 until entries.length()).any { entries.getJSONObject(it).getString("file") == filename }) throw MobileFailure("dataset_invalid")
-        val image = File(datasetDir(name), filename)
+        val (dir, _) = datasetDir(name, call.getString("location"))
+        val entries = datasetEntries(dir)
+        if (!(0 until entries.length()).any { entries.getJSONObject(it).getString("file") == filename }) throw DatasetFailure("entry_name", file = filename)
+        val image = File(dir, filename)
         val mime = if (filename.endsWith(".png", true)) "png" else "jpeg"
         JSONObject().put("dataUrl", "data:image/$mime;base64," + Base64.encodeToString(image.readBytes(), Base64.NO_WRAP))
     }

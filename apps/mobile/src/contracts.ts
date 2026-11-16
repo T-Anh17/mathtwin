@@ -8,9 +8,11 @@ export interface DeviceInfo {
 export interface ModelState { model: Model; bytes: number; downloadedBytes: number; ready: boolean }
 export interface Session { port: number; apiKey: string; reused: boolean; loadMs: number; verifyMs?: number }
 export interface MemoryPressure { callback: 'onTrimMemory' | 'onLowMemory'; trimLevel: number | null }
-export interface ServerState { alive: boolean; peakMemoryMb?: number; rssMemoryMb?: number; exitCode?: number; cpuVariant?: string; memoryPressure?: MemoryPressure }
+export interface ServerState { alive: boolean; peakMemoryMb?: number; rssMemoryMb?: number; exitCode?: number; cpuVariant?: string; cpuVariantSource?: 'maps' | 'log'; errorCode?: 'cpu_backend_unknown'; memoryPressure?: MemoryPressure }
 export interface BenchmarkConfig { model: Model; passes: 1 | 2; mode: 'graph' | 'lines'; threads: number; minRamGb: number; allowLowRam: boolean; backgroundIdleMinutes: number }
 export interface DatasetEntry { id: string; file: string }
+export type DatasetLocation = 'internal' | 'external';
+export interface Dataset { name: string; entries: DatasetEntry[]; location: DatasetLocation }
 export interface MobilePlugin {
   device(): Promise<DeviceInfo>;
   models(): Promise<{ models: ModelState[] }>;
@@ -22,8 +24,8 @@ export interface MobilePlugin {
   stop(): Promise<void>;
   setBenchmarkState(options: { running: boolean; backgroundIdleMinutes: number }): Promise<void>;
   cleanupCameraTempFiles(): Promise<void>;
-  dataset(options: { name: string }): Promise<{ entries: DatasetEntry[] }>;
-  datasetImage(options: { name: string; file: string }): Promise<{ dataUrl: string }>;
+  dataset(options: { name: string }): Promise<{ entries: DatasetEntry[]; location: DatasetLocation }>;
+  datasetImage(options: { name: string; file: string; location?: DatasetLocation }): Promise<{ dataUrl: string }>;
   exportResult(options: { json: string }): Promise<{ path: string }>;
 }
 export interface HttpTransport {

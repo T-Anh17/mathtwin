@@ -1,3 +1,5 @@
+import type { DatasetLocation } from './contracts.js';
+
 export const vi = {
   title: 'MathTwin', subtitle: 'Đọc ảnh trên điện thoại', models: 'Model', bench: 'Đo',
   a: 'A · PaddleOCR-VL-1.5', b: 'B · Qwen3-VL-2B',
@@ -8,6 +10,8 @@ export const vi = {
   allowLowRam: 'Tôi đã đọc cảnh báo và muốn thử trên máy RAM thấp', minRam: 'Ngưỡng RAM (GB)', threads: 'Luồng CPU',
   passes: 'Số lượt', mode: 'Chế độ', graph: 'Đồ thị', lines: 'Dòng chữ',
   camera: 'Chụp ảnh', gallery: 'Chọn ảnh', dataset: 'Nhập bộ đo', datasetName: 'Tên thư mục bộ đo',
+  datasetSummary: (name: string, count: number, location: DatasetLocation): string =>
+    `${name}: ${count} · ${location === 'internal' ? 'Bộ nhớ trong (internal)' : 'Bộ nhớ ngoài (external)'}`,
   webViewCamera: 'Chụp WebView (phụ)', backgroundIdle: 'Dừng khi rảnh ở nền (phút)', cpuVariant: 'Biến thể CPU',
   cancel: 'Hủy', clear: 'Xóa ảnh khỏi bộ nhớ', settings: 'Cấu hình đo', results: 'Kết quả',
   showImage: 'Xem ảnh và chỗ gắn cờ', hideImage: 'Đóng ảnh',
@@ -21,6 +25,16 @@ export const vi = {
   noTimings: 'Server không trả timings.', noMemory: 'Không đọc được RAM server.',
   linePass: 'Lượt', privacy: 'Ảnh chụp từ camera hệ thống được đọc vào bộ nhớ rồi xóa file tạm; không lưu thư viện. File xuất không chứa ảnh.',
   nativeOnly: 'Mở APK Android để tải model và đo. Trang web chỉ dùng xem giao diện.',
+  datasetReasons: {
+    ids_missing: 'Không tìm thấy file ids.json.',
+    ids_too_large: 'File ids.json vượt quá 1 MB.',
+    ids_parse: 'Không đọc hoặc phân tích được ids.json.',
+    entry_count: 'Bộ đo phải có từ 1 đến 1000 mục.',
+    entry_name: 'Tên bộ đo, id hoặc tên file ảnh không hợp lệ.',
+    duplicate_id: 'Id ảnh bị trùng.',
+    image_missing: 'Không tìm thấy file ảnh.',
+    image_too_large: 'File ảnh vượt quá 10 MB.',
+  } as Record<string, string>,
   errors: {
     read_failed: 'Không đọc được ảnh.', text_only: 'Model này chỉ đọc chữ.', busy: 'Đang có tác vụ khác.',
     aborted: 'Đã hủy.', timeout: 'Hết thời gian chờ.', server_exit: 'Tiến trình model đã dừng.',
@@ -44,4 +58,18 @@ export function errorCode(error: unknown): string {
     if (e.name === 'AbortError') return 'aborted';
   }
   return 'read_failed';
+}
+
+export function messageFor(error: unknown): string {
+  const code = errorCode(error);
+  const message = vi.errors[code] ?? vi.errors.read_failed!;
+  if (code !== 'dataset_invalid' || typeof error !== 'object' || error === null || !('data' in error)) return message;
+  const data = error.data;
+  if (typeof data !== 'object' || data === null || !('reason' in data) || typeof data.reason !== 'string'
+    || !Object.hasOwn(vi.datasetReasons, data.reason)) return message;
+  const details = [data.reason];
+  if ('id' in data && typeof data.id === 'string') details.push(`id: ${data.id}`);
+  if ('file' in data && typeof data.file === 'string') details.push(`file: ${data.file}`);
+  if ('operation' in data && typeof data.operation === 'string') details.push(`bước: ${data.operation}`);
+  return `${message} ${vi.datasetReasons[data.reason]} (${details.join('; ')})`;
 }

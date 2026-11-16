@@ -138,17 +138,26 @@ internal class ModelStore(private val context: Context) {
         if (part.length() < e.getLong("bytes")) throw MobileFailure("download_failed")
     }
     fun importModel(model: String) {
-        val incoming = File(context.getExternalFilesDir(null), "import/$model")
         for (e in entries(model)) {
             val target = file(e)
             if (isVerified(e)) continue
-            val source = File(incoming, e.getString("filename"))
+            val internal = File(context.filesDir, "import/$model/${e.getString("filename")}")
+            val fromInternal = internal.isFile
+            val source = if (fromInternal) internal else {
+                val external = context.getExternalFilesDir(null) ?: throw MobileFailure("model_missing")
+                File(external, "import/$model/${e.getString("filename")}")
+            }
             verify(e, source)
-            if (root.usableSpace < e.getLong("bytes") + 64L * 1024 * 1024) throw MobileFailure("no_space")
-            val part = File(target.path + ".part")
-            source.inputStream().use { input -> part.outputStream().use { output -> input.copyTo(output) } }
-            verify(e, part)
-            if (!part.renameTo(target)) throw MobileFailure("native_error")
+            // Internal imports share the model filesystem: try moving before requiring copy space.
+            val moved = fromInternal && source.renameTo(target)
+            if (!moved) {
+                if (root.usableSpace < e.getLong("bytes") + 64L * 1024 * 1024) throw MobileFailure("no_space")
+                val part = File(target.path + ".part")
+                source.inputStream().use { input -> part.outputStream().use { output -> input.copyTo(output) } }
+                if (!part.renameTo(target)) throw MobileFailure("native_error")
+            }
+            verify(e, target)
+            if (fromInternal && !moved && !source.delete()) throw MobileFailure("native_error")
             mark(e)
         }
     }

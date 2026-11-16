@@ -29,7 +29,7 @@ function fake() {
     device: mock.fn(async () => device), models: mock.fn(async () => ({ models: [] })),
     download: mock.fn(async () => {}), cancelDownload: mock.fn(async () => {}), importModel: mock.fn(async () => {}),
     start: mock.fn(async () => ({ ...session })), status: mock.fn(async () => ({ ...state })), stop: mock.fn(async () => {}),
-    dataset: mock.fn(async () => ({ entries: [{ id: 'case-1', file: '1.png' }] })),
+    dataset: mock.fn(async () => ({ entries: [{ id: 'case-1', file: '1.png' }], location: 'internal' as const })),
     datasetImage: mock.fn(async () => ({ dataUrl: decoded.encoded })), exportResult: mock.fn(async () => ({ path: '/private/results/read.json' })),
     setBenchmarkState: mock.fn(async () => {}), cleanupCameraTempFiles: mock.fn(async () => {}),
   };
@@ -178,7 +178,7 @@ describe('Android benchmark flow with fake native plugin (no device/model/networ
         return new Promise(() => {});
       });
       const results: string[] = [];
-      const run = runBatch({ dataset: { name: 'set', entries: [{ id: 'one', file: '1.png' }, { id: 'two', file: '2.png' }] } },
+      const run = runBatch({ dataset: { name: 'set', location: 'internal', entries: [{ id: 'one', file: '1.png' }, { id: 'two', file: '2.png' }] } },
         { ...config, mode }, plugin, runner, signal(), (result) => {
           results.push(result.errorCode!);
           expect(result.memory?.memoryPressure).toEqual({ callback: 'onLowMemory', trimLevel: null });
@@ -231,20 +231,59 @@ describe('Android benchmark flow with fake native plugin (no device/model/networ
     expect(out.results[0]?.config.backgroundIdleMinutes).toBe(5);
     await plugin.exportResult({ json: raw }); expect(plugin.exportResult).toHaveBeenCalledWith({ json: raw });
   });
+  it.each(['maps', 'log'] as const)('exports cpuVariantSource=%s for both cold and reused server runs', async (cpuVariantSource) => {
+    const { runner, plugin, setState } = fake();
+    setState({ alive: true, peakMemoryMb: 1884, cpuVariant: 'android_armv8.6_1', cpuVariantSource });
+    const cold = await runner.run(image, { ...config, passes: 1 }, signal());
+    mock.mocked(plugin.start).mockResolvedValue({ ...session, reused: true, loadMs: 0, verifyMs: 0 });
+    const warm = await runner.run({ ...image, id: 'warm' }, { ...config, passes: 1 }, signal());
+    const raw = exportReport({ version: 1, device, results: [cold, warm] });
+    const exported = JSON.parse(raw) as { results: unknown[] };
+    expect(exported.results).toHaveLength(2);
+    for (const result of exported.results) expect(result).toMatchObject({
+      config: { cpuVariant: 'android_armv8.6_1', cpuVariantSource },
+      memory: { cpuVariant: 'android_armv8.6_1', cpuVariantSource },
+    });
+    expect(warm.reusedModel).toBe(true);
+    expect(raw).not.toContain(session.apiKey);
+    expect(raw).not.toContain('/proc/');
+    expect(raw).not.toContain('data:image');
+  });
+  it('omits an unavailable CPU source from exports instead of inventing one', async () => {
+    const { runner } = fake();
+    const result = await runner.run(image, config, signal());
+    expect(exportReport({ version: 1, device, results: [result] })).not.toContain('cpuVariantSource');
+  });
+  it.each(['success', 'invalid-json'])('stops the dataset on a late CPU maps/log conflict despite %s HTTP output', async (output) => {
+    const { runner, plugin, http, setState } = fake();
+    mock.mocked(http.post).mockImplementation(async () => {
+      setState({ alive: true, peakMemoryMb: 1884, errorCode: 'cpu_backend_unknown' });
+      return { status: 200, data: response(output === 'invalid-json' ? '{' : JSON.stringify({ lines: [{ text: 'A = 8', box: [0, 0, 500, 500] }] })) };
+    });
+    const results: string[] = [];
+    await runBatch({ dataset: { name: 'set', location: 'internal', entries: [{ id: 'one', file: '1.png' }, { id: 'two', file: '2.png' }] } },
+      { ...config, mode: 'lines', passes: 1 }, plugin, runner, signal(), (result) => {
+        results.push(result.errorCode!);
+        expect(result.memory?.peakMemoryMb).toBe(1884);
+      });
+    expect(results).toEqual(['cpu_backend_unknown']);
+    expect(plugin.datasetImage).toHaveBeenCalledTimes(1);
+    expect(plugin.stop).toHaveBeenCalled();
+  });
   it('loads dataset entries lazily in order and stops the batch on execution refusal', async () => {
     const { runner, plugin, http } = fake(); const order: string[] = [];
     mock.mocked(plugin.datasetImage).mockImplementation(async ({ file }) => { order.push(file); return { dataUrl: decoded.encoded }; });
     const entries = [{ id: 'one', file: '1.png' }, { id: 'two', file: '2.jpg' }];
-    await runBatch({ dataset: { name: 'set', entries } }, { ...config, passes: 1 }, plugin, runner, signal(), (r) => { order.push(r.id); });
+    await runBatch({ dataset: { name: 'set', location: 'internal', entries } }, { ...config, passes: 1 }, plugin, runner, signal(), (r) => { order.push(r.id); });
     expect(order).toEqual(['1.png', 'one', '2.jpg', 'two']); expect(http.post).toHaveBeenCalledTimes(2);
     order.length = 0;
     mock.mocked(plugin.start).mockRejectedValue({ code: 'exec_blocked' });
-    await runBatch({ dataset: { name: 'set', entries } }, config, plugin, runner, signal(), (r) => { order.push(r.errorCode!); });
+    await runBatch({ dataset: { name: 'set', location: 'internal', entries } }, config, plugin, runner, signal(), (r) => { order.push(r.errorCode!); });
     expect(order).toEqual(['1.png', 'exec_blocked']);
   });
   it('does not load the next dataset image after cancellation', async () => {
     const { runner, plugin } = fake(); const abort = new AbortController();
-    await runBatch({ dataset: { name: 'set', entries: [{ id: 'one', file: '1.png' }, { id: 'two', file: '2.jpg' }] } },
+    await runBatch({ dataset: { name: 'set', location: 'internal', entries: [{ id: 'one', file: '1.png' }, { id: 'two', file: '2.jpg' }] } },
       { ...config, passes: 1 }, plugin, runner, abort.signal, () => abort.abort());
     expect(plugin.datasetImage).toHaveBeenCalledTimes(1);
     expect(mock.mocked(plugin.setBenchmarkState).mock.calls).toEqual([
@@ -255,7 +294,7 @@ describe('Android benchmark flow with fake native plugin (no device/model/networ
     const { runner, plugin } = fake(); const order: string[] = [];
     mock.mocked(plugin.setBenchmarkState).mockImplementation(async ({ running }) => { order.push(running ? 'screen-on' : 'screen-off'); });
     const results: string[] = [];
-    await runBatch({ dataset: { name: 'set', entries: [{ id: 'one', file: '1.png' }, { id: 'two', file: '2.png' }] } },
+    await runBatch({ dataset: { name: 'set', location: 'internal', entries: [{ id: 'one', file: '1.png' }, { id: 'two', file: '2.png' }] } },
       { ...config, passes: 1, backgroundIdleMinutes: 7 }, plugin, runner, signal(), (r) => { order.push(r.id); results.push(r.imageSource); });
     expect(order).toEqual(['screen-on', 'one', 'two', 'screen-off']); expect(results).toEqual(['dataset', 'dataset']);
     expect(plugin.stop).not.toHaveBeenCalled();
@@ -265,6 +304,15 @@ describe('Android benchmark flow with fake native plugin (no device/model/networ
     const { runner, plugin } = fake();
     await expect(runBatch({ images: [image] }, config, plugin, runner, signal(), () => { throw new Error('view closed'); })).rejects.toThrow('view closed');
     expect(plugin.setBenchmarkState).toHaveBeenLastCalledWith({ running: false, backgroundIdleMinutes: 5 });
+  });
+  it.each(['internal', 'external'] as const)('loads every dataset image from the selected %s location', async (location) => {
+    const { runner, plugin } = fake();
+    await runBatch({ dataset: { name: 'same-name', location, entries: [{ id: 'one', file: '1.png' }, { id: 'two', file: '2.jpg' }] } },
+      { ...config, passes: 1 }, plugin, runner, signal(), () => {});
+    expect(mock.mocked(plugin.datasetImage).mock.calls).toEqual([
+      [{ name: 'same-name', file: '1.png', location }],
+      [{ name: 'same-name', file: '2.jpg', location }],
+    ]);
   });
   it('exports camera method alongside image source without including photo data', async () => {
     const { runner } = fake();

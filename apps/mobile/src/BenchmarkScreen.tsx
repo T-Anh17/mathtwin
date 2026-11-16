@@ -4,19 +4,18 @@ import manifest from '../../../tools/models/manifest.json';
 import { Benchmark, exportReport } from './benchmark.ts';
 import { decodeImage } from './images.ts';
 import { mobile, transport } from './native.ts';
-import { vi, errorCode } from './messages.vi.ts';
+import { vi, messageFor } from './messages.vi.ts';
 import { captureImage, captureWebViewImage, fileDataUrl } from './capture.ts';
 import { flagOverlays } from './overlays.ts';
 import { runBatch } from './batch.ts';
 import type { Graph as GraphModel } from '@mathtwin/core';
 import type { ReadUncertainty } from '@mathtwin/reader';
-import type { BenchImage, BenchmarkConfig, DatasetEntry, DeviceInfo, ImageResult, Model, ModelState } from './contracts.js';
+import { ocrMessages } from '@mathtwin/reader';
+import type { BenchImage, BenchmarkConfig, Dataset, DeviceInfo, ImageResult, Model, ModelState } from './contracts.js';
 
 const gb = (bytes: number): string => `${(bytes / 1e9).toFixed(2)} GB`;
 const ms = (value: number): string => `${Math.round(value)} ms`;
-interface Dataset { name: string; entries: DatasetEntry[] }
 const modelIds: Model[] = ['a', 'b'];
-const messageFor = (e: unknown): string => vi.errors[errorCode(e)] ?? vi.errors.read_failed!;
 const runner = new Benchmark(mobile, transport, decodeImage);
 export function BenchmarkScreen() {
   const [tab, setTab] = useState('bench');
@@ -68,6 +67,7 @@ export function BenchmarkScreen() {
     {device && <p className="device">{device.manufacturer} {device.model} · Android {device.android} · {device.cores} CPU · {vi.ram}: {gb(device.totalRamBytes)} · {vi.storage}: {gb(device.freeStorageBytes)}</p>}
     {message && <p role="status" className="status">{message}</p>}
     {tab === 'models' ? <section><h1>{vi.models}</h1><p>{vi.downloadNote}</p>
+      <p className="warning">{ocrMessages.weightsWarning}</p>
       {modelIds.map((model) => { const files = manifest.files.filter((f) => f.model === model); const bytes = files.reduce((n, f) => n + f.bytes, 0); const state = models.find((m) => m.model === model);
         return <article key={model}><h2>{vi[model]}</h2><p>{gb(bytes)} · {state?.ready ? vi.ready : vi.missing}</p>
           {files.map((f) => <p className="file" key={f.filename}>{f.filename} · {gb(f.bytes)}</p>)}
@@ -91,9 +91,9 @@ export function BenchmarkScreen() {
       <div className="actions"><button disabled={!native} onClick={() => action(async () => addPhoto(await captureImage(), 'camera', 'system'))}>{vi.camera}</button>
       <button disabled={!native} onClick={() => action(async () => addPhoto(await captureWebViewImage(), 'camera', 'webview'))}>{vi.webViewCamera}</button><button onClick={() => input.current?.click()}>{vi.gallery}</button></div>
       <input ref={input} hidden type="file" accept="image/png,image/jpeg" multiple onChange={(e) => { const files = Array.from(e.target.files ?? []); e.target.value = ''; void action(async () => { for (const file of files) addPhoto(await fileDataUrl(file), 'gallery'); }); }}/>
-      <div className="dataset"><label>{vi.datasetName}<input value={datasetName} onChange={(e) => setDatasetName(e.target.value)}/></label><button disabled={!native} onClick={() => action(async () => { const data = await mobile.dataset({ name: datasetName }); setDataset({ name: datasetName, entries: data.entries }); setImages([]); })}>{vi.dataset}</button></div>
+      <div className="dataset"><label>{vi.datasetName}<input value={datasetName} onChange={(e) => setDatasetName(e.target.value)}/></label><button disabled={!native} onClick={() => action(async () => { const data = await mobile.dataset({ name: datasetName }); setDataset({ name: datasetName, ...data }); setImages([]); })}>{vi.dataset}</button></div>
       </fieldset>
-      <p>{dataset ? `${dataset.name}: ${dataset.entries.length}` : images.length ? `${vi.queued}: ${images.length}` : vi.empty}</p>
+      <p>{dataset ? vi.datasetSummary(dataset.name, dataset.entries.length, dataset.location) : images.length ? `${vi.queued}: ${images.length}` : vi.empty}</p>
       <div className="thumbnails">{images.map((image) => <img key={image.id} src={image.dataUrl} alt={image.id}/>)}</div>
       <div className="actions"><button className="primary" disabled={!native || busy || downloading || !ready || (!images.length && !dataset) || (lowRam && !config.allowLowRam)} onClick={() => action(run)}>{vi.run}</button>
       <button disabled={!native || downloading} onClick={() => action(async () => { abort.current?.abort(); await mobile.stop(); })}>{vi.stop}</button>
@@ -112,7 +112,7 @@ function Result({ result, image, dataset }: { result: ImageResult; image: BenchI
   const previewEntry = dataset?.entries.find((e) => e.id === result.id);
   const marks = flagOverlays(result);
   return <article><h3>{result.id} · {vi[result.config.model]} · {vi[result.config.mode]} · {result.config.passes}</h3>
-    {previewEntry && dataset && <button onClick={() => { if (preview) setPreview(null); else void mobile.datasetImage({ name: dataset.name, file: previewEntry.file }).then(({ dataUrl }) => setPreview(dataUrl)).catch(() => {}); }}>{preview ? vi.hideImage : vi.showImage}</button>}
+    {previewEntry && dataset && <button onClick={() => { if (preview) setPreview(null); else void mobile.datasetImage({ name: dataset.name, file: previewEntry.file, location: dataset.location }).then(({ dataUrl }) => setPreview(dataUrl)).catch(() => {}); }}>{preview ? vi.hideImage : vi.showImage}</button>}
     {preview && <div className="preview"><img src={preview} alt={result.id} onLoad={(e) => setSize([e.currentTarget.naturalWidth, e.currentTarget.naturalHeight])}/>
       {size && <svg viewBox={`0 0 ${size[0]} ${size[1]}`} aria-label={vi.flags}>{marks.map((m, i) => <rect key={i} x={m.box[0]} y={m.box[1]} width={m.box[2] - m.box[0]} height={m.box[3] - m.box[1]}><title>{m.label}</title></rect>)}</svg>}
     </div>}
