@@ -12,7 +12,7 @@
     "apps/*"
   ],
   "scripts": {
-    "build": "npm run build --workspace @mathtwin/core --workspace @mathtwin/reader --workspace @mathtwin/reader-llamacpp-shared --workspace @mathtwin/reader-llamacpp --workspace @mathtwin/reader-ocr-shared --workspace @mathtwin/reader-ocr --workspace @mathtwin/reader-figure --workspace @mathtwin/eval --workspace @mathtwin/models",
+    "build": "npm run build --workspace @mathtwin/core --workspace @mathtwin/reader --workspace @mathtwin/reader-llamacpp-shared --workspace @mathtwin/reader-llamacpp --workspace @mathtwin/reader-ocr-shared --workspace @mathtwin/reader-ocr --workspace @mathtwin/reader-figure --workspace @mathtwin/work --workspace @mathtwin/eval --workspace @mathtwin/models",
     "typecheck": "tsc --noEmit -p tsconfig.json && npm run typecheck --workspace @mathtwin/mobile",
     "test": "npm run typecheck && vitest run",
     "eval:read": "npm run build && node tools/eval/dist/cli.js",
@@ -23,7 +23,9 @@
     "mobile:build": "node apps/mobile/scripts/build.mjs",
     "mobile:install": "node apps/mobile/scripts/install.mjs",
     "mobile:dev": "npm run dev --workspace @mathtwin/mobile",
-    "eval:effort": "npm run build && node tools/eval/dist/effort-cli.js"
+    "eval:effort": "npm run build && node tools/eval/dist/effort-cli.js",
+    "eval:work": "npm run build && node tools/eval/dist/work-cli.js",
+    "eval:generate-work": "npm run build && node tools/eval/dist/work-generate-cli.js"
   },
   "devDependencies": {
     "fast-check": "^4.10.2",

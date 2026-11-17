@@ -1,0 +1,36 @@
+{
+  "claims": [
+    {
+      "step": 1,
+      "type": "edge_count",
+      "raw": "Ghi nhận số cạnh có giá trị 4.",
+      "value": 4
+    },
+    {
+      "step": 2,
+      "type": "walk",
+      "raw": "Ghi lại chu trình euler: A → C → D → A.",
+      "kind": "euler_circuit",
+      "vertices": [
+        "A",
+        "C",
+        "D",
+        "A"
+      ]
+    }
+  ],
+  "lineOf": {
+    "1": [
+      0
+    ],
+    "2": [
+      1
+    ]
+  },
+  "prose": [],
+  "expected": {
+    "verdict": "SAI",
+    "firstErrorStep": 2,
+    "errorCode": "CANH_KHONG_TON_TAI"
+  }
+}

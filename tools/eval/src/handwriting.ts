@@ -3,7 +3,9 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import sharp from 'sharp';
 import type { OverlayOptions } from 'sharp';
-import type { ProblemSpec } from '@mathtwin/core';
+import { grade } from '@mathtwin/core';
+import type { WorkTruth } from '@mathtwin/work';
+import type { Claim, ProblemSpec } from '@mathtwin/core';
 import type { TruthLine } from '@mathtwin/reader';
 import { checkedTruth, readJson } from './dataset.js';
 import { syntheticFixtures, questionLines } from './synthetic.js';
@@ -93,11 +95,21 @@ export function buildHandwritingCase(input: ProblemSpec, style: HandwritingStyle
   // Every fixture has a student solution; each font has a correct and an incorrect case.
   const incorrect = style === 'patrick-perspective' || style === 'dancing-straight';
   const solution = handwritingSolution(truth, incorrect);
+  const claims: Claim[] = [];
+  const lineOf: WorkTruth['lineOf'] = {};
+  const appendClaims = (bodies: import('@mathtwin/core').ClaimBody[], source: number[]): void => {
+    for (const body of bodies) {
+      const step = claims.length + 1;
+      claims.push({ ...body, step, raw: source.map((i) => lines[i]!.text).join('\n') });
+      lineOf[String(step)] = source;
+    }
+  };
   if (solution.table) {
     const rows = solution.table;
     rows.forEach((row, i) => {
       row.forEach((s, j) => add(s, 80 + j * 140, 885 + i * 46, 'table', 27, false));
       lines.push({ text: row.join(' ').normalize('NFC'), region: 'table' });
+      appendClaims(solution.tableClaims[i] ?? [], [lines.length - 1]);
       paths.push(`<path d="M 63 ${875 + i * 46} Q 390 ${873 + i * 46}, 785 ${877 + i * 46}" fill="none" stroke="#344e7b" stroke-width="1.5"/>`);
     });
     for (let j = 0; j <= vertices.length + 1; j++) paths.push(`<path d="M ${65 + j * 140} 874 Q ${60 + j * 140} 990, ${67 + j * 140} ${877 + rows.length * 46}" fill="none" stroke="#344e7b" stroke-width="1.5"/>`);
@@ -112,7 +124,9 @@ export function buildHandwritingCase(input: ProblemSpec, style: HandwritingStyle
       lines.push({ text: struck === 'opaque' ? null : solution.correction.discarded, region: 'solution', struck: true });
       solutionY += 44;
     }
+    const start = lines.length;
     for (const line of wrap(text, 63)) { add(line, 75, solutionY, 'solution', 28); solutionY += 44; }
+    appendClaims(solution.proseClaims[i] ?? [], Array.from({ length: lines.length - start }, (_, offset) => start + offset));
   });
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><defs>
 <pattern id="grid" width="25" height="25" patternUnits="userSpaceOnUse"><path d="M 25 0 H 0 V 25" fill="none" stroke="#9db9d7" stroke-width="0.6"/></pattern>
@@ -120,7 +134,11 @@ export function buildHandwritingCase(input: ProblemSpec, style: HandwritingStyle
 <rect width="100%" height="100%" fill="#fffdf3"/><rect width="100%" height="100%" fill="url(#grid)"/>
 <path d="M 45 0 V ${H}" stroke="#d6a3a3" stroke-width="1"/>
 ${paths.join('\n')}</svg>`;
-  return { truth, svg, placements, lines, style, hasSolution: true, studentErrors: solution.studentErrors };
+  const result = grade(truth, claims);
+  const claimedLines = new Set(Object.values(lineOf).flat());
+  const prose = lines.flatMap((line, index) => line.region === 'solution' && !line.struck && !claimedLines.has(index) ? [index] : []);
+  const work: WorkTruth = { claims, lineOf, prose, expected: { verdict: result.verdict, firstErrorStep: result.firstErrorStep ?? null, errorCode: result.errorCode ?? null } };
+  return { truth, work, svg, placements, lines, style, hasSolution: true, studentErrors: solution.studentErrors };
 }
 
 /** Mild projective camera transform (inverse map, bilinear resampling); applied to the entire page. */
@@ -194,7 +212,7 @@ export async function generateHandwriting(root: string): Promise<number> {
     const directory = join(root, 'testdata/images-synthetic-hw', `${fixture}-${style}`);
     await mkdir(directory, { recursive: true });
     const text = (value: unknown): string => `${JSON.stringify(value, null, 2)}\n`;
-    const artifacts = { 'truth.json': text(layout.truth), 'lines.json': text(rendered.lines), 'source.svg': layout.svg, 'layout.json': text(layout.placements),
+    const artifacts = { 'work.json': text(layout.work), 'truth.json': text(layout.truth), 'lines.json': text(rendered.lines), 'source.svg': layout.svg, 'layout.json': text(layout.placements),
       'cancellation.json': text(rendered.cancellations), '1.png': rendered.png };
     for (const [file, data] of Object.entries(artifacts)) await writeFile(join(directory, file), data);
     await writeFile(join(directory, 'meta.json'), text({ source: 'synthetic_handwriting', capture: style.endsWith('perspective') ? 'tilted' : 'straight',

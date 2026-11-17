@@ -91,3 +91,50 @@ Lưu UTF-8 NFC, không nhập dòng trống; `eval:validate` kiểm các điều
 App v1 đo một ảnh mỗi id. Khi đóng gói bộ nhiều trang, tách từng trang ra id riêng và lặp truth đề; mỗi id có lines của đúng trang đó. Đo graph chỉ chọn ảnh chứa đủ thông tin đề và hình, không lấy riêng trang lời giải để kết luận chất lượng đọc đồ thị. Xem [đóng gói và nhập kết quả thiết bị](../../tools/eval/README.md).
 
 Đánh giá thử pipeline: `npm run eval:read -- --engine fake --set real`. Reader `fake` dùng trực tiếp nhãn chuẩn, không đọc pixel; kết quả của nó không phải số đo OCR. Xem [hướng dẫn CLI](../../tools/eval/README.md).
+
+## Gán nhãn bài làm `work.json` (Lô 3.1)
+
+Mỗi thư mục bài làm có thêm `work.json`, giữ `truth.json` là đề đã xác nhận. Giáo viên chép **đúng điều học sinh viết**, gồm cả số và kết luận sai; không chép lời giải chuẩn thay thế. Mỗi claim có step liên tục từ 1, raw nối nguyên văn các dòng nguồn bằng `\n`. `lineOf` ánh xạ step (khóa chuỗi) sang chỉ số 0-based trong `lines.json`. Không ánh xạ dòng đề, hình, văn xuôi không có claim, hay dòng đã gạch. Một dòng có nhiều claim thì lặp chỉ số dòng trong các bước tương ứng.
+
+Ví dụ với đề A—B trọng số 7 ở trên:
+
+```json
+[
+  {"text":"Tìm đường ngắn nhất A đến B.","region":"question"},
+  {"text":"A → B","region":"solution"},
+  {"text":"Độ dài = 9.","region":"solution"},
+  {"text":"Độ dài = 8.","region":"solution","struck":true},
+  {"text":"Em đi qua cạnh AB.","region":"solution"}
+]
+```
+
+`work.json` tương ứng:
+
+```json
+{
+  "claims": [
+    {"step":1,"raw":"A → B","type":"walk","kind":"path","vertices":["A","B"]},
+    {"step":2,"raw":"Độ dài = 9.","type":"length","vertices":["A","B"],"value":9}
+  ],
+  "lineOf": {"1":[1],"2":[2]},
+  "prose": [4],
+  "expected": {"verdict":"SAI","firstErrorStep":2,"errorCode":"SAI_PHEP_TINH"}
+}
+```
+
+`prose` ghi chỉ số các dòng `region: solution` đang có hiệu lực, không nằm trong `lineOf`, chỉ mô tả và không có nội dung cần chấm. Bắt buộc trong `synthetic-hw` và `work-text`; tùy chọn với ảnh `real`, khuyến khích giáo viên ghi đủ. Không ghi dòng gạch, đề, hình hoặc hàng bảng vào đây. Khi có trường này, validator kiểm đủ các dòng văn xuôi và dùng hàm kiểm dữ liệu trong tools/eval (không phải parser).
+
+Nội dung cần chấm gồm: chữ số (trừ chỉ số trong nhãn như v1), `=`, từ hai nhãn nối bằng mũi tên/gạch, từ kết luận “vậy”, “KL”, “đáp số”, “đáp án”, phán đoán Đ/S hoặc “chọn” + mã phương án. Dòng đó chưa có claim thì cần gán nhãn tiếp, không đưa vào prose để bỏ qua. Ví dụ “Cập nhật nhãn D qua cạnh BD.”, “Em đi lần lượt qua cạnh AA rồi AB.”, “Ghép cặp: (A, B); (C, D).” là mô tả. Không sửa chữ học sinh để né điều kiện; bộ sinh tổng hợp có thể sửa câu mô tả và phải sinh lại ảnh/nhãn/hash đồng bộ.
+
+Đỉnh trong claim tham chiếu **id**, không phải nhãn hiển thị. Khuyên có cùng hai đầu mút; `edge_list` giữ đủ số lần của cạnh song song, không cần thứ tự/chiều. Không suy thêm kết luận: viết “2 thành phần” chỉ tạo `component_count`, không tự tạo `connected`. Phép tính “1 + 3 = 2” giữ value 2. Hàng bảng Dijkstra gắn cả bước chọn và các nhãn có số vào cùng dòng; không tạo claim từ header, ô vô cực hay đỉnh đã khoanh. Tổng riêng người đưa thư có thể dùng `final_answer` theo core.
+
+Khi nhiều trang, bổ sung `page` (0-based) và `index` (duy nhất, liên tục trên toàn bài) cho từng dòng. Có thể thêm conf 1 và alternatives rỗng khi lưu bản chuẩn dưới dạng `WorkLine[]`; đây là độ chắc của nhãn chuẩn, không phải confidence của OCR. WorkLine dùng box hệ 0–1000 của từng trang. Định dạng chữ cũ không có index/page vẫn được hỗ trợ cho một trang: CLI gắn page 0 và index theo mảng, chuyển box pixel sang 0–1000 dựa trên kích thước ảnh (mặc định bộ synthetic-hw 1000×1440). Với bôi kín vẫn dùng text null và struck true ở file nhãn; bộ chuyển đổi dùng chuỗi rỗng khi đưa vào API work. Không đặt bất kỳ claim nào trên dòng này.
+
+Giáo viên thứ hai kiểm lại claim, thứ tự, dòng nguồn và nhãn chấm. Kiểm bằng:
+
+```sh
+npm run eval:validate -- real
+npm run eval:validate -- synthetic-hw
+```
+
+Khi có `work.json`, validator kiểm dòng tham chiếu, không lấy dòng gạch/đề/hình, raw trùng nguyên văn, step liên tục và verdict/bước/mã lỗi trùng `grade(truth, claims)`. Nếu không có work.json thì dữ liệu đề cũ vẫn hợp lệ; synthetic-hw bắt buộc có nhãn bài làm. Khi cần đánh giá bài làm thật, mọi bài được chọn phải có work.json. Validator không thay thế việc giáo viên đối chiếu ảnh.

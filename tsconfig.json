@@ -11,7 +11,7 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "lib": ["ES2022", "DOM"],
-    "paths": { "@mathtwin/core": ["./packages/core/src/index.ts"], "@mathtwin/reader": ["./packages/reader/src/index.ts"], "@mathtwin/reader-llamacpp-shared": ["./packages/reader-llamacpp-shared/src/index.ts"], "@mathtwin/reader-ocr-shared": ["./packages/reader-ocr-shared/src/index.ts"], "@mathtwin/reader-ocr": ["./packages/reader-ocr/src/index.ts"], "@mathtwin/reader-figure": ["./packages/reader-figure/src/index.ts"], "@mathtwin/reader-llamacpp": ["./packages/reader-llamacpp/src/index.ts"] },
+    "paths": { "@mathtwin/work": ["./packages/work/src/index.ts"], "@mathtwin/core": ["./packages/core/src/index.ts"], "@mathtwin/reader": ["./packages/reader/src/index.ts"], "@mathtwin/reader-llamacpp-shared": ["./packages/reader-llamacpp-shared/src/index.ts"], "@mathtwin/reader-ocr-shared": ["./packages/reader-ocr-shared/src/index.ts"], "@mathtwin/reader-ocr": ["./packages/reader-ocr/src/index.ts"], "@mathtwin/reader-figure": ["./packages/reader-figure/src/index.ts"], "@mathtwin/reader-llamacpp": ["./packages/reader-llamacpp/src/index.ts"] },
     "noEmit": true
   },
   "include": ["packages/*/src/**/*.ts", "packages/*/test/**/*.ts", "tools/*/src/**/*.ts", "tools/*/test/**/*.ts", "vitest.config.ts"]

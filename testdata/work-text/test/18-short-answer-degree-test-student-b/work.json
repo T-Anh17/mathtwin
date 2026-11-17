@@ -1,0 +1,21 @@
+{
+  "claims": [
+    {
+      "step": 1,
+      "type": "final_answer",
+      "raw": "Em kết luận đáp số bằng 2.",
+      "value": 2
+    }
+  ],
+  "lineOf": {
+    "1": [
+      0
+    ]
+  },
+  "prose": [],
+  "expected": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

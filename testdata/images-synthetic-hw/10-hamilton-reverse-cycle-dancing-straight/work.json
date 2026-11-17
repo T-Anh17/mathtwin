@@ -1,0 +1,32 @@
+{
+  "claims": [
+    {
+      "type": "walk",
+      "kind": "hamilton_cycle",
+      "vertices": [
+        "A",
+        "A",
+        "C",
+        "D",
+        "E",
+        "A"
+      ],
+      "step": 1,
+      "raw": "A → A → C → D → E → A"
+    }
+  ],
+  "lineOf": {
+    "1": [
+      9
+    ]
+  },
+  "prose": [
+    7,
+    10
+  ],
+  "expected": {
+    "verdict": "SAI",
+    "firstErrorStep": 1,
+    "errorCode": "CANH_KHONG_TON_TAI"
+  }
+}

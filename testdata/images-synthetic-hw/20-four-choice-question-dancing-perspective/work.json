@@ -1,0 +1,23 @@
+{
+  "claims": [
+    {
+      "type": "choice",
+      "option": "A",
+      "step": 1,
+      "raw": "Chọn A."
+    }
+  ],
+  "lineOf": {
+    "1": [
+      10
+    ]
+  },
+  "prose": [
+    11
+  ],
+  "expected": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

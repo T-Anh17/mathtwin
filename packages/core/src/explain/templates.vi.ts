@@ -20,6 +20,11 @@ function gradeRows(value: unknown): Record<string, unknown>[] {
 }
 function gradeSubject(f: Record<string, unknown>): string {
   switch (f.claimType) {
+    case 'vertex_list': return 'danh sách đỉnh';
+    case 'edge_list': return 'danh sách cạnh';
+    case 'loop_count': return 'số khuyên';
+    case 'odd_count': return 'số đỉnh bậc lẻ';
+    case 'component_count': return 'số thành phần liên thông';
     case 'vertex_count': return 'số đỉnh';
     case 'edge_count': return 'số cạnh';
     case 'degree': return `bậc của đỉnh ${f.vertexLabel}`;
@@ -95,6 +100,7 @@ export const gradeTemplates = {
     const comparison = `${gradeSubject(facts)} đúng là ${gradeValue(facts.displayExpected)}, bài ghi ${gradeValue(facts.displayGot)}`;
     switch (code) {
       case 'SAI_PHEP_TINH':
+        if (facts.claimType === 'vertex_list') return prefix + comparison + '. Hãy đối chiếu tập đỉnh, liệt kê mỗi đỉnh đúng một lần.';
         if (facts.claimType === 'dijkstra_label' && facts.candidate !== undefined) {
           const sum = `tại ${facts.vertexLabel}, n(${facts.viaLabel}) + w(${pair}) = ${facts.nVia ?? facts.viaDistance} + ${facts.w ?? facts.weight} = ${facts.candidate}`;
           return prefix + sum + (facts.reason === 'minimum_not_taken'
@@ -110,6 +116,8 @@ export const gradeTemplates = {
         if (facts.claimType === 'dijkstra_init') return prefix + 'đã khoanh các đỉnh nên không được khởi tạo lại giữa lượt chạy. Hãy tiếp tục từ các nhãn đã cố định.';
         return prefix + `dãy đi có ${gradeValue(facts.got)} đỉnh phân biệt, cần ít nhất ${gradeValue(facts.minimum)} để tạo chu trình. Hãy kiểm tra lại điều kiện của loại đường.`;
       case 'BO_SOT': {
+        if (facts.claimType === 'vertex_list') return prefix + comparison + '. Hãy bổ sung các đỉnh còn thiếu.';
+        if (facts.claimType === 'edge_list') return prefix + comparison + '. Hãy bổ sung các cạnh còn thiếu, kể cả cạnh song song và khuyên.';
         if (facts.claimType === 'odd_vertices') {
           const missing = gradeRows(facts.missingOdd).map((v) => `${v.vertex} (bậc ${v.degree})`).join(', ');
           const extra = gradeRows(facts.extraOdd).map((v) => `${v.vertex} (bậc ${gradeValue(v.degree)})`).join(', ');
@@ -121,7 +129,9 @@ export const gradeTemplates = {
           + (facts.position === undefined ? '' : ` khi kết thúc dãy ở vị trí ${facts.position}`)
           + '. Hãy bổ sung các phần tử này rồi kiểm tra lại toàn bộ dãy đi.';
       }
-      case 'CANH_KHONG_TON_TAI': return prefix + (facts.reason === 'unknown_vertex' || (!facts.fromLabel && !facts.viaLabel)
+      case 'CANH_KHONG_TON_TAI':
+        if (facts.claimType === 'edge_list') return prefix + comparison + '. Danh sách có cạnh không tồn tại hoặc liệt kê thừa số lần; hãy kiểm tra từng cặp đầu mút.';
+        return prefix + (facts.reason === 'unknown_vertex' || (!facts.fromLabel && !facts.viaLabel)
         ? `đỉnh ${facts.vertexLabel} không có trong đồ thị${position}` : `không có cạnh ${pair} nối các đỉnh được nêu${position}`)
         + '. Hãy sửa đoạn đi này theo các cạnh có trong hình.';
       case 'LAP': return prefix + (facts.reason === 'repeated_vertex' ? `đỉnh ${facts.vertexLabel} đã xuất hiện trước đó${position}`

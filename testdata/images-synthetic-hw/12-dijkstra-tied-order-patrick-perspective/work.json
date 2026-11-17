@@ -1,0 +1,128 @@
+{
+  "claims": [
+    {
+      "type": "dijkstra_select",
+      "v": "A",
+      "step": 1,
+      "raw": "A 0 1 1 ∞"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "B",
+      "value": 1,
+      "step": 2,
+      "raw": "A 0 1 1 ∞"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "C",
+      "value": 1,
+      "step": 3,
+      "raw": "A 0 1 1 ∞"
+    },
+    {
+      "type": "dijkstra_select",
+      "v": "B",
+      "step": 4,
+      "raw": "B 0 1 1 4"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "C",
+      "value": 1,
+      "step": 5,
+      "raw": "B 0 1 1 4"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "D",
+      "value": 4,
+      "step": 6,
+      "raw": "B 0 1 1 4"
+    },
+    {
+      "type": "dijkstra_select",
+      "v": "C",
+      "step": 7,
+      "raw": "C 0 1 1 4"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "D",
+      "value": 4,
+      "step": 8,
+      "raw": "C 0 1 1 4"
+    },
+    {
+      "type": "dijkstra_select",
+      "v": "D",
+      "step": 9,
+      "raw": "D 0 1 1 4"
+    },
+    {
+      "type": "walk",
+      "kind": "path",
+      "vertices": [
+        "A",
+        "B",
+        "D"
+      ],
+      "step": 10,
+      "raw": "A → B → D"
+    },
+    {
+      "type": "length",
+      "vertices": [
+        "A",
+        "B",
+        "D"
+      ],
+      "value": 5,
+      "step": 11,
+      "raw": "Đường đi có độ dài 5."
+    }
+  ],
+  "lineOf": {
+    "1": [
+      11
+    ],
+    "2": [
+      11
+    ],
+    "3": [
+      11
+    ],
+    "4": [
+      12
+    ],
+    "5": [
+      12
+    ],
+    "6": [
+      12
+    ],
+    "7": [
+      13
+    ],
+    "8": [
+      13
+    ],
+    "9": [
+      14
+    ],
+    "10": [
+      15
+    ],
+    "11": [
+      17
+    ]
+  },
+  "prose": [
+    18
+  ],
+  "expected": {
+    "verdict": "SAI",
+    "firstErrorStep": 11,
+    "errorCode": "SAI_PHEP_TINH"
+  }
+}

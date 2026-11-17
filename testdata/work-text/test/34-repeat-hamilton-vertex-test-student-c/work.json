@@ -1,0 +1,28 @@
+{
+  "claims": [
+    {
+      "step": 1,
+      "type": "walk",
+      "raw": "Em liệt kê đường đi hamilton là A → B → C → B → A.",
+      "kind": "hamilton_path",
+      "vertices": [
+        "A",
+        "B",
+        "C",
+        "B",
+        "A"
+      ]
+    }
+  ],
+  "lineOf": {
+    "1": [
+      0
+    ]
+  },
+  "prose": [],
+  "expected": {
+    "verdict": "SAI",
+    "firstErrorStep": 1,
+    "errorCode": "LAP"
+  }
+}

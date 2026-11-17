@@ -1,0 +1,22 @@
+{
+  "claims": [
+    {
+      "step": 1,
+      "type": "theorem",
+      "raw": "Kết quả: Thỏa điều kiện Ore.",
+      "name": "ore",
+      "holds": true
+    }
+  ],
+  "lineOf": {
+    "1": [
+      0
+    ]
+  },
+  "prose": [],
+  "expected": {
+    "verdict": "SAI",
+    "firstErrorStep": 1,
+    "errorCode": "SAI_DIEU_KIEN"
+  }
+}

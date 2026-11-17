@@ -1,0 +1,39 @@
+{
+  "claims": [
+    {
+      "type": "odd_count",
+      "value": 0,
+      "step": 1,
+      "raw": "Em đếm được 0 đỉnh có bậc lẻ."
+    },
+    {
+      "type": "walk",
+      "kind": "euler_circuit",
+      "vertices": [
+        "A",
+        "A",
+        "B",
+        "A",
+        "A"
+      ],
+      "step": 2,
+      "raw": "A → A → B → A → A"
+    }
+  ],
+  "lineOf": {
+    "1": [
+      8
+    ],
+    "2": [
+      10
+    ]
+  },
+  "prose": [
+    11
+  ],
+  "expected": {
+    "verdict": "SAI",
+    "firstErrorStep": 2,
+    "errorCode": "LAP"
+  }
+}

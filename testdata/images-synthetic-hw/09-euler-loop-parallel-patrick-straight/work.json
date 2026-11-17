@@ -1,0 +1,38 @@
+{
+  "claims": [
+    {
+      "type": "odd_count",
+      "value": 0,
+      "step": 1,
+      "raw": "Có 0 đỉnh bậc lẻ."
+    },
+    {
+      "type": "walk",
+      "kind": "euler_circuit",
+      "vertices": [
+        "A",
+        "A",
+        "B",
+        "A"
+      ],
+      "step": 2,
+      "raw": "A → A → B → A"
+    }
+  ],
+  "lineOf": {
+    "1": [
+      8
+    ],
+    "2": [
+      10
+    ]
+  },
+  "prose": [
+    11
+  ],
+  "expected": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

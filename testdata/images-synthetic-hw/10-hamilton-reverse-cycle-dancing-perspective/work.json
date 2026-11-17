@@ -1,0 +1,32 @@
+{
+  "claims": [
+    {
+      "type": "walk",
+      "kind": "hamilton_cycle",
+      "vertices": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "A"
+      ],
+      "step": 1,
+      "raw": "A → B → C → D → E → A"
+    }
+  ],
+  "lineOf": {
+    "1": [
+      9
+    ]
+  },
+  "prose": [
+    7,
+    10
+  ],
+  "expected": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

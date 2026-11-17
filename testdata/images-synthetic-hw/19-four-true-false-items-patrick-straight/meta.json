@@ -10,11 +10,12 @@
   "studentErrors": [],
   "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
   "handwritingHashes": {
+    "work.json": "f8fc1dfe5133c30efc5fd189b38f28d96942168230cbe85aba37557b680eb693",
     "truth.json": "927e2d5f68e01205c8ae844084b02680e022d649f4dac2d552c97a184eac8314",
-    "lines.json": "cffe1bc06102f03f4a62154ad3724ea59263a30a849d8a0f870d4183675de538",
+    "lines.json": "b2066239c791e389659898d82f30c3a665bbe2758c0f71e2bff197f2df378e83",
     "source.svg": "e808b7f8054f83e68675f44a7086f129a1d4d0fc0b9f8ef7ecc0085a1575732a",
-    "layout.json": "05fdbf7a254d41a51200139d67c6afb26570f15f18010957b23907c139c45a81",
+    "layout.json": "5969bbac75148c75b88483d54a610de088c86d1cdb4475ad8b5863c374c9b67c",
     "cancellation.json": "fb8d6bf23f509000557eaadec057518c6902ebdee4f788437f977585c26a398f",
-    "1.png": "cbbf90307e6bec5393959928cb75ae91ed1f7c204ea9baa0a8be2b961169d8b8"
+    "1.png": "26058b1ca2380c605c9e057cf90bb2dd58e6df43fd6aee4fd5c3c104aebaf90d"
   }
 }

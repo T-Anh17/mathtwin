@@ -1,0 +1,31 @@
+{
+  "claims": [
+    {
+      "type": "degree",
+      "v": "A",
+      "value": 2,
+      "step": 1,
+      "raw": "Bậc của A bằng 2."
+    },
+    {
+      "type": "degree_sum",
+      "value": 6,
+      "step": 2,
+      "raw": "Tổng bậc = 2 × số cạnh = 2 × 3 = 6."
+    }
+  ],
+  "lineOf": {
+    "1": [
+      5
+    ],
+    "2": [
+      7
+    ]
+  },
+  "prose": [],
+  "expected": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

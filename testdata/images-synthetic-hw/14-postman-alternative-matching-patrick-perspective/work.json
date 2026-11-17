@@ -1,0 +1,61 @@
+{
+  "claims": [
+    {
+      "type": "odd_vertices",
+      "vertices": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "step": 1,
+      "raw": "Em liệt kê các đỉnh có bậc lẻ: A, B, C, D."
+    },
+    {
+      "type": "postman_duplicate",
+      "vertices": [
+        "A",
+        "B"
+      ],
+      "step": 2,
+      "raw": "Lặp lại cạnh (A, B), (C, D) để ghép các đỉnh lẻ."
+    },
+    {
+      "type": "postman_duplicate",
+      "vertices": [
+        "C",
+        "D"
+      ],
+      "step": 3,
+      "raw": "Lặp lại cạnh (A, B), (C, D) để ghép các đỉnh lẻ."
+    },
+    {
+      "type": "final_answer",
+      "value": 9,
+      "step": 4,
+      "raw": "Tổng = 6 + 2 = 9."
+    }
+  ],
+  "lineOf": {
+    "1": [
+      13
+    ],
+    "2": [
+      15
+    ],
+    "3": [
+      15
+    ],
+    "4": [
+      17
+    ]
+  },
+  "prose": [
+    14
+  ],
+  "expected": {
+    "verdict": "SAI",
+    "firstErrorStep": 4,
+    "errorCode": "KET_LUAN_KHONG_SUY_RA"
+  }
+}

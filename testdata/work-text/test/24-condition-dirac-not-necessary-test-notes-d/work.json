@@ -1,0 +1,33 @@
+{
+  "claims": [
+    {
+      "step": 1,
+      "type": "theorem",
+      "raw": "Nhận xét của em: Không thỏa điều kiện Dirac.",
+      "name": "dirac",
+      "holds": false
+    },
+    {
+      "step": 2,
+      "type": "hamilton_exists",
+      "raw": "Nhận xét của em: Không có chu trình Hamilton (lý do: Dirac).",
+      "kind": "cycle",
+      "value": false,
+      "reason": "dirac"
+    }
+  ],
+  "lineOf": {
+    "1": [
+      0
+    ],
+    "2": [
+      1
+    ]
+  },
+  "prose": [],
+  "expected": {
+    "verdict": "SAI",
+    "firstErrorStep": 2,
+    "errorCode": "SAI_DIEU_KIEN"
+  }
+}

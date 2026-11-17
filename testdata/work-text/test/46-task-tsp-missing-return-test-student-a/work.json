@@ -1,0 +1,26 @@
+{
+  "claims": [
+    {
+      "step": 1,
+      "type": "walk",
+      "raw": "Em liệt kê chu trình người du lịch là A → B → C.",
+      "kind": "tsp_tour",
+      "vertices": [
+        "A",
+        "B",
+        "C"
+      ]
+    }
+  ],
+  "lineOf": {
+    "1": [
+      0
+    ]
+  },
+  "prose": [],
+  "expected": {
+    "verdict": "SAI",
+    "firstErrorStep": 1,
+    "errorCode": "HIEU_SAI_DE"
+  }
+}

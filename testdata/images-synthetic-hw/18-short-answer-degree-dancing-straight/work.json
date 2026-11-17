@@ -1,0 +1,31 @@
+{
+  "claims": [
+    {
+      "type": "degree",
+      "v": "A",
+      "value": 2,
+      "step": 1,
+      "raw": "Đếm các đầu cạnh tại A, em được bậc 2."
+    },
+    {
+      "type": "degree_sum",
+      "value": 7,
+      "step": 2,
+      "raw": "Tổng bậc = 2 × số cạnh = 2 × 3 = 7."
+    }
+  ],
+  "lineOf": {
+    "1": [
+      5
+    ],
+    "2": [
+      7
+    ]
+  },
+  "prose": [],
+  "expected": {
+    "verdict": "SAI",
+    "firstErrorStep": 2,
+    "errorCode": "SAI_PHEP_TINH"
+  }
+}

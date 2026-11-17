@@ -1,0 +1,54 @@
+{
+  "claims": [
+    {
+      "type": "statement",
+      "id": "a",
+      "value": true,
+      "step": 1,
+      "raw": "a) Đ b) S c) Đ d) S"
+    },
+    {
+      "type": "statement",
+      "id": "b",
+      "value": false,
+      "step": 2,
+      "raw": "a) Đ b) S c) Đ d) S"
+    },
+    {
+      "type": "statement",
+      "id": "c",
+      "value": true,
+      "step": 3,
+      "raw": "a) Đ b) S c) Đ d) S"
+    },
+    {
+      "type": "statement",
+      "id": "d",
+      "value": false,
+      "step": 4,
+      "raw": "a) Đ b) S c) Đ d) S"
+    }
+  ],
+  "lineOf": {
+    "1": [
+      10
+    ],
+    "2": [
+      10
+    ],
+    "3": [
+      10
+    ],
+    "4": [
+      10
+    ]
+  },
+  "prose": [
+    11
+  ],
+  "expected": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

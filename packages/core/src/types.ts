@@ -53,6 +53,11 @@ export interface ClaimBase {
 }
 export type Claim = ClaimBase & ClaimBody;
 export type ClaimBody =
+  | { type: 'vertex_list'; vertices: VertexId[] }
+  | { type: 'edge_list'; edges: { u: VertexId; v: VertexId }[] }
+  | { type: 'loop_count'; value: number }
+  | { type: 'odd_count'; value: number }
+  | { type: 'component_count'; value: number }
   | { type: 'vertex_count'; value: number }
   | { type: 'edge_count'; value: number }
   | { type: 'degree'; v: VertexId; value: number }
@@ -76,7 +81,7 @@ export type ClaimBody =
 
 /** Statement items are independent; source/start are required by runtime validation. */
 export type StatementCheck =
-  | Exclude<ClaimBody, { type: 'statement' | 'choice' | 'final_answer' | 'dijkstra_init' | 'dijkstra_select' | 'dijkstra_label' | 'nn_step' }>
+  | Exclude<ClaimBody, { type: 'vertex_list' | 'edge_list' | 'loop_count' | 'odd_count' | 'component_count' | 'statement' | 'choice' | 'final_answer' | 'dijkstra_init' | 'dijkstra_select' | 'dijkstra_label' | 'nn_step' }>
   | (Extract<ClaimBody, { type: 'dijkstra_label' }> & { source?: VertexId })
   | (Extract<ClaimBody, { type: 'nn_step' }> & { start?: VertexId });
 

@@ -1,0 +1,54 @@
+{
+  "claims": [
+    {
+      "type": "statement",
+      "id": "a",
+      "value": false,
+      "step": 1,
+      "raw": "a) S b) S c) Đ d) S"
+    },
+    {
+      "type": "statement",
+      "id": "b",
+      "value": false,
+      "step": 2,
+      "raw": "a) S b) S c) Đ d) S"
+    },
+    {
+      "type": "statement",
+      "id": "c",
+      "value": true,
+      "step": 3,
+      "raw": "a) S b) S c) Đ d) S"
+    },
+    {
+      "type": "statement",
+      "id": "d",
+      "value": false,
+      "step": 4,
+      "raw": "a) S b) S c) Đ d) S"
+    }
+  ],
+  "lineOf": {
+    "1": [
+      10
+    ],
+    "2": [
+      10
+    ],
+    "3": [
+      10
+    ],
+    "4": [
+      10
+    ]
+  },
+  "prose": [
+    11
+  ],
+  "expected": {
+    "verdict": "SAI",
+    "firstErrorStep": 1,
+    "errorCode": "KET_LUAN_KHONG_SUY_RA"
+  }
+}

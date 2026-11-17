@@ -1,0 +1,46 @@
+{
+  "claims": [
+    {
+      "type": "walk",
+      "kind": "tsp_tour",
+      "vertices": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "A"
+      ],
+      "step": 1,
+      "raw": "A → B → C → D → A"
+    },
+    {
+      "type": "length",
+      "vertices": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "A"
+      ],
+      "value": 16,
+      "step": 2,
+      "raw": "Độ dài = 1 + 2 + 4 + 9 = 16."
+    }
+  ],
+  "lineOf": {
+    "1": [
+      13
+    ],
+    "2": [
+      15
+    ]
+  },
+  "prose": [
+    12
+  ],
+  "expected": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

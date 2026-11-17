@@ -10,6 +10,7 @@
   "studentErrors": [],
   "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
   "handwritingHashes": {
+    "work.json": "28d17c9063690212542669b1ce7c94b14f0c0adb0034e12373459feab09b6a20",
     "truth.json": "c5653ea96c05548ee0d7563197eb079f135389084a6367c9fa3c6ec836100a4a",
     "lines.json": "d5a8a587c22a064c469f68d559986cbba8e229b3f9f9345a511d0a725a6cb003",
     "source.svg": "ff44107953871573708008dd81fa9f5c94a28d16f005980901de27659ea1a63c",

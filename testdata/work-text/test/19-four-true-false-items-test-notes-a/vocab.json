@@ -1,0 +1,17 @@
+{
+  "vertexLabels": [
+    "A",
+    "B",
+    "C"
+  ],
+  "edgeNames": [],
+  "task": "statements",
+  "questionFormat": "dung_sai",
+  "statementIds": [
+    "a",
+    "b",
+    "c",
+    "d"
+  ],
+  "questionText": []
+}

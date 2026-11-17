@@ -1,0 +1,30 @@
+{
+  "claims": [
+    {
+      "type": "component_count",
+      "value": 2,
+      "step": 1,
+      "raw": "Em chia các đỉnh thành 2 nhóm liên thông."
+    },
+    {
+      "type": "connected",
+      "value": true,
+      "step": 2,
+      "raw": "Đồ thị liên thông."
+    }
+  ],
+  "lineOf": {
+    "1": [
+      6
+    ],
+    "2": [
+      8
+    ]
+  },
+  "prose": [],
+  "expected": {
+    "verdict": "SAI",
+    "firstErrorStep": 2,
+    "errorCode": "KET_LUAN_KHONG_SUY_RA"
+  }
+}

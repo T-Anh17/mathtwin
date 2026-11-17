@@ -1,0 +1,29 @@
+{
+  "claims": [
+    {
+      "step": 1,
+      "type": "degree",
+      "raw": "A có bậc 3.",
+      "v": "A",
+      "value": 3,
+      "conf": 0.6,
+      "box": [
+        10,
+        20,
+        100,
+        40
+      ]
+    }
+  ],
+  "lineOf": {
+    "1": [
+      0
+    ]
+  },
+  "prose": [],
+  "expected": {
+    "verdict": "CAN_XAC_NHAN",
+    "firstErrorStep": 1,
+    "errorCode": null
+  }
+}

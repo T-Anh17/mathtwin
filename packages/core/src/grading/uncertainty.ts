@@ -35,11 +35,11 @@ function conservativeUncertainty(spec: ProblemSpec, claim: ClaimBody): string[] 
     const edge = match === null ? named : spec.graph.edges[Number(match[1])];
     const weight = match?.[2] === 'w' || (named !== undefined && item === `${named.id}.w`);
     if (weight && claim.type === 'final_answer' && ['elements', 'degree', 'degree_sequence', 'path', 'connectivity', 'euler', 'hamilton'].includes(spec.task.type)) return false;
-    if (weight && ['vertex_count', 'edge_count', 'degree', 'degree_sum', 'odd_vertices', 'connected', 'euler_exists', 'hamilton_exists', 'theorem', 'walk'].includes(claim.type)) {
+    if (weight && ['vertex_list', 'edge_list', 'loop_count', 'odd_count', 'component_count', 'vertex_count', 'edge_count', 'degree', 'degree_sum', 'odd_vertices', 'connected', 'euler_exists', 'hamilton_exists', 'theorem', 'walk'].includes(claim.type)) {
       return claim.type === 'walk' && spec.task.type === 'shortest_path';
     }
     if (edge !== undefined) {
-      if (claim.type === 'vertex_count') return false;
+      if (claim.type === 'vertex_count' || claim.type === 'vertex_list') return false;
       if (claim.type === 'degree') return edge.u === claim.v || edge.v === claim.v;
       if (claim.type === 'length' || claim.type === 'walk') {
         return claim.vertices.some((v, i) => i > 0 && ((edge.u === claim.vertices[i - 1] && edge.v === v) || (edge.v === claim.vertices[i - 1] && edge.u === v)));

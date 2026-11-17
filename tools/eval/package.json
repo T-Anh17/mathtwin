@@ -12,7 +12,8 @@
     "sharp": "^0.35.5",
     "@mathtwin/reader-ocr": "0.1.0",
     "@mathtwin/reader-figure": "0.1.0",
-    "@mathtwin/reader-llamacpp": "0.1.0"
+    "@mathtwin/reader-llamacpp": "0.1.0",
+    "@mathtwin/work": "0.1.0"
   },
   "devDependencies": {
     "@types/node": "^22.20.5"

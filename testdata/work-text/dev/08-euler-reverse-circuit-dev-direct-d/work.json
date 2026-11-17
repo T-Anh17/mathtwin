@@ -1,0 +1,32 @@
+{
+  "claims": [
+    {
+      "step": 1,
+      "type": "walk",
+      "raw": "Chu trình Euler: A → C → B → A. Các cạnh theo thứ tự: e3, e2, e1.",
+      "kind": "euler_circuit",
+      "vertices": [
+        "A",
+        "C",
+        "B",
+        "A"
+      ],
+      "edgeIds": [
+        "e3",
+        "e2",
+        "e1"
+      ]
+    }
+  ],
+  "lineOf": {
+    "1": [
+      0
+    ]
+  },
+  "prose": [],
+  "expected": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

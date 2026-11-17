@@ -1,0 +1,30 @@
+{
+  "claims": [
+    {
+      "type": "component_count",
+      "value": 2,
+      "step": 1,
+      "raw": "Có 2 thành phần liên thông."
+    },
+    {
+      "type": "connected",
+      "value": false,
+      "step": 2,
+      "raw": "Đồ thị không liên thông."
+    }
+  ],
+  "lineOf": {
+    "1": [
+      6
+    ],
+    "2": [
+      8
+    ]
+  },
+  "prose": [],
+  "expected": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

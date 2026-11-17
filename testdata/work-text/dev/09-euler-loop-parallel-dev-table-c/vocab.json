@@ -1,0 +1,16 @@
+{
+  "vertexLabels": [
+    "A",
+    "B",
+    "I"
+  ],
+  "edgeNames": [
+    "khuyên m",
+    "a",
+    "b"
+  ],
+  "task": "euler",
+  "questionFormat": "tu_luan",
+  "statementIds": [],
+  "questionText": []
+}

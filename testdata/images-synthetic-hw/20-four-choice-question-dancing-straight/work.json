@@ -1,0 +1,23 @@
+{
+  "claims": [
+    {
+      "type": "choice",
+      "option": "C",
+      "step": 1,
+      "raw": "Chọn C."
+    }
+  ],
+  "lineOf": {
+    "1": [
+      10
+    ]
+  },
+  "prose": [
+    11
+  ],
+  "expected": {
+    "verdict": "SAI",
+    "firstErrorStep": 1,
+    "errorCode": "KET_LUAN_KHONG_SUY_RA"
+  }
+}

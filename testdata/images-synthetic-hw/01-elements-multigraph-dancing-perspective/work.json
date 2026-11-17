@@ -1,0 +1,43 @@
+{
+  "claims": [
+    {
+      "type": "vertex_list",
+      "vertices": [
+        "A",
+        "B",
+        "I"
+      ],
+      "step": 1,
+      "raw": "Các đỉnh là A, B, I."
+    },
+    {
+      "type": "edge_count",
+      "value": 3,
+      "step": 2,
+      "raw": "Đồ thị có 3 cạnh."
+    },
+    {
+      "type": "loop_count",
+      "value": 1,
+      "step": 3,
+      "raw": "Số khuyên là 1."
+    }
+  ],
+  "lineOf": {
+    "1": [
+      8
+    ],
+    "2": [
+      10
+    ],
+    "3": [
+      11
+    ]
+  },
+  "prose": [],
+  "expected": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

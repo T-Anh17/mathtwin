@@ -1,0 +1,22 @@
+{
+  "claims": [
+    {
+      "step": 1,
+      "type": "nn_step",
+      "raw": "Kết quả: Từ A đi đến D (gần nhất).",
+      "from": "A",
+      "to": "D"
+    }
+  ],
+  "lineOf": {
+    "1": [
+      0
+    ]
+  },
+  "prose": [],
+  "expected": {
+    "verdict": "SAI",
+    "firstErrorStep": 1,
+    "errorCode": "SAI_LUA_CHON"
+  }
+}
