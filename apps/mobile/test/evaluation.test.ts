@@ -35,6 +35,25 @@ async function setup() {
 }
 const options = { mode: 'both', threshold: 0.85 } as const;
 describe('app export to desktop evaluation', () => {
+  it('imports engine D graph drafts (one pass, graph mode only) and rejects D in lines mode', async () => {
+    const { root, file, result, save } = await setup();
+    const figureEngine = 'offline:figure-cv';
+    const reader = { engine: figureEngine, read: async () => ({ usage: { engine: figureEngine, passes: 1, latencyMs: 5 }, draft: {
+      representation: 'figure' as const, directed: false, vertices: [{ label: 'A', conf: 0.9 }, { label: 'B', conf: 0.9 }],
+      edges: [{ u: 'A', v: 'B', w: null, wAlternatives: [], name: null, conf: 0.9 }],
+      statedFacts: { vertexCount: null, edgeCount: null, weightUnit: null }, question: null, unreadable: [] } }) };
+    const outcome = await readProblem([{ width: 1, height: 1, pixels: new Uint8ClampedArray(4) }], { reader, passes: 1 });
+    const d: ImageResult = { ...result, engine: figureEngine, config: { ...result.config, model: 'd', mode: 'graph', passes: 1 },
+      usage: outcome.usage, outcome, modelLoadMs: 0, modelVerifyMs: 0 };
+    delete d.linePasses; delete d.memory;
+    await save([d]);
+    const { report } = (await evaluateDevice(file, root, '2026-11-17', { mode: 'graph', threshold: 0.85 }))[0]!;
+    expect(report.engine).toBe(figureEngine);
+    expect(report.summary.graphMetrics.edges.f1).toBe(1);
+    expect(report.summary.graphMetrics.weights.accuracy).toBe(0);
+    await save([{ ...d, config: { ...d.config, mode: 'lines' } }]);
+    await expect(evaluateDevice(file, root, '2026-11-17', options)).rejects.toThrow();
+  });
   it('separates token limits and retains the actual runtime and restart marker in each report', async () => {
     const { root, file, result, save } = await setup();
     await save([1536, 1024].map((maxTokens) => ({ ...result, serverRestarted: true, config: { ...result.config, maxTokens } })));

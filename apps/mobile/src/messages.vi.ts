@@ -2,7 +2,7 @@ import type { DatasetLocation } from './contracts.js';
 
 export const vi = {
   title: 'MathTwin', subtitle: 'Đọc ảnh trên điện thoại', models: 'Model', bench: 'Đo',
-  a: 'A · PaddleOCR-VL-1.5', b: 'B · Qwen3-VL-2B',
+  a: 'A · PaddleOCR-VL-1.5', b: 'B · Qwen3-VL-2B', d: 'D · Hình đồ thị (thử nghiệm, không cần model)',
   storage: 'Dung lượng trống', ram: 'RAM máy', download: 'Tải', importModel: 'Kiểm tra file adb push',
   ready: 'Đã kiểm tra', missing: 'Chưa đủ file', cancelDownload: 'Dừng tải',
   downloadNote: 'Bấm Tải để xác nhận tải model qua mạng. Ảnh được xử lý trên máy.',
@@ -51,6 +51,7 @@ export const vi = {
     checksum: 'File sai số byte hoặc SHA-256; đã xóa file.', model_missing: 'Model chưa đủ file được kiểm tra.',
     download_failed: 'Tải gián đoạn; bấm Tải để tiếp tục.', dataset_invalid: 'Bộ đo hoặc ids.json không hợp lệ.',
     image_invalid: 'Ảnh không hợp lệ, quá 10 MB hoặc quá 40 triệu điểm ảnh.', native_error: 'Tác vụ trên Android thất bại.',
+    graph_only: 'D chỉ dựng đồ thị nháp; chọn chế độ Đồ thị.', figure_failed: 'Không dò được hình đồ thị.',
     cpu_backend_unknown: 'Không xác định được biến thể CPU thực sự đã nạp; dừng để tránh ghi số đo thiếu căn cứ.',
   } as Record<string, string>,
 };

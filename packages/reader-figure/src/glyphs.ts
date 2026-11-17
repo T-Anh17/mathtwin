@@ -57,3 +57,8 @@ export class LlamaGlyphReader extends CropGlyphReader {
     super('b', (image, role, signal) => host.readCrop(image, signal, role));
   }
 }
+/** No recognizer: labels/weights stay unread and are typed by the user when reviewing the draft. */
+export class NoGlyphReader implements GlyphReader {
+  readonly engine = 'none';
+  async readGlyph(_request: GlyphRequest, signal?: AbortSignal): Promise<GlyphCandidate[]> { signal?.throwIfAborted(); return []; }
+}

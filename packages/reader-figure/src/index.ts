@@ -7,7 +7,7 @@ import { figureMessages } from './messages.vi.js';
 import { markerBranches } from './strokes.js';
 import type { BinaryImage, Box, Component, FigureObservation, FigureOptions, FigureVertex, GlyphCandidate, GlyphRole, Point } from './types.js';
 export type * from './types.js';
-export { CropGlyphReader, VietOcrGlyphReader, LlamaGlyphReader, OracleGlyphReader, allowedGlyph, rankGlyphs } from './glyphs.js';
+export { CropGlyphReader, VietOcrGlyphReader, LlamaGlyphReader, NoGlyphReader, OracleGlyphReader, allowedGlyph, rankGlyphs } from './glyphs.js';
 export type { OracleGlyph } from './glyphs.js';
 export { crop, preprocess, skeletonize } from './pixels.js';
 export { locateFigure } from './geometry.js';

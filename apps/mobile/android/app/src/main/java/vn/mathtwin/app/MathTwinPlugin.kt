@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Build
 import android.os.Environment
 import android.util.Base64
+import android.view.WindowManager
 import com.getcapacitor.JSArray
 import com.getcapacitor.JSObject
 import com.getcapacitor.Plugin
@@ -79,7 +80,13 @@ class MathTwinPlugin : Plugin() {
         val running = call.getBoolean("running") ?: false
         val idleMinutes = call.getDouble("backgroundIdleMinutes") ?: 5.0
         if (!idleMinutes.isFinite() || idleMinutes < 1 || idleMinutes > 60) { call.reject("native_error", "native_error"); return }
-        activity.runOnUiThread { lifecycle.setState(running, idleMinutes); call.resolve() }
+        activity.runOnUiThread {
+            lifecycle.setState(running, idleMinutes)
+            // A screen-off during a long benchmark sends the app to the background, where Android may kill it.
+            if (running) activity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            else activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            call.resolve()
+        }
     }
     // The installed @capacitor/camera legacy Base64 flow uses JPEG_<timestamp>_<random>.jpg here.
     // Never delete gallery items, dataset files, imported models or arbitrary paths supplied by JavaScript.
@@ -263,6 +270,20 @@ class MathTwinPlugin : Plugin() {
         if (report.getInt("version") != 1 || !report.has("device") || !report.has("results")) throw MobileFailure("native_error")
         val dir = File(context.getExternalFilesDir(null), "results").apply { mkdirs() }
         val output = File.createTempFile("read-", ".json", dir); output.writeText(report.toString(2))
+        JSONObject().put("path", output.absolutePath)
+    }
+    /** Overwrites one file per benchmark run after every image, so an interrupted run keeps its results. */
+    @PluginMethod fun saveProgress(call: PluginCall) = task(call) {
+        val runId = call.getString("runId") ?: ""
+        if (!runId.matches(Regex("[A-Za-z0-9-]{1,64}"))) throw MobileFailure("native_error")
+        val text = call.getString("json") ?: throw MobileFailure("native_error")
+        if (text.length > 16 * 1024 * 1024) throw MobileFailure("native_error")
+        val report = JSONObject(text)
+        if (report.getInt("version") != 1 || !report.has("device") || !report.has("results")) throw MobileFailure("native_error")
+        val dir = File(context.getExternalFilesDir(null), "results").apply { mkdirs() }
+        val output = File(dir, "run-$runId.json"); val partial = File(dir, "run-$runId.json.tmp")
+        partial.writeText(report.toString(2))
+        if (!partial.renameTo(output)) { output.delete(); if (!partial.renameTo(output)) throw MobileFailure("native_error") }
         JSONObject().put("path", output.absolutePath)
     }
     override fun handleOnPause() { activity.runOnUiThread { lifecycle.pause() } }

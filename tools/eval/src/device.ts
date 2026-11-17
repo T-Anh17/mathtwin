@@ -113,7 +113,10 @@ export async function evaluateDevice(file: string, root: string, date: string, o
     const result = record(raw); const id = string(result.id); const config = record(result.config);
     const engine = string(result.engine);
     if ((config.passes !== 1 && config.passes !== 2) || !['graph', 'lines'].includes(String(config.mode))
-      || !['a', 'b'].includes(String(config.model)) || engine !== (config.model === 'a' ? 'offline:paddleocr-vl-1.5' : 'offline:qwen3-vl-2b')) invalid();
+      || !['a', 'b', 'd'].includes(String(config.model))
+      || engine !== (config.model === 'a' ? 'offline:paddleocr-vl-1.5' : config.model === 'd' ? 'offline:figure-cv' : 'offline:qwen3-vl-2b')
+      // D (pure-TS figure reader) only drafts graphs, in one pass.
+      || (config.model === 'd' && (config.mode !== 'graph' || config.passes !== 1))) invalid();
     const passes = config.passes as 1 | 2;
     if (options.mode !== 'both' && config.mode !== options.mode) continue;
     const sample = catalog.get(id); if (!sample) throw new Error('Không tìm thấy id thiết bị trong bộ truth đã chọn.');

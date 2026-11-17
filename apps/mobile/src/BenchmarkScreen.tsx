@@ -54,14 +54,17 @@ export function BenchmarkScreen() {
   };
   const run = async () => {
     const signal = new AbortController(); abort.current = signal; setBusy(true); setMessage(vi.running);
+    // Each run starts clean and is saved to its own file after every image.
+    setResults([]);
+    const runId = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
     try {
       await runBatch(dataset ? { dataset } : { images }, config, mobile, runner, signal.signal,
-        (result) => setResults((old) => [...old, result]));
+        (result) => setResults((old) => [...old, result]), device ? { runId, device } : undefined);
       setMessage(signal.signal.aborted ? messageFor({ code: 'aborted' }) : vi.done);
     } finally { setBusy(false); abort.current = null; await refresh(); }
   };
   const lowRam = device !== null && device.totalRamBytes < config.minRamGb * 1e9;
-  const ready = models.find((m) => m.model === config.model)?.ready;
+  const ready = config.model === 'd' || models.find((m) => m.model === config.model)?.ready;
   return <main className="benchmark-screen">
     <header><span className="brand">{vi.title}</span><span>{vi.subtitle}</span></header>
     <nav aria-label={vi.title}><button className={tab === 'bench' ? 'selected' : ''} onClick={() => setTab('bench')}>{vi.bench}</button><button className={tab === 'models' ? 'selected' : ''} onClick={() => setTab('models')}>{vi.models}</button></nav>
@@ -81,7 +84,7 @@ export function BenchmarkScreen() {
       {downloading && <button onClick={() => action(() => mobile.cancelDownload())}>{vi.cancelDownload}</button>}
     </section> : <section><h1>{vi.bench}</h1>
       <fieldset disabled={busy || downloading}><legend>{vi.settings}</legend><div className="settings">
-        <label>{vi.models}<select value={config.model} onChange={(e) => set('model', e.target.value === 'a' ? 'a' : 'b')}><option value="a">{vi.a}</option><option value="b">{vi.b}</option></select></label>
+        <label>{vi.models}<select value={config.model} onChange={(e) => set('model', e.target.value === 'a' ? 'a' : e.target.value === 'd' ? 'd' : 'b')}><option value="a">{vi.a}</option><option value="b">{vi.b}</option><option value="d">{vi.d}</option></select></label>
         <label>{vi.passes}<select value={config.passes} onChange={(e) => set('passes', e.target.value === '1' ? 1 : 2)}><option value={1}>1</option><option value={2}>2</option></select></label>
         <label>{vi.mode}<select value={config.mode} onChange={(e) => set('mode', e.target.value === 'graph' ? 'graph' : 'lines')}><option value="graph">{vi.graph}</option><option value="lines">{vi.lines}</option></select></label>
         <label>{vi.threads}<input type="number" min="1" max={device?.cores ?? 256} value={config.threads} onChange={(e) => set('threads', Number(e.target.value))}/></label>

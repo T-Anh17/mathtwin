@@ -31,6 +31,7 @@ function fake() {
     start: mock.fn(async () => ({ ...session })), status: mock.fn(async () => ({ ...state })), stop: mock.fn(async () => {}),
     dataset: mock.fn(async () => ({ entries: [{ id: 'case-1', file: '1.png' }], location: 'internal' as const })),
     datasetImage: mock.fn(async () => ({ dataUrl: decoded.encoded })), exportResult: mock.fn(async () => ({ path: '/private/results/read.json' })),
+    saveProgress: mock.fn(async () => ({ path: '/private/results/run-x.json' })),
     setBenchmarkState: mock.fn(async () => {}), cleanupCameraTempFiles: mock.fn(async () => {}),
     post: mock.fn(async () => ({ status: 200, data: response(JSON.stringify(graph)) })),
     cancelRequest: mock.fn(async () => {}), slots: mock.fn(async () => ({ idle: true })),
@@ -215,7 +216,8 @@ describe('Android benchmark flow with fake native plugin (no device/model/networ
     const { runner, http, plugin } = fake();
     mock.mocked(http.post).mockResolvedValue({ status: 200, data: response('broken JSON') });
     const result = await runner.run(image, { ...config, mode }, signal());
-    expect(result.errorCode).toBe('invalid_json'); expect(plugin.stop).toHaveBeenCalled();
+    expect(result.errorCode).toBe('invalid_json'); // The HTTP request completed; a parse failure does not mean the server is unhealthy.
+    expect(plugin.stop).not.toHaveBeenCalled();
     if (mode === 'graph') expect(result.outcome?.issues[0]?.code).toBe('read_failed');
   });
   it('does not invent confidence when token probabilities are missing', async () => {
@@ -447,5 +449,28 @@ describe('Android benchmark flow with fake native plugin (no device/model/networ
     const result = await runner.run({ ...image, imageSource: 'camera', captureMethod: 'system' }, { ...config, passes: 1 }, signal());
     const raw = exportReport({ version: 1, device, results: [result] });
     expect(JSON.parse(raw)).toMatchObject({ results: [{ imageSource: 'camera', captureMethod: 'system' }] }); expect(raw).not.toContain('data:image');
+  });
+  it('saves the cumulative run after every image so an interrupted run keeps its results', async () => {
+    const { runner, plugin } = fake();
+    await runBatch({ dataset: { name: 'set', location: 'internal', entries: [{ id: 'one', file: '1.png' }, { id: 'two', file: '2.png' }] } },
+      { ...config, passes: 1 }, plugin, runner, signal(), () => {}, { runId: 'run-1', device });
+    const calls = mock.mocked(plugin.saveProgress).mock.calls.map(([o]) => ({ runId: o.runId, ids: (JSON.parse(o.json) as { results: { id: string }[] }).results.map((r) => r.id) }));
+    expect(calls).toEqual([{ runId: 'run-1', ids: ['one'] }, { runId: 'run-1', ids: ['one', 'two'] }]);
+    expect(mock.mocked(plugin.saveProgress).mock.calls[0]![0].json).not.toContain('data:image');
+  });
+  it('keeps measuring when saving progress fails', async () => {
+    const { runner, plugin } = fake(); const ids: string[] = [];
+    mock.mocked(plugin.saveProgress).mockRejectedValue({ code: 'native_error' });
+    await runBatch({ images: [image, { ...image, id: 'case-2' }] }, { ...config, passes: 1 }, plugin, runner, signal(), (r) => { ids.push(r.id); }, { runId: 'r', device });
+    expect(ids).toEqual(['case-1', 'case-2']);
+  });
+  it('runs engine D without starting a server and refuses lines mode', async () => {
+    const { runner, plugin, http } = fake();
+    const result = await runner.run(image, { ...config, model: 'd', passes: 2 }, signal());
+    expect(result.engine).toBe('offline:figure-cv'); expect(result.config.passes).toBe(1); expect(result.errorCode).toBeUndefined();
+    expect(result.outcome?.graph?.vertices).toEqual([]);
+    expect(plugin.start).not.toHaveBeenCalled(); expect(http.post).not.toHaveBeenCalled();
+    const lines = await runner.run(image, { ...config, model: 'd', mode: 'lines' }, signal());
+    expect(lines.errorCode).toBe('graph_only');
   });
 });

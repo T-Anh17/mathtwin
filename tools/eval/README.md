@@ -87,6 +87,13 @@ kiểm cấu trúc/id/đầu mút và kiểu trọng số hữu hạn. Trọng s
 chấm sai, không từ chối cả file. Ca hồi quy là một bản ghi thật từ file xuất vivo
 đã có sẵn, xem [nguồn fixture](test/fixtures/README.md). Không cần kết nối thiết bị.
 
+## Công sửa bản nháp D — Lô 2.12
+
+`npm run eval:effort -- --split test` chạy D **không có glyph model** (như app) trên `synthetic-fig` và đếm số thao tác
+(chạm hoặc gõ một ô) để biến bản nháp thành đồ thị chú thích, so với tự nhập từ đầu trong màn sửa.
+Đỉnh nháp ghép với đỉnh chú thích theo vị trí; cạnh nối vào đỉnh bị xoá mất theo, không tính thêm.
+Tự nhập: app tự đặt nhãn A, B, C…, nên đồ thị nhãn liền từ A chỉ tốn 1 thao tác/đỉnh. Báo cáo: `reports/figure-effort-<ngày>-<split>.md`.
+
 ## Đo C trên Node — Lô 2.8
 
 `npm run eval:read -- --engine offline:vietocr-onnx --mode lines --set synthetic-hw`
@@ -115,7 +122,8 @@ Xem [adapter](../../packages/reader-ocr/README.md) và
 
 ## Tính chỉ số từ file xuất của app
 
-Lấy JSON qua đường dẫn app đã báo khi bấm Xuất kết quả (xem [README app](../../apps/mobile/README.md)). `--from-device` đọc định dạng version 1 do `exportReport()` tạo. Mặc định `both`: đánh giá các record graph và lines có trong file; không tự suy ra graph từ chữ hoặc ngược lại. Model, lượt đọc và cấu hình lấy từ file; không truyền `--engine`/`--passes` cùng `--from-device`. Hai lượt lines được báo riêng, không chọn lượt tốt hơn bằng truth.
+Lấy JSON qua đường dẫn app đã báo khi bấm Xuất kết quả (xem [README app](../../apps/mobile/README.md)). Engine D (`model: "d"`, `offline:figure-cv`) được nhập khi `mode: "graph"` và một lượt.
+`--from-device` đọc định dạng version 1 do `exportReport()` tạo. Mặc định `both`: đánh giá các record graph và lines có trong file; không tự suy ra graph từ chữ hoặc ngược lại. Model, lượt đọc và cấu hình lấy từ file; không truyền `--engine`/`--passes` cùng `--from-device`. Hai lượt lines được báo riêng, không chọn lượt tốt hơn bằng truth.
 
 Cấu hình `maxImageSide`, `readTimeout` (ms), `maxTokens` và bốn tham số `dry` được giữ trong JSON/Markdown, tách nhóm đo khi khác nhau.
 `maxTokens` lấy từ config từng ảnh; file cũ chưa có thì lấy `runtime.maxTokens` đã ghi (ví dụ 4096),

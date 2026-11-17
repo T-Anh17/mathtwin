@@ -46,6 +46,23 @@ Handler rỗng chờ nối nằm trong `emptyProductActions` (`sample-data.ts`),
 | Kết quả | `onRegrade`, `onHint`, `onSolution` |
 | Dừng | `onCancel` |
 
+## Soát/sửa đồ thị (Lô 2.12)
+
+Người dùng chốt 2026-11-17: bộ đọc hình D (`packages/reader-figure`) **chỉ làm bản nháp**; không bật đọc hình tự động.
+Trên tập `test` tổng hợp, D đúng cấu trúc 1/116 đề (xem `.ai/reviews/2.11-r3.md`), nên màn này bắt đầu từ **đồ thị rỗng**.
+
+- **Chụp bài** (Android: camera hệ thống; trình duyệt: chọn file) và **Nhập đề bằng tay** cùng mở [`GraphEditScreen.tsx`](src/GraphEditScreen.tsx).
+  Ảnh chỉ nằm trong bộ nhớ, rời màn là bỏ.
+- Đồ thị vẽ phủ lên ảnh (ẩn/hiện ảnh được). Ba chế độ: **Thêm đỉnh** (chạm chỗ trống, tự đặt nhãn A, B, C…),
+  **Nối cạnh** (chạm hai đỉnh; chạm một đỉnh hai lần = khuyên; lặp cặp = cạnh song song, vẽ thành các cung tách nhau), **Xoá**.
+  Danh sách đỉnh/cạnh bên dưới để gõ nhãn, trọng số, tên cạnh.
+- Nút **Gợi ý từ ảnh (thử nghiệm)** chạy D trong một Web Worker ([`figure.worker.ts`](src/figure.worker.ts)), không có glyph model,
+  nên nhãn/trọng số để trống và các đỉnh chưa có nhãn được tô **cần soát**. Huỷ được (dừng worker). Khoảng 4 s/ảnh trên máy tính.
+- **Đồ thị đã đúng** chỉ bật khi không còn lỗi: có đỉnh, nhãn không trống/không trùng, ≤ 20 đỉnh, trọng số dương,
+  có trọng số thì đủ cho mọi cạnh, và `validateSpec` của core chấp nhận. Lỗi hiện bằng tiếng Việt ([`graph-editor.vi.ts`](src/graph-editor.vi.ts)).
+- Mô hình thuần TS ở [`graph-editor.ts`](src/graph-editor.ts) (`fromDraft`, `addVertex`, `addEdge`, `toGraph`, `edgeShapes`…), test ở `test/graph-editor.test.ts`.
+- Phần chấm theo đồ thị đã chốt **chưa nối** (giai đoạn 4): sau khi chốt, màn báo số đỉnh/cạnh và cho sửa lại; không hiện kết quả chấm mẫu.
+
 `App.tsx` chỉ bọc `onCapture`/`onConfirm`/`onCancel` để chuyển màn mẫu. Chọn đáp án, tải bộ đọc,
 xem ảnh đầy đủ, gợi ý và lời giải chưa nối xử lý. Nút quay lại/thanh dưới và mở màn Đo là điều hướng UI.
 Logic kỹ thuật của `BenchmarkScreen.tsx` giữ nguyên từ màn `App.tsx` trước UI-1;
@@ -306,6 +323,11 @@ Các mục không có tọa độ được liệt kê trong kết quả; không 
   Không có cloud inference, upload ảnh, tài khoản hay telemetry.
 
 ## Xuất kết quả
+
+Sau **mỗi ảnh**, lượt đo được ghi đè vào `files/results/run-<id>.json` (`saveProgress`), nên app bị tắt giữa chừng vẫn giữ kết quả đã đo.
+Khi đang đo, app giữ màn hình sáng (`FLAG_KEEP_SCREEN_ON`, bật/tắt cùng `setBenchmarkState`). Bắt đầu lượt mới thì xoá kết quả cũ trên màn.
+Lỗi đọc kết quả sau khi HTTP đã xong (`repetition_loop`, `logprob_alignment`, `invalid_json`, `truncated`, `missing_probs`) **không** dừng server; ảnh sau dùng lại model đang nạp.
+Engine **D** (`offline:figure-cv`) chạy ngay trong WebView, không cần model hay server, chỉ chế độ Đồ thị, một lượt.
 
 Nút **Xuất kết quả** ghi JSON `version:1`, thông tin máy (model/Android/CPU/RAM/storage), từng id,
 engine, cấu hình CPU (gồm `cpuVariant` thực nạp và `cpuVariantSource: "maps" | "log"`, cũng có trong `memory`), `imageSource`/`captureMethod`, ReadOutcome hoặc các lượt

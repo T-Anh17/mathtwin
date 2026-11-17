@@ -2,12 +2,15 @@ import { readProblem } from '@mathtwin/reader';
 import type { ReadUsage, TextLine, VisionReader } from '@mathtwin/reader';
 import { completionRequest, completionFinishReason, defaultMaxImageSide, defaultReadTimeout, defaultMaxTokens, defaultDry, validateDry, imageTimeout, graphResult, lineResult, parseCompletion, spottingLines } from '@mathtwin/reader-llamacpp-shared';
 import type { ReadMode } from '@mathtwin/reader-llamacpp-shared';
-import type { BenchImage, BenchmarkConfig, BenchmarkReport, HttpTransport, ImageResult, MobilePlugin, ServerState, Session } from './contracts.js';
+import { FigureReader, NoGlyphReader } from '@mathtwin/reader-figure';
+import type { BenchImage, BenchModel, BenchmarkConfig, Model, BenchmarkReport, HttpTransport, ImageResult, MobilePlugin, ServerState, Session } from './contracts.js';
 import type { DecodedImage } from './images.js';
 import { errorCode } from './messages.vi.js';
 import manifest from '../../../tools/models/manifest.json';
 
-const engineFor = (model: 'a' | 'b'): string => model === 'a' ? 'offline:paddleocr-vl-1.5' : 'offline:qwen3-vl-2b';
+export const engineFor = (model: BenchModel): string => model === 'a' ? 'offline:paddleocr-vl-1.5' : model === 'd' ? 'offline:figure-cv' : 'offline:qwen3-vl-2b';
+/** Parse failures happen after a complete HTTP response; the server is healthy and stays warm. */
+const parseFailures = ['repetition_loop', 'logprob_alignment', 'invalid_json', 'truncated', 'missing_probs'];
 let requestSequence = 0;
 function check(signal: AbortSignal): void { if (signal.aborted) throw { code: 'aborted' }; }
 function serverFailure(state: ServerState): string | undefined {
@@ -18,7 +21,7 @@ function serverFailure(state: ServerState): string | undefined {
 }
 function validateConfig(c: BenchmarkConfig): void {
   try { validateDry(c.dry ?? defaultDry); } catch { throw { code: 'native_error' }; }
-  if (!['a', 'b'].includes(c.model) || ![1, 2].includes(c.passes) || !['graph', 'lines'].includes(c.mode)
+  if (!['a', 'b', 'd'].includes(c.model) || ![1, 2].includes(c.passes) || !['graph', 'lines'].includes(c.mode)
     || ![512, 768, 1024].includes(c.maxImageSide ?? defaultMaxImageSide)
     || !Number.isSafeInteger(c.maxTokens ?? defaultMaxTokens) || (c.maxTokens ?? defaultMaxTokens) < 1 || (c.maxTokens ?? defaultMaxTokens) > 8192
     || !Number.isSafeInteger(c.readTimeout ?? defaultReadTimeout) || (c.readTimeout ?? defaultReadTimeout) < 1000 || (c.readTimeout ?? defaultReadTimeout) > 3_600_000
@@ -33,6 +36,7 @@ export class Benchmark {
 
   async run(image: BenchImage, config: BenchmarkConfig, signal: AbortSignal): Promise<ImageResult> {
     if (this.active) throw { code: 'busy' };
+    if (config.model === 'd') return this.runFigure(image, config, signal);
     config = { ...config, maxImageSide: config.maxImageSide ?? defaultMaxImageSide,
       readTimeout: config.readTimeout ?? defaultReadTimeout, maxTokens: config.maxTokens ?? defaultMaxTokens, dry: { ...(config.dry ?? defaultDry) } };
     this.active = true;
@@ -78,7 +82,7 @@ export class Benchmark {
       if (device.totalRamBytes < config.minRamGb * 1e9 && !config.allowLowRam) throw { code: 'low_ram' };
       const decoded = await guard(this.decode(image.dataUrl, config.maxImageSide!)); check(signal);
       startAttempted = true;
-      session = await guard(this.plugin.start(config));
+      session = await guard(this.plugin.start({ ...config, model: llm(config.model) }));
       validateSession(session);
       const currentSession = session;
       result.modelLoadMs = session.loadMs; result.reusedModel = session.reused;
@@ -97,7 +101,7 @@ export class Benchmark {
         try {
           response = await guard(this.http.post({ requestId: pendingRequest, url: `http://127.0.0.1:${currentSession.port}/v1/chat/completions`,
             headers: { Authorization: `Bearer ${currentSession.apiKey}`, 'Content-Type': 'application/json' },
-            data: completionRequest(config.model, mode, [decoded.encoded], config.maxTokens, config.dry), connectTimeout: 5000, readTimeout: config.readTimeout!, disableRedirects: true }));
+            data: completionRequest(llm(config.model), mode, [decoded.encoded], config.maxTokens, config.dry), connectTimeout: 5000, readTimeout: config.readTimeout!, disableRedirects: true }));
           if (response.status !== 200) throw { code: 'http_error' };
         } catch (e) {
           if (failure || signal.aborted) throw e;
@@ -158,9 +162,9 @@ export class Benchmark {
       if (pendingRequest) await this.plugin.cancelRequest({ requestId: pendingRequest }).catch(() => {});
       if (session && pendingRequest && ['timeout', 'aborted'].includes(result.errorCode)) {
         if (!await waitForIdle(this.plugin, session)) {
-          await this.plugin.stop(); result.serverRestarted = true;
+          await this.plugin.stop().catch(() => {}); result.serverRestarted = true;
         }
-      } else await this.plugin.stop().catch(() => {});
+      } else if (!(session && !pendingRequest && parseFailures.includes(result.errorCode))) await this.plugin.stop().catch(() => {});
     } finally {
       if (timer) clearInterval(timer);
       if (timeout) clearTimeout(timeout);
@@ -172,7 +176,28 @@ export class Benchmark {
     }
     return result;
   }
+
+  /** Engine D: pure-TS figure reader in this thread, no model file or server. Graph drafts only. */
+  private async runFigure(image: BenchImage, config: BenchmarkConfig, signal: AbortSignal): Promise<ImageResult> {
+    this.active = true;
+    const start = this.now(), engine = engineFor('d');
+    const result: ImageResult = { id: image.id, imageSource: image.imageSource, ...(image.captureMethod ? { captureMethod: image.captureMethod } : {}),
+      config: { ...config, passes: 1 }, engine, usage: { engine, passes: 0, latencyMs: 0 }, totalMs: 0, modelLoadMs: 0, modelVerifyMs: 0, reusedModel: false, serverRestarted: false };
+    try {
+      if (config.mode !== 'graph') throw { code: 'graph_only' };
+      check(signal);
+      const decoded = await this.decode(image.dataUrl, config.maxImageSide ?? defaultMaxImageSide); check(signal);
+      const reader = new FigureReader({ glyphReader: new NoGlyphReader() });
+      result.outcome = await readProblem([decoded.original], { reader, passes: 1, signal });
+      result.usage = result.outcome.usage;
+      check(signal);
+    } catch (e) { result.errorCode = signal.aborted ? 'aborted' : errorCode(e); }
+    finally { result.totalMs = this.now() - start; this.active = false; }
+    return result;
+  }
 }
+/** A/B go through llama-server; D never reaches these paths (see runFigure). */
+function llm(model: BenchModel): Model { if (model === 'd') throw { code: 'native_error' }; return model; }
 function validateSession(s: Session): void {
   if (!Number.isInteger(s.port) || s.port < 1 || s.port > 65535 || !/^[a-f0-9]{64}$/.test(s.apiKey)
     || !Number.isFinite(s.loadMs) || s.loadMs < 0) throw { code: 'native_error' };

@@ -6,8 +6,12 @@ export interface DecodedImage { original: PreparedImage; resized: PreparedImage;
 /** Browser decoding applies EXIF orientation; all canvases/data URLs stay in memory. */
 export async function decodeImage(dataUrl: string, maxImageSide = defaultMaxImageSide): Promise<DecodedImage> {
   if (!/^data:image\/(?:png|jpeg);base64,[A-Za-z0-9+/]+=*$/.test(dataUrl) || dataUrl.length > 14_000_000) throw { code: 'image_invalid' };
-  const img = new Image(); img.src = dataUrl;
-  try { await img.decode(); } catch { throw { code: 'image_invalid' }; }
+  // Wait for `load`, not `img.decode()`: Chromium may defer decode() while the WebView is hidden,
+  // which would hang a read started just before the screen turns off.
+  const img = new Image();
+  try {
+    await new Promise<void>((resolve, reject) => { img.onload = () => resolve(); img.onerror = () => reject(new Error('decode')); img.src = dataUrl; });
+  } catch { throw { code: 'image_invalid' }; }
   const width = img.naturalWidth, height = img.naturalHeight;
   if (width < 1 || height < 1 || width * height > 40_000_000) throw { code: 'image_invalid' };
   const canvas = document.createElement('canvas'); canvas.width = width; canvas.height = height;
