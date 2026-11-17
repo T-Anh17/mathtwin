@@ -1,5 +1,6 @@
 import type { Graph, ProblemSpec } from '@mathtwin/core';
 import type { ReadDraft } from './schema.js';
+import type { GraphMetrics } from './graph-metrics.js';
 
 export interface PreparedImage { pixels: Uint8ClampedArray; width: number; height: number; source?: string }
 export type ReadIssueCode =
@@ -55,6 +56,7 @@ export interface ReadDifference {
   tags?: ReadErrorType[];
 }
 export interface ReadComparison {
+  graphMetrics: GraphMetrics;
   completeCorrect: boolean;
   graphCorrect: boolean;
   fullyFlagged: boolean;

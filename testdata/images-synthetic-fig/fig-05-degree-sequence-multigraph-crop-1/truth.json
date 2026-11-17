@@ -1,0 +1,11 @@
+{
+  "graph": {
+    "directed": false,
+    "vertices": [],
+    "edges": []
+  },
+  "task": {
+    "type": "elements"
+  },
+  "questionFormat": "tu_luan"
+}

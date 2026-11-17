@@ -4,6 +4,8 @@ import sharp from 'sharp';
 import { validateSpec } from '@mathtwin/core';
 import type { ProblemSpec } from '@mathtwin/core';
 import type { PreparedImage, TruthLine } from '@mathtwin/reader';
+import { validateFigure } from './figure-geometry.js';
+import type { FigureAnnotation } from './figure-geometry.js';
 
 export interface ImageMeta {
   source: 'printed' | 'handwritten' | 'synthetic_handwriting';
@@ -13,12 +15,18 @@ export interface ImageMeta {
   notes: string;
   synthetic: boolean;
   variant?: string;
+  variants?: string[];
+  split?: 'dev' | 'test';
+  originalGraph?: string;
+  form?: 'crop' | 'page';
+  parameters?: import('./figures.js').FigureParameters;
+  figureHashes?: Record<string, string>;
   coreFixture?: string;
   hasSolution?: boolean;
   studentErrors?: { kind: 'arithmetic' | 'vertex' | 'conclusion'; written: string; expected: string; description: string }[];
   artifactHashes?: { svgSha256: string; pngSha256: string };
 }
-export interface ImageCase { id: string; directory: string; files: string[]; truth: ProblemSpec; meta: ImageMeta; lines?: TruthLine[] }
+export interface ImageCase { id: string; directory: string; files: string[]; truth: ProblemSpec; meta: ImageMeta; lines?: TruthLine[]; figure?: FigureAnnotation }
 export async function readJson(path: string): Promise<unknown> { return JSON.parse(await readFile(path, 'utf8')) as unknown; }
 
 export function checkedTruth(value: unknown, id: string): ProblemSpec {
@@ -51,7 +59,14 @@ export async function loadCases(directory: string, limit?: number): Promise<Imag
     const names = await readdir(folder);
     const lines = names.includes('lines.json') ? checkedLines(await readJson(join(folder, 'lines.json'))) : undefined;
     if (meta.source === 'synthetic_handwriting' && lines === undefined) throw new Error(`Thiếu lines.json: ${entry.name}`);
-    result.push({ id: entry.name, directory: folder, files, truth, meta, ...(lines === undefined ? {} : { lines }) });
+    let figure: FigureAnnotation | undefined;
+    if (meta.originalGraph !== undefined) {
+      if (!/^[a-f0-9]{64}$/.test(meta.originalGraph) || !['dev', 'test'].includes(String(meta.split))
+        || !['crop', 'page'].includes(String(meta.form)) || !Array.isArray(meta.variants) || meta.variants.some((v) => typeof v !== 'string')) throw new Error(`Metadata hình không hợp lệ: ${entry.name}`);
+      figure = await readJson(join(folder, 'figure.json')) as FigureAnnotation;
+      validateFigure(figure, truth);
+    }
+    result.push({ id: entry.name, directory: folder, files, truth, meta, ...(lines === undefined ? {} : { lines }), ...(figure ? { figure } : {}) });
   }
   return result;
 }
@@ -69,7 +84,7 @@ export function checkedLines(value: unknown): TruthLine[] {
   })) throw new Error('lines.json không hợp lệ (cần text NFC và region).');
   return value as TruthLine[];
 }
-export const setFolders = { synthetic: 'images-synthetic', 'synthetic-hw': 'images-synthetic-hw', real: 'images' } as const;
+export const setFolders = { synthetic: 'images-synthetic', 'synthetic-hw': 'images-synthetic-hw', 'synthetic-fig': 'images-synthetic-fig', real: 'images' } as const;
 export type DatasetSet = keyof typeof setFolders;
 export async function prepareImages(sample: ImageCase): Promise<PreparedImage[]> {
   const result: PreparedImage[] = [];

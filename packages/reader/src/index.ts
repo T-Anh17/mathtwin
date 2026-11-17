@@ -8,6 +8,8 @@ export { readProblem } from './read.js';
 export { applyConfirmation } from './confirmation.js';
 export { completeWithQuestion } from './complete.js';
 export { compareRead } from './compare.js';
+export { compareGraphMetrics, matchScore } from './graph-metrics.js';
+export type { GraphMetrics, MatchScore } from './graph-metrics.js';
 export { localReaderMessages } from './messages.vi.js';
 export { ocrMessages } from './messages.vi.js';
 export { resizeImage, defaultMaxImageSide } from './resize.js';

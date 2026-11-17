@@ -7,10 +7,10 @@ import type { DatasetSet } from './dataset.js';
 import { repositoryRoot } from './cli.js';
 
 /** App protocol v1 accepts a single image per id. Fail rather than silently dropping pages. */
-export async function packDataset(set: DatasetSet, root = repositoryRoot): Promise<string> {
-  const cases = await loadCases(join(root, 'testdata', setFolders[set]));
+export async function packDataset(set: DatasetSet, root = repositoryRoot, split?: 'dev' | 'test'): Promise<string> {
+  const cases = (await loadCases(join(root, 'testdata', setFolders[set]))).filter((c) => !split || c.meta.split === split);
   if (!cases.length || cases.some((c) => c.files.length !== 1 || !/^[a-zA-Z0-9_.-]+$/.test(c.id))) throw new Error('Bộ đo cần id an toàn và đúng một ảnh mỗi đề; không bỏ trang.');
-  const output = join(root, '.build-cache/datasets', set);
+  const output = join(root, '.build-cache/datasets', split ? `${set}-${split}` : set);
   await mkdir(output, { recursive: true });
   // Only remove generated flat files in the fixed output directory; never touch corpus or images from users.
   for (const entry of await readdir(output, { withFileTypes: true })) {
@@ -28,8 +28,9 @@ export async function packDataset(set: DatasetSet, root = repositoryRoot): Promi
   return output;
 }
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const { values } = parseArgs({ options: { set: { type: 'string', default: 'synthetic-hw' } } });
-  if (!Object.hasOwn(setFolders, values.set!)) throw new Error('Chọn synthetic, synthetic-hw hoặc real.');
-  packDataset(values.set as DatasetSet).then((directory) => console.log(`Bộ đo cho app: ${directory}`))
+  const { values } = parseArgs({ options: { set: { type: 'string', default: 'synthetic-hw' }, split: { type: 'string' } } });
+  if (!Object.hasOwn(setFolders, values.set!)) throw new Error('Chọn synthetic, synthetic-hw, synthetic-fig hoặc real.');
+  if (values.split !== undefined && (!['dev', 'test'].includes(values.split) || values.set !== 'synthetic-fig')) throw new Error('--split dev|test cần --set synthetic-fig.');
+  packDataset(values.set as DatasetSet, repositoryRoot, values.split as 'dev' | 'test' | undefined).then((directory) => console.log(`Bộ đo cho app: ${directory}`))
     .catch(() => { console.error('Không đóng gói được bộ đo; kiểm tra id, trang và thư mục xuất.'); process.exitCode = 1; });
 }

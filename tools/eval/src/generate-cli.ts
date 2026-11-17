@@ -9,6 +9,7 @@ import { checkedTruth, readJson } from './dataset.js';
 import type { ImageMeta } from './dataset.js';
 import { buildSyntheticCase, syntheticFixtures, variants } from './synthetic.js';
 import { generateHandwriting } from './handwriting.js';
+import { generateFigures } from './figures.js';
 
 export async function generateSynthetic(root = repositoryRoot): Promise<number> {
   let count = 0;
@@ -41,7 +42,7 @@ export async function generateSynthetic(root = repositoryRoot): Promise<number> 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const { values } = parseArgs({ options: { set: { type: 'string', default: 'synthetic' } } });
   const generate = values.set === 'synthetic' ? () => generateSynthetic() : values.set === 'synthetic-hw'
-    ? () => generateHandwriting(repositoryRoot) : () => Promise.reject(new Error('Chọn synthetic hoặc synthetic-hw.'));
+    ? () => generateHandwriting(repositoryRoot) : values.set === 'synthetic-fig' ? () => generateFigures(repositoryRoot) : () => Promise.reject(new Error('Chọn synthetic, synthetic-hw hoặc synthetic-fig.'));
   generate().then((count) => { console.log(`Đã sinh ${count} ảnh tổng hợp qua sharp (${values.set}).`); })
-    .catch(() => { console.error('Không sinh được bộ ảnh tổng hợp.'); process.exitCode = 1; });
+    .catch((error: unknown) => { console.error('Không sinh được bộ ảnh tổng hợp.', error); process.exitCode = 1; });
 }

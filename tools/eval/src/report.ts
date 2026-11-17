@@ -1,3 +1,4 @@
+import { matchScore } from '@mathtwin/reader';
 import type { ReadComparison, ReadUsage, TextComparison, TextMetrics, EditScore } from '@mathtwin/reader';
 import type { ImageMeta } from './dataset.js';
 
@@ -50,7 +51,20 @@ export function summarize(all: EvaluationRow[]) {
   for (const row of rows) for (const level of ['precise', 'coarse', 'none'] as const) coverage[level] += row.comparison.coverage[level];
   const errors: Record<string, number> = {};
   for (const row of rows) for (const [key, count] of Object.entries(row.comparison.errorCounts)) errors[key] = (errors[key] ?? 0) + count;
-  return { total, correct, incorrect, graphCorrect, fullyFlagged: flagged,
+  const metrics = rows.map((r) => r.comparison.graphMetrics);
+  const score = (key: 'vertices' | 'edges') => matchScore(metrics.reduce((n, m) => n + m[key].matched, 0),
+    metrics.reduce((n, m) => n + m[key].predicted, 0), metrics.reduce((n, m) => n + m[key].reference, 0));
+  const weightTotal = metrics.reduce((n, m) => n + m.weights.total, 0);
+  const weightCorrect = metrics.reduce((n, m) => n + m.weights.correct, 0);
+  const special = (key: 'loops' | 'parallelEdges') => {
+    const applicable = metrics.filter((m) => m[key].applicable);
+    const correct = applicable.filter((m) => m[key].correct).length;
+    return { total: applicable.length, correct, incorrect: applicable.length - correct, accuracy: applicable.length ? correct / applicable.length : null };
+  };
+  return { graphMetrics: { vertices: score('vertices'), edges: score('edges'), weights: { correct: weightCorrect, total: weightTotal, accuracy: weightTotal ? weightCorrect / weightTotal : null },
+      loops: special('loops'), parallelEdges: special('parallelEdges') },
+    graphSilentRate: total ? rows.filter((r) => r.comparison.graphSilentError).length / total : null,
+    total, correct, incorrect, graphCorrect, fullyFlagged: flagged,
     completeRate: total === 0 ? null : correct / total, graphRate: total === 0 ? null : graphCorrect / total,
     flaggedRate: incorrect === 0 ? null : flagged / incorrect,
     silentErrors: rows.filter((r) => r.comparison.silentError).map((r) => r.id),
@@ -78,9 +92,13 @@ export function makeReport(engine: string, set: string, passes: 1 | 2, date: str
     legacy_synthetic_pen: summarize(rows.filter((r) => r.meta.source === 'handwritten' && r.meta.synthetic)),
     tilted: summarize(rows.filter((r) => r.meta.capture === 'tilted')),
     blurred: summarize(rows.filter((r) => r.meta.blurred)),
+    ...Object.fromEntries([...new Set(rows.flatMap((r) => r.meta.variants ?? []))].sort().map((variant) =>
+      [`variant:${variant}`, summarize(rows.filter((r) => r.meta.variants?.includes(variant)))])),
+    ...Object.fromEntries((['dev', 'test'] as const).filter((split) => rows.some((r) => r.meta.split === split)).map((split) =>
+      [`split:${split}`, summarize(rows.filter((r) => r.meta.split === split))])),
   };
   return { engine, set, passes, date, mode: context.mode ?? 'graph', fixtureOnly: engine === 'fake', downloadBytes: engine === 'fake' ? 0 : null,
-    configuration: context.configuration ?? null, phoneMeasurements: context.phoneMeasurements ?? null, unsupportedSymbols: context.unsupportedSymbols ?? null, summary: summarize(rows), groups, rows };
+    configuration: context.configuration ?? null, phoneMeasurements: context.phoneMeasurements ?? null, unsupportedSymbols: context.unsupportedSymbols ?? null, summary: summarize(rows), groups: groups as typeof groups & Record<string, ReturnType<typeof summarize>>, rows };
 }
 export type EvaluationReport = ReturnType<typeof makeReport>;
 export function renderReport(report: EvaluationReport): string {
@@ -93,6 +111,14 @@ export function renderReport(report: EvaluationReport): string {
     '| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |'];
   for (const [name, group] of Object.entries({ all: report.summary, ...report.groups })) lines.push(
     `| ${name} | ${group.total} | ${percent(group.completeRate)} | ${percent(group.graphRate)} | ${group.fullyFlagged}/${group.incorrect} (${percent(group.flaggedRate)}) | ${group.silentErrors.length} | ${group.graphSilentErrors.length} | ${group.extraFlagsPerProblem ?? 'N/A'} |`);
+  lines.push('', '## Chỉ số phần đồ thị', '',
+    '| Nhóm | Precision đỉnh | Recall đỉnh | F1 cạnh {u,v} | Đúng trọng số/cạnh đúng | Khuyên đúng/số đề có khuyên | Đa cạnh đúng/số đề có đa cạnh | Đúng đồ thị | Sai thầm lặng đồ thị |',
+    '| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |');
+  for (const [name, group] of Object.entries({ all: report.summary, ...report.groups })) {
+    const m = group.graphMetrics;
+    lines.push(`| ${name} | ${percent(m.vertices.precision)} | ${percent(m.vertices.recall)} | ${percent(m.edges.f1)} | ${m.weights.correct}/${m.weights.total} (${percent(m.weights.accuracy)}) | ${m.loops.correct}/${m.loops.total} | ${m.parallelEdges.correct}/${m.parallelEdges.total} | ${percent(group.graphRate)} | ${group.graphSilentErrors.length}/${group.total} (${percent(group.graphSilentRate)}) |`);
+  }
+  lines.push('', 'Đỉnh theo nhãn chuẩn hóa; F1 cạnh giữ số lần lặp, chỉ so cặp đầu mút vô hướng. Trọng số ghép giá trị bằng nhau trước trong từng cặp đầu mút; không trọng số tính là null. Khuyên/đa cạnh xét đúng toàn bộ trọng số, tên và số lượng trong các nhóm tương ứng, kể cả khuyên/đa cạnh bị đọc thừa. N/A khi mẫu số bằng 0. Các nhóm biến thể chồng lấn; test chỉ dùng báo cáo, không chỉnh ngưỡng.', '');
   lines.push('', 'Nhóm nguồn ảnh có thể chồng lấn (ví dụ in + nghiêng + mờ). N/A = không có mẫu/mẫu sai.', '',
     '## Độ phủ từng phần tử lệch', '',
     '| Nhóm | precise | coarse | none |', '| --- | ---: | ---: | ---: |');

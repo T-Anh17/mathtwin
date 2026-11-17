@@ -16,10 +16,11 @@ export const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), '
 export function readOptions(args: string[]) {
   const { values } = parseArgs({ args, options: { engine: { type: 'string' }, passes: { type: 'string', default: '2' },
     set: { type: 'string' }, mode: { type: 'string' }, 'from-device': { type: 'string' }, threshold: { type: 'string', default: '0.85' },
-    limit: { type: 'string' }, confirm: { type: 'boolean', default: false }, 'dump-lines': { type: 'boolean', default: false } } });
+    limit: { type: 'string' }, split: { type: 'string' }, confirm: { type: 'boolean', default: false }, 'dump-lines': { type: 'boolean', default: false } } });
   if (values['from-device'] ? values.engine !== undefined || args.includes('--passes') || args.some((a) => a.startsWith('--passes=')) : values.engine !== 'fake' && values.engine !== 'offline:vietocr-onnx') throw new Error('Chọn --engine fake, offline:vietocr-onnx hoặc --from-device; cấu hình thiết bị lấy từ file.');
   if (values.passes !== '1' && values.passes !== '2') throw new Error('--passes phải là 1 hoặc 2.');
-  if (values.set !== undefined && !Object.hasOwn(setFolders, values.set)) throw new Error('--set phải là synthetic, synthetic-hw hoặc real.');
+  if (values.set !== undefined && !Object.hasOwn(setFolders, values.set)) throw new Error('--set phải là synthetic, synthetic-hw, synthetic-fig hoặc real.');
+  if (values.split !== undefined && (!['dev', 'test'].includes(values.split) || values.set !== 'synthetic-fig')) throw new Error('--split dev|test cần --set synthetic-fig.');
   const mode = values.mode ?? (values['from-device'] ? 'both' : values.engine === 'offline:vietocr-onnx' ? 'lines' : 'graph');
   if (mode !== 'graph' && mode !== 'lines' && mode !== 'both') throw new Error('--mode phải là graph, lines hoặc both.');
   if (values.engine === 'offline:vietocr-onnx' && mode !== 'lines') throw Object.assign(new Error(ocrMessages.unsupported_mode), { code: 'unsupported_mode' });
@@ -30,6 +31,7 @@ export function readOptions(args: string[]) {
   if (!values.threshold?.trim() || !Number.isFinite(threshold) || threshold < 0 || threshold > 1) throw new Error('--threshold phải nằm trong [0,1].');
   if (values.limit !== undefined && (!/^[1-9]\d*$/.test(values.limit) || !Number.isSafeInteger(Number(values.limit)))) throw new Error('--limit phải là số nguyên dương.');
   return { engine: values.engine, passes: passes as 1 | 2, set: (values.set ?? 'synthetic') as DatasetSet, mode: mode as 'graph' | 'lines' | 'both', threshold, dumpLines: values['dump-lines'],
+    ...(values.split === undefined ? {} : { split: values.split as 'dev' | 'test' }),
     ...(values['from-device'] === undefined ? {} : { fromDevice: values['from-device'] }), explicitSet: values.set !== undefined,
     ...(values.limit === undefined ? {} : { limit: Number(values.limit) }) };
 }
@@ -38,7 +40,7 @@ export async function evaluate(args: string[], root = repositoryRoot, date = new
 } = {}) {
   const options = readOptions(args);
   if (options.fromDevice) throw new Error('Dùng evaluateDevice cho file thiết bị.');
-  const cases = await loadCases(join(root, 'testdata', setFolders[options.set]), options.limit);
+  const cases = (await loadCases(join(root, 'testdata', setFolders[options.set]))).filter((c) => !options.split || c.meta.split === options.split).slice(0, options.limit);
   if (cases.length === 0) throw new Error('Chưa có ảnh đã gán nhãn trong bộ dữ liệu được chọn.');
   if (cases.some((sample) => sample.meta.synthetic !== (options.set !== 'real'))) throw new Error('Nguồn ảnh không khớp --set.');
   const rows: EvaluationRow[] = [];
@@ -104,7 +106,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     console.log('Dung lượng model sẽ tải: 0 byte.');
     if (options.engine === 'offline:vietocr-onnx') console.log(ocrMessages.weightsWarning);
     const results = options.fromDevice ? await evaluateDevice(resolve(options.fromDevice), repositoryRoot, new Date().toISOString().slice(0, 10), {
-      mode: options.mode, threshold: options.threshold, ...(options.explicitSet ? { set: options.set } : {}), ...(options.limit ? { limit: options.limit } : {}) }) : [await evaluate(args)];
+      mode: options.mode, threshold: options.threshold, ...(options.explicitSet ? { set: options.set } : {}), ...(options.split ? { split: options.split } : {}), ...(options.limit ? { limit: options.limit } : {}) }) : [await evaluate(args)];
     for (const { report, basename, reportDirectory } of results) console.log(`Đã đánh giá ${report.summary.evaluatedImages} ảnh. Báo cáo: ${reportDirectory}/${basename}.md và .json`);
   };
   run().catch((error: unknown) => {

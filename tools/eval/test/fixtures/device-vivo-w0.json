@@ -1,0 +1,572 @@
+{
+  "version": 1,
+  "runtime": {
+    "llamaCpp": {
+      "repository": "ggml-org/llama.cpp",
+      "revision": "b12388",
+      "commit": "1c2adc75f619d05efc5d49ce08eaaa96272ebfa2",
+      "url": "https://github.com/ggml-org/llama.cpp.git",
+      "license": "MIT",
+      "licenseUrl": "https://github.com/ggml-org/llama.cpp/blob/1c2adc75f619d05efc5d49ce08eaaa96272ebfa2/LICENSE"
+    },
+    "backend": "CPU",
+    "contextSize": 8192,
+    "maxTokens": 1536,
+    "alternativesThreshold": 0.1,
+    "mmprojOffload": false
+  },
+  "device": {
+    "manufacturer": "vivo",
+    "model": "V2324HA",
+    "android": "16",
+    "sdk": 36,
+    "cores": 8,
+    "totalRamBytes": 11874000896,
+    "availableRamBytes": 4095926272,
+    "freeStorageBytes": 13772005376
+  },
+  "results": [
+    {
+      "id": "07-connectivity-components-dancing-perspective",
+      "engine": "offline:qwen3-vl-2b",
+      "config": {
+        "model": "b",
+        "passes": 2,
+        "mode": "graph",
+        "threads": 8,
+        "minRamGb": 6,
+        "allowLowRam": false,
+        "maxImageSide": 768,
+        "readTimeout": 300000,
+        "maxTokens": 1536,
+        "dry": {
+          "dry_multiplier": 0.8,
+          "dry_base": 1.75,
+          "dry_allowed_length": 2,
+          "dry_penalty_last_n": 64
+        },
+        "backgroundIdleMinutes": 5,
+        "backend": "CPU",
+        "cpuVariant": "android_armv8.6_1",
+        "cpuVariantSource": "maps"
+      },
+      "imageSource": "dataset",
+      "outcome": {
+        "spec": null,
+        "graph": {
+          "directed": false,
+          "vertices": [
+            {
+              "id": "A",
+              "label": "A"
+            },
+            {
+              "id": "B",
+              "label": "B"
+            },
+            {
+              "id": "C",
+              "label": "C"
+            },
+            {
+              "id": "D",
+              "label": "D"
+            }
+          ],
+          "edges": [
+            {
+              "id": "e1",
+              "u": "A",
+              "v": "B",
+              "w": 0,
+              "name": "A-B"
+            },
+            {
+              "id": "e2",
+              "u": "D",
+              "v": "C",
+              "name": "D-C",
+              "w": 0
+            }
+          ]
+        },
+        "graphUncertain": [
+          {
+            "item": "e1.w",
+            "candidates": [
+              0,
+              null,
+              1
+            ]
+          },
+          {
+            "item": "e1",
+            "candidates": [
+              true,
+              false
+            ]
+          },
+          {
+            "item": "e2.w",
+            "candidates": [
+              0,
+              null
+            ]
+          },
+          {
+            "item": "graph",
+            "candidates": [
+              {
+                "directed": false,
+                "vertices": [
+                  {
+                    "id": "A",
+                    "label": "A"
+                  },
+                  {
+                    "id": "B",
+                    "label": "B"
+                  },
+                  {
+                    "id": "C",
+                    "label": "C"
+                  },
+                  {
+                    "id": "D",
+                    "label": "D"
+                  }
+                ],
+                "edges": [
+                  {
+                    "id": "e1",
+                    "u": "A",
+                    "v": "B",
+                    "w": 0,
+                    "name": "A-B"
+                  },
+                  {
+                    "id": "e2",
+                    "u": "D",
+                    "v": "C",
+                    "name": "D-C",
+                    "w": 0
+                  }
+                ]
+              },
+              {
+                "directed": false,
+                "vertices": [
+                  {
+                    "id": "A",
+                    "label": "A"
+                  },
+                  {
+                    "id": "B",
+                    "label": "B"
+                  },
+                  {
+                    "id": "C",
+                    "label": "C"
+                  },
+                  {
+                    "id": "D",
+                    "label": "D"
+                  }
+                ],
+                "edges": [
+                  {
+                    "id": "e1",
+                    "u": "A",
+                    "v": "B",
+                    "name": "A-B"
+                  },
+                  {
+                    "id": "e2",
+                    "u": "D",
+                    "v": "C",
+                    "name": "D-C"
+                  }
+                ]
+              },
+              {
+                "directed": false,
+                "vertices": [
+                  {
+                    "id": "A",
+                    "label": "A"
+                  },
+                  {
+                    "id": "B",
+                    "label": "B"
+                  },
+                  {
+                    "id": "C",
+                    "label": "C"
+                  },
+                  {
+                    "id": "D",
+                    "label": "D"
+                  }
+                ],
+                "edges": [
+                  {
+                    "id": "e1",
+                    "u": "A",
+                    "v": "B",
+                    "w": 0,
+                    "name": "A-B"
+                  },
+                  {
+                    "id": "e2",
+                    "u": "C",
+                    "v": "D",
+                    "w": 0,
+                    "name": "C-D"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "item": "e2.u",
+            "candidates": [
+              "D",
+              "C",
+              "B"
+            ]
+          },
+          {
+            "item": "e2",
+            "candidates": [
+              true,
+              false
+            ]
+          }
+        ],
+        "issues": [
+          {
+            "code": "unsupported_task",
+            "severity": "blocking",
+            "item": "task.type",
+            "message": "Dạng bài này nằm ngoài phạm vi hỗ trợ."
+          },
+          {
+            "code": "nonpositive_weight",
+            "severity": "blocking",
+            "item": "e1.w",
+            "message": "Trọng số phải dương. Dijkstra không áp dụng cho trọng số không dương."
+          },
+          {
+            "code": "nonpositive_weight",
+            "severity": "blocking",
+            "item": "e2.w",
+            "message": "Trọng số phải dương. Dijkstra không áp dụng cho trọng số không dương."
+          },
+          {
+            "code": "unreadable_region",
+            "severity": "warning",
+            "item": "graph",
+            "message": "Có vùng ảnh chưa đọc được. Hãy kiểm tra lại đề."
+          }
+        ],
+        "drafts": [
+          {
+            "representation": "text",
+            "directed": false,
+            "vertices": [
+              {
+                "label": "A",
+                "conf": 0.9866297240119191,
+                "alternatives": []
+              },
+              {
+                "label": "B",
+                "conf": 0.9841050494707175,
+                "alternatives": []
+              },
+              {
+                "label": "C",
+                "conf": 0.9982202649449912,
+                "alternatives": []
+              },
+              {
+                "label": "D",
+                "conf": 0.9955585000799796,
+                "alternatives": []
+              }
+            ],
+            "edges": [
+              {
+                "u": "A",
+                "v": "B",
+                "w": null,
+                "wAlternatives": [
+                  0
+                ],
+                "wConf": 0.3808107787018386,
+                "uConf": 0.9984003902049292,
+                "vConf": 0.9979012012082306,
+                "uAlternatives": [],
+                "vAlternatives": [],
+                "name": "A-B",
+                "conf": 0.34351652212815237
+              },
+              {
+                "u": "D",
+                "v": "C",
+                "w": null,
+                "wAlternatives": [
+                  0
+                ],
+                "wConf": 0.992902457790655,
+                "uConf": 0.7140540554840009,
+                "vConf": 0.996530354096067,
+                "uAlternatives": [
+                  "C"
+                ],
+                "vAlternatives": [],
+                "name": "D-C",
+                "conf": 0.7140540554840009
+              }
+            ],
+            "statedFacts": {
+              "vertexCount": 4,
+              "edgeCount": 2,
+              "weightUnit": null
+            },
+            "question": {
+              "rawText": "Cho đồ thị vô hướng. Tự luận. Xét linh kiện thông của đồ thị đã cho. Có 2 thành phần liên thông. Đổ thi không liên thông.",
+              "format": "tu_luan",
+              "task": {
+                "type": "trace",
+                "rawText": "Cho đồ thị vô hướng. Tự luận. Xét linh kiện thông của đồ thị đã cho. Có 2 thành phần liên thông. Đổ thi không liên thông."
+              },
+              "options": [
+                {
+                  "id": "A",
+                  "text": "A",
+                  "check": null,
+                  "conf": 0.8933322414602857
+                },
+                {
+                  "id": "B",
+                  "text": "B",
+                  "check": null,
+                  "conf": 0.9996414184433053
+                },
+                {
+                  "id": "C",
+                  "text": "C",
+                  "check": null,
+                  "conf": 0.9999535083773645
+                },
+                {
+                  "id": "D",
+                  "text": "D",
+                  "check": null,
+                  "conf": 0.9999779462808753
+                }
+              ],
+              "conf": 1.1504807368911345e-07,
+              "needsPostprocessing": false
+            },
+            "unreadable": [
+              {
+                "what": "Có 2 thành phần liên thông",
+                "note": "Không thể đọc được"
+              },
+              {
+                "what": "Đổ thi không liên thông",
+                "note": "Không thể đọc được"
+              }
+            ]
+          },
+          {
+            "representation": "text",
+            "directed": false,
+            "vertices": [
+              {
+                "label": "A",
+                "conf": 0.9882917998817604,
+                "alternatives": []
+              },
+              {
+                "label": "B",
+                "conf": 0.9811780451514849,
+                "alternatives": []
+              },
+              {
+                "label": "C",
+                "conf": 0.9979178309915983,
+                "alternatives": []
+              },
+              {
+                "label": "D",
+                "conf": 0.996910512425158,
+                "alternatives": []
+              }
+            ],
+            "edges": [
+              {
+                "u": "A",
+                "v": "B",
+                "w": 0,
+                "wAlternatives": [
+                  1
+                ],
+                "wConf": 0.5962898223711913,
+                "uConf": 0.9978477955807051,
+                "vConf": 0.9959940909501365,
+                "uAlternatives": [],
+                "vAlternatives": [],
+                "name": "A-B",
+                "conf": 0.5189027665069124
+              },
+              {
+                "u": "C",
+                "v": "D",
+                "w": 0,
+                "wAlternatives": [],
+                "wConf": 0.9832119348703047,
+                "uConf": 0.40863271711945015,
+                "vConf": 0.9919351340091259,
+                "uAlternatives": [
+                  "D",
+                  "B"
+                ],
+                "vAlternatives": [],
+                "name": "C-D",
+                "conf": 0.40863271711945015
+              }
+            ],
+            "statedFacts": {
+              "vertexCount": 4,
+              "edgeCount": 2,
+              "weightUnit": "0"
+            },
+            "question": {
+              "rawText": "Cho đồ thị vô hướng. Tuy nhiên, Xét linh kiện thông qua đồ thị đã cho.",
+              "format": "tu_luan",
+              "task": {
+                "type": "unmappable",
+                "rawText": "Cho đồ thị vô hướng. Tùy chọn. Xét linh kiện thông thường. Có 2 thành phần liên thông. Đổ thi không liên thông."
+              },
+              "options": [
+                {
+                  "id": "A",
+                  "text": "A",
+                  "check": null,
+                  "conf": 0.841295186982675
+                },
+                {
+                  "id": "B",
+                  "text": "B",
+                  "check": null,
+                  "conf": 0.9990584254438809
+                },
+                {
+                  "id": "C",
+                  "text": "C",
+                  "check": null,
+                  "conf": 0.9997747540405347
+                },
+                {
+                  "id": "D",
+                  "text": "D",
+                  "check": null,
+                  "conf": 0.9999203681930432
+                }
+              ],
+              "conf": 2.2616025856331944e-07
+            },
+            "unreadable": [
+              {
+                "what": "Có 2 thành phần liên thông",
+                "note": "Không thể đọc được"
+              },
+              {
+                "what": "Đổ thi không liên thông",
+                "note": "Không thể đọc được"
+              }
+            ]
+          }
+        ],
+        "usage": {
+          "passes": 2,
+          "latencyMs": 174485.10000002384,
+          "engine": "offline:qwen3-vl-2b",
+          "serverTimings": {
+            "promptMs": 82745.52799999999,
+            "predictedMs": 90810.20999999999,
+            "promptTokens": 1277,
+            "predictedTokens": 1290
+          },
+          "sentImages": [
+            {
+              "originalWidth": 1000,
+              "originalHeight": 1440,
+              "width": 533,
+              "height": 768,
+              "maxImageSide": 768
+            },
+            {
+              "originalWidth": 1000,
+              "originalHeight": 1440,
+              "width": 533,
+              "height": 768,
+              "maxImageSide": 768
+            }
+          ],
+          "finish_reason": [
+            "stop",
+            "stop"
+          ]
+        }
+      },
+      "usage": {
+        "passes": 2,
+        "latencyMs": 174485.10000002384,
+        "engine": "offline:qwen3-vl-2b",
+        "serverTimings": {
+          "promptMs": 82745.52799999999,
+          "predictedMs": 90810.20999999999,
+          "promptTokens": 1277,
+          "predictedTokens": 1290
+        },
+        "sentImages": [
+          {
+            "originalWidth": 1000,
+            "originalHeight": 1440,
+            "width": 533,
+            "height": 768,
+            "maxImageSide": 768
+          },
+          {
+            "originalWidth": 1000,
+            "originalHeight": 1440,
+            "width": 533,
+            "height": 768,
+            "maxImageSide": 768
+          }
+        ],
+        "finish_reason": [
+          "stop",
+          "stop"
+        ],
+        "peakMemoryMb": 3902.04296875
+      },
+      "totalMs": 174697.10000002384,
+      "modelLoadMs": 0,
+      "modelVerifyMs": 0,
+      "reusedModel": true,
+      "memory": {
+        "alive": true,
+        "peakMemoryMb": 3902.04296875,
+        "rssMemoryMb": 3769.62890625,
+        "cpuVariant": "android_armv8.6_1",
+        "cpuVariantSource": "maps"
+      },
+      "serverRestarted": false
+    }
+  ]
+}

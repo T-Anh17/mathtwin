@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "width": 1200,
+  "height": 1000,
+  "box": [
+    360,
+    300,
+    840,
+    550
+  ],
+  "vertices": [],
+  "edges": [],
+  "crossings": []
+}

@@ -1,0 +1,46 @@
+{
+  "source": "synthetic_handwriting",
+  "capture": "tilted",
+  "blurred": true,
+  "questionFormat": "tu_luan",
+  "notes": "Hình vẽ tay tổng hợp bằng code và font OFL, không phải ảnh thật.",
+  "synthetic": true,
+  "coreFixture": "60-solve-postman-four-odd",
+  "originalGraph": "a3a88851445aa43c9578be94c1cf6dd48a803a45367575d7f447aad423b9b08f",
+  "split": "dev",
+  "form": "crop",
+  "parameters": {
+    "seed": 210261436,
+    "form": "crop",
+    "paper": "ruled",
+    "pen": "#272327",
+    "strokeWidth": 2.914802956278436,
+    "rotation": -4.921796508133411,
+    "perspective": -0.015556132011115551,
+    "blur": 0.8097971048206091,
+    "jpegQuality": 84,
+    "font": "dancing",
+    "curved": false,
+    "crossingDots": true,
+    "endpoint": "gap"
+  },
+  "variants": [
+    "ruled",
+    "gap",
+    "open",
+    "double",
+    "dot",
+    "label-only",
+    "crossing",
+    "crossing-dot",
+    "crop"
+  ],
+  "hasSolution": false,
+  "figureHashes": {
+    "1.jpg": "5cb8f0ffd6fd3d1126495a29ed7a523899d8cd2d7ae32c70e27ec7680c65d35f",
+    "truth.json": "7fdd9190b8340c4838248c2062e1d93bc1f1fa5c036bd76c19b71cf9164edf38",
+    "figure.json": "055f0117e6fb1ef61b973b5a44b453fb52c2d89ef11aba5f8fe3ddc520356fd0",
+    "lines.json": "ce03dd61e79d523404fa6e881c2844482aab70b33b047d5492b4095aab96e6aa",
+    "source.svg": "6c975011d6596a2e58a3f778ed9bae398c3278122a089cb4d0af4e01b7c547cf"
+  }
+}

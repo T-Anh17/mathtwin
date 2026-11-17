@@ -56,7 +56,19 @@ function textLine(value: unknown): TextLine {
 function outcome(value: unknown, engine: string): ReadOutcome {
   const o = record(value);
   if (o.spec !== null && !validateSpec(o.spec as ProblemSpec).ok) invalid();
-  if (o.graph !== null && !validateSpec({ graph: o.graph, task: { type: 'elements' }, questionFormat: 'tu_luan' } as ProblemSpec).ok) invalid();
+  if (o.graph !== null) {
+    const graph = record(o.graph);
+    if (graph.directed !== false) invalid();
+    const vertices = list(graph.vertices).map((v) => { const vertex = record(v); return { id: string(vertex.id), label: string(vertex.label) }; });
+    const ids = new Set(vertices.map((v) => v.id));
+    const edges = list(graph.edges).map((e) => {
+      const edge = record(e); const id = string(edge.id); const u = string(edge.u); const v = string(edge.v);
+      if (!ids.has(u) || !ids.has(v) || (edge.w !== undefined && (typeof edge.w !== 'number' || !Number.isFinite(edge.w)))
+        || (edge.name !== undefined && typeof edge.name !== 'string')) invalid();
+      return id;
+    });
+    if (ids.size !== vertices.length || new Set(edges).size !== edges.length) invalid();
+  }
   const uncertain = list(o.graphUncertain);
   if (uncertain.some((u) => typeof record(u).item !== 'string' || !Array.isArray(record(u).candidates))) invalid();
   const issues = list(o.issues).map((value) => {
@@ -73,7 +85,7 @@ function failedOutcome(u: ReadUsage): ReadOutcome {
   return { spec: null, graph: null, graphUncertain: [], drafts: [], usage: u,
     issues: ['graph', 'spec', 'questionFormat'].map((item) => ({ code: 'read_failed', severity: 'blocking', item, message: 'Lượt đọc trên thiết bị thất bại.' })) };
 }
-export interface DeviceEvaluationOptions { set?: DatasetSet; mode: 'graph' | 'lines' | 'both'; limit?: number; threshold: number }
+export interface DeviceEvaluationOptions { set?: DatasetSet; split?: 'dev' | 'test'; mode: 'graph' | 'lines' | 'both'; limit?: number; threshold: number }
 export async function evaluateDevice(file: string, root: string, date: string, options: DeviceEvaluationOptions) {
   const data = record(await readJson(file)); if (data.version !== 1) invalid();
   const rawDevice = record(data.device); const rawRuntime = record(data.runtime);
@@ -106,6 +118,7 @@ export async function evaluateDevice(file: string, root: string, date: string, o
     if (options.mode !== 'both' && config.mode !== options.mode) continue;
     const sample = catalog.get(id); if (!sample) throw new Error('Không tìm thấy id thiết bị trong bộ truth đã chọn.');
     if (options.set && sourceSets.get(id) !== options.set) continue;
+    if (options.split && sample.meta.split !== options.split) continue;
     let dry: Record<string, number> | undefined;
     if (config.dry !== undefined) {
       const d = record(config.dry);
@@ -168,8 +181,8 @@ export async function evaluateDevice(file: string, root: string, date: string, o
   for (const [key, group] of groups) {
     const report = makeReport(group.engine, options.set ?? 'device-mixed', group.passes, date, group.rows,
       { mode: group.config.mode as 'graph' | 'lines', configuration: group.config, phoneMeasurements: {
-        ...phoneMeasurements, runtime: { ...runtime, maxTokens: group.config.maxTokens }, ...(options.set ? { notExportedIds: [...catalog.keys()].filter((id) => sourceSets.get(id) === options.set && !group.ids.has(id)) } : {}) } });
-    const basename = `read-device-${date}-${createHash('sha256').update(JSON.stringify({ key, set: options.set, threshold: options.threshold, limit: options.limit, export: data })).digest('hex').slice(0, 12)}`;
+        ...phoneMeasurements, runtime: { ...runtime, maxTokens: group.config.maxTokens }, ...(options.set ? { notExportedIds: [...catalog.keys()].filter((id) => sourceSets.get(id) === options.set && (!options.split || catalog.get(id)!.meta.split === options.split) && !group.ids.has(id)) } : {}) } });
+    const basename = `read-device-${date}-${createHash('sha256').update(JSON.stringify({ key, set: options.set, split: options.split, threshold: options.threshold, limit: options.limit, export: data })).digest('hex').slice(0, 12)}`;
     await writeFile(join(directory, `${basename}.json`), `${JSON.stringify(report, null, 2)}\n`);
     await writeFile(join(directory, `${basename}.md`), renderReport(report));
     reports.push({ report, basename, reportDirectory: 'reports' });

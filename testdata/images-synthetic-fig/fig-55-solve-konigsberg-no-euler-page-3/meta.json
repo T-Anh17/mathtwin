@@ -1,0 +1,47 @@
+{
+  "source": "synthetic_handwriting",
+  "capture": "tilted",
+  "blurred": false,
+  "questionFormat": "tu_luan",
+  "notes": "Hình vẽ tay tổng hợp bằng code và font OFL, không phải ảnh thật.",
+  "synthetic": true,
+  "coreFixture": "55-solve-konigsberg-no-euler",
+  "originalGraph": "afe54214f7d9917342c80869ba656f2a6f0c1ea516848deedb49f6480eaf16c0",
+  "split": "dev",
+  "form": "page",
+  "parameters": {
+    "seed": 210256452,
+    "form": "page",
+    "paper": "ruled",
+    "pen": "#183f8b",
+    "strokeWidth": 3.0858997142640874,
+    "rotation": -6.00284568220377,
+    "perspective": 0.05067917335778475,
+    "blur": 0,
+    "jpegQuality": 73,
+    "font": "dancing",
+    "curved": false,
+    "crossingDots": true,
+    "endpoint": "touch"
+  },
+  "variants": [
+    "ruled",
+    "touch",
+    "open",
+    "double",
+    "dot",
+    "label-only",
+    "near-other-label",
+    "crossing",
+    "crossing-dot",
+    "page"
+  ],
+  "hasSolution": true,
+  "figureHashes": {
+    "1.jpg": "377701e8d2079a89b011d5f4f0d59649d8fca6448680600d68d52fdfddecab2f",
+    "truth.json": "e4d6acd7fb3031b288c4e44670932fe4ab35afd91c424a429af1852732df50c3",
+    "figure.json": "ae27b8e1a0fe06171b1ce16950c76f85ababdb8a9a63a89b36f337af44e7fb07",
+    "lines.json": "a3f2236b7d2030894e242aed1445fd01781f0527a811cd597f0a106c53c32249",
+    "source.svg": "94d1c113401148967b5c02d36399cf73545c8b32bdbdd4c5a5cf150245e3b230"
+  }
+}

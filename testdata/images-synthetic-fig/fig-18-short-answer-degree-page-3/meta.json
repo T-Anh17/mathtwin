@@ -1,0 +1,44 @@
+{
+  "source": "synthetic_handwriting",
+  "capture": "tilted",
+  "blurred": true,
+  "questionFormat": "tu_luan",
+  "notes": "Hình vẽ tay tổng hợp bằng code và font OFL, không phải ảnh thật.",
+  "synthetic": true,
+  "coreFixture": "18-short-answer-degree",
+  "originalGraph": "1ab6fcf0dc418d417760835e85ae42fa0c4f0fffb0af51bd97cdc86127015b57",
+  "split": "dev",
+  "form": "page",
+  "parameters": {
+    "seed": 210219563,
+    "form": "page",
+    "paper": "white",
+    "pen": "#653884",
+    "strokeWidth": 2.344846003456041,
+    "rotation": -5.541935365647078,
+    "perspective": 0.01812583863735199,
+    "blur": 0.8166522311745211,
+    "jpegQuality": 86,
+    "font": "patrick",
+    "curved": true,
+    "crossingDots": false,
+    "endpoint": "overshoot"
+  },
+  "variants": [
+    "white",
+    "overshoot",
+    "curved",
+    "label-only",
+    "open",
+    "double",
+    "page"
+  ],
+  "hasSolution": true,
+  "figureHashes": {
+    "1.jpg": "0043a91c5f99f5f2a4361a93f26d070cf977853976b373fbaf5e1606abda35ec",
+    "truth.json": "3544eb879e6a4ed7a30cc06ecadd55753f6bfe9bbe670821da28771251f72698",
+    "figure.json": "d5b0f3fa4c40d27dfb196ebd016a21ad0a5c7f7e270f77be068b52b76efe9aa5",
+    "lines.json": "70ead08c77bca52cc480f2c310fac9d6b309f78313839a49b4082e52d649d108",
+    "source.svg": "dbe3e804d3f4e810ac66a4d297a9df4efee7382ece3960f6788ed654f7b4daf3"
+  }
+}

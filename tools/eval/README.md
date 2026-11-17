@@ -52,6 +52,41 @@ adb push .build-cache/datasets/synthetic-hw /sdcard/Android/data/vn.mathtwin.app
 
 Nhập `synthetic-hw` trên màn Đo. Với `--set synthetic`, lệnh đóng gói tương tự. Bộ cũ có 10 ảnh nét bút giả bằng font hệ thống: báo cáo để riêng `legacy_synthetic_pen`, không gộp thành viết tay thật hay bộ font mới.
 
+## Bộ hình khó — Lô 2.10
+
+[synthetic-fig](../../testdata/images-synthetic-fig/README.md) gồm 320 ảnh tổng hợp
+(240 vùng hình, 80 trang), lấy toàn bộ 60 fixture core và 20 đồ thị có seed.
+`figure.json` lưu nét và box theo pixel ảnh sau biến đổi; `meta.json` có tham số,
+hash và split theo đồ thị gốc. **Không phải ảnh thật.** Test chỉ dùng báo cáo,
+không dùng chỉnh ngưỡng. Các biến thể của cùng đồ thị, kể cả trùng giữa nhiều
+fixture core, luôn ở cùng split.
+
+```powershell
+npm run eval:generate -- --set synthetic-fig
+npm run eval:validate -- synthetic-fig
+npm run eval:pack -- --set synthetic-fig
+npm run eval:pack -- --set synthetic-fig --split test
+npm run eval:read -- --engine fake --set synthetic-fig --split dev --mode graph
+```
+
+Sinh ảnh không cần model/mạng. Pack chỉ chứa ảnh và `ids.json`, không chứa truth,
+chú thích hoặc đáp án; pack theo split nằm trong `.build-cache/datasets/synthetic-fig-<split>/`.
+Reader `fake` chỉ kiểm pipeline, không phải số đo nhận dạng.
+
+`compareRead().graphMetrics` và báo cáo JSON/Markdown thêm precision/recall đỉnh
+theo nhãn chuẩn hóa, F1 multiset cạnh theo cặp đầu mút vô hướng, độ đúng trọng số
+trên cạnh khớp đầu mút, khuyên/đa cạnh đúng/sai. Ghép các trọng số bằng nhau trước
+trong mỗi nhóm cạnh song song; không trọng số là `null`, `0` vẫn là sai. Chỉ số
+khuyên/đa cạnh đòi hỏi đủ số lượng, trọng số và tên của mọi nhóm tương ứng; tính
+cả khuyên/đa cạnh đọc thừa. Tỉ lệ đúng đồ thị và sai thầm lặng đồ thị được giữ
+riêng với phần câu hỏi. Cộng tử/mẫu số trước khi tính tỉ lệ; mẫu số 0 là N/A.
+Nhóm `variant:*` và `split:*` tách các biến thể và tập dữ liệu, nhóm có thể chồng lấn.
+
+Nhập `--from-device` vẫn kiểm `spec` bằng `validateSpec`; graph giữ lại chỉ được
+kiểm cấu trúc/id/đầu mút và kiểu trọng số hữu hạn. Trọng số ≤ 0 được giữ nguyên để
+chấm sai, không từ chối cả file. Ca hồi quy là một bản ghi thật từ file xuất vivo
+đã có sẵn, xem [nguồn fixture](test/fixtures/README.md). Không cần kết nối thiết bị.
+
 ## Đo C trên Node — Lô 2.8
 
 `npm run eval:read -- --engine offline:vietocr-onnx --mode lines --set synthetic-hw`

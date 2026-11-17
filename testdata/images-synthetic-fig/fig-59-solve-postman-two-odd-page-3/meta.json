@@ -1,0 +1,43 @@
+{
+  "source": "synthetic_handwriting",
+  "capture": "tilted",
+  "blurred": true,
+  "questionFormat": "tu_luan",
+  "notes": "Hình vẽ tay tổng hợp bằng code và font OFL, không phải ảnh thật.",
+  "synthetic": true,
+  "coreFixture": "59-solve-postman-two-odd",
+  "originalGraph": "86304887e6b37baf69940c7104aa74d13c11f8b12089c35fc7dff3742c63f09f",
+  "split": "test",
+  "form": "page",
+  "parameters": {
+    "seed": 210260440,
+    "form": "page",
+    "paper": "ruled",
+    "pen": "#272327",
+    "strokeWidth": 1.949797412729822,
+    "rotation": 5.623001851141453,
+    "perspective": -0.010666412077844143,
+    "blur": 0.37564688166603444,
+    "jpegQuality": 90,
+    "font": "dancing",
+    "curved": false,
+    "crossingDots": true,
+    "endpoint": "gap"
+  },
+  "variants": [
+    "ruled",
+    "gap",
+    "open",
+    "double",
+    "dot",
+    "page"
+  ],
+  "hasSolution": true,
+  "figureHashes": {
+    "1.jpg": "92dbcbb3fdc05e84247e8e929d739152cda59450361d13eb945537ae1de32972",
+    "truth.json": "08f828b3335b3e7d6a2f91e200820b2a6225836bad2f2edcf79510491422efc6",
+    "figure.json": "2e0658420a2e0a357eb8421dfd28327b7728b15b281e0d6f963e1aefcc9d8a78",
+    "lines.json": "c598d32db3e82031bc070639a1bdd24fd21bbe5f6501519d22699dc1b69797c4",
+    "source.svg": "2506393171d494932f17b7ae0d4858166b0a967cd626db551b26fbeb7426db02"
+  }
+}

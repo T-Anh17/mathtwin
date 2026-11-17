@@ -1,6 +1,7 @@
 import type { Edge, Graph, ProblemSpec } from '@mathtwin/core';
 import { assignEdges, canonicalTask, labelMapper } from './comparison-model.js';
 import { flag as mergeFlag, normalizeLabel, same } from './model.js';
+import { compareGraphMetrics } from './graph-metrics.js';
 import type { ReadComparison, ReadDifference, ReadErrorType, ReadOutcome, ReadUncertainty } from './types.js';
 
 function isGraphDifference(diff: ReadDifference): boolean {
@@ -109,6 +110,6 @@ export function compareRead(predicted: ReadOutcome, truth: ProblemSpec): ReadCom
   const fullyFlagged = coverage.none === 0;
   const errorCounts: Partial<Record<ReadErrorType, number>> = {};
   for (const diff of differences) for (const type of new Set([diff.type, ...(diff.tags ?? [])])) errorCounts[type] = (errorCounts[type] ?? 0) + 1;
-  return { completeCorrect, graphCorrect, fullyFlagged, silentError: !fullyFlagged, graphSilentError, coverage,
+  return { graphMetrics: compareGraphMetrics(graph, truth.graph), completeCorrect, graphCorrect, fullyFlagged, silentError: !fullyFlagged, graphSilentError, coverage,
     extraFlags: flags.filter((flag) => !differences.some((diff) => affects(flag, diff))).length, differences, errorCounts };
 }

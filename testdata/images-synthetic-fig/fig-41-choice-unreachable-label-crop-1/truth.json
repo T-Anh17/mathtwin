@@ -1,0 +1,53 @@
+{
+  "graph": {
+    "directed": false,
+    "vertices": [
+      {
+        "id": "A",
+        "label": "A"
+      },
+      {
+        "id": "B",
+        "label": "B"
+      },
+      {
+        "id": "C",
+        "label": "C"
+      },
+      {
+        "id": "D",
+        "label": "D"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1",
+        "u": "A",
+        "v": "B",
+        "w": 1
+      },
+      {
+        "id": "e2",
+        "u": "A",
+        "v": "C",
+        "w": 1
+      },
+      {
+        "id": "e3",
+        "u": "B",
+        "v": "D",
+        "w": 3
+      },
+      {
+        "id": "e4",
+        "u": "C",
+        "v": "D",
+        "w": 3
+      }
+    ]
+  },
+  "task": {
+    "type": "elements"
+  },
+  "questionFormat": "tu_luan"
+}

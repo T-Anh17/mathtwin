@@ -5,7 +5,7 @@ import { createHash } from 'node:crypto';
 import { afterEach, describe, expect, it } from 'vitest';
 import sharp from 'sharp';
 import { validateSpec } from '@mathtwin/core';
-import { compareRead, readProblem } from '@mathtwin/reader';
+import { compareRead, compareGraphMetrics, readProblem } from '@mathtwin/reader';
 import { evaluate, readOptions, repositoryRoot } from '../src/cli.js';
 import { checkedTruth, loadCases, prepareImages, readJson } from '../src/dataset.js';
 import { fakeReader } from '../src/fake-reader.js';
@@ -99,7 +99,7 @@ describe('report aggregation', () => {
   it('uses incorrect samples as the flagged denominator, lists silent ids and separates overlapping groups', () => {
     const base: EvaluationRow = { id: 'ok', meta: { source: 'printed', capture: 'straight', blurred: false, synthetic: true, notes: '', questionFormat: 'tu_luan' },
       usage: { engine: 'fake', passes: 2, latencyMs: 4 }, nodeLatencyMs: 10, issueCodes: [],
-      comparison: { completeCorrect: true, graphCorrect: true, fullyFlagged: true, silentError: false, graphSilentError: false,
+      comparison: { graphMetrics: compareGraphMetrics({ directed: false, vertices: [], edges: [] }, { directed: false, vertices: [], edges: [] }), completeCorrect: true, graphCorrect: true, fullyFlagged: true, silentError: false, graphSilentError: false,
         coverage: { precise: 0, coarse: 0, none: 0 }, extraFlags: 1, differences: [], errorCounts: {} } };
     const flagged: EvaluationRow = { ...structuredClone(base), id: 'blocked', meta: { ...base.meta, capture: 'tilted', blurred: true }, nodeLatencyMs: 20,
       comparison: { ...base.comparison!, completeCorrect: false, fullyFlagged: true, coverage: { precise: 1, coarse: 1, none: 0 } } };

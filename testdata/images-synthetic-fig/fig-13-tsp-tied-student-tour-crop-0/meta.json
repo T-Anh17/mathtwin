@@ -1,0 +1,48 @@
+{
+  "source": "synthetic_handwriting",
+  "capture": "tilted",
+  "blurred": false,
+  "questionFormat": "tu_luan",
+  "notes": "Hình vẽ tay tổng hợp bằng code và font OFL, không phải ảnh thật.",
+  "synthetic": true,
+  "coreFixture": "13-tsp-tied-student-tour",
+  "originalGraph": "af99dff3f684a4ccbb96455c49ac36f90f8ded07b1f5f72fa5d12fc77da3d83d",
+  "split": "test",
+  "form": "crop",
+  "parameters": {
+    "seed": 210214575,
+    "form": "crop",
+    "paper": "white",
+    "pen": "#183f8b",
+    "strokeWidth": 2.512067237170413,
+    "rotation": 3.571974489837885,
+    "perspective": -0.033852150291204454,
+    "blur": 0,
+    "jpegQuality": 69,
+    "font": "patrick",
+    "curved": true,
+    "crossingDots": false,
+    "endpoint": "touch"
+  },
+  "variants": [
+    "white",
+    "touch",
+    "curved",
+    "label-only",
+    "open",
+    "double",
+    "dot",
+    "near-other-label",
+    "crossing",
+    "crossing-no-dot",
+    "crop"
+  ],
+  "hasSolution": false,
+  "figureHashes": {
+    "1.jpg": "55710730303e3a9abbf022d9887c3a6017a41d3080d7d14e68faf89daaa91a6d",
+    "truth.json": "dbf35fb1c4587ebd100707b2882a1837d874fb1f9ef7552de0e47eefa2339d92",
+    "figure.json": "77c3c5d548e971691ed1c20addb32075ee2c0ec59137c1f2ca19dd31bb0a4c60",
+    "lines.json": "8e137d412c32503c5775f26c88543984d0029845e655c35e66fe7c1af670b593",
+    "source.svg": "d7e6378a028c8c12025e65bb71de55041ead3b0ac834546bd769805cd997cf29"
+  }
+}

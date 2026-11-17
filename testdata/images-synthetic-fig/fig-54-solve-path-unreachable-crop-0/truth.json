@@ -1,0 +1,30 @@
+{
+  "graph": {
+    "directed": false,
+    "vertices": [
+      {
+        "id": "A",
+        "label": "A"
+      },
+      {
+        "id": "B",
+        "label": "B"
+      },
+      {
+        "id": "C",
+        "label": "C"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1",
+        "u": "A",
+        "v": "B"
+      }
+    ]
+  },
+  "task": {
+    "type": "elements"
+  },
+  "questionFormat": "tu_luan"
+}
