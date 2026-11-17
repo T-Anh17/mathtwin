@@ -1,0 +1,21 @@
+{
+  "claims": [
+    {
+      "step": 1,
+      "type": "connected",
+      "raw": "Đồ thị không liên thông.",
+      "value": false
+    }
+  ],
+  "lineOf": {
+    "1": [
+      0
+    ]
+  },
+  "prose": [],
+  "expected": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

@@ -29,8 +29,7 @@ export function wording(claim: ClaimBody, spec: ProblemSpec, family: WordingFami
     case 'euler_exists': return family.conclusion(`${claim.value ? 'Có' : 'Không có'} ${claim.kind === 'circuit' ? 'chu trình' : 'đường đi'} Euler`);
     case 'hamilton_exists': return family.conclusion(`${claim.value ? 'Có' : 'Không có'} ${claim.kind === 'cycle' ? 'chu trình' : 'đường đi'} Hamilton${claim.reason ? ` (lý do: ${{ dirac: 'Dirac', ore: 'Ore', degree1: 'đỉnh bậc 1', forced_edges: 'cạnh bắt buộc', found: 'đã tìm thấy' }[claim.reason]})` : ''}`);
     case 'theorem': return family.conclusion(`${claim.holds ? 'Thỏa' : 'Không thỏa'} điều kiện ${claim.name === 'dirac' ? 'Dirac' : 'Ore'}`);
-    case 'walk': return family.list(({ path: 'đường đi', euler_path: 'Đường đi Euler', euler_circuit: 'Chu trình Euler', hamilton_path: 'Đường đi Hamilton', hamilton_cycle: 'Chu trình Hamilton', tsp_tour: 'Chu trình người du lịch', postman_tour: 'Hành trình người đưa thư' })[claim.kind], walk(claim.vertices))
-      + (claim.edgeIds ? ` Các cạnh theo thứ tự: ${claim.edgeIds.join(', ')}.` : '');
+    case 'walk': return family.list(({ path: 'đường đi', euler_path: 'Đường đi Euler', euler_circuit: 'Chu trình Euler', hamilton_path: 'Đường đi Hamilton', hamilton_cycle: 'Chu trình Hamilton', tsp_tour: 'Chu trình người du lịch', postman_tour: 'Hành trình người đưa thư' })[claim.kind], walk(claim.vertices)); // Use visible endpoints, not internal edge identifiers.
     case 'length': return count('Độ dài', claim.value);
     case 'shortest_length': return family.conclusion(`d(${label(claim.from)}, ${label(claim.to)}) = ${claim.value}`);
     case 'dijkstra_init': return family.conclusion(`Gán nhãn ${label(claim.source)} = 0, các đỉnh khác ∞`);
@@ -89,5 +88,10 @@ export function renderClaims(claims: Claim[], spec: ProblemSpec, family: Wording
       i = row.end;
     } else lineOf[String(claim.step)] = [add(wording(claim, spec, effective), 'solution')];
   }
-  return { lines, lineOf, tableFallback, claims: claims.map((claim) => ({ ...claim, raw: lineOf[String(claim.step)]!.map((i) => lines[i]!.text).join('\n') })) };
+  return { lines, lineOf, tableFallback, claims: claims.map((claim) => {
+    // This renderer writes only endpoints. Truth must describe that same evidence.
+    const body = { ...claim };
+    if (body.type === 'walk') delete body.edgeIds;
+    return { ...body, raw: lineOf[String(claim.step)]!.map((i) => lines[i]!.text).join('\n') };
+  }) };
 }

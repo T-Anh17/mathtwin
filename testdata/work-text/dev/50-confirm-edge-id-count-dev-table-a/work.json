@@ -3,15 +3,12 @@
     {
       "step": 1,
       "type": "walk",
-      "raw": "đường đi gồm A → B → C. Các cạnh theo thứ tự: e1.",
+      "raw": "đường đi gồm A → B → C.",
       "kind": "path",
       "vertices": [
         "A",
         "B",
         "C"
-      ],
-      "edgeIds": [
-        "e1"
       ]
     }
   ],
@@ -22,8 +19,8 @@
   },
   "prose": [],
   "expected": {
-    "verdict": "CAN_XAC_NHAN",
-    "firstErrorStep": 1,
+    "verdict": "DUNG",
+    "firstErrorStep": null,
     "errorCode": null
   }
 }

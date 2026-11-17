@@ -1,0 +1,30 @@
+{
+  "claims": [
+    {
+      "step": 1,
+      "type": "dijkstra_select",
+      "raw": "Khoanh tròn A.",
+      "v": "A"
+    },
+    {
+      "step": 2,
+      "type": "dijkstra_select",
+      "raw": "Khoanh tròn D.",
+      "v": "D"
+    }
+  ],
+  "lineOf": {
+    "1": [
+      0
+    ],
+    "2": [
+      1
+    ]
+  },
+  "prose": [],
+  "expected": {
+    "verdict": "SAI",
+    "firstErrorStep": 2,
+    "errorCode": "SAI_LUA_CHON"
+  }
+}

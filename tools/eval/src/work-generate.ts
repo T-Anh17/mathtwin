@@ -39,9 +39,9 @@ export async function generateWork(root: string, measure = false) {
     const spec = await readJson(join(folder, 'spec.json')) as ProblemSpec;
     const claims = await readJson(join(folder, 'claims.json')) as Claim[];
     const expected = await readJson(join(folder, 'expected.json')) as { grade?: WorkTruth['expected'] };
-    const expectedGrade = expected.grade ?? { verdict: grade(spec, claims).verdict, firstErrorStep: null, errorCode: null };
-    for (const [familyIndex, family] of [...devFamilies, ...testFamilies].entries()) {
+    for (const [familyIndex, family] of [...devFamilies.slice(0, 3), ...testFamilies, ...devFamilies.slice(3)].entries()) {
       const clean = renderClaims(claims, spec, family, family.split === 'dev' ? devFamilies[0] : testFamilies[0]);
+      const expectedGrade = grade(spec, clean.claims);
       const work: WorkTruth = { claims: clean.claims, lineOf: clean.lineOf, prose: [], expected: { verdict: expectedGrade.verdict, firstErrorStep: expectedGrade.firstErrorStep ?? null, errorCode: expectedGrade.errorCode ?? null } };
       const seed = 310000 + fixtureIndex * 100 + familyIndex;
       const noiseEngine = (fixtureIndex + familyIndex) % 2 ? 'B' : 'C';

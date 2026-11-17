@@ -1,0 +1,26 @@
+{
+  "claims": [
+    {
+      "step": 1,
+      "type": "walk",
+      "raw": "A → B → C là đường đi euler.",
+      "kind": "euler_path",
+      "vertices": [
+        "A",
+        "B",
+        "C"
+      ]
+    }
+  ],
+  "lineOf": {
+    "1": [
+      0
+    ]
+  },
+  "prose": [],
+  "expected": {
+    "verdict": "SAI",
+    "firstErrorStep": 1,
+    "errorCode": "HIEU_SAI_DE"
+  }
+}

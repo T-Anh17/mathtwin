@@ -1,0 +1,25 @@
+{
+  "claims": [
+    {
+      "step": 1,
+      "type": "walk",
+      "raw": "đường đi là A → C.",
+      "kind": "path",
+      "vertices": [
+        "A",
+        "C"
+      ]
+    }
+  ],
+  "lineOf": {
+    "1": [
+      0
+    ]
+  },
+  "prose": [],
+  "expected": {
+    "verdict": "SAI",
+    "firstErrorStep": 1,
+    "errorCode": "CANH_KHONG_TON_TAI"
+  }
+}

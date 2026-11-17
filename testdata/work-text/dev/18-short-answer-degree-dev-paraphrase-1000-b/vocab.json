@@ -1,0 +1,12 @@
+{
+  "vertexLabels": [
+    "A",
+    "B",
+    "C"
+  ],
+  "edgeNames": [],
+  "task": "degree",
+  "questionFormat": "tra_loi_ngan",
+  "statementIds": [],
+  "questionText": []
+}

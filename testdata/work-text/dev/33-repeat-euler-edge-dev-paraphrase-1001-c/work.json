@@ -1,0 +1,26 @@
+{
+  "claims": [
+    {
+      "step": 1,
+      "type": "walk",
+      "raw": "Em nhận thấy A → B → A là đường đi euler.",
+      "kind": "euler_path",
+      "vertices": [
+        "A",
+        "B",
+        "A"
+      ]
+    }
+  ],
+  "lineOf": {
+    "1": [
+      0
+    ]
+  },
+  "prose": [],
+  "expected": {
+    "verdict": "SAI",
+    "firstErrorStep": 1,
+    "errorCode": "LAP"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "claims": [],
+  "lineOf": {},
+  "prose": [],
+  "expected": {
+    "verdict": "KHONG_DU_CAN_CU",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

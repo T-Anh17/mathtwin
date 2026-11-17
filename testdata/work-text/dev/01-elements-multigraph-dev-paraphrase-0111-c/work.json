@@ -1,0 +1,30 @@
+{
+  "claims": [
+    {
+      "step": 1,
+      "type": "vertex_count",
+      "raw": "3 bằng số lượng đỉnh.",
+      "value": 3
+    },
+    {
+      "step": 2,
+      "type": "edge_count",
+      "raw": "3 bằng số lượng cạnh.",
+      "value": 3
+    }
+  ],
+  "lineOf": {
+    "1": [
+      0
+    ],
+    "2": [
+      1
+    ]
+  },
+  "prose": [],
+  "expected": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

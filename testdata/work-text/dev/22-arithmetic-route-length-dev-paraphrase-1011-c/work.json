@@ -1,0 +1,35 @@
+{
+  "claims": [
+    {
+      "step": 1,
+      "type": "edge_count",
+      "raw": "Em nhận thấy 2 bằng số cạnh.",
+      "value": 2
+    },
+    {
+      "step": 2,
+      "type": "length",
+      "raw": "Em nhận thấy 4 bằng độ dài.",
+      "vertices": [
+        "A",
+        "B",
+        "C"
+      ],
+      "value": 4
+    }
+  ],
+  "lineOf": {
+    "1": [
+      0
+    ],
+    "2": [
+      1
+    ]
+  },
+  "prose": [],
+  "expected": {
+    "verdict": "SAI",
+    "firstErrorStep": 2,
+    "errorCode": "SAI_PHEP_TINH"
+  }
+}

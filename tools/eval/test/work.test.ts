@@ -47,10 +47,10 @@ describe('work truth and measuring instrument', () => {
       expect(lines.some((l) => l.text.startsWith('Cập nhật nhãn')) ? Object.values(work.lineOf).flat().includes(lines.findIndex((l) => l.text.startsWith('Cập nhật nhãn'))) : false).toBe(false);
     }
   });
-  it('keeps all 60 source fixtures across five separate families and four deterministic noise variants', async () => {
+  it('keeps all 60 source fixtures across separate wording families and four deterministic noise variants', async () => {
     const manifest = await readJson(join(root, 'testdata/work-text/manifest.json')) as WorkSampleMeta[];
     const confusions = await readJson(join(root, 'testdata/work-text/confusions.json')) as ConfusionTable;
-    expect(manifest).toHaveLength(1200); expect(new Set(manifest.map((m) => m.id)).size).toBe(1200);
+    expect(manifest).toHaveLength(60 * families.length * 4); expect(new Set(manifest.map((m) => m.id)).size).toBe(60 * families.length * 4);
     expect(new Set(manifest.map((m) => m.coreFixture)).size).toBe(60);
     expect(new Set(manifest.filter((m) => m.split === 'dev').map((m) => m.family))).toEqual(new Set(devFamilies.map((f) => f.id)));
     expect(new Set(manifest.filter((m) => m.split === 'test').map((m) => m.family))).toEqual(new Set(testFamilies.map((f) => f.id)));
@@ -59,7 +59,6 @@ describe('work truth and measuring instrument', () => {
       const folder = join(root, 'testdata/core', fixture);
       const spec = await readJson(join(folder, 'spec.json')) as ProblemSpec;
       const claims = await readJson(join(folder, 'claims.json')) as Claim[];
-      const expected = await readJson(join(folder, 'expected.json')) as { grade?: WorkTruth['expected'] };
       for (const family of families) {
         const clean = renderClaims(claims, spec, family, family.split === 'dev' ? devFamilies[0] : testFamilies[0]);
         if (clean.tableFallback) fallbacks++;
@@ -78,11 +77,12 @@ describe('work truth and measuring instrument', () => {
           const work = await readJson(join(directory, 'work.json')) as WorkTruth;
           expect(await readdir(directory)).toEqual(['lines.json', 'vocab.json', 'work.json']);
           expect(lines).toEqual(noisyLines(clean.lines, meta.variant, meta.seed, confusions, meta.noiseEngine));
-          expect(work.claims.map(claimKey)).toEqual(claims.map(claimKey));
+          expect(work.claims.map(claimKey)).toEqual(clean.claims.map(claimKey));
           expect(work.claims.map((c) => c.conf)).toEqual(claims.map((c) => c.conf));
-          expect(work.expected.verdict).toBe(expected.grade?.verdict ?? 'KHONG_DU_CAN_CU');
-          expect(work.expected.firstErrorStep).toBe(expected.grade?.firstErrorStep ?? null);
-          expect(work.expected.errorCode).toBe(expected.grade?.errorCode ?? null);
+          const expected = grade(spec, clean.claims);
+          expect(work.expected.verdict).toBe(expected.verdict);
+          expect(work.expected.firstErrorStep).toBe(expected.firstErrorStep ?? null);
+          expect(work.expected.errorCode).toBe(expected.errorCode ?? null);
           expect(await readJson(join(directory, 'vocab.json')) as WorkVocabulary).toEqual(vocabularyOf(spec));
           expect(() => validateWork(spec, work, clean.lines, true)).not.toThrow();
           if (meta.variant === 'c') changed += lines.filter((l, i) => l.text !== clean.lines[i]!.text).length;

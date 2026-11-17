@@ -1,0 +1,6719 @@
+{
+  "date": "2026-11-17",
+  "set": "work-text",
+  "source": "truth",
+  "split": "test",
+  "parser": "real",
+  "variant": "b",
+  "fixtureOnly": true,
+  "note": "Parser văn xuôi Lô 3.2; chưa hỗ trợ Dijkstra, nn_step, postman_duplicate, bảng. Chấm trực tiếp bằng core.grade để đo; chưa có gradeWork, readingCheck hay nâng unchecked thành hỏi lại (Lô 3.4). Các chỉ số chấm là chẩn đoán, không phải pipeline an toàn hoàn chỉnh. Chưa đủ căn cứ trên bài thật.",
+  "summary": {
+    "total": 120,
+    "completeCorrect": 77,
+    "claimMatched": 104,
+    "claimPredicted": 104,
+    "claimReference": 214,
+    "sourceCorrect": 104,
+    "sourceMatched": 104,
+    "verdictCorrect": 57,
+    "verdictComparable": 89,
+    "confirmations": 31,
+    "firstErrorCorrect": 1,
+    "firstErrorReference": 54,
+    "silentFalseCorrect": 1,
+    "silentFalseWrongParse": 0,
+    "silentFalseWrongReading": 0,
+    "proseAsUnchecked": 0,
+    "silentFalseCorrectWithUnchecked": 1,
+    "silentFalseCorrectWithoutUnchecked": 0,
+    "silentFalseWrongParseWithPriorUnchecked": 0,
+    "silentFalseWrongParseWithoutPriorUnchecked": 0,
+    "insufficientReasons": {
+      "unparsed_line": 17,
+      "no_solution_lines": 36
+    },
+    "struckAsContent": 0,
+    "insufficient": 54,
+    "questionsMean": 0,
+    "questionsMax": 0,
+    "completeRate": 0.6416666666666667,
+    "claimPrecision": 1,
+    "claimRecall": 0.48598130841121495,
+    "sourceLineAccuracy": 1,
+    "verdictAccuracy": 0.6404494382022472,
+    "firstErrorAccuracy": 0.018518518518518517,
+    "insufficientRate": 0.45
+  },
+  "proseOnly": {
+    "total": 90,
+    "completeCorrect": 77,
+    "claimMatched": 97,
+    "claimPredicted": 97,
+    "claimReference": 114,
+    "sourceCorrect": 97,
+    "sourceMatched": 97,
+    "verdictCorrect": 52,
+    "verdictComparable": 59,
+    "confirmations": 31,
+    "firstErrorCorrect": 1,
+    "firstErrorReference": 34,
+    "silentFalseCorrect": 1,
+    "silentFalseWrongParse": 0,
+    "silentFalseWrongReading": 0,
+    "proseAsUnchecked": 0,
+    "silentFalseCorrectWithUnchecked": 1,
+    "silentFalseCorrectWithoutUnchecked": 0,
+    "silentFalseWrongParseWithPriorUnchecked": 0,
+    "silentFalseWrongParseWithoutPriorUnchecked": 0,
+    "insufficientReasons": {
+      "unparsed_line": 5,
+      "no_solution_lines": 24
+    },
+    "struckAsContent": 0,
+    "insufficient": 29,
+    "questionsMean": 0,
+    "questionsMax": 0,
+    "completeRate": 0.8555555555555555,
+    "claimPrecision": 1,
+    "claimRecall": 0.8508771929824561,
+    "sourceLineAccuracy": 1,
+    "verdictAccuracy": 0.8813559322033898,
+    "firstErrorAccuracy": 0.029411764705882353,
+    "insufficientRate": 0.32222222222222224
+  },
+  "groups": {
+    "test-student": {
+      "total": 60,
+      "completeCorrect": 44,
+      "claimMatched": 61,
+      "claimPredicted": 61,
+      "claimReference": 107,
+      "sourceCorrect": 61,
+      "sourceMatched": 61,
+      "verdictCorrect": 30,
+      "verdictComparable": 43,
+      "confirmations": 17,
+      "firstErrorCorrect": 0,
+      "firstErrorReference": 27,
+      "silentFalseCorrect": 1,
+      "silentFalseWrongParse": 0,
+      "silentFalseWrongReading": 0,
+      "proseAsUnchecked": 0,
+      "silentFalseCorrectWithUnchecked": 1,
+      "silentFalseCorrectWithoutUnchecked": 0,
+      "silentFalseWrongParseWithPriorUnchecked": 0,
+      "silentFalseWrongParseWithoutPriorUnchecked": 0,
+      "insufficientReasons": {
+        "no_solution_lines": 18,
+        "unparsed_line": 5
+      },
+      "struckAsContent": 0,
+      "insufficient": 24,
+      "questionsMean": 0,
+      "questionsMax": 0,
+      "completeRate": 0.7333333333333333,
+      "claimPrecision": 1,
+      "claimRecall": 0.5700934579439252,
+      "sourceLineAccuracy": 1,
+      "verdictAccuracy": 0.6976744186046512,
+      "firstErrorAccuracy": 0,
+      "insufficientRate": 0.4
+    },
+    "test-notes": {
+      "total": 60,
+      "completeCorrect": 33,
+      "claimMatched": 43,
+      "claimPredicted": 43,
+      "claimReference": 107,
+      "sourceCorrect": 43,
+      "sourceMatched": 43,
+      "verdictCorrect": 27,
+      "verdictComparable": 46,
+      "confirmations": 14,
+      "firstErrorCorrect": 1,
+      "firstErrorReference": 27,
+      "silentFalseCorrect": 0,
+      "silentFalseWrongParse": 0,
+      "silentFalseWrongReading": 0,
+      "proseAsUnchecked": 0,
+      "silentFalseCorrectWithUnchecked": 0,
+      "silentFalseCorrectWithoutUnchecked": 0,
+      "silentFalseWrongParseWithPriorUnchecked": 0,
+      "silentFalseWrongParseWithoutPriorUnchecked": 0,
+      "insufficientReasons": {
+        "unparsed_line": 12,
+        "no_solution_lines": 18
+      },
+      "struckAsContent": 0,
+      "insufficient": 30,
+      "questionsMean": 0,
+      "questionsMax": 0,
+      "completeRate": 0.55,
+      "claimPrecision": 1,
+      "claimRecall": 0.40186915887850466,
+      "sourceLineAccuracy": 1,
+      "verdictAccuracy": 0.5869565217391305,
+      "firstErrorAccuracy": 0.037037037037037035,
+      "insufficientRate": 0.5
+    }
+  },
+  "variants": {
+    "b": {
+      "total": 120,
+      "completeCorrect": 77,
+      "claimMatched": 104,
+      "claimPredicted": 104,
+      "claimReference": 214,
+      "sourceCorrect": 104,
+      "sourceMatched": 104,
+      "verdictCorrect": 57,
+      "verdictComparable": 89,
+      "confirmations": 31,
+      "firstErrorCorrect": 1,
+      "firstErrorReference": 54,
+      "silentFalseCorrect": 1,
+      "silentFalseWrongParse": 0,
+      "silentFalseWrongReading": 0,
+      "proseAsUnchecked": 0,
+      "silentFalseCorrectWithUnchecked": 1,
+      "silentFalseCorrectWithoutUnchecked": 0,
+      "silentFalseWrongParseWithPriorUnchecked": 0,
+      "silentFalseWrongParseWithoutPriorUnchecked": 0,
+      "insufficientReasons": {
+        "unparsed_line": 17,
+        "no_solution_lines": 36
+      },
+      "struckAsContent": 0,
+      "insufficient": 54,
+      "questionsMean": 0,
+      "questionsMax": 0,
+      "completeRate": 0.6416666666666667,
+      "claimPrecision": 1,
+      "claimRecall": 0.48598130841121495,
+      "sourceLineAccuracy": 1,
+      "verdictAccuracy": 0.6404494382022472,
+      "firstErrorAccuracy": 0.018518518518518517,
+      "insufficientRate": 0.45
+    }
+  },
+  "silentErrors": [
+    {
+      "id": "22-arithmetic-route-length-test-student-b",
+      "type": "i",
+      "firstErrorLines": [],
+      "expectedErrorLines": [
+        1
+      ],
+      "unchecked": [
+        1
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "id": "01-elements-multigraph-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 2,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 2,
+          "predicted": 2,
+          "reference": 2,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 2,
+          "matched": 2,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "vertex_count",
+        "edge_count"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "01-elements-multigraph-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 2,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 2,
+          "precision": 0,
+          "recall": 0
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 0
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "unparsed_line",
+          "unparsed_line"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [
+        0,
+        1
+      ],
+      "issues": [
+        {
+          "code": "unparsed_line",
+          "lines": [
+            0
+          ]
+        },
+        {
+          "code": "unparsed_line",
+          "lines": [
+            1
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "02-elements-isolated-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 4,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 4,
+          "predicted": 4,
+          "reference": 4,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 4,
+          "matched": 4,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "vertex_count",
+        "edge_count",
+        "degree",
+        "connected"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "02-elements-isolated-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 4,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 2,
+          "predicted": 2,
+          "reference": 4,
+          "precision": 1,
+          "recall": 0.5
+        },
+        "sourceLines": {
+          "correct": 2,
+          "matched": 2,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "degree",
+        "connected"
+      ],
+      "unchecked": [
+        0,
+        1
+      ],
+      "issues": [
+        {
+          "code": "unparsed_line",
+          "lines": [
+            0
+          ]
+        },
+        {
+          "code": "unparsed_line",
+          "lines": [
+            1
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "03-degree-two-loops-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 4,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 4,
+          "predicted": 4,
+          "reference": 4,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 4,
+          "matched": 4,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "degree",
+        "degree",
+        "degree_sum",
+        "odd_vertices"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "03-degree-two-loops-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 4,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 3,
+          "predicted": 3,
+          "reference": 4,
+          "precision": 1,
+          "recall": 0.75
+        },
+        "sourceLines": {
+          "correct": 3,
+          "matched": 3,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "degree",
+        "degree",
+        "odd_vertices"
+      ],
+      "unchecked": [
+        2
+      ],
+      "issues": [
+        {
+          "code": "unparsed_line",
+          "lines": [
+            2
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "04-degree-sequence-simple-impossible-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 0,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "KHONG_DU_CAN_CU",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "04-degree-sequence-simple-impossible-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 0,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "KHONG_DU_CAN_CU",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "05-degree-sequence-multigraph-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 0,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "KHONG_DU_CAN_CU",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "05-degree-sequence-multigraph-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 0,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "KHONG_DU_CAN_CU",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "06-path-alternative-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "06-path-alternative-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "07-connectivity-components-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "connected"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "07-connectivity-components-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "connected"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "08-euler-reverse-circuit-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "08-euler-reverse-circuit-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "09-euler-loop-parallel-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 3,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 3,
+          "predicted": 3,
+          "reference": 3,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 3,
+          "matched": 3,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "degree",
+        "degree",
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "09-euler-loop-parallel-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 3,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 3,
+          "predicted": 3,
+          "reference": 3,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 3,
+          "matched": 3,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "degree",
+        "degree",
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "10-hamilton-reverse-cycle-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "10-hamilton-reverse-cycle-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "11-hamilton-line-path-only-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 3,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 3,
+          "predicted": 3,
+          "reference": 3,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 3,
+          "matched": 3,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "hamilton_exists",
+        "hamilton_exists",
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "11-hamilton-line-path-only-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 3,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 3,
+          "predicted": 3,
+          "reference": 3,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 3,
+          "matched": 3,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "hamilton_exists",
+        "hamilton_exists",
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "12-dijkstra-tied-order-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 6,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 6,
+          "precision": 1,
+          "recall": 0.16666666666666666
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "final_answer"
+      ],
+      "unchecked": [
+        2
+      ],
+      "issues": [
+        {
+          "code": "unparsed_line",
+          "lines": [
+            2
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "12-dijkstra-tied-order-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 6,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 6,
+          "precision": 1,
+          "recall": 0.16666666666666666
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "final_answer"
+      ],
+      "unchecked": [
+        2
+      ],
+      "issues": [
+        {
+          "code": "unparsed_line",
+          "lines": [
+            2
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "13-tsp-tied-student-tour-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 5,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 5,
+          "precision": 1,
+          "recall": 0.2
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "final_answer"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "13-tsp-tied-student-tour-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 5,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 5,
+          "precision": 0,
+          "recall": 0
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 0
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "unparsed_line"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [
+        4
+      ],
+      "issues": [
+        {
+          "code": "unparsed_line",
+          "lines": [
+            4
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "14-postman-alternative-matching-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 3,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 3,
+          "precision": 1,
+          "recall": 0.3333333333333333
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "final_answer"
+      ],
+      "unchecked": [
+        0,
+        1
+      ],
+      "issues": [
+        {
+          "code": "unparsed_line",
+          "lines": [
+            0
+          ]
+        },
+        {
+          "code": "unparsed_line",
+          "lines": [
+            1
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "14-postman-alternative-matching-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 3,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 3,
+          "precision": 0,
+          "recall": 0
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 0
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "unparsed_line",
+          "unparsed_line",
+          "unparsed_line"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [
+        0,
+        1,
+        2
+      ],
+      "issues": [
+        {
+          "code": "unparsed_line",
+          "lines": [
+            0
+          ]
+        },
+        {
+          "code": "unparsed_line",
+          "lines": [
+            1
+          ]
+        },
+        {
+          "code": "unparsed_line",
+          "lines": [
+            2
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "15-postman-even-start-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 3,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 2,
+          "predicted": 2,
+          "reference": 3,
+          "precision": 1,
+          "recall": 0.6666666666666666
+        },
+        "sourceLines": {
+          "correct": 2,
+          "matched": 2,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "walk",
+        "final_answer"
+      ],
+      "unchecked": [
+        0
+      ],
+      "issues": [
+        {
+          "code": "unparsed_line",
+          "lines": [
+            0
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "15-postman-even-start-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 3,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 3,
+          "precision": 1,
+          "recall": 0.3333333333333333
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "walk"
+      ],
+      "unchecked": [
+        0,
+        2
+      ],
+      "issues": [
+        {
+          "code": "unparsed_line",
+          "lines": [
+            0
+          ]
+        },
+        {
+          "code": "unparsed_line",
+          "lines": [
+            2
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "16-postman-all-even-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 2,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 2,
+          "predicted": 2,
+          "reference": 2,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 2,
+          "matched": 2,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "walk",
+        "final_answer"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "16-postman-all-even-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 2,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 2,
+          "precision": 1,
+          "recall": 0.5
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "walk"
+      ],
+      "unchecked": [
+        1
+      ],
+      "issues": [
+        {
+          "code": "unparsed_line",
+          "lines": [
+            1
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "17-answer-only-correct-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "final_answer"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "17-answer-only-correct-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 1,
+          "precision": 0,
+          "recall": 0
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 0
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "unparsed_line"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [
+        0
+      ],
+      "issues": [
+        {
+          "code": "unparsed_line",
+          "lines": [
+            0
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "18-short-answer-degree-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "final_answer"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "18-short-answer-degree-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 1,
+          "precision": 0,
+          "recall": 0
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 0
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "unparsed_line"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [
+        0
+      ],
+      "issues": [
+        {
+          "code": "unparsed_line",
+          "lines": [
+            0
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "19-four-true-false-items-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 4,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 4,
+          "predicted": 4,
+          "reference": 4,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 4,
+          "matched": 4,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "statement",
+        "statement",
+        "statement",
+        "statement"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "19-four-true-false-items-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 4,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 4,
+          "predicted": 4,
+          "reference": 4,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 4,
+          "matched": 4,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "statement",
+        "statement",
+        "statement",
+        "statement"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "20-four-choice-question-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "choice"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "20-four-choice-question-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "choice"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "21-arithmetic-loop-degree-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 3,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 3,
+          "predicted": 3,
+          "reference": 3,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 3,
+          "matched": 3,
+          "accuracy": 1
+        },
+        "verdictCorrect": null,
+        "confirmation": true,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "SAI_PHEP_TINH"
+      },
+      "predictedClaimTypes": [
+        "vertex_count",
+        "degree",
+        "edge_count"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [
+        1
+      ],
+      "expectedErrorLines": [
+        1
+      ],
+      "predictedVerdict": "CAN_XAC_NHAN",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "21-arithmetic-loop-degree-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 3,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 3,
+          "precision": 1,
+          "recall": 0.3333333333333333
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": true,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": false,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "SAI_PHEP_TINH"
+      },
+      "predictedClaimTypes": [
+        "degree"
+      ],
+      "unchecked": [
+        0,
+        2
+      ],
+      "issues": [
+        {
+          "code": "unparsed_line",
+          "lines": [
+            0
+          ]
+        },
+        {
+          "code": "unparsed_line",
+          "lines": [
+            2
+          ]
+        }
+      ],
+      "firstErrorLines": [
+        1
+      ],
+      "expectedErrorLines": [
+        1
+      ],
+      "predictedVerdict": "SAI",
+      "predictedErrorCode": "SAI_PHEP_TINH",
+      "deferredTruth": false
+    },
+    {
+      "id": "22-arithmetic-route-length-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 2,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 2,
+          "precision": 1,
+          "recall": 0.5
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": true,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "SAI_PHEP_TINH"
+      },
+      "predictedClaimTypes": [
+        "edge_count"
+      ],
+      "unchecked": [
+        1
+      ],
+      "issues": [
+        {
+          "code": "unparsed_line",
+          "lines": [
+            1
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [
+        1
+      ],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "22-arithmetic-route-length-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 2,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 2,
+          "precision": 0,
+          "recall": 0
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 0
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "unparsed_line",
+          "unparsed_line"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "SAI_PHEP_TINH"
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [
+        0,
+        1
+      ],
+      "issues": [
+        {
+          "code": "unparsed_line",
+          "lines": [
+            0
+          ]
+        },
+        {
+          "code": "unparsed_line",
+          "lines": [
+            1
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [
+        1
+      ],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "23-arithmetic-dijkstra-addition-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 3,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 3,
+          "precision": 0,
+          "recall": 0
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 0
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "unparsed_line"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 3,
+        "errorCode": "SAI_PHEP_TINH"
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [
+        2
+      ],
+      "issues": [
+        {
+          "code": "unparsed_line",
+          "lines": [
+            2
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [
+        2
+      ],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "23-arithmetic-dijkstra-addition-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 3,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 3,
+          "precision": 0,
+          "recall": 0
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 0
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "unparsed_line"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 3,
+        "errorCode": "SAI_PHEP_TINH"
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [
+        2
+      ],
+      "issues": [
+        {
+          "code": "unparsed_line",
+          "lines": [
+            2
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [
+        2
+      ],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "24-condition-dirac-not-necessary-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 2,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 2,
+          "predicted": 2,
+          "reference": 2,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 2,
+          "matched": 2,
+          "accuracy": 1
+        },
+        "verdictCorrect": null,
+        "confirmation": true,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "SAI_DIEU_KIEN"
+      },
+      "predictedClaimTypes": [
+        "theorem",
+        "hamilton_exists"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [
+        1
+      ],
+      "expectedErrorLines": [
+        1
+      ],
+      "predictedVerdict": "CAN_XAC_NHAN",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "24-condition-dirac-not-necessary-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 2,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 2,
+          "predicted": 2,
+          "reference": 2,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 2,
+          "matched": 2,
+          "accuracy": 1
+        },
+        "verdictCorrect": null,
+        "confirmation": true,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "SAI_DIEU_KIEN"
+      },
+      "predictedClaimTypes": [
+        "theorem",
+        "hamilton_exists"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [
+        1
+      ],
+      "expectedErrorLines": [
+        1
+      ],
+      "predictedVerdict": "CAN_XAC_NHAN",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "25-condition-ore-assumption-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": null,
+        "confirmation": true,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 1,
+        "errorCode": "SAI_DIEU_KIEN"
+      },
+      "predictedClaimTypes": [
+        "theorem"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [
+        0
+      ],
+      "expectedErrorLines": [
+        0
+      ],
+      "predictedVerdict": "CAN_XAC_NHAN",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "25-condition-ore-assumption-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": null,
+        "confirmation": true,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 1,
+        "errorCode": "SAI_DIEU_KIEN"
+      },
+      "predictedClaimTypes": [
+        "theorem"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [
+        0
+      ],
+      "expectedErrorLines": [
+        0
+      ],
+      "predictedVerdict": "CAN_XAC_NHAN",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "26-condition-euler-disconnected-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 2,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 2,
+          "predicted": 2,
+          "reference": 2,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 2,
+          "matched": 2,
+          "accuracy": 1
+        },
+        "verdictCorrect": null,
+        "confirmation": true,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "SAI_DIEU_KIEN"
+      },
+      "predictedClaimTypes": [
+        "connected",
+        "euler_exists"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [
+        1
+      ],
+      "expectedErrorLines": [
+        1
+      ],
+      "predictedVerdict": "CAN_XAC_NHAN",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "26-condition-euler-disconnected-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 2,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 2,
+          "predicted": 2,
+          "reference": 2,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 2,
+          "matched": 2,
+          "accuracy": 1
+        },
+        "verdictCorrect": null,
+        "confirmation": true,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "SAI_DIEU_KIEN"
+      },
+      "predictedClaimTypes": [
+        "connected",
+        "euler_exists"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [
+        1
+      ],
+      "expectedErrorLines": [
+        1
+      ],
+      "predictedVerdict": "CAN_XAC_NHAN",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "27-omission-euler-edges-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": null,
+        "confirmation": true,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 1,
+        "errorCode": "BO_SOT"
+      },
+      "predictedClaimTypes": [
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [
+        0
+      ],
+      "expectedErrorLines": [
+        0
+      ],
+      "predictedVerdict": "CAN_XAC_NHAN",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "27-omission-euler-edges-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": null,
+        "confirmation": true,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 1,
+        "errorCode": "BO_SOT"
+      },
+      "predictedClaimTypes": [
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [
+        0
+      ],
+      "expectedErrorLines": [
+        0
+      ],
+      "predictedVerdict": "CAN_XAC_NHAN",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "28-omission-hamilton-vertex-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 2,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 2,
+          "predicted": 2,
+          "reference": 2,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 2,
+          "matched": 2,
+          "accuracy": 1
+        },
+        "verdictCorrect": null,
+        "confirmation": true,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "BO_SOT"
+      },
+      "predictedClaimTypes": [
+        "vertex_count",
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [
+        1
+      ],
+      "expectedErrorLines": [
+        1
+      ],
+      "predictedVerdict": "CAN_XAC_NHAN",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "28-omission-hamilton-vertex-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 2,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 2,
+          "precision": 1,
+          "recall": 0.5
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": null,
+        "confirmation": true,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "BO_SOT"
+      },
+      "predictedClaimTypes": [
+        "walk"
+      ],
+      "unchecked": [
+        0
+      ],
+      "issues": [
+        {
+          "code": "unparsed_line",
+          "lines": [
+            0
+          ]
+        }
+      ],
+      "firstErrorLines": [
+        1
+      ],
+      "expectedErrorLines": [
+        1
+      ],
+      "predictedVerdict": "CAN_XAC_NHAN",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "29-omission-dijkstra-label-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 3,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 3,
+          "precision": 0,
+          "recall": 0
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 0
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "unparsed_line"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 3,
+        "errorCode": "BO_SOT"
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [
+        1
+      ],
+      "issues": [
+        {
+          "code": "unparsed_line",
+          "lines": [
+            1
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [
+        2
+      ],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "29-omission-dijkstra-label-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 3,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 3,
+          "precision": 0,
+          "recall": 0
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 0
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "unparsed_line"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 3,
+        "errorCode": "BO_SOT"
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [
+        1
+      ],
+      "issues": [
+        {
+          "code": "unparsed_line",
+          "lines": [
+            1
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [
+        2
+      ],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "30-missing-edge-path-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": null,
+        "confirmation": true,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 1,
+        "errorCode": "CANH_KHONG_TON_TAI"
+      },
+      "predictedClaimTypes": [
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [
+        0
+      ],
+      "expectedErrorLines": [
+        0
+      ],
+      "predictedVerdict": "CAN_XAC_NHAN",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "30-missing-edge-path-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": null,
+        "confirmation": true,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 1,
+        "errorCode": "CANH_KHONG_TON_TAI"
+      },
+      "predictedClaimTypes": [
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [
+        0
+      ],
+      "expectedErrorLines": [
+        0
+      ],
+      "predictedVerdict": "CAN_XAC_NHAN",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "31-missing-edge-euler-diagonal-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 2,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 2,
+          "predicted": 2,
+          "reference": 2,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 2,
+          "matched": 2,
+          "accuracy": 1
+        },
+        "verdictCorrect": null,
+        "confirmation": true,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "CANH_KHONG_TON_TAI"
+      },
+      "predictedClaimTypes": [
+        "edge_count",
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [
+        1
+      ],
+      "expectedErrorLines": [
+        1
+      ],
+      "predictedVerdict": "CAN_XAC_NHAN",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "31-missing-edge-euler-diagonal-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 2,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 2,
+          "precision": 1,
+          "recall": 0.5
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": null,
+        "confirmation": true,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "CANH_KHONG_TON_TAI"
+      },
+      "predictedClaimTypes": [
+        "walk"
+      ],
+      "unchecked": [
+        0
+      ],
+      "issues": [
+        {
+          "code": "unparsed_line",
+          "lines": [
+            0
+          ]
+        }
+      ],
+      "firstErrorLines": [
+        1
+      ],
+      "expectedErrorLines": [
+        1
+      ],
+      "predictedVerdict": "CAN_XAC_NHAN",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "32-missing-edge-dijkstra-via-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 2,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 2,
+          "precision": 0,
+          "recall": 0
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 0
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "unparsed_line"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "CANH_KHONG_TON_TAI"
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [
+        1
+      ],
+      "issues": [
+        {
+          "code": "unparsed_line",
+          "lines": [
+            1
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [
+        1
+      ],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "32-missing-edge-dijkstra-via-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 2,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 2,
+          "precision": 0,
+          "recall": 0
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 0
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "unparsed_line"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "CANH_KHONG_TON_TAI"
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [
+        1
+      ],
+      "issues": [
+        {
+          "code": "unparsed_line",
+          "lines": [
+            1
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [
+        1
+      ],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "33-repeat-euler-edge-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": null,
+        "confirmation": true,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 1,
+        "errorCode": "LAP"
+      },
+      "predictedClaimTypes": [
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [
+        0
+      ],
+      "expectedErrorLines": [
+        0
+      ],
+      "predictedVerdict": "CAN_XAC_NHAN",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "33-repeat-euler-edge-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": null,
+        "confirmation": true,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 1,
+        "errorCode": "LAP"
+      },
+      "predictedClaimTypes": [
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [
+        0
+      ],
+      "expectedErrorLines": [
+        0
+      ],
+      "predictedVerdict": "CAN_XAC_NHAN",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "34-repeat-hamilton-vertex-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": null,
+        "confirmation": true,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 1,
+        "errorCode": "LAP"
+      },
+      "predictedClaimTypes": [
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [
+        0
+      ],
+      "expectedErrorLines": [
+        0
+      ],
+      "predictedVerdict": "CAN_XAC_NHAN",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "34-repeat-hamilton-vertex-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": null,
+        "confirmation": true,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 1,
+        "errorCode": "LAP"
+      },
+      "predictedClaimTypes": [
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [
+        0
+      ],
+      "expectedErrorLines": [
+        0
+      ],
+      "predictedVerdict": "CAN_XAC_NHAN",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "35-repeat-postman-odd-endpoint-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 2,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 2,
+          "precision": 0,
+          "recall": 0
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 0
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "unparsed_line",
+          "unparsed_line"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "LAP"
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [
+        0,
+        1
+      ],
+      "issues": [
+        {
+          "code": "unparsed_line",
+          "lines": [
+            0
+          ]
+        },
+        {
+          "code": "unparsed_line",
+          "lines": [
+            1
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [
+        1
+      ],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "35-repeat-postman-odd-endpoint-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 2,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 2,
+          "precision": 0,
+          "recall": 0
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 0
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "unparsed_line",
+          "unparsed_line"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "LAP"
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [
+        0,
+        1
+      ],
+      "issues": [
+        {
+          "code": "unparsed_line",
+          "lines": [
+            0
+          ]
+        },
+        {
+          "code": "unparsed_line",
+          "lines": [
+            1
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [
+        1
+      ],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "36-confusion-prim-and-nearest-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 4,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 4,
+          "precision": 0,
+          "recall": 0
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 0
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 3,
+        "errorCode": "NHAM_THUAT_TOAN"
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [
+        2
+      ],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "36-confusion-prim-and-nearest-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 4,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 4,
+          "precision": 0,
+          "recall": 0
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 0
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 3,
+        "errorCode": "NHAM_THUAT_TOAN"
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [
+        2
+      ],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "37-confusion-prim-only-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 6,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 6,
+          "precision": 0,
+          "recall": 0
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 0
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 3,
+        "errorCode": "NHAM_THUAT_TOAN"
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [
+        2
+      ],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "37-confusion-prim-only-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 6,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 6,
+          "precision": 0,
+          "recall": 0
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 0
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 3,
+        "errorCode": "NHAM_THUAT_TOAN"
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [
+        2
+      ],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "38-confusion-nearest-only-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 5,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 5,
+          "precision": 0,
+          "recall": 0
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 0
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 3,
+        "errorCode": "NHAM_THUAT_TOAN"
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [
+        2
+      ],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "38-confusion-nearest-only-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 5,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 5,
+          "precision": 0,
+          "recall": 0
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 0
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 3,
+        "errorCode": "NHAM_THUAT_TOAN"
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [
+        2
+      ],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "39-choice-nearest-heavy-edge-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 1,
+          "precision": 0,
+          "recall": 0
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 0
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 1,
+        "errorCode": "SAI_LUA_CHON"
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [
+        0
+      ],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "39-choice-nearest-heavy-edge-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 1,
+          "precision": 0,
+          "recall": 0
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 0
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 1,
+        "errorCode": "SAI_LUA_CHON"
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [
+        0
+      ],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "40-choice-settled-vertex-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 2,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 2,
+          "precision": 0,
+          "recall": 0
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 0
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "SAI_LUA_CHON"
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [
+        1
+      ],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "40-choice-settled-vertex-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 2,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 2,
+          "precision": 0,
+          "recall": 0
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 0
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "SAI_LUA_CHON"
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [
+        1
+      ],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "41-choice-unreachable-label-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 2,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 2,
+          "precision": 0,
+          "recall": 0
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 0
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "SAI_LUA_CHON"
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [
+        1
+      ],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "41-choice-unreachable-label-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 2,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 2,
+          "precision": 0,
+          "recall": 0
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 0
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "SAI_LUA_CHON"
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [
+        1
+      ],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "42-conclusion-connectivity-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 2,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 2,
+          "predicted": 2,
+          "reference": 2,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 2,
+          "matched": 2,
+          "accuracy": 1
+        },
+        "verdictCorrect": null,
+        "confirmation": true,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "KET_LUAN_KHONG_SUY_RA"
+      },
+      "predictedClaimTypes": [
+        "vertex_count",
+        "connected"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [
+        1
+      ],
+      "expectedErrorLines": [
+        1
+      ],
+      "predictedVerdict": "CAN_XAC_NHAN",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "42-conclusion-connectivity-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 2,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 2,
+          "precision": 1,
+          "recall": 0.5
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": null,
+        "confirmation": true,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "KET_LUAN_KHONG_SUY_RA"
+      },
+      "predictedClaimTypes": [
+        "connected"
+      ],
+      "unchecked": [
+        0
+      ],
+      "issues": [
+        {
+          "code": "unparsed_line",
+          "lines": [
+            0
+          ]
+        }
+      ],
+      "firstErrorLines": [
+        1
+      ],
+      "expectedErrorLines": [
+        1
+      ],
+      "predictedVerdict": "CAN_XAC_NHAN",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "43-conclusion-nonshortest-traceback-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 2,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 2,
+          "predicted": 2,
+          "reference": 2,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 2,
+          "matched": 2,
+          "accuracy": 1
+        },
+        "verdictCorrect": null,
+        "confirmation": true,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "KET_LUAN_KHONG_SUY_RA"
+      },
+      "predictedClaimTypes": [
+        "shortest_length",
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [
+        1
+      ],
+      "expectedErrorLines": [
+        1
+      ],
+      "predictedVerdict": "CAN_XAC_NHAN",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "43-conclusion-nonshortest-traceback-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 2,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 2,
+          "predicted": 2,
+          "reference": 2,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 2,
+          "matched": 2,
+          "accuracy": 1
+        },
+        "verdictCorrect": null,
+        "confirmation": true,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "KET_LUAN_KHONG_SUY_RA"
+      },
+      "predictedClaimTypes": [
+        "shortest_length",
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [
+        1
+      ],
+      "expectedErrorLines": [
+        1
+      ],
+      "predictedVerdict": "CAN_XAC_NHAN",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "44-conclusion-answer-only-wrong-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": null,
+        "confirmation": true,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 1,
+        "errorCode": "KET_LUAN_KHONG_SUY_RA"
+      },
+      "predictedClaimTypes": [
+        "final_answer"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [
+        0
+      ],
+      "expectedErrorLines": [
+        0
+      ],
+      "predictedVerdict": "CAN_XAC_NHAN",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "44-conclusion-answer-only-wrong-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 1,
+          "precision": 0,
+          "recall": 0
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 0
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "unparsed_line"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 1,
+        "errorCode": "KET_LUAN_KHONG_SUY_RA"
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [
+        0
+      ],
+      "issues": [
+        {
+          "code": "unparsed_line",
+          "lines": [
+            0
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [
+        0
+      ],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "45-task-euler-path-for-circuit-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": null,
+        "confirmation": true,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 1,
+        "errorCode": "HIEU_SAI_DE"
+      },
+      "predictedClaimTypes": [
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [
+        0
+      ],
+      "expectedErrorLines": [
+        0
+      ],
+      "predictedVerdict": "CAN_XAC_NHAN",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "45-task-euler-path-for-circuit-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": null,
+        "confirmation": true,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 1,
+        "errorCode": "HIEU_SAI_DE"
+      },
+      "predictedClaimTypes": [
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [
+        0
+      ],
+      "expectedErrorLines": [
+        0
+      ],
+      "predictedVerdict": "CAN_XAC_NHAN",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "46-task-tsp-missing-return-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": null,
+        "confirmation": true,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 1,
+        "errorCode": "HIEU_SAI_DE"
+      },
+      "predictedClaimTypes": [
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [
+        0
+      ],
+      "expectedErrorLines": [
+        0
+      ],
+      "predictedVerdict": "CAN_XAC_NHAN",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "46-task-tsp-missing-return-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": null,
+        "confirmation": true,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 1,
+        "errorCode": "HIEU_SAI_DE"
+      },
+      "predictedClaimTypes": [
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [
+        0
+      ],
+      "expectedErrorLines": [
+        0
+      ],
+      "predictedVerdict": "CAN_XAC_NHAN",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "47-task-postman-wrong-start-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": null,
+        "confirmation": true,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 1,
+        "errorCode": "HIEU_SAI_DE"
+      },
+      "predictedClaimTypes": [
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [
+        0
+      ],
+      "expectedErrorLines": [
+        0
+      ],
+      "predictedVerdict": "CAN_XAC_NHAN",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "47-task-postman-wrong-start-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": null,
+        "confirmation": true,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 1,
+        "errorCode": "HIEU_SAI_DE"
+      },
+      "predictedClaimTypes": [
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [
+        0
+      ],
+      "expectedErrorLines": [
+        0
+      ],
+      "predictedVerdict": "CAN_XAC_NHAN",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "48-confirm-low-confidence-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": null,
+        "confirmation": true,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "CAN_XAC_NHAN",
+        "firstErrorStep": 1,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "degree"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [
+        0
+      ],
+      "expectedErrorLines": [
+        0
+      ],
+      "predictedVerdict": "CAN_XAC_NHAN",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "48-confirm-low-confidence-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": false,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "CAN_XAC_NHAN",
+        "firstErrorStep": 1,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "degree"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [
+        0
+      ],
+      "expectedErrorLines": [
+        0
+      ],
+      "predictedVerdict": "SAI",
+      "predictedErrorCode": "SAI_PHEP_TINH",
+      "deferredTruth": false
+    },
+    {
+      "id": "49-confirm-uncertain-weight-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 3,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 3,
+          "precision": 0,
+          "recall": 0
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 0
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "unparsed_line"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "CAN_XAC_NHAN",
+        "firstErrorStep": 3,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [
+        2
+      ],
+      "issues": [
+        {
+          "code": "unparsed_line",
+          "lines": [
+            2
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [
+        2
+      ],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "49-confirm-uncertain-weight-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 3,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 3,
+          "precision": 0,
+          "recall": 0
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 0
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "unparsed_line"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "CAN_XAC_NHAN",
+        "firstErrorStep": 3,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [
+        2
+      ],
+      "issues": [
+        {
+          "code": "unparsed_line",
+          "lines": [
+            2
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [
+        2
+      ],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "50-confirm-edge-id-count-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "50-confirm-edge-id-count-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 1,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "51-insufficient-empty-work-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 0,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "KHONG_DU_CAN_CU",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "51-insufficient-empty-work-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 0,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "KHONG_DU_CAN_CU",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "52-solve-elements-loop-parallel-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 0,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "KHONG_DU_CAN_CU",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "52-solve-elements-loop-parallel-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 0,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "KHONG_DU_CAN_CU",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "53-solve-degree-handshake-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 0,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "KHONG_DU_CAN_CU",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "53-solve-degree-handshake-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 0,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "KHONG_DU_CAN_CU",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "54-solve-path-unreachable-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 0,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "KHONG_DU_CAN_CU",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "54-solve-path-unreachable-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 0,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "KHONG_DU_CAN_CU",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "55-solve-konigsberg-no-euler-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 0,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "KHONG_DU_CAN_CU",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "55-solve-konigsberg-no-euler-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 0,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "KHONG_DU_CAN_CU",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "56-solve-hamilton-no-cycle-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 0,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "KHONG_DU_CAN_CU",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "56-solve-hamilton-no-cycle-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 0,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "KHONG_DU_CAN_CU",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "57-solve-dijkstra-unreachable-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 0,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "KHONG_DU_CAN_CU",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "57-solve-dijkstra-unreachable-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 0,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "KHONG_DU_CAN_CU",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "58-solve-tsp-greedy-not-optimal-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 0,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "KHONG_DU_CAN_CU",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "58-solve-tsp-greedy-not-optimal-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 0,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "KHONG_DU_CAN_CU",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "59-solve-postman-two-odd-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 0,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "KHONG_DU_CAN_CU",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "59-solve-postman-two-odd-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 0,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "KHONG_DU_CAN_CU",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "60-solve-postman-four-odd-test-student-b",
+      "group": "test-student",
+      "variant": "b",
+      "observedLines": 0,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "KHONG_DU_CAN_CU",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "60-solve-postman-four-odd-test-notes-b",
+      "group": "test-notes",
+      "variant": "b",
+      "observedLines": 0,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 0,
+          "predicted": 0,
+          "reference": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 0,
+          "matched": 0,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": true,
+        "insufficientReasons": [
+          "no_solution_lines"
+        ],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "KHONG_DU_CAN_CU",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "no_solution_lines",
+          "lines": []
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "KHONG_DU_CAN_CU",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "claims": [
+    {
+      "step": 1,
+      "type": "shortest_length",
+      "raw": "d(A, C) = 2.",
+      "from": "A",
+      "to": "C",
+      "value": 2
+    },
+    {
+      "step": 2,
+      "type": "walk",
+      "raw": "đường đi bằng A → C.",
+      "kind": "path",
+      "vertices": [
+        "A",
+        "C"
+      ]
+    }
+  ],
+  "lineOf": {
+    "1": [
+      0
+    ],
+    "2": [
+      1
+    ]
+  },
+  "prose": [],
+  "expected": {
+    "verdict": "SAI",
+    "firstErrorStep": 2,
+    "errorCode": "KET_LUAN_KHONG_SUY_RA"
+  }
+}

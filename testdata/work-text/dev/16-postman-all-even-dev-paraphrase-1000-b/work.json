@@ -1,0 +1,36 @@
+{
+  "claims": [
+    {
+      "step": 1,
+      "type": "walk",
+      "raw": "Em nhận thấy Hành trình người đưa thư là A → C → B → A.",
+      "kind": "postman_tour",
+      "vertices": [
+        "A",
+        "C",
+        "B",
+        "A"
+      ]
+    },
+    {
+      "step": 2,
+      "type": "final_answer",
+      "raw": "Đáp số: 9.",
+      "value": 9
+    }
+  ],
+  "lineOf": {
+    "1": [
+      0
+    ],
+    "2": [
+      1
+    ]
+  },
+  "prose": [],
+  "expected": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

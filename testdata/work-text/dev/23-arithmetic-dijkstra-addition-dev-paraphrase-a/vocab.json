@@ -1,0 +1,12 @@
+{
+  "vertexLabels": [
+    "A",
+    "B",
+    "C"
+  ],
+  "edgeNames": [],
+  "task": "shortest_path",
+  "questionFormat": "tu_luan",
+  "statementIds": [],
+  "questionText": []
+}

@@ -17,18 +17,13 @@
     {
       "step": 3,
       "type": "walk",
-      "raw": "Em liệt kê chu trình euler là B → A → A → B. Các cạnh theo thứ tự: b, l, a.",
+      "raw": "Em liệt kê chu trình euler là B → A → A → B.",
       "kind": "euler_circuit",
       "vertices": [
         "B",
         "A",
         "A",
         "B"
-      ],
-      "edgeIds": [
-        "b",
-        "l",
-        "a"
       ]
     }
   ],

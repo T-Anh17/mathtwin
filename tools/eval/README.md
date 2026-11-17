@@ -193,3 +193,24 @@ Báo cáo dev, checkpoint và quan sát từng ảnh nằm trong reports/.debug/
 Oracle glyph chỉ khớp crop do CV đề xuất: IoU ít nhất 0,05 hoặc khoảng cách tâm không quá 0,75 chiều cao chữ truth; chiều cao crop không quá 2,5 lần và chiều rộng không quá 3 lần chữ truth. Chọn theo IoU + 0,3/(1 + khoảng cách/chiều cao truth); nếu ứng viên thứ hai đạt ít nhất 80% điểm cao nhất thì trả rỗng. Không khớp hộp nào cũng trả rỗng. Giới hạn kích thước ngăn nguyên một khuyên bị nhận là nhãn ở đầu khuyên; oracle không đề xuất crop hay hình học.
 
 Chỉ khi F1 đỉnh đạt 95% (mỗi style 90%), gán nhãn 95%, F1 cạnh geometry oracle 95% (khuyên và đa cạnh 90%), toàn bộ đồ thị glyph oracle 80%, mới chạy test một lần cho oracle và C. Không đạt sau các thử nghiệm dev hợp lý thì báo khâu kẹt và dừng, không đánh giá lại test. JSON test trước review là dữ liệu lịch sử, không đại diện cho code sau sửa.
+
+### Bài làm — parser văn xuôi Lô 3.2
+
+```powershell
+npm run eval:work -- --set work-text --lines truth --split dev --variant a --parser real
+npm run eval:work -- --set work-text --lines truth --split dev --variant b --parser real
+npm run eval:work -- --set work-text --lines truth --split test --variant a --parser real
+npm run eval:work -- --set work-text --lines truth --split test --variant b --parser real
+npm run eval:work -- --set synthetic-hw --lines truth --parser real
+```
+
+`--parser oracle|real` mặc định oracle để giữ phép kiểm bộ đo Lô 3.1. `--variant a|b|c|d` chỉ áp dụng work-text, không có thì đo mọi biến thể. Parser thật chỉ nhận chữ và vocabulary; truth chỉ dùng đối chiếu sau khi hiểu. `--lines device/engine` cấp chữ quan sát thật cho parser real, không thay bằng truth. Engine phải được đăng ký sẵn, không tải model.
+
+Tên báo cáo real có hậu tố `-<variant>-real` (bỏ variant nếu không lọc), không đè báo cáo oracle. JSON giữ count/rate, nhóm cách viết, biến thể, unchecked/issues và dòng lỗi đầu; `proseOnly` đo riêng những bài truth không chứa năm loại claim thuật toán để dành cho Lô 3.3. Nhóm này vẫn có thể chứa cách viết chưa hiểu, không phải mẫu số đã lọc theo kết quả parser.
+
+Chấm real ở lô này chỉ là adapter chẩn đoán gọi core.grade trực tiếp sau đổi nhãn hiển thị sang id. Chưa phải gradeWork: chưa nâng DUNG có unchecked thành CAN_XAC_NHAN, chưa readingCheck, chưa ánh xạ needsConfirmation thành câu hỏi. Vì vậy chỉ số questions = 0 là chưa triển khai; không phải đã đo số câu hỏi cần thiết. Chưa mô phỏng sau hỏi lại. Báo cáo nêu rõ giới hạn Dijkstra/nn_step/postman_duplicate/bảng và không dùng số tổng hợp để kết luận bật chấm tự động trên ảnh thật.
+
+Với work-text, các biến thể nhiễu dùng lines của biến thể a cùng coreFixture/family làm tham chiếu chữ khi phân loại (ii)/(iii); parser vẫn chỉ nhận lines của biến thể được chọn. JSON và danh sách sai thầm lặng giữ dòng lỗi dự đoán, dòng lỗi truth và unchecked (chỉ số 0-based), không ghi thêm chữ quan sát vào log.
+
+
+Sửa review 3.2-r1: thêm 16 tổ hợp `dev-paraphrase*` (2 tiền tố × 2 từ đồng nghĩa × 2 từ nối × 2 thứ tự), mỗi tổ hợp có đủ nhiễu a–d; tổng work-text là 5.040 mẫu. Seed/noiseEngine của các họ cũ giữ nguyên, họ mới xếp sau test trong thứ tự cấp seed. Renderer dùng chung cho dev/test chỉ in nhãn đầu mút của walk, bỏ phần chữ edgeIds; `work.json` vẫn giữ các trường claim core. Vì bộ đo vẫn so claim đầy đủ, walk thiếu edgeIds trong phần chữ có thể làm precision/recall thấp dù dãy nhãn khớp; không đổi metric để bù việc này. Chỉ đo test sau khi chốt parser, không dùng các dòng test để sửa parser.

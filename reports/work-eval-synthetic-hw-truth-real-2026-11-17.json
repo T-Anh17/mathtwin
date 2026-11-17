@@ -1,0 +1,4192 @@
+{
+  "date": "2026-11-17",
+  "set": "synthetic-hw",
+  "source": "truth",
+  "parser": "real",
+  "fixtureOnly": true,
+  "note": "Parser văn xuôi Lô 3.2; chưa hỗ trợ Dijkstra, nn_step, postman_duplicate, bảng. Chấm trực tiếp bằng core.grade để đo; chưa có gradeWork, readingCheck hay nâng unchecked thành hỏi lại (Lô 3.4). Các chỉ số chấm là chẩn đoán, không phải pipeline an toàn hoàn chỉnh. Chưa đủ căn cứ trên bài thật.",
+  "summary": {
+    "total": 40,
+    "completeCorrect": 32,
+    "claimMatched": 80,
+    "claimPredicted": 80,
+    "claimReference": 128,
+    "sourceCorrect": 80,
+    "sourceMatched": 80,
+    "verdictCorrect": 38,
+    "verdictComparable": 40,
+    "confirmations": 0,
+    "firstErrorCorrect": 18,
+    "firstErrorReference": 20,
+    "silentFalseCorrect": 2,
+    "silentFalseWrongParse": 0,
+    "silentFalseWrongReading": 0,
+    "proseAsUnchecked": 0,
+    "silentFalseCorrectWithUnchecked": 2,
+    "silentFalseCorrectWithoutUnchecked": 0,
+    "silentFalseWrongParseWithPriorUnchecked": 0,
+    "silentFalseWrongParseWithoutPriorUnchecked": 0,
+    "insufficientReasons": {},
+    "struckAsContent": 0,
+    "insufficient": 0,
+    "questionsMean": 0,
+    "questionsMax": 0,
+    "completeRate": 0.8,
+    "claimPrecision": 1,
+    "claimRecall": 0.625,
+    "sourceLineAccuracy": 1,
+    "verdictAccuracy": 0.95,
+    "firstErrorAccuracy": 0.9,
+    "insufficientRate": 0
+  },
+  "proseOnly": {
+    "total": 32,
+    "completeCorrect": 32,
+    "claimMatched": 68,
+    "claimPredicted": 68,
+    "claimReference": 68,
+    "sourceCorrect": 68,
+    "sourceMatched": 68,
+    "verdictCorrect": 32,
+    "verdictComparable": 32,
+    "confirmations": 0,
+    "firstErrorCorrect": 16,
+    "firstErrorReference": 16,
+    "silentFalseCorrect": 0,
+    "silentFalseWrongParse": 0,
+    "silentFalseWrongReading": 0,
+    "proseAsUnchecked": 0,
+    "silentFalseCorrectWithUnchecked": 0,
+    "silentFalseCorrectWithoutUnchecked": 0,
+    "silentFalseWrongParseWithPriorUnchecked": 0,
+    "silentFalseWrongParseWithoutPriorUnchecked": 0,
+    "insufficientReasons": {},
+    "struckAsContent": 0,
+    "insufficient": 0,
+    "questionsMean": 0,
+    "questionsMax": 0,
+    "completeRate": 1,
+    "claimPrecision": 1,
+    "claimRecall": 1,
+    "sourceLineAccuracy": 1,
+    "verdictAccuracy": 1,
+    "firstErrorAccuracy": 1,
+    "insufficientRate": 0
+  },
+  "groups": {
+    "elements": {
+      "total": 4,
+      "completeCorrect": 4,
+      "claimMatched": 12,
+      "claimPredicted": 12,
+      "claimReference": 12,
+      "sourceCorrect": 12,
+      "sourceMatched": 12,
+      "verdictCorrect": 4,
+      "verdictComparable": 4,
+      "confirmations": 0,
+      "firstErrorCorrect": 2,
+      "firstErrorReference": 2,
+      "silentFalseCorrect": 0,
+      "silentFalseWrongParse": 0,
+      "silentFalseWrongReading": 0,
+      "proseAsUnchecked": 0,
+      "silentFalseCorrectWithUnchecked": 0,
+      "silentFalseCorrectWithoutUnchecked": 0,
+      "silentFalseWrongParseWithPriorUnchecked": 0,
+      "silentFalseWrongParseWithoutPriorUnchecked": 0,
+      "insufficientReasons": {},
+      "struckAsContent": 0,
+      "insufficient": 0,
+      "questionsMean": 0,
+      "questionsMax": 0,
+      "completeRate": 1,
+      "claimPrecision": 1,
+      "claimRecall": 1,
+      "sourceLineAccuracy": 1,
+      "verdictAccuracy": 1,
+      "firstErrorAccuracy": 1,
+      "insufficientRate": 0
+    },
+    "connectivity": {
+      "total": 4,
+      "completeCorrect": 4,
+      "claimMatched": 8,
+      "claimPredicted": 8,
+      "claimReference": 8,
+      "sourceCorrect": 8,
+      "sourceMatched": 8,
+      "verdictCorrect": 4,
+      "verdictComparable": 4,
+      "confirmations": 0,
+      "firstErrorCorrect": 2,
+      "firstErrorReference": 2,
+      "silentFalseCorrect": 0,
+      "silentFalseWrongParse": 0,
+      "silentFalseWrongReading": 0,
+      "proseAsUnchecked": 0,
+      "silentFalseCorrectWithUnchecked": 0,
+      "silentFalseCorrectWithoutUnchecked": 0,
+      "silentFalseWrongParseWithPriorUnchecked": 0,
+      "silentFalseWrongParseWithoutPriorUnchecked": 0,
+      "insufficientReasons": {},
+      "struckAsContent": 0,
+      "insufficient": 0,
+      "questionsMean": 0,
+      "questionsMax": 0,
+      "completeRate": 1,
+      "claimPrecision": 1,
+      "claimRecall": 1,
+      "sourceLineAccuracy": 1,
+      "verdictAccuracy": 1,
+      "firstErrorAccuracy": 1,
+      "insufficientRate": 0
+    },
+    "euler": {
+      "total": 4,
+      "completeCorrect": 4,
+      "claimMatched": 8,
+      "claimPredicted": 8,
+      "claimReference": 8,
+      "sourceCorrect": 8,
+      "sourceMatched": 8,
+      "verdictCorrect": 4,
+      "verdictComparable": 4,
+      "confirmations": 0,
+      "firstErrorCorrect": 2,
+      "firstErrorReference": 2,
+      "silentFalseCorrect": 0,
+      "silentFalseWrongParse": 0,
+      "silentFalseWrongReading": 0,
+      "proseAsUnchecked": 0,
+      "silentFalseCorrectWithUnchecked": 0,
+      "silentFalseCorrectWithoutUnchecked": 0,
+      "silentFalseWrongParseWithPriorUnchecked": 0,
+      "silentFalseWrongParseWithoutPriorUnchecked": 0,
+      "insufficientReasons": {},
+      "struckAsContent": 0,
+      "insufficient": 0,
+      "questionsMean": 0,
+      "questionsMax": 0,
+      "completeRate": 1,
+      "claimPrecision": 1,
+      "claimRecall": 1,
+      "sourceLineAccuracy": 1,
+      "verdictAccuracy": 1,
+      "firstErrorAccuracy": 1,
+      "insufficientRate": 0
+    },
+    "hamilton": {
+      "total": 4,
+      "completeCorrect": 4,
+      "claimMatched": 4,
+      "claimPredicted": 4,
+      "claimReference": 4,
+      "sourceCorrect": 4,
+      "sourceMatched": 4,
+      "verdictCorrect": 4,
+      "verdictComparable": 4,
+      "confirmations": 0,
+      "firstErrorCorrect": 2,
+      "firstErrorReference": 2,
+      "silentFalseCorrect": 0,
+      "silentFalseWrongParse": 0,
+      "silentFalseWrongReading": 0,
+      "proseAsUnchecked": 0,
+      "silentFalseCorrectWithUnchecked": 0,
+      "silentFalseCorrectWithoutUnchecked": 0,
+      "silentFalseWrongParseWithPriorUnchecked": 0,
+      "silentFalseWrongParseWithoutPriorUnchecked": 0,
+      "insufficientReasons": {},
+      "struckAsContent": 0,
+      "insufficient": 0,
+      "questionsMean": 0,
+      "questionsMax": 0,
+      "completeRate": 1,
+      "claimPrecision": 1,
+      "claimRecall": 1,
+      "sourceLineAccuracy": 1,
+      "verdictAccuracy": 1,
+      "firstErrorAccuracy": 1,
+      "insufficientRate": 0
+    },
+    "shortest_path": {
+      "total": 4,
+      "completeCorrect": 0,
+      "claimMatched": 8,
+      "claimPredicted": 8,
+      "claimReference": 44,
+      "sourceCorrect": 8,
+      "sourceMatched": 8,
+      "verdictCorrect": 4,
+      "verdictComparable": 4,
+      "confirmations": 0,
+      "firstErrorCorrect": 2,
+      "firstErrorReference": 2,
+      "silentFalseCorrect": 0,
+      "silentFalseWrongParse": 0,
+      "silentFalseWrongReading": 0,
+      "proseAsUnchecked": 0,
+      "silentFalseCorrectWithUnchecked": 0,
+      "silentFalseCorrectWithoutUnchecked": 0,
+      "silentFalseWrongParseWithPriorUnchecked": 0,
+      "silentFalseWrongParseWithoutPriorUnchecked": 0,
+      "insufficientReasons": {},
+      "struckAsContent": 0,
+      "insufficient": 0,
+      "questionsMean": 0,
+      "questionsMax": 0,
+      "completeRate": 0,
+      "claimPrecision": 1,
+      "claimRecall": 0.18181818181818182,
+      "sourceLineAccuracy": 1,
+      "verdictAccuracy": 1,
+      "firstErrorAccuracy": 1,
+      "insufficientRate": 0
+    },
+    "tsp": {
+      "total": 4,
+      "completeCorrect": 4,
+      "claimMatched": 8,
+      "claimPredicted": 8,
+      "claimReference": 8,
+      "sourceCorrect": 8,
+      "sourceMatched": 8,
+      "verdictCorrect": 4,
+      "verdictComparable": 4,
+      "confirmations": 0,
+      "firstErrorCorrect": 2,
+      "firstErrorReference": 2,
+      "silentFalseCorrect": 0,
+      "silentFalseWrongParse": 0,
+      "silentFalseWrongReading": 0,
+      "proseAsUnchecked": 0,
+      "silentFalseCorrectWithUnchecked": 0,
+      "silentFalseCorrectWithoutUnchecked": 0,
+      "silentFalseWrongParseWithPriorUnchecked": 0,
+      "silentFalseWrongParseWithoutPriorUnchecked": 0,
+      "insufficientReasons": {},
+      "struckAsContent": 0,
+      "insufficient": 0,
+      "questionsMean": 0,
+      "questionsMax": 0,
+      "completeRate": 1,
+      "claimPrecision": 1,
+      "claimRecall": 1,
+      "sourceLineAccuracy": 1,
+      "verdictAccuracy": 1,
+      "firstErrorAccuracy": 1,
+      "insufficientRate": 0
+    },
+    "postman": {
+      "total": 4,
+      "completeCorrect": 0,
+      "claimMatched": 4,
+      "claimPredicted": 4,
+      "claimReference": 16,
+      "sourceCorrect": 4,
+      "sourceMatched": 4,
+      "verdictCorrect": 2,
+      "verdictComparable": 4,
+      "confirmations": 0,
+      "firstErrorCorrect": 0,
+      "firstErrorReference": 2,
+      "silentFalseCorrect": 2,
+      "silentFalseWrongParse": 0,
+      "silentFalseWrongReading": 0,
+      "proseAsUnchecked": 0,
+      "silentFalseCorrectWithUnchecked": 2,
+      "silentFalseCorrectWithoutUnchecked": 0,
+      "silentFalseWrongParseWithPriorUnchecked": 0,
+      "silentFalseWrongParseWithoutPriorUnchecked": 0,
+      "insufficientReasons": {},
+      "struckAsContent": 0,
+      "insufficient": 0,
+      "questionsMean": 0,
+      "questionsMax": 0,
+      "completeRate": 0,
+      "claimPrecision": 1,
+      "claimRecall": 0.25,
+      "sourceLineAccuracy": 1,
+      "verdictAccuracy": 0.5,
+      "firstErrorAccuracy": 0,
+      "insufficientRate": 0
+    },
+    "degree": {
+      "total": 4,
+      "completeCorrect": 4,
+      "claimMatched": 8,
+      "claimPredicted": 8,
+      "claimReference": 8,
+      "sourceCorrect": 8,
+      "sourceMatched": 8,
+      "verdictCorrect": 4,
+      "verdictComparable": 4,
+      "confirmations": 0,
+      "firstErrorCorrect": 2,
+      "firstErrorReference": 2,
+      "silentFalseCorrect": 0,
+      "silentFalseWrongParse": 0,
+      "silentFalseWrongReading": 0,
+      "proseAsUnchecked": 0,
+      "silentFalseCorrectWithUnchecked": 0,
+      "silentFalseCorrectWithoutUnchecked": 0,
+      "silentFalseWrongParseWithPriorUnchecked": 0,
+      "silentFalseWrongParseWithoutPriorUnchecked": 0,
+      "insufficientReasons": {},
+      "struckAsContent": 0,
+      "insufficient": 0,
+      "questionsMean": 0,
+      "questionsMax": 0,
+      "completeRate": 1,
+      "claimPrecision": 1,
+      "claimRecall": 1,
+      "sourceLineAccuracy": 1,
+      "verdictAccuracy": 1,
+      "firstErrorAccuracy": 1,
+      "insufficientRate": 0
+    },
+    "statements": {
+      "total": 8,
+      "completeCorrect": 8,
+      "claimMatched": 20,
+      "claimPredicted": 20,
+      "claimReference": 20,
+      "sourceCorrect": 20,
+      "sourceMatched": 20,
+      "verdictCorrect": 8,
+      "verdictComparable": 8,
+      "confirmations": 0,
+      "firstErrorCorrect": 4,
+      "firstErrorReference": 4,
+      "silentFalseCorrect": 0,
+      "silentFalseWrongParse": 0,
+      "silentFalseWrongReading": 0,
+      "proseAsUnchecked": 0,
+      "silentFalseCorrectWithUnchecked": 0,
+      "silentFalseCorrectWithoutUnchecked": 0,
+      "silentFalseWrongParseWithPriorUnchecked": 0,
+      "silentFalseWrongParseWithoutPriorUnchecked": 0,
+      "insufficientReasons": {},
+      "struckAsContent": 0,
+      "insufficient": 0,
+      "questionsMean": 0,
+      "questionsMax": 0,
+      "completeRate": 1,
+      "claimPrecision": 1,
+      "claimRecall": 1,
+      "sourceLineAccuracy": 1,
+      "verdictAccuracy": 1,
+      "firstErrorAccuracy": 1,
+      "insufficientRate": 0
+    }
+  },
+  "variants": {
+    "dancing-perspective": {
+      "total": 10,
+      "completeCorrect": 8,
+      "claimMatched": 20,
+      "claimPredicted": 20,
+      "claimReference": 32,
+      "sourceCorrect": 20,
+      "sourceMatched": 20,
+      "verdictCorrect": 10,
+      "verdictComparable": 10,
+      "confirmations": 0,
+      "firstErrorCorrect": 0,
+      "firstErrorReference": 0,
+      "silentFalseCorrect": 0,
+      "silentFalseWrongParse": 0,
+      "silentFalseWrongReading": 0,
+      "proseAsUnchecked": 0,
+      "silentFalseCorrectWithUnchecked": 0,
+      "silentFalseCorrectWithoutUnchecked": 0,
+      "silentFalseWrongParseWithPriorUnchecked": 0,
+      "silentFalseWrongParseWithoutPriorUnchecked": 0,
+      "insufficientReasons": {},
+      "struckAsContent": 0,
+      "insufficient": 0,
+      "questionsMean": 0,
+      "questionsMax": 0,
+      "completeRate": 0.8,
+      "claimPrecision": 1,
+      "claimRecall": 0.625,
+      "sourceLineAccuracy": 1,
+      "verdictAccuracy": 1,
+      "firstErrorAccuracy": null,
+      "insufficientRate": 0
+    },
+    "dancing-straight": {
+      "total": 10,
+      "completeCorrect": 8,
+      "claimMatched": 20,
+      "claimPredicted": 20,
+      "claimReference": 32,
+      "sourceCorrect": 20,
+      "sourceMatched": 20,
+      "verdictCorrect": 9,
+      "verdictComparable": 10,
+      "confirmations": 0,
+      "firstErrorCorrect": 9,
+      "firstErrorReference": 10,
+      "silentFalseCorrect": 1,
+      "silentFalseWrongParse": 0,
+      "silentFalseWrongReading": 0,
+      "proseAsUnchecked": 0,
+      "silentFalseCorrectWithUnchecked": 1,
+      "silentFalseCorrectWithoutUnchecked": 0,
+      "silentFalseWrongParseWithPriorUnchecked": 0,
+      "silentFalseWrongParseWithoutPriorUnchecked": 0,
+      "insufficientReasons": {},
+      "struckAsContent": 0,
+      "insufficient": 0,
+      "questionsMean": 0,
+      "questionsMax": 0,
+      "completeRate": 0.8,
+      "claimPrecision": 1,
+      "claimRecall": 0.625,
+      "sourceLineAccuracy": 1,
+      "verdictAccuracy": 0.9,
+      "firstErrorAccuracy": 0.9,
+      "insufficientRate": 0
+    },
+    "patrick-perspective": {
+      "total": 10,
+      "completeCorrect": 8,
+      "claimMatched": 20,
+      "claimPredicted": 20,
+      "claimReference": 32,
+      "sourceCorrect": 20,
+      "sourceMatched": 20,
+      "verdictCorrect": 9,
+      "verdictComparable": 10,
+      "confirmations": 0,
+      "firstErrorCorrect": 9,
+      "firstErrorReference": 10,
+      "silentFalseCorrect": 1,
+      "silentFalseWrongParse": 0,
+      "silentFalseWrongReading": 0,
+      "proseAsUnchecked": 0,
+      "silentFalseCorrectWithUnchecked": 1,
+      "silentFalseCorrectWithoutUnchecked": 0,
+      "silentFalseWrongParseWithPriorUnchecked": 0,
+      "silentFalseWrongParseWithoutPriorUnchecked": 0,
+      "insufficientReasons": {},
+      "struckAsContent": 0,
+      "insufficient": 0,
+      "questionsMean": 0,
+      "questionsMax": 0,
+      "completeRate": 0.8,
+      "claimPrecision": 1,
+      "claimRecall": 0.625,
+      "sourceLineAccuracy": 1,
+      "verdictAccuracy": 0.9,
+      "firstErrorAccuracy": 0.9,
+      "insufficientRate": 0
+    },
+    "patrick-straight": {
+      "total": 10,
+      "completeCorrect": 8,
+      "claimMatched": 20,
+      "claimPredicted": 20,
+      "claimReference": 32,
+      "sourceCorrect": 20,
+      "sourceMatched": 20,
+      "verdictCorrect": 10,
+      "verdictComparable": 10,
+      "confirmations": 0,
+      "firstErrorCorrect": 0,
+      "firstErrorReference": 0,
+      "silentFalseCorrect": 0,
+      "silentFalseWrongParse": 0,
+      "silentFalseWrongReading": 0,
+      "proseAsUnchecked": 0,
+      "silentFalseCorrectWithUnchecked": 0,
+      "silentFalseCorrectWithoutUnchecked": 0,
+      "silentFalseWrongParseWithPriorUnchecked": 0,
+      "silentFalseWrongParseWithoutPriorUnchecked": 0,
+      "insufficientReasons": {},
+      "struckAsContent": 0,
+      "insufficient": 0,
+      "questionsMean": 0,
+      "questionsMax": 0,
+      "completeRate": 0.8,
+      "claimPrecision": 1,
+      "claimRecall": 0.625,
+      "sourceLineAccuracy": 1,
+      "verdictAccuracy": 1,
+      "firstErrorAccuracy": null,
+      "insufficientRate": 0
+    }
+  },
+  "silentErrors": [
+    {
+      "id": "14-postman-alternative-matching-dancing-straight",
+      "type": "i",
+      "firstErrorLines": [],
+      "expectedErrorLines": [
+        17
+      ],
+      "unchecked": [
+        17
+      ]
+    },
+    {
+      "id": "14-postman-alternative-matching-patrick-perspective",
+      "type": "i",
+      "firstErrorLines": [],
+      "expectedErrorLines": [
+        17
+      ],
+      "unchecked": [
+        17
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "id": "01-elements-multigraph-dancing-perspective",
+      "group": "elements",
+      "variant": "dancing-perspective",
+      "observedLines": 12,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 3,
+          "predicted": 3,
+          "reference": 3,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 3,
+          "matched": 3,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "vertex_list",
+        "edge_count",
+        "loop_count"
+      ],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            2
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            3
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            4
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            5
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            6
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            7
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "01-elements-multigraph-dancing-straight",
+      "group": "elements",
+      "variant": "dancing-straight",
+      "observedLines": 12,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 3,
+          "predicted": 3,
+          "reference": 3,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 3,
+          "matched": 3,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": true,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": false,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "SAI_PHEP_TINH"
+      },
+      "predictedClaimTypes": [
+        "vertex_list",
+        "edge_count",
+        "loop_count"
+      ],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            2
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            3
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            4
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            5
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            6
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            7
+          ]
+        }
+      ],
+      "firstErrorLines": [
+        10
+      ],
+      "expectedErrorLines": [
+        10
+      ],
+      "predictedVerdict": "SAI",
+      "predictedErrorCode": "SAI_PHEP_TINH",
+      "deferredTruth": false
+    },
+    {
+      "id": "01-elements-multigraph-patrick-perspective",
+      "group": "elements",
+      "variant": "patrick-perspective",
+      "observedLines": 12,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 3,
+          "predicted": 3,
+          "reference": 3,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 3,
+          "matched": 3,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": true,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": false,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "SAI_PHEP_TINH"
+      },
+      "predictedClaimTypes": [
+        "vertex_list",
+        "edge_count",
+        "loop_count"
+      ],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            2
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            3
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            4
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            5
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            6
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            7
+          ]
+        }
+      ],
+      "firstErrorLines": [
+        10
+      ],
+      "expectedErrorLines": [
+        10
+      ],
+      "predictedVerdict": "SAI",
+      "predictedErrorCode": "SAI_PHEP_TINH",
+      "deferredTruth": false
+    },
+    {
+      "id": "01-elements-multigraph-patrick-straight",
+      "group": "elements",
+      "variant": "patrick-straight",
+      "observedLines": 12,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 3,
+          "predicted": 3,
+          "reference": 3,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 3,
+          "matched": 3,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "vertex_list",
+        "edge_count",
+        "loop_count"
+      ],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            2
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            3
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            4
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            5
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            6
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            7
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "07-connectivity-components-dancing-perspective",
+      "group": "connectivity",
+      "variant": "dancing-perspective",
+      "observedLines": 9,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 2,
+          "predicted": 2,
+          "reference": 2,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 2,
+          "matched": 2,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "component_count",
+        "connected"
+      ],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            2
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            3
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            4
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            5
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "07-connectivity-components-dancing-straight",
+      "group": "connectivity",
+      "variant": "dancing-straight",
+      "observedLines": 9,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 2,
+          "predicted": 2,
+          "reference": 2,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 2,
+          "matched": 2,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": true,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": false,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "KET_LUAN_KHONG_SUY_RA"
+      },
+      "predictedClaimTypes": [
+        "component_count",
+        "connected"
+      ],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            2
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            3
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            4
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            5
+          ]
+        }
+      ],
+      "firstErrorLines": [
+        8
+      ],
+      "expectedErrorLines": [
+        8
+      ],
+      "predictedVerdict": "SAI",
+      "predictedErrorCode": "KET_LUAN_KHONG_SUY_RA",
+      "deferredTruth": false
+    },
+    {
+      "id": "07-connectivity-components-patrick-perspective",
+      "group": "connectivity",
+      "variant": "patrick-perspective",
+      "observedLines": 9,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 2,
+          "predicted": 2,
+          "reference": 2,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 2,
+          "matched": 2,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": true,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": false,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "KET_LUAN_KHONG_SUY_RA"
+      },
+      "predictedClaimTypes": [
+        "component_count",
+        "connected"
+      ],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            2
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            3
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            4
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            5
+          ]
+        }
+      ],
+      "firstErrorLines": [
+        8
+      ],
+      "expectedErrorLines": [
+        8
+      ],
+      "predictedVerdict": "SAI",
+      "predictedErrorCode": "KET_LUAN_KHONG_SUY_RA",
+      "deferredTruth": false
+    },
+    {
+      "id": "07-connectivity-components-patrick-straight",
+      "group": "connectivity",
+      "variant": "patrick-straight",
+      "observedLines": 9,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 2,
+          "predicted": 2,
+          "reference": 2,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 2,
+          "matched": 2,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "component_count",
+        "connected"
+      ],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            2
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            3
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            4
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            5
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "09-euler-loop-parallel-dancing-perspective",
+      "group": "euler",
+      "variant": "dancing-perspective",
+      "observedLines": 12,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 2,
+          "predicted": 2,
+          "reference": 2,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 2,
+          "matched": 2,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "odd_count",
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            2
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            3
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            4
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            5
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            6
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            7
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "09-euler-loop-parallel-dancing-straight",
+      "group": "euler",
+      "variant": "dancing-straight",
+      "observedLines": 12,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 2,
+          "predicted": 2,
+          "reference": 2,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 2,
+          "matched": 2,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": true,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": false,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "LAP"
+      },
+      "predictedClaimTypes": [
+        "odd_count",
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            2
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            3
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            4
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            5
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            6
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            7
+          ]
+        }
+      ],
+      "firstErrorLines": [
+        10
+      ],
+      "expectedErrorLines": [
+        10
+      ],
+      "predictedVerdict": "SAI",
+      "predictedErrorCode": "LAP",
+      "deferredTruth": false
+    },
+    {
+      "id": "09-euler-loop-parallel-patrick-perspective",
+      "group": "euler",
+      "variant": "patrick-perspective",
+      "observedLines": 12,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 2,
+          "predicted": 2,
+          "reference": 2,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 2,
+          "matched": 2,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": true,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": false,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "LAP"
+      },
+      "predictedClaimTypes": [
+        "odd_count",
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            2
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            3
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            4
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            5
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            6
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            7
+          ]
+        }
+      ],
+      "firstErrorLines": [
+        10
+      ],
+      "expectedErrorLines": [
+        10
+      ],
+      "predictedVerdict": "SAI",
+      "predictedErrorCode": "LAP",
+      "deferredTruth": false
+    },
+    {
+      "id": "09-euler-loop-parallel-patrick-straight",
+      "group": "euler",
+      "variant": "patrick-straight",
+      "observedLines": 12,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 2,
+          "predicted": 2,
+          "reference": 2,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 2,
+          "matched": 2,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "odd_count",
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            2
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            3
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            4
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            5
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            6
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            7
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "10-hamilton-reverse-cycle-dancing-perspective",
+      "group": "hamilton",
+      "variant": "dancing-perspective",
+      "observedLines": 11,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            2
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            3
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            4
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            5
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            6
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "10-hamilton-reverse-cycle-dancing-straight",
+      "group": "hamilton",
+      "variant": "dancing-straight",
+      "observedLines": 11,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": true,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": false,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 1,
+        "errorCode": "CANH_KHONG_TON_TAI"
+      },
+      "predictedClaimTypes": [
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            2
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            3
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            4
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            5
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            6
+          ]
+        }
+      ],
+      "firstErrorLines": [
+        9
+      ],
+      "expectedErrorLines": [
+        9
+      ],
+      "predictedVerdict": "SAI",
+      "predictedErrorCode": "CANH_KHONG_TON_TAI",
+      "deferredTruth": false
+    },
+    {
+      "id": "10-hamilton-reverse-cycle-patrick-perspective",
+      "group": "hamilton",
+      "variant": "patrick-perspective",
+      "observedLines": 11,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": true,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": false,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 1,
+        "errorCode": "CANH_KHONG_TON_TAI"
+      },
+      "predictedClaimTypes": [
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            2
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            3
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            4
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            5
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            6
+          ]
+        }
+      ],
+      "firstErrorLines": [
+        9
+      ],
+      "expectedErrorLines": [
+        9
+      ],
+      "predictedVerdict": "SAI",
+      "predictedErrorCode": "CANH_KHONG_TON_TAI",
+      "deferredTruth": false
+    },
+    {
+      "id": "10-hamilton-reverse-cycle-patrick-straight",
+      "group": "hamilton",
+      "variant": "patrick-straight",
+      "observedLines": 11,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "walk"
+      ],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            2
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            3
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            4
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            5
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            6
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "12-dijkstra-tied-order-dancing-perspective",
+      "group": "shortest_path",
+      "variant": "dancing-perspective",
+      "observedLines": 19,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 2,
+          "predicted": 2,
+          "reference": 11,
+          "precision": 1,
+          "recall": 0.18181818181818182
+        },
+        "sourceLines": {
+          "correct": 2,
+          "matched": 2,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "walk",
+        "length"
+      ],
+      "unchecked": [
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            2
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            3
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            4
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            5
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            6
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            7
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            8
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            9
+          ]
+        },
+        {
+          "code": "table_unrecognized",
+          "lines": [
+            10
+          ]
+        },
+        {
+          "code": "table_unrecognized",
+          "lines": [
+            11
+          ]
+        },
+        {
+          "code": "table_unrecognized",
+          "lines": [
+            12
+          ]
+        },
+        {
+          "code": "table_unrecognized",
+          "lines": [
+            13
+          ]
+        },
+        {
+          "code": "table_unrecognized",
+          "lines": [
+            14
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "12-dijkstra-tied-order-dancing-straight",
+      "group": "shortest_path",
+      "variant": "dancing-straight",
+      "observedLines": 19,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 2,
+          "predicted": 2,
+          "reference": 11,
+          "precision": 1,
+          "recall": 0.18181818181818182
+        },
+        "sourceLines": {
+          "correct": 2,
+          "matched": 2,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": true,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": false,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 11,
+        "errorCode": "SAI_PHEP_TINH"
+      },
+      "predictedClaimTypes": [
+        "walk",
+        "length"
+      ],
+      "unchecked": [
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            2
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            3
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            4
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            5
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            6
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            7
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            8
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            9
+          ]
+        },
+        {
+          "code": "table_unrecognized",
+          "lines": [
+            10
+          ]
+        },
+        {
+          "code": "table_unrecognized",
+          "lines": [
+            11
+          ]
+        },
+        {
+          "code": "table_unrecognized",
+          "lines": [
+            12
+          ]
+        },
+        {
+          "code": "table_unrecognized",
+          "lines": [
+            13
+          ]
+        },
+        {
+          "code": "table_unrecognized",
+          "lines": [
+            14
+          ]
+        }
+      ],
+      "firstErrorLines": [
+        17
+      ],
+      "expectedErrorLines": [
+        17
+      ],
+      "predictedVerdict": "SAI",
+      "predictedErrorCode": "SAI_PHEP_TINH",
+      "deferredTruth": true
+    },
+    {
+      "id": "12-dijkstra-tied-order-patrick-perspective",
+      "group": "shortest_path",
+      "variant": "patrick-perspective",
+      "observedLines": 19,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 2,
+          "predicted": 2,
+          "reference": 11,
+          "precision": 1,
+          "recall": 0.18181818181818182
+        },
+        "sourceLines": {
+          "correct": 2,
+          "matched": 2,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": true,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": false,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 11,
+        "errorCode": "SAI_PHEP_TINH"
+      },
+      "predictedClaimTypes": [
+        "walk",
+        "length"
+      ],
+      "unchecked": [
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            2
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            3
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            4
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            5
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            6
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            7
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            8
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            9
+          ]
+        },
+        {
+          "code": "table_unrecognized",
+          "lines": [
+            10
+          ]
+        },
+        {
+          "code": "table_unrecognized",
+          "lines": [
+            11
+          ]
+        },
+        {
+          "code": "table_unrecognized",
+          "lines": [
+            12
+          ]
+        },
+        {
+          "code": "table_unrecognized",
+          "lines": [
+            13
+          ]
+        },
+        {
+          "code": "table_unrecognized",
+          "lines": [
+            14
+          ]
+        }
+      ],
+      "firstErrorLines": [
+        17
+      ],
+      "expectedErrorLines": [
+        17
+      ],
+      "predictedVerdict": "SAI",
+      "predictedErrorCode": "SAI_PHEP_TINH",
+      "deferredTruth": true
+    },
+    {
+      "id": "12-dijkstra-tied-order-patrick-straight",
+      "group": "shortest_path",
+      "variant": "patrick-straight",
+      "observedLines": 19,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 2,
+          "predicted": 2,
+          "reference": 11,
+          "precision": 1,
+          "recall": 0.18181818181818182
+        },
+        "sourceLines": {
+          "correct": 2,
+          "matched": 2,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "walk",
+        "length"
+      ],
+      "unchecked": [
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            2
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            3
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            4
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            5
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            6
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            7
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            8
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            9
+          ]
+        },
+        {
+          "code": "table_unrecognized",
+          "lines": [
+            10
+          ]
+        },
+        {
+          "code": "table_unrecognized",
+          "lines": [
+            11
+          ]
+        },
+        {
+          "code": "table_unrecognized",
+          "lines": [
+            12
+          ]
+        },
+        {
+          "code": "table_unrecognized",
+          "lines": [
+            13
+          ]
+        },
+        {
+          "code": "table_unrecognized",
+          "lines": [
+            14
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "13-tsp-tied-student-tour-dancing-perspective",
+      "group": "tsp",
+      "variant": "dancing-perspective",
+      "observedLines": 16,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 2,
+          "predicted": 2,
+          "reference": 2,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 2,
+          "matched": 2,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "walk",
+        "length"
+      ],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            2
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            3
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            4
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            5
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            6
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            7
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            8
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            9
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            10
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            11
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "13-tsp-tied-student-tour-dancing-straight",
+      "group": "tsp",
+      "variant": "dancing-straight",
+      "observedLines": 16,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 2,
+          "predicted": 2,
+          "reference": 2,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 2,
+          "matched": 2,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": true,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": false,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "SAI_PHEP_TINH"
+      },
+      "predictedClaimTypes": [
+        "walk",
+        "length"
+      ],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            2
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            3
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            4
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            5
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            6
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            7
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            8
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            9
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            10
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            11
+          ]
+        }
+      ],
+      "firstErrorLines": [
+        15
+      ],
+      "expectedErrorLines": [
+        15
+      ],
+      "predictedVerdict": "SAI",
+      "predictedErrorCode": "SAI_PHEP_TINH",
+      "deferredTruth": false
+    },
+    {
+      "id": "13-tsp-tied-student-tour-patrick-perspective",
+      "group": "tsp",
+      "variant": "patrick-perspective",
+      "observedLines": 16,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 2,
+          "predicted": 2,
+          "reference": 2,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 2,
+          "matched": 2,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": true,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": false,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "SAI_PHEP_TINH"
+      },
+      "predictedClaimTypes": [
+        "walk",
+        "length"
+      ],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            2
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            3
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            4
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            5
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            6
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            7
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            8
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            9
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            10
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            11
+          ]
+        }
+      ],
+      "firstErrorLines": [
+        15
+      ],
+      "expectedErrorLines": [
+        15
+      ],
+      "predictedVerdict": "SAI",
+      "predictedErrorCode": "SAI_PHEP_TINH",
+      "deferredTruth": false
+    },
+    {
+      "id": "13-tsp-tied-student-tour-patrick-straight",
+      "group": "tsp",
+      "variant": "patrick-straight",
+      "observedLines": 16,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 2,
+          "predicted": 2,
+          "reference": 2,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 2,
+          "matched": 2,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "walk",
+        "length"
+      ],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            2
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            3
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            4
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            5
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            6
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            7
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            8
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            9
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            10
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            11
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "14-postman-alternative-matching-dancing-perspective",
+      "group": "postman",
+      "variant": "dancing-perspective",
+      "observedLines": 18,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 4,
+          "precision": 1,
+          "recall": 0.25
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "odd_vertices"
+      ],
+      "unchecked": [
+        17
+      ],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            3
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            4
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            5
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            6
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            7
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            8
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            9
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            10
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            11
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            12
+          ]
+        },
+        {
+          "code": "unparsed_line",
+          "lines": [
+            17
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "14-postman-alternative-matching-dancing-straight",
+      "group": "postman",
+      "variant": "dancing-straight",
+      "observedLines": 18,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 4,
+          "precision": 1,
+          "recall": 0.25
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": true,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 4,
+        "errorCode": "KET_LUAN_KHONG_SUY_RA"
+      },
+      "predictedClaimTypes": [
+        "odd_vertices"
+      ],
+      "unchecked": [
+        17
+      ],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            3
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            4
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            5
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            6
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            7
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            8
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            9
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            10
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            11
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            12
+          ]
+        },
+        {
+          "code": "unparsed_line",
+          "lines": [
+            17
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [
+        17
+      ],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "14-postman-alternative-matching-patrick-perspective",
+      "group": "postman",
+      "variant": "patrick-perspective",
+      "observedLines": 18,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 4,
+          "precision": 1,
+          "recall": 0.25
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": false,
+        "confirmation": false,
+        "firstErrorCorrect": false,
+        "silentFalseCorrect": true,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 4,
+        "errorCode": "KET_LUAN_KHONG_SUY_RA"
+      },
+      "predictedClaimTypes": [
+        "odd_vertices"
+      ],
+      "unchecked": [
+        17
+      ],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            3
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            4
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            5
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            6
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            7
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            8
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            9
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            10
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            11
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            12
+          ]
+        },
+        {
+          "code": "unparsed_line",
+          "lines": [
+            17
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [
+        17
+      ],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "14-postman-alternative-matching-patrick-straight",
+      "group": "postman",
+      "variant": "patrick-straight",
+      "observedLines": 18,
+      "comparison": {
+        "completeCorrect": false,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 4,
+          "precision": 1,
+          "recall": 0.25
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "odd_vertices"
+      ],
+      "unchecked": [
+        17
+      ],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            3
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            4
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            5
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            6
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            7
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            8
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            9
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            10
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            11
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            12
+          ]
+        },
+        {
+          "code": "unparsed_line",
+          "lines": [
+            17
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": true
+    },
+    {
+      "id": "18-short-answer-degree-dancing-perspective",
+      "group": "degree",
+      "variant": "dancing-perspective",
+      "observedLines": 8,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 2,
+          "predicted": 2,
+          "reference": 2,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 2,
+          "matched": 2,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "degree",
+        "degree_sum"
+      ],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            2
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            3
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            4
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "18-short-answer-degree-dancing-straight",
+      "group": "degree",
+      "variant": "dancing-straight",
+      "observedLines": 8,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 2,
+          "predicted": 2,
+          "reference": 2,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 2,
+          "matched": 2,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": true,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": false,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "SAI_PHEP_TINH"
+      },
+      "predictedClaimTypes": [
+        "degree",
+        "degree_sum"
+      ],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            2
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            3
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            4
+          ]
+        }
+      ],
+      "firstErrorLines": [
+        7
+      ],
+      "expectedErrorLines": [
+        7
+      ],
+      "predictedVerdict": "SAI",
+      "predictedErrorCode": "SAI_PHEP_TINH",
+      "deferredTruth": false
+    },
+    {
+      "id": "18-short-answer-degree-patrick-perspective",
+      "group": "degree",
+      "variant": "patrick-perspective",
+      "observedLines": 8,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 2,
+          "predicted": 2,
+          "reference": 2,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 2,
+          "matched": 2,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": true,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": false,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 2,
+        "errorCode": "SAI_PHEP_TINH"
+      },
+      "predictedClaimTypes": [
+        "degree",
+        "degree_sum"
+      ],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            2
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            3
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            4
+          ]
+        }
+      ],
+      "firstErrorLines": [
+        7
+      ],
+      "expectedErrorLines": [
+        7
+      ],
+      "predictedVerdict": "SAI",
+      "predictedErrorCode": "SAI_PHEP_TINH",
+      "deferredTruth": false
+    },
+    {
+      "id": "18-short-answer-degree-patrick-straight",
+      "group": "degree",
+      "variant": "patrick-straight",
+      "observedLines": 8,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 2,
+          "predicted": 2,
+          "reference": 2,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 2,
+          "matched": 2,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "degree",
+        "degree_sum"
+      ],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            2
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            3
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            4
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "19-four-true-false-items-dancing-perspective",
+      "group": "statements",
+      "variant": "dancing-perspective",
+      "observedLines": 12,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 4,
+          "predicted": 4,
+          "reference": 4,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 4,
+          "matched": 4,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "statement",
+        "statement",
+        "statement",
+        "statement"
+      ],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            6
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            7
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            8
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "19-four-true-false-items-dancing-straight",
+      "group": "statements",
+      "variant": "dancing-straight",
+      "observedLines": 12,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 4,
+          "predicted": 4,
+          "reference": 4,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 4,
+          "matched": 4,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": true,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": false,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 1,
+        "errorCode": "KET_LUAN_KHONG_SUY_RA"
+      },
+      "predictedClaimTypes": [
+        "statement",
+        "statement",
+        "statement",
+        "statement"
+      ],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            6
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            7
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            8
+          ]
+        }
+      ],
+      "firstErrorLines": [
+        10
+      ],
+      "expectedErrorLines": [
+        10
+      ],
+      "predictedVerdict": "SAI",
+      "predictedErrorCode": "KET_LUAN_KHONG_SUY_RA",
+      "deferredTruth": false
+    },
+    {
+      "id": "19-four-true-false-items-patrick-perspective",
+      "group": "statements",
+      "variant": "patrick-perspective",
+      "observedLines": 12,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 4,
+          "predicted": 4,
+          "reference": 4,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 4,
+          "matched": 4,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": true,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": false,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 1,
+        "errorCode": "KET_LUAN_KHONG_SUY_RA"
+      },
+      "predictedClaimTypes": [
+        "statement",
+        "statement",
+        "statement",
+        "statement"
+      ],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            6
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            7
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            8
+          ]
+        }
+      ],
+      "firstErrorLines": [
+        10
+      ],
+      "expectedErrorLines": [
+        10
+      ],
+      "predictedVerdict": "SAI",
+      "predictedErrorCode": "KET_LUAN_KHONG_SUY_RA",
+      "deferredTruth": false
+    },
+    {
+      "id": "19-four-true-false-items-patrick-straight",
+      "group": "statements",
+      "variant": "patrick-straight",
+      "observedLines": 12,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 4,
+          "predicted": 4,
+          "reference": 4,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 4,
+          "matched": 4,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "statement",
+        "statement",
+        "statement",
+        "statement"
+      ],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            6
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            7
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            8
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "20-four-choice-question-dancing-perspective",
+      "group": "statements",
+      "variant": "dancing-perspective",
+      "observedLines": 12,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "choice"
+      ],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            6
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            7
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            8
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    },
+    {
+      "id": "20-four-choice-question-dancing-straight",
+      "group": "statements",
+      "variant": "dancing-straight",
+      "observedLines": 12,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": true,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": false,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 1,
+        "errorCode": "KET_LUAN_KHONG_SUY_RA"
+      },
+      "predictedClaimTypes": [
+        "choice"
+      ],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            6
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            7
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            8
+          ]
+        }
+      ],
+      "firstErrorLines": [
+        10
+      ],
+      "expectedErrorLines": [
+        10
+      ],
+      "predictedVerdict": "SAI",
+      "predictedErrorCode": "KET_LUAN_KHONG_SUY_RA",
+      "deferredTruth": false
+    },
+    {
+      "id": "20-four-choice-question-patrick-perspective",
+      "group": "statements",
+      "variant": "patrick-perspective",
+      "observedLines": 12,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": true,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": false,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "SAI",
+        "firstErrorStep": 1,
+        "errorCode": "KET_LUAN_KHONG_SUY_RA"
+      },
+      "predictedClaimTypes": [
+        "choice"
+      ],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            6
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            7
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            8
+          ]
+        }
+      ],
+      "firstErrorLines": [
+        10
+      ],
+      "expectedErrorLines": [
+        10
+      ],
+      "predictedVerdict": "SAI",
+      "predictedErrorCode": "KET_LUAN_KHONG_SUY_RA",
+      "deferredTruth": false
+    },
+    {
+      "id": "20-four-choice-question-patrick-straight",
+      "group": "statements",
+      "variant": "patrick-straight",
+      "observedLines": 12,
+      "comparison": {
+        "completeCorrect": true,
+        "claims": {
+          "matched": 1,
+          "predicted": 1,
+          "reference": 1,
+          "precision": 1,
+          "recall": 1
+        },
+        "sourceLines": {
+          "correct": 1,
+          "matched": 1,
+          "accuracy": 1
+        },
+        "verdictCorrect": true,
+        "confirmation": false,
+        "firstErrorCorrect": null,
+        "silentFalseCorrect": false,
+        "silentFalseWrongParse": false,
+        "silentFalseWrongReading": false,
+        "readingMismatch": null,
+        "proseAsUnchecked": 0,
+        "struckAsContent": 0,
+        "insufficient": false,
+        "insufficientReasons": [],
+        "questions": 0
+      },
+      "expected": {
+        "verdict": "DUNG",
+        "firstErrorStep": null,
+        "errorCode": null
+      },
+      "predictedClaimTypes": [
+        "choice"
+      ],
+      "unchecked": [],
+      "issues": [
+        {
+          "code": "figure_annotations",
+          "lines": [
+            6
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            7
+          ]
+        },
+        {
+          "code": "figure_annotations",
+          "lines": [
+            8
+          ]
+        }
+      ],
+      "firstErrorLines": [],
+      "expectedErrorLines": [],
+      "predictedVerdict": "DUNG",
+      "predictedErrorCode": null,
+      "deferredTruth": false
+    }
+  ]
+}
