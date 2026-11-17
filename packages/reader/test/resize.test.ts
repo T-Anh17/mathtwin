@@ -1,9 +1,9 @@
 import { expect, it } from 'vitest';
 import { resizeImage } from '../src/index.js';
 function image(width: number, height: number) { return { width, height, pixels: new Uint8ClampedArray(width * height * 4) }; }
-it('caps phone photos at 1536px without upscaling, preserving aspect ratio within rounding', () => {
-  expect(resizeImage(image(4000, 3000))).toMatchObject({ width: 1536, height: 1152 });
-  expect(resizeImage(image(3000, 4000))).toMatchObject({ width: 1152, height: 1536 });
+it('caps phone photos at 768px without upscaling, preserving aspect ratio within rounding', () => {
+  expect(resizeImage(image(4000, 3000))).toMatchObject({ width: 768, height: 576 });
+  expect(resizeImage(image(3000, 4000))).toMatchObject({ width: 576, height: 768 });
   const small = image(100, 200); expect(resizeImage(small)).toBe(small);
   expect(resizeImage(image(7, 3), 5)).toMatchObject({ width: 5, height: 2 });
 });

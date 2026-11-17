@@ -24,6 +24,15 @@ function usage(value: unknown, engine: string): ReadUsage {
   if (u.engine !== engine || !Number.isInteger(u.passes) || number(u.passes) > 2) invalid();
   const result: ReadUsage = { engine, passes: number(u.passes), latencyMs: number(u.latencyMs) };
   if (u.peakMemoryMb !== undefined) result.peakMemoryMb = number(u.peakMemoryMb);
+  if (u.finish_reason !== undefined) result.finish_reason = list(u.finish_reason).map(string);
+  if (u.sentImages !== undefined) result.sentImages = list(u.sentImages).map((value) => {
+    const image = record(value);
+    const size = { originalWidth: number(image.originalWidth), originalHeight: number(image.originalHeight),
+      width: number(image.width), height: number(image.height), ...(image.maxImageSide === undefined ? {} : { maxImageSide: number(image.maxImageSide) }) };
+    if (![size.originalWidth, size.originalHeight, size.width, size.height].every((n) => Number.isSafeInteger(n) && n > 0)
+      || (size.maxImageSide !== undefined && (!Number.isSafeInteger(size.maxImageSide) || size.maxImageSide <= 0 || Math.max(size.width, size.height) > size.maxImageSide))) invalid();
+    return size;
+  });
   if (u.serverTimings !== undefined) {
     const t = record(u.serverTimings);
     result.serverTimings = { promptMs: number(t.promptMs), predictedMs: number(t.predictedMs), promptTokens: number(t.promptTokens), predictedTokens: number(t.predictedTokens) };
@@ -69,7 +78,7 @@ export async function evaluateDevice(file: string, root: string, date: string, o
   const data = record(await readJson(file)); if (data.version !== 1) invalid();
   const rawDevice = record(data.device); const rawRuntime = record(data.runtime);
   const runtime = Object.fromEntries(Object.entries(rawRuntime).filter(([key, value]) =>
-    ['backend', 'contextSize', 'maxTokens', 'maxLongEdge', 'alternativesThreshold', 'mmprojOffload'].includes(key)
+    ['backend', 'contextSize', 'maxTokens', 'maxLongEdge', 'maxImageSide', 'readTimeout', 'alternativesThreshold', 'mmprojOffload'].includes(key)
       && ['string', 'number', 'boolean'].includes(typeof value)));
   const llamaCpp = record(rawRuntime.llamaCpp);
   runtime.llamaCpp = Object.fromEntries(Object.entries(llamaCpp).filter(([key, value]) =>
@@ -97,7 +106,18 @@ export async function evaluateDevice(file: string, root: string, date: string, o
     if (options.mode !== 'both' && config.mode !== options.mode) continue;
     const sample = catalog.get(id); if (!sample) throw new Error('Không tìm thấy id thiết bị trong bộ truth đã chọn.');
     if (options.set && sourceSets.get(id) !== options.set) continue;
+    let dry: Record<string, number> | undefined;
+    if (config.dry !== undefined) {
+      const d = record(config.dry);
+      dry = { dry_multiplier: number(d.dry_multiplier), dry_base: number(d.dry_base), dry_allowed_length: number(d.dry_allowed_length),
+        dry_penalty_last_n: d.dry_penalty_last_n === -1 ? -1 : number(d.dry_penalty_last_n) };
+      if (dry.dry_base! < 1 || !Number.isSafeInteger(dry.dry_allowed_length) || !Number.isSafeInteger(dry.dry_penalty_last_n)) invalid();
+    }
+    if (config.maxImageSide !== undefined && ![512, 768, 1024].includes(number(config.maxImageSide))) invalid();
+    if (config.readTimeout !== undefined && (!Number.isSafeInteger(config.readTimeout) || number(config.readTimeout) < 1000 || number(config.readTimeout) > 3_600_000)) invalid();
     const configuration = { model: config.model, passes, mode: config.mode, threads: number(config.threads), minRamGb: number(config.minRamGb),
+      ...(config.maxImageSide === undefined ? {} : { maxImageSide: number(config.maxImageSide) }),
+      ...(config.readTimeout === undefined ? {} : { readTimeout: number(config.readTimeout) }), ...(dry ? { dry } : {}),
       allowLowRam: bool(config.allowLowRam), backgroundIdleMinutes: number(config.backgroundIdleMinutes),
       backend: config.backend === 'CPU' ? 'CPU' : invalid(), ...(config.cpuVariant === undefined ? {} : { cpuVariant: string(config.cpuVariant) }) };
     const key = JSON.stringify({ engine, configuration });

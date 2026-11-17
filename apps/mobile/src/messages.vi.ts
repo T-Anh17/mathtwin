@@ -9,6 +9,8 @@ export const vi = {
   lowRam: 'RAM thấp hơn ngưỡng cấu hình. Máy có thể bị hệ điều hành dừng model khi thiếu bộ nhớ.',
   allowLowRam: 'Tôi đã đọc cảnh báo và muốn thử trên máy RAM thấp', minRam: 'Ngưỡng RAM (GB)', threads: 'Luồng CPU',
   passes: 'Số lượt', mode: 'Chế độ', graph: 'Đồ thị', lines: 'Dòng chữ',
+  maxImageSide: 'Cạnh ảnh tối đa', readTimeout: 'Thời gian chờ mỗi lượt (giây)', dry: 'Chống lặp DRY', enabled: 'Bật', disabled: 'Tắt',
+  dry_multiplier: 'Hệ số DRY', dry_base: 'Cơ số DRY', dry_allowed_length: 'Độ dài được phép lặp', dry_penalty_last_n: 'Số token xét DRY (-1: toàn bộ)',
   camera: 'Chụp ảnh', gallery: 'Chọn ảnh', dataset: 'Nhập bộ đo', datasetName: 'Tên thư mục bộ đo',
   datasetSummary: (name: string, count: number, location: DatasetLocation): string =>
     `${name}: ${count} · ${location === 'internal' ? 'Bộ nhớ trong (internal)' : 'Bộ nhớ ngoài (external)'}`,
@@ -43,6 +45,8 @@ export const vi = {
     exec_blocked: 'Android chặn chạy llama-server. Dừng thử nghiệm và báo reviewer để xem xét JNI.',
     invalid_json: 'Kết quả JSON không hợp lệ.', missing_probs: 'Thiếu xác suất token; không thể tính độ tin cậy.',
     truncated: 'Kết quả bị cắt ngắn.', http_error: 'Lỗi kết nối tới model trong máy.',
+    logprob_alignment: 'Không căn được xác suất token với nội dung; không thể tính độ tin cậy.',
+    repetition_loop: 'Model lặp nội dung hoặc hết token khi JSON chưa hoàn chỉnh; lượt đọc thất bại.',
     low_ram: 'RAM dưới ngưỡng; cần xác nhận cảnh báo trước khi chạy.', no_space: 'Máy không đủ dung lượng trống.',
     checksum: 'File sai số byte hoặc SHA-256; đã xóa file.', model_missing: 'Model chưa đủ file được kiểm tra.',
     download_failed: 'Tải gián đoạn; bấm Tải để tiếp tục.', dataset_invalid: 'Bộ đo hoặc ids.json không hợp lệ.',

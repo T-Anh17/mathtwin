@@ -35,6 +35,25 @@ async function setup() {
 }
 const options = { mode: 'both', threshold: 0.85 } as const;
 describe('app export to desktop evaluation', () => {
+  it('keeps image size/timeout/DRY configurations separate and retains sent dimensions and finish reasons', async () => {
+    const { root, file, result, save } = await setup();
+    const dry = { dry_multiplier: 0.8, dry_base: 1.75, dry_allowed_length: 2, dry_penalty_last_n: 64 };
+    const results = [
+      { ...result, config: { ...result.config, maxImageSide: 512, readTimeout: 300_000, dry } },
+      { ...result, config: { ...result.config, maxImageSide: 768, readTimeout: 450_000, dry } },
+      { ...result, config: { ...result.config, maxImageSide: 768, readTimeout: 450_000, dry: { ...dry, dry_multiplier: 0 } } },
+    ].map((r) => ({ ...r, usage: { ...r.usage, finish_reason: ['stop', 'stop'], sentImages: [
+      { originalWidth: 2000, originalHeight: 1000, width: r.config.maxImageSide, height: r.config.maxImageSide / 2, maxImageSide: r.config.maxImageSide },
+    ] } }));
+    await save(results);
+    const reports = await evaluateDevice(file, root, '2026-11-16', options);
+    expect(reports).toHaveLength(3);
+    for (const { report, basename } of reports) {
+      expect(report.configuration).toMatchObject({ maxImageSide: expect.any(Number), readTimeout: expect.any(Number), dry: expect.any(Object) });
+      expect(report.rows[0]?.usage).toMatchObject({ finish_reason: ['stop', 'stop'], sentImages: [{ maxImageSide: report.configuration!.maxImageSide }] });
+      expect(await readFile(join(root, 'reports', `${basename}.md`), 'utf8')).toContain('maxImageSide');
+    }
+  });
   it('joins by id, keeps both passes independently, preserves timings/configuration and separates true/synthetic handwriting', async () => {
     const { root, file, result, save } = await setup();
     await save([result, { ...result, id: 'real' }, { ...result, id: 'print', reusedModel: true, modelLoadMs: 0 }]);

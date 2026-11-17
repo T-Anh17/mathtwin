@@ -6,19 +6,20 @@ Không tạo Termux hay app trong lô này.
 
 API xuất tại `@mathtwin/reader-llamacpp-shared`:
 
-- `completionRequest(model, mode, imageUrls, maxTokens?)`: dựng body; chỉ nhận ảnh data URL, không nhận URL mạng/file.
+- `completionRequest(model, mode, imageUrls, maxTokens?, dry?)`: dựng body; chỉ nhận ảnh data URL, không nhận URL mạng/file.
   B có mode `edges`, `neighbors`, `lines`; A có `spotting` và `ocr`.
-- `parseCompletion(raw)`: kiểm output hoàn chỉnh, byte UTF-8, logprobs và `timings` nếu có.
+- `parseCompletion(raw, expectsJson?)`: kiểm output hoàn chỉnh, byte UTF-8, logprobs và `timings` nếu có; adapter truyền `true` cho B.
 - `graphResult(completion, threshold?, originalImages?)`, `lineResult(completion, originalWidth, originalHeight, threshold?)`:
   dựng drafts/dòng chữ, confidence, top-k, box. `plainLines` xử lý OCR thuần; `spottingLines` xử lý Paddle LOC.
 - `LlamaCppReadError`, `LlamaFailureReason`: mã lỗi dùng chung; không chứa nội dung ảnh/đề/phản hồi.
-- `resizeImage(image, maxLongEdge?)` ở **`@mathtwin/reader`**, để app và adapter cùng chính sách ảnh.
+- `resizeImage(image, maxImageSide?)` và `defaultMaxImageSide` ở **`@mathtwin/reader`**, để app và adapter cùng chính sách ảnh.
 
 ## Điểm tin cậy từng giá trị
 
 `parseCompletion` giữ khoảng byte `[start,end)` và `exp(logprob)` của từng token đã sinh, cùng top-k.
-Byte token phải nối lại đúng toàn bộ UTF-8 của `message.content`; hỗ trợ token bị cắt giữa chữ Việt hoặc emoji.
-Không đủ byte/điểm, điểm không hữu hạn hoặc > 0 → `missing_probs`; không thay bằng 1.
+Byte token phải nối lại đúng UTF-8 của `message.content`, hoặc chỉ thừa fence Markdown JSON ở hai đầu do llama-server đã bóc khỏi content.
+Parser loại fence khỏi khoảng byte, giữ điểm token và top-k của từng giá trị, kể cả token cắt giữa chữ Việt/emoji hoặc qua ranh giới fence.
+Không căn được → `logprob_alignment`; thiếu điểm, điểm không hữu hạn hoặc > 0 → `missing_probs`; không thay bằng 1.
 
 Bộ quét JSON xác định khoảng byte **giá trị**, không lấy khóa, dấu phẩy, dấu ngoặc hay dấu nháy bao ngoài chuỗi.
 Giá trị escape (`\u1ec1`, `\"`) giữ vị trí theo cách viết thô trong JSON; chuẩn hóa NFC sau khi lấy điểm.
@@ -90,8 +91,27 @@ Lô này chưa tải/chỉnh projector và không thay hash đã duyệt. Cấu 
 trước phép đo spotting thật; parser hiện kiểm bằng phản hồi giả. Không âm thầm sửa GGUF trong adapter.
 Không tự upscale gấp đôi như ví dụ Paddle để giữ chung chính sách ảnh A/B đã yêu cầu; cần ghi khác biệt này khi đo thật.
 
-Ảnh RGBA được co xác định bằng bilinear, cạnh dài tối đa **1536 px** mặc định, không phóng to, kích thước ngắn làm tròn gần nhất.
-App/adapter phải áp dụng chính sách trước mã hóa ảnh. `usage.sentImages` ghi kích thước gốc/thực gửi, nên không giấu bước co ảnh.
+Ảnh RGBA được co xác định bằng bilinear, `maxImageSide` mặc định **768 px**, không phóng to, kích thước ngắn làm tròn gần nhất.
+App/adapter áp dụng trước mã hóa ảnh. `usage.sentImages` ghi kích thước gốc/thực gửi và `maxImageSide`.
+
+## Cấu hình đo trên vivo (Lô 2.7b)
+
+Mọi schema gửi llama-server (lines và graph) chuyển tuple số thành `type:array`, `items:{type:number}`, `minItems:4`, `maxItems:4`.
+Không gửi `prefixItems` hoặc `items:false`; vẫn kiểm đầu ra bằng schema reader như trước.
+
+Nguồn mặc định sampler: [llama.cpp b12388 server README](https://github.com/ggml-org/llama.cpp/blob/b12388/tools/server/README.md#post-completion):
+upstream `dry_multiplier=0` (tắt), `dry_base=1.75`, `dry_allowed_length=2`, `dry_penalty_last_n=64` (0 tắt; -1 toàn context).
+MathTwin **bật thử nghiệm** multiplier **0.8**, giữ ba giá trị còn lại. Đây là lựa chọn của app, chưa phải kết quả đo cải thiện CER/tỉ lệ lặp.
+Truyền đủ bốn trường mỗi request cho A/B; tắt bằng multiplier 0. Giữ sequence breakers và thứ tự sampler mặc định của server (có DRY).
+
+Phát hiện lặp độc lập với sampler: n-gram ký tự Unicode dài 1..128 lặp liền ít nhất 8 lần, với ít nhất 64 ký tự bằng chứng, bỏ chuỗi chỉ có khoảng trắng.
+Ngưỡng bảo thủ này vẫn có thể chặn nội dung lặp thật; cần đánh giá lại trên bộ đo. `finish_reason=length` và JSON chưa hoàn chỉnh cũng trả `repetition_loop`.
+Không sửa/đóng JSON cụt. JSON hoàn chỉnh nhưng finish khác stop vẫn trả `truncated`.
+`Completion.finish_reason` giữ nguyên metadata; lỗi lặp/căn token giữ nó trong `LlamaCppReadError.finish_reason`.
+`ReadUsage.finish_reason` là mảng theo thứ tự request, gộp qua các lượt đọc. App giữ cả finish của lượt thất bại trong usage/file xuất.
+
+`readTimeout` tính bằng **ms**, mặc định **300000** mỗi request. Hạn tổng mỗi ảnh = `180000 + passes * readTimeout`, gồm dự phòng khởi động model.
+Đây là giới hạn chờ, không phải số đo tốc độ model.
 
 ## Kiểm tra và Quyết định & giả định
 
@@ -102,12 +122,12 @@ Trường bổ sung tương thích ngược:
 
 - `ReadUsage.serverTimings?: { promptMs, predictedMs, promptTokens, predictedTokens }`, lấy nguyên số từ
   `timings.{prompt_ms,predicted_ms,prompt_n,predicted_n}`. Thiếu không bịa 0; nhiều request/lượt chỉ cộng khi tất cả có số đo.
-- `ReadUsage.sentImages?: { originalWidth, originalHeight, width, height }[]`, theo thứ tự ảnh/lượt thực gửi.
+- `ReadUsage.sentImages?: { originalWidth, originalHeight, width, height, maxImageSide? }[]`, theo thứ tự ảnh/lượt thực gửi.
 - `ReadDraft.vertices[].alternatives?`, `edges[].uAlternatives?` và `vAlternatives?` để giữ top-k nhãn/đầu mút và gắn cờ trong reader.
 - `ReadDraft.edges[].wConf?`, `uConf?`, `vConf?` trong [0,1], tương thích drafts cũ chưa có điểm theo trường.
   Không đổi thuật toán reconcile hoặc định nghĩa `compareRead`: cờ `.w` chứa `[9]` mà truth là 7 vẫn có coverage `none`
   theo chỉ số hiện tại; thay đổi này sửa đúng mục cần hỏi, không tự tuyên bố ứng viên đúng đã có.
-- `LlamaCppReadError.reason?`: `timeout`, `server_exit`, `truncated`, `invalid_json`, `missing_probs`, `http_error`, `aborted`.
+- `LlamaCppReadError.reason?`: `timeout`, `server_exit`, `truncated`, `invalid_json`, `missing_probs`, `http_error`, `aborted`, `logprob_alignment`, `repetition_loop`.
   Nội dung lỗi là thông báo cố định tiếng Việt. Các lỗi IO/cấu hình ảnh khác vẫn `read_failed`, không giả mã mạng.
 
 `latencyMs` là tổng trên bên gọi, tách với prompt/prediction trên server; `promptMs + predictedMs` không mặc nhiên

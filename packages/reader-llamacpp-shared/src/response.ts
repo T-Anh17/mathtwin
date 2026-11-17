@@ -1,12 +1,47 @@
 import { ReadDraftSchema } from '@mathtwin/reader';
 import type { ReadDraft, ServerTimings, TextLine } from '@mathtwin/reader';
-import { failed } from './errors.js';
+import { failed, LlamaCppReadError } from './errors.js';
 import { jsonValues } from './json-spans.js';
 import type { ValueSpan } from './json-spans.js';
 
 export interface TokenAlternative { bytes: Uint8Array; probability: number }
 export interface ScoredToken { start: number; end: number; probability: number; alternatives: TokenAlternative[] }
-export interface Completion { text: string; bytes: Uint8Array; tokens: ScoredToken[]; timings?: ServerTimings }
+export interface Completion { text: string; bytes: Uint8Array; tokens: ScoredToken[]; timings?: ServerTimings; finish_reason?: string }
+/** Repeated character n-grams: n=1..128, k=8, at least 64 characters of evidence. */
+function repetitionLoop(text: string): boolean {
+  const chars = [...text];
+  for (let n = 1; n <= Math.min(128, Math.floor(chars.length / 8)); n++) {
+    let run = 0;
+    for (let i = n; i < chars.length; i++) {
+      run = chars[i] === chars[i - n] ? run + 1 : 0;
+      const length = Math.max(8 * n, 64);
+      if (run >= length - n && chars.slice(i - length + 1, i + 1).some((c) => c.trim())) return true;
+    }
+  }
+  return false;
+}
+function unclosedJson(text: string): boolean {
+  const stack: string[] = [];
+  let quoted = false, escaped = false;
+  for (const char of text) {
+    if (quoted) {
+      if (escaped) escaped = false;
+      else if (char === '\\') escaped = true;
+      else if (char === '"') quoted = false;
+    } else if (char === '"') quoted = true;
+    else if (char === '{' || char === '[') stack.push(char);
+    else if (char === '}' || char === ']') {
+      if (stack.pop() !== (char === '}' ? '{' : '[')) return false;
+    }
+  }
+  return quoted || stack.length > 0 || !text.trim();
+}
+/** Read metadata before parsing so failed device records retain the server finish reason. */
+export function completionFinishReason(raw: unknown): string | undefined {
+  if (!raw || typeof raw !== 'object' || !('choices' in raw) || !Array.isArray(raw.choices)) return;
+  const choice: unknown = raw.choices[0];
+  if (choice && typeof choice === 'object' && 'finish_reason' in choice && typeof choice.finish_reason === 'string') return choice.finish_reason;
+}
 export function object(value: unknown): Record<string, unknown> {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) return failed('invalid_json');
   return value as Record<string, unknown>;
@@ -24,12 +59,22 @@ function probability(logprob: unknown): number {
   return Math.exp(logprob);
 }
 function equal(a: Uint8Array, b: Uint8Array): boolean { return a.length === b.length && a.every((v, i) => v === b[i]); }
-export function parseCompletion(raw: unknown): Completion {
+export function parseCompletion(raw: unknown, expectsJson = false): Completion {
+  try { return parseResponse(raw, expectsJson); }
+  catch (error) {
+    if (error instanceof LlamaCppReadError) throw new LlamaCppReadError(error.code, error.reason, completionFinishReason(raw));
+    throw error;
+  }
+}
+function parseResponse(raw: unknown, expectsJson: boolean): Completion {
   const body = object(raw);
   if (!Array.isArray(body.choices) || body.choices.length !== 1) return failed('invalid_json');
   const choice = object(body.choices[0]);
-  if (choice.finish_reason !== 'stop') return failed('truncated');
-  const text = object(choice.message).content;
+  const text = choice.message && typeof choice.message === 'object' ? object(choice.message).content : undefined;
+  const finish = typeof choice.finish_reason === 'string' ? choice.finish_reason : undefined;
+  if (typeof text === 'string' && (repetitionLoop(text)
+    || (finish === 'length' && (expectsJson || /^[\s]*[\[{]/.test(text)) && unclosedJson(text)))) return failed('repetition_loop', finish);
+  if (finish !== 'stop') return failed('truncated', finish);
   if (typeof text !== 'string' || !text.trim()) return failed('invalid_json');
   if (!choice.logprobs || typeof choice.logprobs !== 'object') return failed('missing_probs');
   const scores = scoreObject(choice.logprobs).content;
@@ -55,8 +100,27 @@ export function parseCompletion(raw: unknown): Completion {
   }
   const bytes = new Uint8Array(offset); let cursor = 0;
   for (const chunk of chunks) { bytes.set(chunk, cursor); cursor += chunk.length; }
-  if (!tokens.length || !equal(bytes, new TextEncoder().encode(text))) return failed('missing_probs');
-  const result: Completion = { text, bytes, tokens };
+  const contentBytes = new TextEncoder().encode(text);
+  let alignedTokens = tokens;
+  if (!equal(bytes, contentBytes)) {
+    let tokenText: string;
+    try { tokenText = new TextDecoder('utf-8', { fatal: true }).decode(bytes); } catch { return failed('logprob_alignment', finish); }
+    const start = tokenText.indexOf(text), before = tokenText.slice(0, start), after = tokenText.slice(start + text.length);
+    // Only tolerate the wrapper removed by llama-server, never arbitrary missing content.
+    if (start < 0 || !/^\s*```(?:json)?\s*$/i.test(before) || !/^\s*```\s*$/.test(after)) return failed('logprob_alignment', finish);
+    const byteStart = new TextEncoder().encode(before).length, byteEnd = byteStart + contentBytes.length;
+    alignedTokens = tokens.filter((t) => t.end > byteStart && t.start < byteEnd).map((t) => {
+      const prefix = Math.max(0, byteStart - t.start), suffix = Math.max(0, t.end - byteEnd);
+      // A token may straddle a fence/content boundary; retain only alternatives with identical outside bytes.
+      const alternatives = t.alternatives.filter((a) => a.bytes.length >= prefix + suffix
+        && equal(a.bytes.subarray(0, prefix), bytes.subarray(t.start, t.start + prefix))
+        && equal(a.bytes.subarray(a.bytes.length - suffix), bytes.subarray(t.end - suffix, t.end)))
+        .map((a) => ({ ...a, bytes: a.bytes.slice(prefix, a.bytes.length - suffix) }));
+      return { ...t, start: Math.max(t.start, byteStart) - byteStart, end: Math.min(t.end, byteEnd) - byteStart, alternatives };
+    });
+  }
+  if (!alignedTokens.length) return failed('logprob_alignment', finish);
+  const result: Completion = { text, bytes: contentBytes, tokens: alignedTokens, finish_reason: finish };
   if (body.timings !== undefined) {
     const t = object(body.timings);
     if (![t.prompt_ms, t.predicted_ms].every((n) => typeof n === 'number' && Number.isFinite(n) && n >= 0)

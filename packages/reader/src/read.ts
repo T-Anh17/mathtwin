@@ -50,6 +50,7 @@ export async function readProblem(images: PreparedImage[], deps: { reader: Visio
           promptTokens: prior.promptTokens + t.promptTokens, predictedTokens: prior.predictedTokens + t.predictedTokens };
       } else { completeServerTimings = false; delete usage.serverTimings; }
       if (result.usage.sentImages) usage.sentImages = [...(usage.sentImages ?? []), ...result.usage.sentImages];
+      if (result.usage.finish_reason) usage.finish_reason = [...(usage.finish_reason ?? []), ...result.usage.finish_reason];
       if (result.usage.peakMemoryMb !== undefined) usage.peakMemoryMb = Math.max(usage.peakMemoryMb ?? 0, result.usage.peakMemoryMb);
       const parsed = ReadDraftSchema.safeParse(result.draft);
       if (!parsed.success) return failure('invalid_spec');

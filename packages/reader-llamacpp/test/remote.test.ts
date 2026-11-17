@@ -17,6 +17,19 @@ function remote(raw: unknown = response('{"lines":[{"text":"7"}]}')) {
   return { runtime, fetcher, options, reader: new LlamaCppReader(options, runtime) };
 }
 
+it.each([512, 768, 1024])('Node resizes to configured %dpx and uses shared DRY/finish metadata', async (maxImageSide) => {
+  const h = remote(); const reader = new LlamaCppReader({ ...h.options, maxImageSide,
+    dry: { dry_multiplier: 0, dry_base: 2, dry_allowed_length: 3, dry_penalty_last_n: -1 } }, h.runtime);
+  const result = await reader.readLines([{ width: 2048, height: 1024, pixels: new Uint8ClampedArray(2048 * 1024 * 4) }]);
+  expect(result.usage).toMatchObject({ finish_reason: ['stop'], sentImages: [{ width: maxImageSide, height: maxImageSide / 2, maxImageSide }] });
+  expect(JSON.parse(String(h.fetcher.mock.calls[1]?.[1]?.body))).toMatchObject({ dry_multiplier: 0, dry_base: 2, dry_allowed_length: 3, dry_penalty_last_n: -1 });
+});
+it('Node enforces a configurable readTimeout even when HTTP ignores its abort signal', async () => {
+  const h = remote(); const reader = new LlamaCppReader({ ...h.options, readTimeout: 25 }, h.runtime);
+  h.fetcher.mockImplementation(async (url) => String(url).endsWith('/health') ? new Response('{}') : new Promise<Response>(() => {}));
+  await expect(reader.readLines([image])).rejects.toMatchObject({ reason: 'timeout' });
+});
+
 it.each(['http://10.0.0.1:8080', 'http://172.16.0.1', 'http://172.31.255.254', 'http://192.168.0.1/',
   'http://127.0.0.1', 'http://127.3.2.1:65535', 'http://[::1]:8080'])('accepts literal private/loopback origin %s', (url) => {
   expect(privateServerUrl(url)).toBe(new URL(url).origin);
@@ -55,12 +68,12 @@ it('sends resized dimensions in usage and converts normalized boxes back to the 
   const h = remote(response('{"lines":[{"text":"7","box":[100,200,900,800]}]}'));
   const photo = { width: 2000, height: 1000, pixels: new Uint8ClampedArray(2000 * 1000 * 4) };
   const result = await h.reader.readLines([photo]);
-  expect(result.usage.sentImages).toEqual([{ originalWidth: 2000, originalHeight: 1000, width: 1536, height: 768 }]);
+  expect(result.usage.sentImages).toEqual([{ originalWidth: 2000, originalHeight: 1000, width: 768, height: 384, maxImageSide: 768 }]);
   expect(result.lines[0]?.box).toEqual([200, 200, 1800, 800]);
   const body = JSON.parse(String(h.fetcher.mock.calls[1]?.[1]?.body)) as { messages: { content: { image_url?: { url: string } }[] }[] };
   const dataUrl = body.messages[1]!.content[0]!.image_url!.url;
   const png = Buffer.from(dataUrl.split(',')[1]!, 'base64');
-  expect(png.readUInt32BE(16)).toBe(1536); expect(png.readUInt32BE(20)).toBe(768);
+  expect(png.readUInt32BE(16)).toBe(768); expect(png.readUInt32BE(20)).toBe(384);
 });
 
 it('omits incomplete timing aggregates rather than claiming unmeasured server work took zero time', async () => {

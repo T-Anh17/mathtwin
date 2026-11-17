@@ -8,11 +8,12 @@ export type ReadIssueCode =
   | 'missing_question' | 'needs_postprocessing' | 'invalid_spec' | 'read_failed';
 export interface ReadIssue { code: ReadIssueCode; severity: 'blocking' | 'warning'; item?: string; message: string }
 export interface ServerTimings { promptMs: number; predictedMs: number; promptTokens: number; predictedTokens: number }
-export interface SentImageSize { originalWidth: number; originalHeight: number; width: number; height: number }
+export interface SentImageSize { originalWidth: number; originalHeight: number; width: number; height: number; maxImageSide?: number }
 export interface ReadUsage {
   passes: number; latencyMs: number; engine: string; peakMemoryMb?: number;
   serverTimings?: ServerTimings;
   sentImages?: SentImageSize[];
+  finish_reason?: string[];
   lineCount?: number;
   detectionMs?: number;
   recognitionMs?: number;

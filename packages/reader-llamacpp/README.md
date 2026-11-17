@@ -44,8 +44,10 @@ Không tự tải model, mã nguồn, binary hay driver. Manifest nay chỉ pin 
 | `gpuLayers`, `mmprojGpu` | `0`, `false` | Chỉ spawn, CPU mặc định |
 | `threads` | `os.availableParallelism()` | Chỉ spawn; thay số `--threads` cứng, có thể đặt rõ khi phát triển |
 | `contextSize`, `maxTokens` | `8192`, `4096` | Context chỉ spawn; token output mọi mode |
-| `timeoutMs`, `startupTimeoutMs` | `180000`, `120000` | Hạn thao tác và chờ `/health`; cùng áp dụng cho kết nối server có sẵn |
-| `maxLongEdge` | `1536` | Bilinear RGBA giữ tỉ lệ trước gửi |
+| `readTimeout`, `startupTimeoutMs` | `300000`, `120000` | Hạn mỗi request hoàn chỉnh và chờ `/health`, ms; cả server có sẵn |
+| `timeoutMs` | `180000 + readTimeout` | Hạn tổng một ảnh; nhiều ảnh cộng thêm readTimeout/ảnh. Phải lớn hơn readTimeout. Tương thích caller cũ: nếu chỉ truyền timeoutMs, readTimeout tối đa timeoutMs−1 |
+| `maxImageSide` | `768` | Bilinear RGBA giữ tỉ lệ trước gửi; maxLongEdge là alias cũ, maxImageSide được ưu tiên |
+| `dry` | `0.8 / 1.75 / 2 / 64` | dry_multiplier / dry_base / dry_allowed_length / dry_penalty_last_n; multiplier 0 để tắt |
 | `alternativesThreshold` | `0.1` | Ngưỡng ứng viên top-k, không dùng đáp án để lọc |
 | `paddleTextMode` | `spotting` | `Spotting:` có LOC/box; chọn `ocr` để dùng OCR thuần không box |
 
@@ -53,9 +55,12 @@ Hai engine cài `TextReader`; Qwen cài đọc đồ thị với prompt `edges`/
 Paddle `read()` báo `text_only`; không dựng cạnh từ chữ OCR hoặc trả đồ thị rỗng giả thành công.
 
 Ảnh `PreparedImage` RGBA đã xoay EXIF được co bằng `reader.resizeImage`, mã hóa PNG trong RAM bằng Node zlib.
-Không đọc `source`, không lưu ảnh. `usage.sentImages` ghi kích thước thực gửi;
+Không đọc `source`, không lưu ảnh. `usage.sentImages` ghi kích thước thực gửi và maxImageSide; `usage.finish_reason` giữ lý do kết thúc từng request;
 box normalized từ response đổi thẳng về kích thước ảnh gốc, box lỗi bỏ mà không mất dòng.
 Nhiều trang text đọc theo thứ tự input; box thuộc trang tương ứng, interface hiện chưa có pageIndex.
+
+Nguồn mặc định DRY, lựa chọn multiplier thử nghiệm của app, schema tương thích b12388, căn token fence và lỗi `repetition_loop`/`logprob_alignment`:
+xem [giao thức dùng chung](../reader-llamacpp-shared/README.md#cấu-hình-đo-trên-vivo-lô-27b). Không phục hồi JSON cụt.
 
 `usage.serverTimings` giữ tổng prompt/predicted ms và token của server (chỉ nếu mọi request có `timings`),
 `latencyMs` đo tổng thao tác trên bên gọi, gồm co/mã hóa/giao tiếp/chờ server/inference, chưa gồm dừng process.

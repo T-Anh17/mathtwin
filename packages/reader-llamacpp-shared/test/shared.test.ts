@@ -15,6 +15,74 @@ function response(text: string, changes = new Map<number, Change>()): unknown {
 }
 function scored(text: string, changes?: Map<number, Change>) { return parseCompletion(response(text, changes)); }
 
+it.each(['lines', 'edges', 'neighbors'] as const)('emits only llama.cpp-compatible array items throughout %s schema', (mode) => {
+  const request = completionRequest('b', mode, ['data:image/png;base64,AA==']);
+  const boxes: unknown[] = [];
+  const fixedArrays: Record<string, unknown>[] = [];
+  const visit = (value: unknown): void => {
+    if (!value || typeof value !== 'object') return;
+    if (Array.isArray(value)) { value.forEach(visit); return; }
+    const node = value as Record<string, unknown>;
+    expect(node).not.toHaveProperty('prefixItems');
+    if ('items' in node) { expect(typeof node.items).toBe('object'); expect(node.items).not.toBeNull(); expect(Array.isArray(node.items)).toBe(false); }
+    if ('box' in node) boxes.push(node.box);
+    if (node.minItems === 4 && node.maxItems === 4) fixedArrays.push(node);
+    Object.values(node).forEach(visit);
+  };
+  visit(request.response_format);
+  expect(boxes.length).toBeGreaterThan(0);
+  // Zod can reuse the box through $ref; its actual definition is a fixed numeric array.
+  expect(fixedArrays.length).toBeGreaterThan(0);
+  for (const box of fixedArrays) expect(box).toMatchObject({ type: 'array', items: { type: 'number' } });
+});
+
+it('aligns stripped JSON fences, split UTF-8 bytes, per-value confidence and top-k alternatives', () => {
+  const text = '{"lines":[{"text":"Đề 7"},{"text":"B"}]}';
+  const bytes = encoder.encode(text), target = encoder.encode(text.slice(0, text.indexOf('7'))).length;
+  const fence = (token: string) => ({ token, bytes: [...encoder.encode(token)], logprob: Math.log(0.001), top_logprobs: [] });
+  // Real server shape: message.content excludes the fence, logprobs.content still contains it.
+  const completion = parseCompletion({ choices: [{ finish_reason: 'stop', message: { content: text }, logprobs: {
+    content: [fence('```'), fence('json'), fence('\n'),
+      ...[...bytes].map((byte, i) => ({ bytes: [byte], logprob: Math.log(i === target ? 0.4 : 0.99),
+        top_logprobs: i === target ? [{ bytes: [...encoder.encode('1')], logprob: Math.log(0.3) }] : [] })), fence('\n'), fence('```')],
+  } }] }, true);
+  expect(lineResult(completion, 100, 100)).toEqual([
+    { text: 'Đề 7', conf: 0.4, alternatives: ['Đề 1'] }, { text: 'B', conf: 0.99, alternatives: [] },
+  ]);
+  expect(completion.finish_reason).toBe('stop');
+});
+
+it('handles a token spanning fence/content boundaries without corrupting byte offsets', () => {
+  const text = '{"lines":[{"text":"Đề"}]}';
+  const wrapped = '```json\r\n' + text + '\r\n```';
+  const c = parseCompletion({ choices: [{ finish_reason: 'stop', message: { content: text },
+    logprobs: { content: [{ bytes: [...encoder.encode(wrapped)], logprob: Math.log(0.6),
+      top_logprobs: [{ bytes: [...encoder.encode(wrapped.replace('Đề', 'Đê'))], logprob: Math.log(0.2) }] }] } }] });
+  expect(lineResult(c, 1, 1)[0]).toEqual({ text: 'Đề', conf: 0.6, alternatives: ['Đê'] });
+});
+
+it.each(['prefix data', '```json\n{"lines":[]}\n```'])('rejects unmatched token content with logprob_alignment: %s', (tokens) => {
+  expect(() => parseCompletion({ choices: [{ finish_reason: 'stop', message: { content: '{"lines":[{"text":"7"}]}' },
+    logprobs: { content: [{ bytes: [...encoder.encode(tokens)], logprob: -0.1 }] } }] }))
+    .toThrow(expect.objectContaining({ code: 'logprob_alignment', reason: 'logprob_alignment' }));
+});
+
+it.each(['stop', 'length'])('reports repeated n-grams separately and retains finish_reason=%s', (finish_reason) => {
+  expect(() => parseCompletion({ choices: [{ finish_reason, message: { content: '{"lines":[{"text":"' + 'lặp chữ '.repeat(12) } }] }, true))
+    .toThrow(expect.objectContaining({ code: 'repetition_loop', reason: 'repetition_loop', finish_reason }));
+});
+it('rejects token-limited incomplete JSON without repairing it; complete JSON at length is still truncated', () => {
+  expect(() => parseCompletion({ choices: [{ finish_reason: 'length', message: { content: '{"lines":[' } }] }, true))
+    .toThrow(expect.objectContaining({ code: 'repetition_loop', finish_reason: 'length' }));
+  expect(() => parseCompletion({ choices: [{ finish_reason: 'length', message: { content: '{"lines":[]}' } }] }, true))
+    .toThrow(expect.objectContaining({ reason: 'truncated' }));
+  // Closed malformed JSON and braces inside strings are not an unclosed JSON loop.
+  expect(() => parseCompletion({ choices: [{ finish_reason: 'length', message: { content: '{bad}' } }] }, true))
+    .toThrow(expect.objectContaining({ reason: 'truncated' }));
+  expect(() => parseCompletion({ choices: [{ finish_reason: 'length', message: { content: '{"text":"[\\\"}"}' } }] }, true))
+    .toThrow(expect.objectContaining({ reason: 'truncated' }));
+});
+
 it('only the ambiguous weight has low confidence; punctuation and keys do not contaminate other values', () => {
   const text = JSON.stringify(draft()), weight = text.indexOf('"w":7') + 4;
   const result = graphResult(scored(text, new Map([[weight, { probability: 0.4 }], [0, { probability: 0.001 }],

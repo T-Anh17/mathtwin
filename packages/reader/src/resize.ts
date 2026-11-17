@@ -1,12 +1,14 @@
 import type { PreparedImage } from './types.js';
 
+export const defaultMaxImageSide = 768;
+
 /** Deterministic center-sampled bilinear RGBA resize; never upscales. */
-export function resizeImage(image: PreparedImage, maxLongEdge = 1536): PreparedImage {
+export function resizeImage(image: PreparedImage, maxImageSide = defaultMaxImageSide): PreparedImage {
   const { width, height, pixels } = image;
-  if (!Number.isSafeInteger(maxLongEdge) || maxLongEdge < 1 || maxLongEdge > 16384
+  if (!Number.isSafeInteger(maxImageSide) || maxImageSide < 1 || maxImageSide > 16384
     || !Number.isSafeInteger(width) || !Number.isSafeInteger(height) || width < 1 || height < 1
     || !(pixels instanceof Uint8ClampedArray) || pixels.length !== width * height * 4) throw new Error('Invalid image dimensions.');
-  const scale = Math.min(1, maxLongEdge / Math.max(width, height));
+  const scale = Math.min(1, maxImageSide / Math.max(width, height));
   if (scale === 1) return image;
   const outWidth = Math.max(1, Math.round(width * scale)), outHeight = Math.max(1, Math.round(height * scale));
   const output = new Uint8ClampedArray(outWidth * outHeight * 4);

@@ -42,6 +42,43 @@ const image = { id: 'case-1', dataUrl: decoded.encoded, imageSource: 'gallery' a
 const signal = () => new AbortController().signal;
 
 describe('Android benchmark flow with fake native plugin (no device/model/network)', () => {
+  it('defaults to 768px, 300s and shared DRY, and exports the effective settings', async () => {
+    const { runner, http, decode } = fake();
+    const result = await runner.run(image, { ...config, passes: 1 }, signal());
+    expect(decode).toHaveBeenCalledWith(image.dataUrl, 768);
+    expect(http.post).toHaveBeenCalledWith(expect.objectContaining({ readTimeout: 300_000,
+      data: expect.objectContaining({ dry_multiplier: 0.8, dry_base: 1.75, dry_allowed_length: 2, dry_penalty_last_n: 64 }) }));
+    expect(result.usage).toMatchObject({ finish_reason: ['stop'], sentImages: [{ maxImageSide: 768 }] });
+    expect(JSON.parse(exportReport({ version: 1, device, results: [result] }))).toMatchObject({ results: [{ config: {
+      maxImageSide: 768, readTimeout: 300_000, dry: { dry_multiplier: 0.8 } } }] });
+  });
+  it.each([512, 768, 1024])('propagates %dpx, a custom read timeout and disabled DRY to the request/export', async (maxImageSide) => {
+    const { runner, http, decode } = fake();
+    const result = await runner.run(image, { ...config, passes: 1, maxImageSide, readTimeout: 450_000,
+      dry: { dry_multiplier: 0, dry_base: 2, dry_allowed_length: 3, dry_penalty_last_n: -1 } }, signal());
+    expect(decode).toHaveBeenCalledWith(image.dataUrl, maxImageSide);
+    expect(http.post).toHaveBeenCalledWith(expect.objectContaining({ readTimeout: 450_000,
+      data: expect.objectContaining({ dry_multiplier: 0, dry_base: 2, dry_allowed_length: 3, dry_penalty_last_n: -1 }) }));
+    expect(result.config).toMatchObject({ maxImageSide, readTimeout: 450_000 });
+    expect(result.usage.sentImages?.[0]?.maxImageSide).toBe(maxImageSide);
+  });
+  it.each(['graph', 'lines'] as const)('retains repetition_loop and finish_reason through failed %s runs and export', async (mode) => {
+    const { runner, http } = fake();
+    mock.mocked(http.post).mockResolvedValue({ status: 200, data: { choices: [{ finish_reason: 'length', message: { content: '{"lines":[' } }] } });
+    const result = await runner.run(image, { ...config, mode }, signal());
+    expect(result.errorCode).toBe('repetition_loop'); expect(result.linePasses ?? []).toEqual([]);
+    expect(result.usage).toMatchObject({ finish_reason: ['length'], sentImages: [{ maxImageSide: 768 }] });
+    expect(JSON.parse(exportReport({ version: 1, device, results: [result] }))).toMatchObject({ results: [{ errorCode: 'repetition_loop', usage: { finish_reason: ['length'] } }] });
+  });
+  it('runs a stripped-fence response end-to-end with measured confidence', async () => {
+    const { runner, http } = fake();
+    const text = '{"lines":[{"text":"Đề sai 7"}]}';
+    const raw = response('```json\n' + text + '\n```', 0.7) as { choices: { message: { content: string } }[] };
+    raw.choices[0]!.message.content = text;
+    mock.mocked(http.post).mockResolvedValue({ status: 200, data: raw });
+    const result = await runner.run(image, { ...config, mode: 'lines', passes: 1 }, signal());
+    expect(result.errorCode).toBeUndefined(); expect(result.linePasses?.[0]?.lines[0]?.conf).toBe(0.7);
+  });
   it('runs independent edges/neighbors requests on authenticated loopback and reuses common parser', async () => {
     const { runner, http } = fake();
     const result = await runner.run(image, config, signal());
@@ -198,7 +235,7 @@ describe('Android benchmark flow with fake native plugin (no device/model/networ
         return new Promise(() => {});
       });
       const run = runner.run(image, config, abort.signal);
-      await mock.advanceTimersByTimeAsync(cause === 'timeout' ? 300_000 : 0);
+      await mock.advanceTimersByTimeAsync(cause === 'timeout' ? 780_000 : 0);
       setState({ alive: false });
       expect((await run).errorCode).toBe(cause);
     } finally { mock.useRealTimers(); }

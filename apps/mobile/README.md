@@ -5,6 +5,11 @@ Lịch sử và Cài đặt; màn **Model** và **Đo** cũ nằm trong **Cài �
 Chỉ Android **arm64-v8a**, Android 8 / API 26 trở lên. Backend CPU; Vulkan, OpenCL và GPU offload tắt.
 Không có model trong APK. Không chạy `adb` hoặc tải trọng số khi chạy `npm test` / `mobile:build`.
 
+APK debug luôn ký bằng [`android/debug.keystore`](android/debug.keystore) trong repo, alias `androiddebugkey`, mật khẩu store/key `android`.
+Khóa công khai này **chỉ dùng cho debug**, không dùng phát hành; không có khóa release trong repo.
+Giữ nguyên file này giữa các máy/phiên build để cài đè debug APK không đổi chữ ký và giữ dữ liệu/model đã nạp.
+APK cũ ký bằng khóa khác vẫn không thể cập nhật trực tiếp bằng khóa mới; cần người dùng tự sao lưu/chuyển dữ liệu trước khi đổi lần đầu.
+
 ## Giao diện
 
 Nguồn đối chiếu: [`docs/design/wireframe.html`](../../docs/design/wireframe.html), nấc Màu:
@@ -188,7 +193,14 @@ Không lưu bản copy ảnh chụp lâu dài hoặc tự lưu vào gallery.
 camera tĩnh. Kết quả luôn phân biệt `imageSource:"camera"` và `captureMethod:"system"|"webview"`.
 Chọn thư viện dùng file picker -> FileReader, chỉ giữ data URL trong bộ nhớ.
 Nguồn thư viện ghi `imageSource:"gallery"`; bộ đo ghi `imageSource:"dataset"`.
-PNG/JPEG tối đa 10 MiB, 40 triệu pixel; giải mã có EXIF orientation, resize TS về cạnh dài tối đa 1536.
+PNG/JPEG tối đa 10 MiB, 40 triệu pixel; giải mã có EXIF orientation, resize TS theo `maxImageSide`, mặc định 768 px.
+Màn Đo chọn 512 / 768 / 1024 px. Thời gian chờ mỗi lượt mặc định 300 giây, chỉnh được từ 1 đến 3600 giây;
+file config ghi `readTimeout` bằng ms. Hạn tổng mỗi ảnh `180000 + passes * readTimeout` ms luôn lớn hơn thời gian chờ HTTP.
+Mặc định chọn B và chế độ dòng chữ; A giữ để đối chứng, chỉ hỗ trợ chữ.
+DRY có bật/tắt và chỉnh đủ bốn tham số; mặc định app `dry_multiplier=0.8`, `dry_base=1.75`, `dry_allowed_length=2`, `dry_penalty_last_n=64`.
+Nguồn upstream (multiplier mặc định 0), ngưỡng phát hiện vòng lặp và quy tắc confidence xem [README dùng chung](../../packages/reader-llamacpp-shared/README.md#cấu-hình-đo-trên-vivo-lô-27b).
+Không đóng/sửa JSON cụt. Lặp hoặc hết token khi JSON chưa xong → `repetition_loop`; không căn được token → `logprob_alignment`.
+File xuất ghi cấu hình hiệu lực trên từng ảnh, `usage.sentImages[].maxImageSide` và `usage.finish_reason[]` theo thứ tự request, kể cả lượt thất bại đã có response.
 Tọa độ kết quả quy về ảnh gốc đã xoay. Xóa ảnh khỏi bộ nhớ bằng nút trên màn Đo.
 
 Thư mục bộ đo chứa ảnh và `ids.json` (mảng, id duy nhất, filename không có thư mục con):

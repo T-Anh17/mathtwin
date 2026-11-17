@@ -10,6 +10,6 @@ export { completeWithQuestion } from './complete.js';
 export { compareRead } from './compare.js';
 export { localReaderMessages } from './messages.vi.js';
 export { ocrMessages } from './messages.vi.js';
-export { resizeImage } from './resize.js';
+export { resizeImage, defaultMaxImageSide } from './resize.js';
 export { compareText, editDistance, stripDiacritics } from './text-metrics.js';
 export type { TruthLine, TextComparison, TextMetrics, TextRegion, EditScore, TokenScore } from './text-metrics.js';

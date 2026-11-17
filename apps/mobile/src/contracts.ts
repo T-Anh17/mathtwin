@@ -1,4 +1,5 @@
 import type { ReadOutcome, ReadUsage, TextLine } from '@mathtwin/reader';
+import type { DryConfig } from '@mathtwin/reader-llamacpp-shared';
 
 export type Model = 'a' | 'b';
 export interface DeviceInfo {
@@ -9,7 +10,8 @@ export interface ModelState { model: Model; bytes: number; downloadedBytes: numb
 export interface Session { port: number; apiKey: string; reused: boolean; loadMs: number; verifyMs?: number }
 export interface MemoryPressure { callback: 'onTrimMemory' | 'onLowMemory'; trimLevel: number | null }
 export interface ServerState { alive: boolean; peakMemoryMb?: number; rssMemoryMb?: number; exitCode?: number; cpuVariant?: string; cpuVariantSource?: 'maps' | 'log'; errorCode?: 'cpu_backend_unknown'; memoryPressure?: MemoryPressure }
-export interface BenchmarkConfig { model: Model; passes: 1 | 2; mode: 'graph' | 'lines'; threads: number; minRamGb: number; allowLowRam: boolean; backgroundIdleMinutes: number }
+export interface BenchmarkConfig { model: Model; passes: 1 | 2; mode: 'graph' | 'lines'; threads: number; minRamGb: number; allowLowRam: boolean; backgroundIdleMinutes: number;
+  maxImageSide?: number; readTimeout?: number; dry?: DryConfig }
 export interface DatasetEntry { id: string; file: string }
 export type DatasetLocation = 'internal' | 'external';
 export interface Dataset { name: string; entries: DatasetEntry[]; location: DatasetLocation }

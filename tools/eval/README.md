@@ -82,6 +82,11 @@ Xem [adapter](../../packages/reader-ocr/README.md) và
 
 Lấy JSON qua đường dẫn app đã báo khi bấm Xuất kết quả (xem [README app](../../apps/mobile/README.md)). `--from-device` đọc định dạng version 1 do `exportReport()` tạo. Mặc định `both`: đánh giá các record graph và lines có trong file; không tự suy ra graph từ chữ hoặc ngược lại. Model, lượt đọc và cấu hình lấy từ file; không truyền `--engine`/`--passes` cùng `--from-device`. Hai lượt lines được báo riêng, không chọn lượt tốt hơn bằng truth.
 
+Cấu hình `maxImageSide`, `readTimeout` (ms) và bốn tham số `dry` được giữ trong JSON/Markdown, tách nhóm đo khi khác nhau.
+Mỗi row giữ `usage.sentImages` (kích thước gốc/thực gửi/maxImageSide) và `usage.finish_reason` theo thứ tự request.
+File version 1 cũ không có các trường này vẫn nhập được, không suy đoán cấu hình hay metadata còn thiếu.
+`repetition_loop` và `logprob_alignment` giữ mã riêng và tính là lượt thất bại; không loại khỏi mẫu số.
+
 Ghép theo id trên cả ba bộ; `--set` lọc theo bộ sau khi ghép. Id không có truth, id trùng trong cùng cấu hình, schema sai, lượt thiếu mà không có errorCode hoặc thiếu lines truth đều báo lỗi. Cùng id ở mode/cấu hình khác được chấp nhận và xuất báo cáo riêng. `--limit` giới hạn từng cấu hình theo thứ tự file. Lỗi đọc có errorCode vẫn được tính: graph sai có cờ lỗi xử lý, lượt chữ chưa có kết quả được so như mảng rỗng; không loại mẫu thất bại khỏi mẫu số. Nếu có `--set`, JSON ghi thêm `notExportedIds` để thấy các id chưa được app chạy/xuất.
 
 Kết quả: `reports/read-device-<ngày UTC>-<hash>.md` và `.json`. Hash gồm nội dung file, bộ chọn, cấu hình, limit và ngưỡng nên các lần đo khác không ghi đè nhau. Chạy lại đúng cùng đầu vào thay đúng cặp báo cáo. Không chứa pixel/draft/khóa server; không đọc file ảnh khi nhập JSON. Ghi thiết bị, runtime/commit, backend, `cpuVariant` nếu app trả, cấu hình, độ trễ tổng/server p50/p90, thời gian nạp mới/dùng lại, RAM đỉnh và lỗi. Không gán thời gian tính chỉ số trên PC thành thời gian điện thoại. RAM < 6 GB có `targetEligible: false`: chỉ chứng minh chạy được hay không. Thiếu ảnh viết tay thật vẫn chưa đủ căn cứ cho kết luận nghiệm thu.

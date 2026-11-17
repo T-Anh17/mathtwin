@@ -5,8 +5,8 @@ import { fileURLToPath } from 'node:url';
 import { setTimeout as delay } from 'node:timers/promises';
 import { resizeImage } from '@mathtwin/reader';
 import type { PreparedImage, ReadDraft, ReadUsage, ServerTimings, TextLine, TextReader, VisionReader } from '@mathtwin/reader';
-import { completionRequest, graphResult, lineResult, parseCompletion, plainLines, spottingLines, LlamaCppReadError } from '@mathtwin/reader-llamacpp-shared';
-import type { Completion, ReadMode } from '@mathtwin/reader-llamacpp-shared';
+import { completionRequest, defaultDry, defaultMaxImageSide, defaultReadTimeout, imageTimeout, validateDry, graphResult, lineResult, parseCompletion, plainLines, spottingLines, LlamaCppReadError } from '@mathtwin/reader-llamacpp-shared';
+import type { Completion, DryConfig, ReadMode } from '@mathtwin/reader-llamacpp-shared';
 import { imageDataUrl } from './image.js';
 import { nodeRuntime } from './runtime.js';
 import type { LlamaRuntime } from './runtime.js';
@@ -17,7 +17,7 @@ export type { LlamaRuntime, ServerProcess } from './runtime.js';
 interface CommonOptions {
   model: 'a' | 'b'; modelsDirectory?: string; gpuLayers?: number; mmprojGpu?: boolean;
   contextSize?: number; maxTokens?: number; timeoutMs?: number; startupTimeoutMs?: number;
-  threads?: number; maxLongEdge?: number; alternativesThreshold?: number;
+  threads?: number; maxImageSide?: number; maxLongEdge?: number; readTimeout?: number; dry?: DryConfig; alternativesThreshold?: number;
   paddleTextMode?: 'spotting' | 'ocr';
 }
 export type LlamaCppOptions = CommonOptions & (
@@ -69,11 +69,16 @@ export class LlamaCppReader implements VisionReader, TextReader {
       this.endpoint = { serverPath: resolve(options.serverPath) };
     }
     this.engine = options.model === 'a' ? 'offline:paddleocr-vl-1.5' : 'offline:qwen3-vl-2b';
+    const readTimeout = options.readTimeout ?? Math.min(defaultReadTimeout, (options.timeoutMs ?? Infinity) - 1);
+    const maxImageSide = options.maxImageSide ?? options.maxLongEdge ?? defaultMaxImageSide;
     this.options = { modelsDirectory: fileURLToPath(new URL('../../../.models/', import.meta.url)),
-      gpuLayers: 0, mmprojGpu: false, contextSize: 8192, maxTokens: 4096, timeoutMs: 180_000, startupTimeoutMs: 120_000,
-      threads: availableParallelism(), maxLongEdge: 1536, alternativesThreshold: 0.1, paddleTextMode: 'spotting', ...options };
+      gpuLayers: 0, mmprojGpu: false, contextSize: 8192, maxTokens: 4096, timeoutMs: imageTimeout(readTimeout), startupTimeoutMs: 120_000,
+      threads: availableParallelism(), alternativesThreshold: 0.1, paddleTextMode: 'spotting', ...options,
+      readTimeout, maxImageSide, maxLongEdge: maxImageSide, dry: { ...(options.dry ?? defaultDry) } };
     const o = this.options;
-    if (![o.contextSize, o.maxTokens, o.timeoutMs, o.startupTimeoutMs, o.threads, o.maxLongEdge].every((n) => Number.isSafeInteger(n) && n > 0 && n <= 2_147_483_647)
+    validateDry(o.dry);
+    if (![o.contextSize, o.maxTokens, o.timeoutMs, o.readTimeout, o.startupTimeoutMs, o.threads, o.maxImageSide].every((n) => Number.isSafeInteger(n) && n > 0 && n <= 2_147_483_647)
+      || o.timeoutMs <= o.readTimeout
       || o.maxLongEdge > 16384 || !Number.isSafeInteger(o.gpuLayers) || o.gpuLayers < 0 || o.maxTokens > o.contextSize
       || !Number.isFinite(o.alternativesThreshold) || o.alternativesThreshold < 0 || o.alternativesThreshold > 1
       || !['ocr', 'spotting'].includes(o.paddleTextMode)) throw new Error('Invalid runtime limits.');
@@ -102,13 +107,13 @@ export class LlamaCppReader implements VisionReader, TextReader {
     checkAbort(signal);
     if (this.active) throw new LlamaCppReadError('busy');
     this.active = true;
-    const start = performance.now(), timeout = AbortSignal.timeout(this.options.timeoutMs), lifetime = new AbortController();
+    const start = performance.now(), timeout = AbortSignal.timeout(this.options.timeoutMs + this.options.readTimeout * Math.max(0, images.length - 1)), lifetime = new AbortController();
     const combined = AbortSignal.any([timeout, lifetime.signal, ...(signal ? [signal] : [])]);
     let child: ReturnType<LlamaRuntime['start']> | undefined;
     let startup: AbortSignal | undefined;
     try {
       if (!images.length) throw new LlamaCppReadError('read_failed', 'invalid_json');
-      const sized = images.map((image) => resizeImage(image, this.options.maxLongEdge));
+      const sized = images.map((image) => resizeImage(image, this.options.maxImageSide));
       const encoded = new Map(images.map((image, i) => [image, imageDataUrl(sized[i]!)]));
       let base: string, apiKey: string;
       if ('serverUrl' in this.endpoint) ({ serverUrl: base, apiKey } = this.endpoint);
@@ -133,6 +138,7 @@ export class LlamaCppReader implements VisionReader, TextReader {
           headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
           ...(body === undefined ? {} : { body: JSON.stringify(body) }), signal: requestSignal, redirect: 'error' }), requestSignal);
       const metrics: (ServerTimings | undefined)[] = [];
+      const finishes: string[] = [];
       const work = async (): Promise<T> => {
         startup = AbortSignal.timeout(this.options.startupTimeoutMs);
         const readiness = AbortSignal.any([combined, startup]);
@@ -151,15 +157,18 @@ export class LlamaCppReader implements VisionReader, TextReader {
         }
         startup = undefined;
         return action(async (pages, mode) => {
+          const readLimit = AbortSignal.timeout(this.options.readTimeout);
+          const requestSignal = AbortSignal.any([combined, readLimit]);
           let response: Response;
           try { response = await request('/v1/chat/completions', completionRequest(this.options.model, mode,
-            pages.map((image) => encoded.get(image)!), this.options.maxTokens)); }
-          catch (error) { if (combined.aborted) throw error; throw new LlamaCppReadError('read_failed', 'http_error'); }
+            pages.map((image) => encoded.get(image)!), this.options.maxTokens, this.options.dry), requestSignal); }
+          catch (error) { if (combined.aborted) throw error; throw new LlamaCppReadError('read_failed', readLimit.aborted ? 'timeout' : 'http_error'); }
           if (!response.ok) { await response.body?.cancel(); throw new LlamaCppReadError('read_failed', 'http_error'); }
           let raw: unknown;
-          try { raw = await cancellable(() => response.json() as Promise<unknown>, combined); }
-          catch (error) { if (combined.aborted) throw error; throw new LlamaCppReadError('read_failed', 'invalid_json'); }
-          const result = parseCompletion(raw); metrics.push(result.timings); return result;
+          try { raw = await cancellable(() => response.json() as Promise<unknown>, requestSignal); }
+          catch (error) { if (combined.aborted) throw error; throw new LlamaCppReadError('read_failed', readLimit.aborted ? 'timeout' : 'invalid_json'); }
+          const result = parseCompletion(raw, this.options.model === 'b'); metrics.push(result.timings);
+          if (result.finish_reason) finishes.push(result.finish_reason); return result;
         });
       };
       const result = await cancellable(() => {
@@ -168,7 +177,8 @@ export class LlamaCppReader implements VisionReader, TextReader {
         return Promise.race(races);
       }, combined);
       const usage: ReadUsage = { passes: 1, latencyMs: performance.now() - start, engine: this.engine,
-        sentImages: images.map((image, i) => ({ originalWidth: image.width, originalHeight: image.height, width: sized[i]!.width, height: sized[i]!.height })) };
+        finish_reason: finishes,
+        sentImages: images.map((image, i) => ({ originalWidth: image.width, originalHeight: image.height, width: sized[i]!.width, height: sized[i]!.height, maxImageSide: this.options.maxImageSide })) };
       if (metrics.length && metrics.every((t) => t !== undefined)) {
         usage.serverTimings = metrics.reduce<ServerTimings>((sum, t) => ({ promptMs: sum.promptMs + t!.promptMs, predictedMs: sum.predictedMs + t!.predictedMs,
           promptTokens: sum.promptTokens + t!.promptTokens, predictedTokens: sum.predictedTokens + t!.predictedTokens }),

@@ -1,6 +1,6 @@
 import { readProblem } from '@mathtwin/reader';
 import type { ReadUsage, TextLine, VisionReader } from '@mathtwin/reader';
-import { completionRequest, graphResult, lineResult, parseCompletion, spottingLines } from '@mathtwin/reader-llamacpp-shared';
+import { completionRequest, completionFinishReason, defaultMaxImageSide, defaultReadTimeout, defaultDry, validateDry, imageTimeout, graphResult, lineResult, parseCompletion, spottingLines } from '@mathtwin/reader-llamacpp-shared';
 import type { ReadMode } from '@mathtwin/reader-llamacpp-shared';
 import type { BenchImage, BenchmarkConfig, BenchmarkReport, HttpTransport, ImageResult, MobilePlugin, ServerState, Session } from './contracts.js';
 import type { DecodedImage } from './images.js';
@@ -16,7 +16,10 @@ function serverFailure(state: ServerState): string | undefined {
   return undefined;
 }
 function validateConfig(c: BenchmarkConfig): void {
+  try { validateDry(c.dry ?? defaultDry); } catch { throw { code: 'native_error' }; }
   if (!['a', 'b'].includes(c.model) || ![1, 2].includes(c.passes) || !['graph', 'lines'].includes(c.mode)
+    || ![512, 768, 1024].includes(c.maxImageSide ?? defaultMaxImageSide)
+    || !Number.isSafeInteger(c.readTimeout ?? defaultReadTimeout) || (c.readTimeout ?? defaultReadTimeout) < 1000 || (c.readTimeout ?? defaultReadTimeout) > 3_600_000
     || !Number.isInteger(c.threads) || c.threads < 1 || c.threads > 256 || !Number.isFinite(c.minRamGb) || c.minRamGb < 1 || c.minRamGb > 64
     || !Number.isFinite(c.backgroundIdleMinutes) || c.backgroundIdleMinutes < 1 || c.backgroundIdleMinutes > 60) throw { code: 'native_error' };
 }
@@ -24,10 +27,12 @@ function validateConfig(c: BenchmarkConfig): void {
 export class Benchmark {
   private active = false;
   constructor(private readonly plugin: MobilePlugin, private readonly http: HttpTransport,
-    private readonly decode: (dataUrl: string) => Promise<DecodedImage>, private readonly now = () => performance.now()) {}
+    private readonly decode: (dataUrl: string, maxImageSide: number) => Promise<DecodedImage>, private readonly now = () => performance.now()) {}
 
   async run(image: BenchImage, config: BenchmarkConfig, signal: AbortSignal): Promise<ImageResult> {
     if (this.active) throw { code: 'busy' };
+    config = { ...config, maxImageSide: config.maxImageSide ?? defaultMaxImageSide,
+      readTimeout: config.readTimeout ?? defaultReadTimeout, dry: { ...(config.dry ?? defaultDry) } };
     this.active = true;
     const start = this.now(), engine = engineFor(config.model);
     const result: ImageResult = { id: image.id, imageSource: image.imageSource, ...(image.captureMethod ? { captureMethod: image.captureMethod } : {}),
@@ -57,11 +62,11 @@ export class Benchmark {
       validateConfig(config); check(signal);
       onAbort = () => { fail('aborted'); void this.plugin.stop().catch(() => {}); };
       signal.addEventListener('abort', onAbort, { once: true }); check(signal);
-      timeout = setTimeout(() => { fail('timeout'); void this.plugin.stop().catch(() => {}); }, 300_000);
+      timeout = setTimeout(() => { fail('timeout'); void this.plugin.stop().catch(() => {}); }, imageTimeout(config.readTimeout!, config.passes));
       if (config.model === 'a' && config.mode === 'graph') throw { code: 'text_only' };
       const device = await guard(this.plugin.device());
       if (device.totalRamBytes < config.minRamGb * 1e9 && !config.allowLowRam) throw { code: 'low_ram' };
-      const decoded = await guard(this.decode(image.dataUrl)); check(signal);
+      const decoded = await guard(this.decode(image.dataUrl, config.maxImageSide!)); check(signal);
       startAttempted = true;
       const session = await guard(this.plugin.start(config));
       validateSession(session);
@@ -72,11 +77,14 @@ export class Benchmark {
       timer = setInterval(() => { void updateMemory(); }, 250);
       const complete = async (mode: ReadMode): Promise<{ completion: ReturnType<typeof parseCompletion>; usage: ReadUsage }> => {
         check(signal); if (failure) throw { code: failure }; const began = this.now();
+        const sentImage = { originalWidth: decoded.original.width, originalHeight: decoded.original.height,
+          width: decoded.resized.width, height: decoded.resized.height, maxImageSide: config.maxImageSide! };
+        result.usage.sentImages = [...(result.usage.sentImages ?? []), sentImage];
         let response: { status: number; data: unknown };
         try {
           response = await guard(this.http.post({ url: `http://127.0.0.1:${session.port}/v1/chat/completions`,
             headers: { Authorization: `Bearer ${session.apiKey}`, 'Content-Type': 'application/json' },
-            data: completionRequest(config.model, mode, [decoded.encoded]), connectTimeout: 5000, readTimeout: 180_000, disableRedirects: true }));
+            data: completionRequest(config.model, mode, [decoded.encoded], 4096, config.dry), connectTimeout: 5000, readTimeout: config.readTimeout!, disableRedirects: true }));
           if (response.status !== 200) throw { code: 'http_error' };
         } catch (e) {
           if (failure || signal.aborted) throw e;
@@ -85,9 +93,12 @@ export class Benchmark {
           const code = serverFailure(currentMemory); if (code) throw { code };
           throw { code: 'http_error' };
         }
-        const completion = parseCompletion(response.data);
+        const finish = completionFinishReason(response.data);
+        result.usage.finish_reason = [...(result.usage.finish_reason ?? []), ...(finish ? [finish] : [])];
+        const completion = parseCompletion(response.data, config.model === 'b');
         const usage: ReadUsage = { engine, passes: 1, latencyMs: this.now() - began,
-          sentImages: [{ originalWidth: decoded.original.width, originalHeight: decoded.original.height, width: decoded.resized.width, height: decoded.resized.height }],
+          finish_reason: finish ? [finish] : [],
+          sentImages: [sentImage],
           ...(completion.timings ? { serverTimings: completion.timings } : {}) };
         return { completion, usage };
       };
@@ -98,7 +109,7 @@ export class Benchmark {
           } catch (e) { failure ??= errorCode(e); throw e; }
         } };
         result.outcome = await guard(readProblem([decoded.original], { reader, passes: config.passes, signal }));
-        result.usage = result.outcome.usage;
+        result.usage = { ...result.outcome.usage, sentImages: result.usage.sentImages ?? [], finish_reason: result.usage.finish_reason ?? [] };
         if (failure) result.errorCode = failure;
       } else {
         result.linePasses = [];
@@ -145,6 +156,7 @@ function validateSession(s: Session): void {
 }
 function addUsage(all: ReadUsage[], engine: string): ReadUsage {
   const usage: ReadUsage = { engine, passes: all.length, latencyMs: all.reduce((sum, u) => sum + u.latencyMs, 0), sentImages: all.flatMap((u) => u.sentImages ?? []) };
+  usage.finish_reason = all.flatMap((u) => u.finish_reason ?? []);
   if (all.every((u) => u.serverTimings)) usage.serverTimings = all.reduce((sum, u) => ({ promptMs: sum.promptMs + u.serverTimings!.promptMs,
     predictedMs: sum.predictedMs + u.serverTimings!.predictedMs, promptTokens: sum.promptTokens + u.serverTimings!.promptTokens, predictedTokens: sum.predictedTokens + u.serverTimings!.predictedTokens }),
   { promptMs: 0, predictedMs: 0, promptTokens: 0, predictedTokens: 0 });
@@ -154,12 +166,13 @@ function addUsage(all: ReadUsage[], engine: string): ReadUsage {
 /** Explicit allowlist. Pixel buffers, data URLs, file paths, server key and source are never serialized. */
 export function exportReport(report: BenchmarkReport): string {
   return JSON.stringify({ version: 1, runtime: { llamaCpp: manifest.llamaCppSource, backend: 'CPU', contextSize: 8192,
-    maxTokens: 4096, maxLongEdge: 1536, alternativesThreshold: 0.1, mmprojOffload: false },
+    maxTokens: 4096, alternativesThreshold: 0.1, mmprojOffload: false },
   device: { manufacturer: report.device.manufacturer, model: report.device.model,
     android: report.device.android, sdk: report.device.sdk, cores: report.device.cores,
     totalRamBytes: report.device.totalRamBytes, availableRamBytes: report.device.availableRamBytes, freeStorageBytes: report.device.freeStorageBytes },
   results: report.results.map((r) => ({ id: r.id, engine: r.engine, config: { model: r.config.model, passes: r.config.passes,
     mode: r.config.mode, threads: r.config.threads, minRamGb: r.config.minRamGb, allowLowRam: r.config.allowLowRam,
+    maxImageSide: r.config.maxImageSide ?? defaultMaxImageSide, readTimeout: r.config.readTimeout ?? defaultReadTimeout, dry: r.config.dry ?? defaultDry,
     backgroundIdleMinutes: r.config.backgroundIdleMinutes, backend: 'CPU', cpuVariant: r.memory?.cpuVariant, cpuVariantSource: r.memory?.cpuVariantSource },
     imageSource: r.imageSource, captureMethod: r.captureMethod,
     outcome: r.outcome, linePasses: r.linePasses, usage: r.usage, totalMs: r.totalMs, modelLoadMs: r.modelLoadMs,
