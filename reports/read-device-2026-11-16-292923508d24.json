@@ -1,0 +1,6292 @@
+{
+  "engine": "offline:qwen3-vl-2b",
+  "set": "synthetic-hw",
+  "passes": 1,
+  "date": "2026-11-16",
+  "mode": "lines",
+  "fixtureOnly": false,
+  "downloadBytes": null,
+  "configuration": {
+    "model": "b",
+    "passes": 1,
+    "mode": "lines",
+    "threads": 8,
+    "minRamGb": 6,
+    "maxImageSide": 768,
+    "readTimeout": 300000,
+    "dry": {
+      "dry_multiplier": 0.8,
+      "dry_base": 1.75,
+      "dry_allowed_length": 2,
+      "dry_penalty_last_n": 64
+    },
+    "allowLowRam": false,
+    "backgroundIdleMinutes": 5,
+    "backend": "CPU",
+    "cpuVariant": "android_armv8.6_1"
+  },
+  "phoneMeasurements": {
+    "device": {
+      "manufacturer": "vivo",
+      "model": "V2324HA",
+      "android": "16",
+      "sdk": 36,
+      "cores": 8,
+      "totalRamBytes": 11874000896,
+      "availableRamBytes": 6649962496,
+      "freeStorageBytes": 15325212672
+    },
+    "runtime": {
+      "backend": "CPU",
+      "contextSize": 8192,
+      "maxTokens": 4096,
+      "alternativesThreshold": 0.1,
+      "mmprojOffload": false,
+      "llamaCpp": {
+        "repository": "ggml-org/llama.cpp",
+        "revision": "b12388",
+        "commit": "1c2adc75f619d05efc5d49ce08eaaa96272ebfa2",
+        "url": "https://github.com/ggml-org/llama.cpp.git",
+        "license": "MIT",
+        "licenseUrl": "https://github.com/ggml-org/llama.cpp/blob/1c2adc75f619d05efc5d49ce08eaaa96272ebfa2/LICENSE"
+      }
+    },
+    "targetEligible": true,
+    "notExportedIds": [
+      "13-tsp-tied-student-tour-dancing-perspective",
+      "13-tsp-tied-student-tour-dancing-straight",
+      "13-tsp-tied-student-tour-patrick-perspective",
+      "13-tsp-tied-student-tour-patrick-straight",
+      "14-postman-alternative-matching-dancing-perspective",
+      "14-postman-alternative-matching-dancing-straight",
+      "14-postman-alternative-matching-patrick-perspective",
+      "14-postman-alternative-matching-patrick-straight",
+      "18-short-answer-degree-dancing-perspective",
+      "18-short-answer-degree-dancing-straight",
+      "18-short-answer-degree-patrick-perspective",
+      "18-short-answer-degree-patrick-straight",
+      "19-four-true-false-items-dancing-perspective",
+      "19-four-true-false-items-dancing-straight",
+      "19-four-true-false-items-patrick-perspective",
+      "19-four-true-false-items-patrick-straight",
+      "20-four-choice-question-dancing-perspective",
+      "20-four-choice-question-dancing-straight",
+      "20-four-choice-question-patrick-perspective",
+      "20-four-choice-question-patrick-straight"
+    ]
+  },
+  "unsupportedSymbols": null,
+  "summary": {
+    "total": 0,
+    "correct": 0,
+    "incorrect": 0,
+    "graphCorrect": 0,
+    "fullyFlagged": 0,
+    "completeRate": null,
+    "graphRate": null,
+    "flaggedRate": null,
+    "silentErrors": [],
+    "graphSilentErrors": [],
+    "coverage": {
+      "precise": 0,
+      "coarse": 0,
+      "none": 0
+    },
+    "extraFlagsPerProblem": null,
+    "evaluatedImages": 20,
+    "failedImages": [
+      {
+        "id": "12-dijkstra-tied-order-dancing-perspective",
+        "code": "http_error"
+      },
+      {
+        "id": "12-dijkstra-tied-order-dancing-straight",
+        "code": "http_error"
+      },
+      {
+        "id": "12-dijkstra-tied-order-patrick-straight",
+        "code": "aborted"
+      }
+    ],
+    "memoryPressureCount": 0,
+    "truncatedLines": null,
+    "unsupportedSymbolTruthLines": null,
+    "textByPass": {
+      "1": {
+        "samples": 20,
+        "cer": {
+          "errors": 1053,
+          "reference": 3406,
+          "rate": 0.30916030534351147
+        },
+        "wer": {
+          "errors": 430,
+          "reference": 950,
+          "rate": 0.45263157894736844
+        },
+        "cerWithoutDiacritics": {
+          "errors": 998,
+          "reference": 3406,
+          "rate": 0.2930123311802701
+        },
+        "digits": {
+          "errors": 69,
+          "reference": 96,
+          "rate": 0.71875,
+          "accuracy": 0.28125
+        },
+        "vertexLabels": {
+          "errors": 113,
+          "reference": 214,
+          "rate": 0.5280373831775701,
+          "accuracy": 0.4719626168224299
+        },
+        "referenceLines": 232,
+        "predictedLines": 149,
+        "correctLines": 68,
+        "lineRecall": 0.29310344827586204,
+        "silentLines": 11,
+        "silentLineRate": 0.0738255033557047,
+        "struckReferenceLines": 20,
+        "struckReadAsContent": 0,
+        "struckUnassessable": 9,
+        "byRegion": {
+          "question": {
+            "samples": 20,
+            "cer": {
+              "errors": 273,
+              "reference": 1388,
+              "rate": 0.19668587896253603
+            },
+            "wer": {
+              "errors": 80,
+              "reference": 312,
+              "rate": 0.2564102564102564
+            },
+            "cerWithoutDiacritics": {
+              "errors": 258,
+              "reference": 1388,
+              "rate": 0.18587896253602307
+            },
+            "digits": {
+              "errors": 0,
+              "reference": 0,
+              "rate": null,
+              "accuracy": null
+            },
+            "vertexLabels": {
+              "errors": 7,
+              "reference": 12,
+              "rate": 0.5833333333333334,
+              "accuracy": 0.41666666666666663
+            },
+            "referenceLines": 40,
+            "predictedLines": 31,
+            "correctLines": 14,
+            "lineRecall": 0.35,
+            "silentLines": 1,
+            "silentLineRate": 0.03225806451612903,
+            "struckReferenceLines": 0,
+            "struckReadAsContent": 0,
+            "struckUnassessable": 0
+          },
+          "figure": {
+            "samples": 20,
+            "cer": {
+              "errors": 412,
+              "reference": 268,
+              "rate": 1.537313432835821
+            },
+            "wer": {
+              "errors": 143,
+              "reference": 124,
+              "rate": 1.153225806451613
+            },
+            "cerWithoutDiacritics": {
+              "errors": 406,
+              "reference": 268,
+              "rate": 1.5149253731343284
+            },
+            "digits": {
+              "errors": 21,
+              "reference": 16,
+              "rate": 1.3125,
+              "accuracy": 0
+            },
+            "vertexLabels": {
+              "errors": 58,
+              "reference": 76,
+              "rate": 0.7631578947368421,
+              "accuracy": 0.23684210526315785
+            },
+            "referenceLines": 116,
+            "predictedLines": 65,
+            "correctLines": 34,
+            "lineRecall": 0.29310344827586204,
+            "silentLines": 3,
+            "silentLineRate": 0.046153846153846156,
+            "struckReferenceLines": 0,
+            "struckReadAsContent": 0,
+            "struckUnassessable": 0
+          },
+          "table": {
+            "samples": 4,
+            "cer": {
+              "errors": 158,
+              "reference": 208,
+              "rate": 0.7596153846153846
+            },
+            "wer": {
+              "errors": 77,
+              "reference": 100,
+              "rate": 0.77
+            },
+            "cerWithoutDiacritics": {
+              "errors": 158,
+              "reference": 208,
+              "rate": 0.7596153846153846
+            },
+            "digits": {
+              "errors": 47,
+              "reference": 60,
+              "rate": 0.7833333333333333,
+              "accuracy": 0.21666666666666667
+            },
+            "vertexLabels": {
+              "errors": 24,
+              "reference": 32,
+              "rate": 0.75,
+              "accuracy": 0.25
+            },
+            "referenceLines": 20,
+            "predictedLines": 5,
+            "correctLines": 3,
+            "lineRecall": 0.15,
+            "silentLines": 0,
+            "silentLineRate": 0,
+            "struckReferenceLines": 0,
+            "struckReadAsContent": 0,
+            "struckUnassessable": 0
+          },
+          "solution": {
+            "samples": 20,
+            "cer": {
+              "errors": 490,
+              "reference": 1498,
+              "rate": 0.32710280373831774
+            },
+            "wer": {
+              "errors": 190,
+              "reference": 414,
+              "rate": 0.45893719806763283
+            },
+            "cerWithoutDiacritics": {
+              "errors": 465,
+              "reference": 1498,
+              "rate": 0.3104138851802403
+            },
+            "digits": {
+              "errors": 11,
+              "reference": 20,
+              "rate": 0.55,
+              "accuracy": 0.44999999999999996
+            },
+            "vertexLabels": {
+              "errors": 31,
+              "reference": 94,
+              "rate": 0.32978723404255317,
+              "accuracy": 0.6702127659574468
+            },
+            "referenceLines": 56,
+            "predictedLines": 48,
+            "correctLines": 14,
+            "lineRecall": 0.25,
+            "silentLines": 8,
+            "silentLineRate": 0.16666666666666666,
+            "struckReferenceLines": 20,
+            "struckReadAsContent": 0,
+            "struckUnassessable": 9
+          }
+        }
+      }
+    },
+    "nodeLatencyMs": {
+      "p50": null,
+      "p90": null
+    },
+    "readerLatencyMs": {
+      "p50": 39146.30000001192,
+      "p90": 44706.69999998808
+    },
+    "deviceTotalMs": {
+      "p50": 43360.299999952316,
+      "p90": 80226.59999996424
+    },
+    "serverMs": {
+      "p50": 42180.445,
+      "p90": 44714.072
+    },
+    "modelLoadMs": {
+      "cold": [
+        5313,
+        5379,
+        7961
+      ],
+      "reused": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "peakMemoryMb": 3930.65234375,
+    "errors": {}
+  },
+  "groups": {
+    "printed": {
+      "total": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "graphCorrect": 0,
+      "fullyFlagged": 0,
+      "completeRate": null,
+      "graphRate": null,
+      "flaggedRate": null,
+      "silentErrors": [],
+      "graphSilentErrors": [],
+      "coverage": {
+        "precise": 0,
+        "coarse": 0,
+        "none": 0
+      },
+      "extraFlagsPerProblem": null,
+      "evaluatedImages": 0,
+      "failedImages": [],
+      "memoryPressureCount": 0,
+      "truncatedLines": null,
+      "unsupportedSymbolTruthLines": null,
+      "textByPass": {},
+      "nodeLatencyMs": {
+        "p50": null,
+        "p90": null
+      },
+      "readerLatencyMs": {
+        "p50": null,
+        "p90": null
+      },
+      "deviceTotalMs": {
+        "p50": null,
+        "p90": null
+      },
+      "serverMs": {
+        "p50": null,
+        "p90": null
+      },
+      "modelLoadMs": {
+        "cold": [],
+        "reused": []
+      },
+      "peakMemoryMb": null,
+      "errors": {}
+    },
+    "handwritten": {
+      "total": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "graphCorrect": 0,
+      "fullyFlagged": 0,
+      "completeRate": null,
+      "graphRate": null,
+      "flaggedRate": null,
+      "silentErrors": [],
+      "graphSilentErrors": [],
+      "coverage": {
+        "precise": 0,
+        "coarse": 0,
+        "none": 0
+      },
+      "extraFlagsPerProblem": null,
+      "evaluatedImages": 0,
+      "failedImages": [],
+      "memoryPressureCount": 0,
+      "truncatedLines": null,
+      "unsupportedSymbolTruthLines": null,
+      "textByPass": {},
+      "nodeLatencyMs": {
+        "p50": null,
+        "p90": null
+      },
+      "readerLatencyMs": {
+        "p50": null,
+        "p90": null
+      },
+      "deviceTotalMs": {
+        "p50": null,
+        "p90": null
+      },
+      "serverMs": {
+        "p50": null,
+        "p90": null
+      },
+      "modelLoadMs": {
+        "cold": [],
+        "reused": []
+      },
+      "peakMemoryMb": null,
+      "errors": {}
+    },
+    "synthetic_handwriting": {
+      "total": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "graphCorrect": 0,
+      "fullyFlagged": 0,
+      "completeRate": null,
+      "graphRate": null,
+      "flaggedRate": null,
+      "silentErrors": [],
+      "graphSilentErrors": [],
+      "coverage": {
+        "precise": 0,
+        "coarse": 0,
+        "none": 0
+      },
+      "extraFlagsPerProblem": null,
+      "evaluatedImages": 20,
+      "failedImages": [
+        {
+          "id": "12-dijkstra-tied-order-dancing-perspective",
+          "code": "http_error"
+        },
+        {
+          "id": "12-dijkstra-tied-order-dancing-straight",
+          "code": "http_error"
+        },
+        {
+          "id": "12-dijkstra-tied-order-patrick-straight",
+          "code": "aborted"
+        }
+      ],
+      "memoryPressureCount": 0,
+      "truncatedLines": null,
+      "unsupportedSymbolTruthLines": null,
+      "textByPass": {
+        "1": {
+          "samples": 20,
+          "cer": {
+            "errors": 1053,
+            "reference": 3406,
+            "rate": 0.30916030534351147
+          },
+          "wer": {
+            "errors": 430,
+            "reference": 950,
+            "rate": 0.45263157894736844
+          },
+          "cerWithoutDiacritics": {
+            "errors": 998,
+            "reference": 3406,
+            "rate": 0.2930123311802701
+          },
+          "digits": {
+            "errors": 69,
+            "reference": 96,
+            "rate": 0.71875,
+            "accuracy": 0.28125
+          },
+          "vertexLabels": {
+            "errors": 113,
+            "reference": 214,
+            "rate": 0.5280373831775701,
+            "accuracy": 0.4719626168224299
+          },
+          "referenceLines": 232,
+          "predictedLines": 149,
+          "correctLines": 68,
+          "lineRecall": 0.29310344827586204,
+          "silentLines": 11,
+          "silentLineRate": 0.0738255033557047,
+          "struckReferenceLines": 20,
+          "struckReadAsContent": 0,
+          "struckUnassessable": 9,
+          "byRegion": {
+            "question": {
+              "samples": 20,
+              "cer": {
+                "errors": 273,
+                "reference": 1388,
+                "rate": 0.19668587896253603
+              },
+              "wer": {
+                "errors": 80,
+                "reference": 312,
+                "rate": 0.2564102564102564
+              },
+              "cerWithoutDiacritics": {
+                "errors": 258,
+                "reference": 1388,
+                "rate": 0.18587896253602307
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 7,
+                "reference": 12,
+                "rate": 0.5833333333333334,
+                "accuracy": 0.41666666666666663
+              },
+              "referenceLines": 40,
+              "predictedLines": 31,
+              "correctLines": 14,
+              "lineRecall": 0.35,
+              "silentLines": 1,
+              "silentLineRate": 0.03225806451612903,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "figure": {
+              "samples": 20,
+              "cer": {
+                "errors": 412,
+                "reference": 268,
+                "rate": 1.537313432835821
+              },
+              "wer": {
+                "errors": 143,
+                "reference": 124,
+                "rate": 1.153225806451613
+              },
+              "cerWithoutDiacritics": {
+                "errors": 406,
+                "reference": 268,
+                "rate": 1.5149253731343284
+              },
+              "digits": {
+                "errors": 21,
+                "reference": 16,
+                "rate": 1.3125,
+                "accuracy": 0
+              },
+              "vertexLabels": {
+                "errors": 58,
+                "reference": 76,
+                "rate": 0.7631578947368421,
+                "accuracy": 0.23684210526315785
+              },
+              "referenceLines": 116,
+              "predictedLines": 65,
+              "correctLines": 34,
+              "lineRecall": 0.29310344827586204,
+              "silentLines": 3,
+              "silentLineRate": 0.046153846153846156,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "table": {
+              "samples": 4,
+              "cer": {
+                "errors": 158,
+                "reference": 208,
+                "rate": 0.7596153846153846
+              },
+              "wer": {
+                "errors": 77,
+                "reference": 100,
+                "rate": 0.77
+              },
+              "cerWithoutDiacritics": {
+                "errors": 158,
+                "reference": 208,
+                "rate": 0.7596153846153846
+              },
+              "digits": {
+                "errors": 47,
+                "reference": 60,
+                "rate": 0.7833333333333333,
+                "accuracy": 0.21666666666666667
+              },
+              "vertexLabels": {
+                "errors": 24,
+                "reference": 32,
+                "rate": 0.75,
+                "accuracy": 0.25
+              },
+              "referenceLines": 20,
+              "predictedLines": 5,
+              "correctLines": 3,
+              "lineRecall": 0.15,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "solution": {
+              "samples": 20,
+              "cer": {
+                "errors": 490,
+                "reference": 1498,
+                "rate": 0.32710280373831774
+              },
+              "wer": {
+                "errors": 190,
+                "reference": 414,
+                "rate": 0.45893719806763283
+              },
+              "cerWithoutDiacritics": {
+                "errors": 465,
+                "reference": 1498,
+                "rate": 0.3104138851802403
+              },
+              "digits": {
+                "errors": 11,
+                "reference": 20,
+                "rate": 0.55,
+                "accuracy": 0.44999999999999996
+              },
+              "vertexLabels": {
+                "errors": 31,
+                "reference": 94,
+                "rate": 0.32978723404255317,
+                "accuracy": 0.6702127659574468
+              },
+              "referenceLines": 56,
+              "predictedLines": 48,
+              "correctLines": 14,
+              "lineRecall": 0.25,
+              "silentLines": 8,
+              "silentLineRate": 0.16666666666666666,
+              "struckReferenceLines": 20,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 9
+            }
+          }
+        }
+      },
+      "nodeLatencyMs": {
+        "p50": null,
+        "p90": null
+      },
+      "readerLatencyMs": {
+        "p50": 39146.30000001192,
+        "p90": 44706.69999998808
+      },
+      "deviceTotalMs": {
+        "p50": 43360.299999952316,
+        "p90": 80226.59999996424
+      },
+      "serverMs": {
+        "p50": 42180.445,
+        "p90": 44714.072
+      },
+      "modelLoadMs": {
+        "cold": [
+          5313,
+          5379,
+          7961
+        ],
+        "reused": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "peakMemoryMb": 3930.65234375,
+      "errors": {}
+    },
+    "legacy_synthetic_pen": {
+      "total": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "graphCorrect": 0,
+      "fullyFlagged": 0,
+      "completeRate": null,
+      "graphRate": null,
+      "flaggedRate": null,
+      "silentErrors": [],
+      "graphSilentErrors": [],
+      "coverage": {
+        "precise": 0,
+        "coarse": 0,
+        "none": 0
+      },
+      "extraFlagsPerProblem": null,
+      "evaluatedImages": 0,
+      "failedImages": [],
+      "memoryPressureCount": 0,
+      "truncatedLines": null,
+      "unsupportedSymbolTruthLines": null,
+      "textByPass": {},
+      "nodeLatencyMs": {
+        "p50": null,
+        "p90": null
+      },
+      "readerLatencyMs": {
+        "p50": null,
+        "p90": null
+      },
+      "deviceTotalMs": {
+        "p50": null,
+        "p90": null
+      },
+      "serverMs": {
+        "p50": null,
+        "p90": null
+      },
+      "modelLoadMs": {
+        "cold": [],
+        "reused": []
+      },
+      "peakMemoryMb": null,
+      "errors": {}
+    },
+    "tilted": {
+      "total": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "graphCorrect": 0,
+      "fullyFlagged": 0,
+      "completeRate": null,
+      "graphRate": null,
+      "flaggedRate": null,
+      "silentErrors": [],
+      "graphSilentErrors": [],
+      "coverage": {
+        "precise": 0,
+        "coarse": 0,
+        "none": 0
+      },
+      "extraFlagsPerProblem": null,
+      "evaluatedImages": 10,
+      "failedImages": [
+        {
+          "id": "12-dijkstra-tied-order-dancing-perspective",
+          "code": "http_error"
+        }
+      ],
+      "memoryPressureCount": 0,
+      "truncatedLines": null,
+      "unsupportedSymbolTruthLines": null,
+      "textByPass": {
+        "1": {
+          "samples": 10,
+          "cer": {
+            "errors": 314,
+            "reference": 1703,
+            "rate": 0.18438050499119202
+          },
+          "wer": {
+            "errors": 137,
+            "reference": 475,
+            "rate": 0.28842105263157897
+          },
+          "cerWithoutDiacritics": {
+            "errors": 294,
+            "reference": 1703,
+            "rate": 0.17263652378156194
+          },
+          "digits": {
+            "errors": 26,
+            "reference": 48,
+            "rate": 0.5416666666666666,
+            "accuracy": 0.45833333333333337
+          },
+          "vertexLabels": {
+            "errors": 47,
+            "reference": 107,
+            "rate": 0.4392523364485981,
+            "accuracy": 0.5607476635514019
+          },
+          "referenceLines": 116,
+          "predictedLines": 70,
+          "correctLines": 36,
+          "lineRecall": 0.3103448275862069,
+          "silentLines": 1,
+          "silentLineRate": 0.014285714285714285,
+          "struckReferenceLines": 10,
+          "struckReadAsContent": 0,
+          "struckUnassessable": 9,
+          "byRegion": {
+            "question": {
+              "samples": 10,
+              "cer": {
+                "errors": 93,
+                "reference": 694,
+                "rate": 0.1340057636887608
+              },
+              "wer": {
+                "errors": 30,
+                "reference": 156,
+                "rate": 0.19230769230769232
+              },
+              "cerWithoutDiacritics": {
+                "errors": 86,
+                "reference": 694,
+                "rate": 0.1239193083573487
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 3,
+                "reference": 6,
+                "rate": 0.5,
+                "accuracy": 0.5
+              },
+              "referenceLines": 20,
+              "predictedLines": 15,
+              "correctLines": 5,
+              "lineRecall": 0.25,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "figure": {
+              "samples": 10,
+              "cer": {
+                "errors": 75,
+                "reference": 134,
+                "rate": 0.5597014925373134
+              },
+              "wer": {
+                "errors": 43,
+                "reference": 62,
+                "rate": 0.6935483870967742
+              },
+              "cerWithoutDiacritics": {
+                "errors": 71,
+                "reference": 134,
+                "rate": 0.5298507462686567
+              },
+              "digits": {
+                "errors": 7,
+                "reference": 8,
+                "rate": 0.875,
+                "accuracy": 0.125
+              },
+              "vertexLabels": {
+                "errors": 28,
+                "reference": 38,
+                "rate": 0.7368421052631579,
+                "accuracy": 0.26315789473684215
+              },
+              "referenceLines": 58,
+              "predictedLines": 26,
+              "correctLines": 16,
+              "lineRecall": 0.27586206896551724,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "table": {
+              "samples": 2,
+              "cer": {
+                "errors": 54,
+                "reference": 104,
+                "rate": 0.5192307692307693
+              },
+              "wer": {
+                "errors": 27,
+                "reference": 50,
+                "rate": 0.54
+              },
+              "cerWithoutDiacritics": {
+                "errors": 54,
+                "reference": 104,
+                "rate": 0.5192307692307693
+              },
+              "digits": {
+                "errors": 17,
+                "reference": 30,
+                "rate": 0.5666666666666667,
+                "accuracy": 0.43333333333333335
+              },
+              "vertexLabels": {
+                "errors": 8,
+                "reference": 16,
+                "rate": 0.5,
+                "accuracy": 0.5
+              },
+              "referenceLines": 10,
+              "predictedLines": 5,
+              "correctLines": 3,
+              "lineRecall": 0.3,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "solution": {
+              "samples": 10,
+              "cer": {
+                "errors": 85,
+                "reference": 749,
+                "rate": 0.11348464619492657
+              },
+              "wer": {
+                "errors": 37,
+                "reference": 207,
+                "rate": 0.178743961352657
+              },
+              "cerWithoutDiacritics": {
+                "errors": 76,
+                "reference": 749,
+                "rate": 0.10146862483311081
+              },
+              "digits": {
+                "errors": 2,
+                "reference": 10,
+                "rate": 0.2,
+                "accuracy": 0.8
+              },
+              "vertexLabels": {
+                "errors": 8,
+                "reference": 47,
+                "rate": 0.1702127659574468,
+                "accuracy": 0.8297872340425532
+              },
+              "referenceLines": 28,
+              "predictedLines": 24,
+              "correctLines": 12,
+              "lineRecall": 0.42857142857142855,
+              "silentLines": 1,
+              "silentLineRate": 0.041666666666666664,
+              "struckReferenceLines": 10,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 9
+            }
+          }
+        }
+      },
+      "nodeLatencyMs": {
+        "p50": null,
+        "p90": null
+      },
+      "readerLatencyMs": {
+        "p50": 37935.10000002384,
+        "p90": 43197.59999996424
+      },
+      "deviceTotalMs": {
+        "p50": 42565.40000003576,
+        "p90": 74210.19999998808
+      },
+      "serverMs": {
+        "p50": 39756.747,
+        "p90": 61646.547000000006
+      },
+      "modelLoadMs": {
+        "cold": [
+          5313,
+          7961
+        ],
+        "reused": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "peakMemoryMb": 3930.65234375,
+      "errors": {}
+    },
+    "blurred": {
+      "total": 0,
+      "correct": 0,
+      "incorrect": 0,
+      "graphCorrect": 0,
+      "fullyFlagged": 0,
+      "completeRate": null,
+      "graphRate": null,
+      "flaggedRate": null,
+      "silentErrors": [],
+      "graphSilentErrors": [],
+      "coverage": {
+        "precise": 0,
+        "coarse": 0,
+        "none": 0
+      },
+      "extraFlagsPerProblem": null,
+      "evaluatedImages": 0,
+      "failedImages": [],
+      "memoryPressureCount": 0,
+      "truncatedLines": null,
+      "unsupportedSymbolTruthLines": null,
+      "textByPass": {},
+      "nodeLatencyMs": {
+        "p50": null,
+        "p90": null
+      },
+      "readerLatencyMs": {
+        "p50": null,
+        "p90": null
+      },
+      "deviceTotalMs": {
+        "p50": null,
+        "p90": null
+      },
+      "serverMs": {
+        "p50": null,
+        "p90": null
+      },
+      "modelLoadMs": {
+        "cold": [],
+        "reused": []
+      },
+      "peakMemoryMb": null,
+      "errors": {}
+    }
+  },
+  "rows": [
+    {
+      "id": "01-elements-multigraph-dancing-perspective",
+      "meta": {
+        "source": "synthetic_handwriting",
+        "capture": "tilted",
+        "blurred": false,
+        "questionFormat": "tu_luan",
+        "synthetic": true,
+        "variant": "dancing-perspective",
+        "coreFixture": "01-elements-multigraph",
+        "hasSolution": true,
+        "studentErrors": [],
+        "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
+        "handwritingHashes": {
+          "truth.json": "0069ccff943f7a43e5ceae44926843dfb1ba8c0f18b34237cebe93ffa9006554",
+          "lines.json": "304dcdb65fea85098f820d7b63f1d6cc4783ddfb2ab93459a08dd985b3599b50",
+          "source.svg": "a231477bb81e70e61fb4696154358087875340af46cd6d80c0013c52554c9f16",
+          "layout.json": "bdc5ab63f2fb6177172e1e834fac18884ab8ef6f225c37616665a3cc2c9e7040",
+          "cancellation.json": "886e5e624b66730cb41cb2ff3d37040a0633979668b7fa55929d919501affc27",
+          "1.png": "5ee75a054a755517b08c479779a0d48b28991155376cffacce17eee7de1731c9"
+        }
+      },
+      "usage": {
+        "engine": "offline:qwen3-vl-2b",
+        "passes": 1,
+        "latencyMs": 35897.5,
+        "peakMemoryMb": 3837.0390625,
+        "finish_reason": [
+          "stop"
+        ],
+        "sentImages": [
+          {
+            "originalWidth": 1000,
+            "originalHeight": 1440,
+            "width": 533,
+            "height": 768,
+            "maxImageSide": 768
+          }
+        ],
+        "serverTimings": {
+          "promptMs": 25913.962,
+          "predictedMs": 9794.687,
+          "promptTokens": 595,
+          "predictedTokens": 190
+        }
+      },
+      "issueCodes": [],
+      "deviceTiming": {
+        "totalMs": 43573.59999996424,
+        "modelLoadMs": 5313,
+        "modelVerifyMs": 2060,
+        "reusedModel": false
+      },
+      "textComparisons": [
+        {
+          "cer": {
+            "errors": 15,
+            "reference": 167,
+            "rate": 0.08982035928143713
+          },
+          "wer": {
+            "errors": 10,
+            "reference": 42,
+            "rate": 0.23809523809523808
+          },
+          "cerWithoutDiacritics": {
+            "errors": 12,
+            "reference": 167,
+            "rate": 0.0718562874251497
+          },
+          "digits": {
+            "errors": 0,
+            "reference": 2,
+            "rate": 0,
+            "accuracy": 1
+          },
+          "vertexLabels": {
+            "errors": 1,
+            "reference": 6,
+            "rate": 0.16666666666666666,
+            "accuracy": 0.8333333333333334
+          },
+          "referenceLines": 11,
+          "predictedLines": 12,
+          "correctLines": 6,
+          "lineRecall": 0.5454545454545454,
+          "wrongLines": 6,
+          "silentLines": 0,
+          "silentLineRate": 0,
+          "confidenceThreshold": 0.85,
+          "struckReferenceLines": 1,
+          "struckReadAsContent": 0,
+          "struckUnassessable": 1,
+          "byRegion": {
+            "question": {
+              "cer": {
+                "errors": 2,
+                "reference": 93,
+                "rate": 0.021505376344086023
+              },
+              "wer": {
+                "errors": 2,
+                "reference": 20,
+                "rate": 0.1
+              },
+              "cerWithoutDiacritics": {
+                "errors": 1,
+                "reference": 93,
+                "rate": 0.010752688172043012
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "referenceLines": 2,
+              "predictedLines": 2,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 2,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "figure": {
+              "cer": {
+                "errors": 11,
+                "reference": 18,
+                "rate": 0.6111111111111112
+              },
+              "wer": {
+                "errors": 6,
+                "reference": 7,
+                "rate": 0.8571428571428571
+              },
+              "cerWithoutDiacritics": {
+                "errors": 10,
+                "reference": 18,
+                "rate": 0.5555555555555556
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 1,
+                "reference": 3,
+                "rate": 0.3333333333333333,
+                "accuracy": 0.6666666666666667
+              },
+              "referenceLines": 6,
+              "predictedLines": 7,
+              "correctLines": 4,
+              "lineRecall": 0.6666666666666666,
+              "wrongLines": 3,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "table": {
+              "cer": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "wer": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "cerWithoutDiacritics": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "referenceLines": 0,
+              "predictedLines": 0,
+              "correctLines": 0,
+              "lineRecall": null,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": null,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "solution": {
+              "cer": {
+                "errors": 2,
+                "reference": 54,
+                "rate": 0.037037037037037035
+              },
+              "wer": {
+                "errors": 2,
+                "reference": 15,
+                "rate": 0.13333333333333333
+              },
+              "cerWithoutDiacritics": {
+                "errors": 1,
+                "reference": 54,
+                "rate": 0.018518518518518517
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 2,
+                "rate": 0,
+                "accuracy": 1
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 3,
+                "rate": 0,
+                "accuracy": 1
+              },
+              "referenceLines": 3,
+              "predictedLines": 3,
+              "correctLines": 2,
+              "lineRecall": 0.6666666666666666,
+              "wrongLines": 1,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 1,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "01-elements-multigraph-dancing-straight",
+      "meta": {
+        "source": "synthetic_handwriting",
+        "capture": "straight",
+        "blurred": false,
+        "questionFormat": "tu_luan",
+        "synthetic": true,
+        "variant": "dancing-straight",
+        "coreFixture": "01-elements-multigraph",
+        "hasSolution": true,
+        "studentErrors": [
+          {
+            "kind": "conclusion",
+            "written": "Đồ thị có 4 cạnh.",
+            "expected": "Đồ thị có 3 cạnh.",
+            "description": "Đếm thừa một cạnh của đồ thị."
+          }
+        ],
+        "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
+        "handwritingHashes": {
+          "truth.json": "0069ccff943f7a43e5ceae44926843dfb1ba8c0f18b34237cebe93ffa9006554",
+          "lines.json": "50dc69636ae1eb0789472952dfbfbcd7e1a388f2e68a7c60971652be4bd52c8d",
+          "source.svg": "a231477bb81e70e61fb4696154358087875340af46cd6d80c0013c52554c9f16",
+          "layout.json": "4d725dba3db3366354ced662bb70cfbb1da600444dea43864f1fb53198ddaa12",
+          "cancellation.json": "f1eccad45b61126202d091ee69dec4c63e1eabb5e81022a86a9ae7a8aceb655b",
+          "1.png": "6cd32985fc0ea0d1ede476d7b3e50ac7a2b6344f1a38999e565876d87a25ff96"
+        }
+      },
+      "usage": {
+        "engine": "offline:qwen3-vl-2b",
+        "passes": 1,
+        "latencyMs": 44706.69999998808,
+        "peakMemoryMb": 3837.0390625,
+        "finish_reason": [
+          "stop"
+        ],
+        "sentImages": [
+          {
+            "originalWidth": 1000,
+            "originalHeight": 1440,
+            "width": 533,
+            "height": 768,
+            "maxImageSide": 768
+          }
+        ],
+        "serverTimings": {
+          "promptMs": 27487.834,
+          "predictedMs": 17026.411,
+          "promptTokens": 595,
+          "predictedTokens": 305
+        }
+      },
+      "issueCodes": [],
+      "deviceTiming": {
+        "totalMs": 44826,
+        "modelLoadMs": 0,
+        "modelVerifyMs": 0,
+        "reusedModel": true
+      },
+      "textComparisons": [
+        {
+          "cer": {
+            "errors": 80,
+            "reference": 175,
+            "rate": 0.45714285714285713
+          },
+          "wer": {
+            "errors": 33,
+            "reference": 44,
+            "rate": 0.75
+          },
+          "cerWithoutDiacritics": {
+            "errors": 75,
+            "reference": 175,
+            "rate": 0.42857142857142855
+          },
+          "digits": {
+            "errors": 1,
+            "reference": 2,
+            "rate": 0.5,
+            "accuracy": 0.5
+          },
+          "vertexLabels": {
+            "errors": 6,
+            "reference": 6,
+            "rate": 1,
+            "accuracy": 0
+          },
+          "referenceLines": 11,
+          "predictedLines": 21,
+          "correctLines": 6,
+          "lineRecall": 0.5454545454545454,
+          "wrongLines": 15,
+          "silentLines": 3,
+          "silentLineRate": 0.14285714285714285,
+          "confidenceThreshold": 0.85,
+          "struckReferenceLines": 1,
+          "struckReadAsContent": 0,
+          "struckUnassessable": 0,
+          "byRegion": {
+            "question": {
+              "cer": {
+                "errors": 10,
+                "reference": 93,
+                "rate": 0.10752688172043011
+              },
+              "wer": {
+                "errors": 5,
+                "reference": 20,
+                "rate": 0.25
+              },
+              "cerWithoutDiacritics": {
+                "errors": 7,
+                "reference": 93,
+                "rate": 0.07526881720430108
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "referenceLines": 2,
+              "predictedLines": 2,
+              "correctLines": 1,
+              "lineRecall": 0.5,
+              "wrongLines": 1,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "figure": {
+              "cer": {
+                "errors": 83,
+                "reference": 18,
+                "rate": 4.611111111111111
+              },
+              "wer": {
+                "errors": 26,
+                "reference": 7,
+                "rate": 3.7142857142857144
+              },
+              "cerWithoutDiacritics": {
+                "errors": 82,
+                "reference": 18,
+                "rate": 4.555555555555555
+              },
+              "digits": {
+                "errors": 3,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 5,
+                "reference": 3,
+                "rate": 1.6666666666666667,
+                "accuracy": 0
+              },
+              "referenceLines": 6,
+              "predictedLines": 12,
+              "correctLines": 4,
+              "lineRecall": 0.6666666666666666,
+              "wrongLines": 8,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "table": {
+              "cer": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "wer": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "cerWithoutDiacritics": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "referenceLines": 0,
+              "predictedLines": 0,
+              "correctLines": 0,
+              "lineRecall": null,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": null,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "solution": {
+              "cer": {
+                "errors": 53,
+                "reference": 62,
+                "rate": 0.8548387096774194
+              },
+              "wer": {
+                "errors": 17,
+                "reference": 17,
+                "rate": 1
+              },
+              "cerWithoutDiacritics": {
+                "errors": 51,
+                "reference": 62,
+                "rate": 0.8225806451612904
+              },
+              "digits": {
+                "errors": 2,
+                "reference": 2,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "vertexLabels": {
+                "errors": 1,
+                "reference": 3,
+                "rate": 0.3333333333333333,
+                "accuracy": 0.6666666666666667
+              },
+              "referenceLines": 3,
+              "predictedLines": 7,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 7,
+              "silentLines": 3,
+              "silentLineRate": 0.42857142857142855,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 1,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "01-elements-multigraph-patrick-perspective",
+      "meta": {
+        "source": "synthetic_handwriting",
+        "capture": "tilted",
+        "blurred": false,
+        "questionFormat": "tu_luan",
+        "synthetic": true,
+        "variant": "patrick-perspective",
+        "coreFixture": "01-elements-multigraph",
+        "hasSolution": true,
+        "studentErrors": [
+          {
+            "kind": "conclusion",
+            "written": "Đồ thị có 4 cạnh.",
+            "expected": "Đồ thị có 3 cạnh.",
+            "description": "Đếm thừa một cạnh của đồ thị."
+          }
+        ],
+        "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
+        "handwritingHashes": {
+          "truth.json": "0069ccff943f7a43e5ceae44926843dfb1ba8c0f18b34237cebe93ffa9006554",
+          "lines.json": "a462d663e498fb21cdd62383e08d19c55624b8301be798996fa24648a326be45",
+          "source.svg": "a231477bb81e70e61fb4696154358087875340af46cd6d80c0013c52554c9f16",
+          "layout.json": "1bc2166efa6dd7aa07bca38d9cd59eb71568d4292787aa61720184b3239873e9",
+          "cancellation.json": "f44fc50b4c2aad48f3685c3adc8749e7d52917b70173e5d0ea99a3d587e9ffcf",
+          "1.png": "61655d0668dcb2354e42a207e39e3d7d6644a2e108bce4322339cc5d077ae7de"
+        }
+      },
+      "usage": {
+        "engine": "offline:qwen3-vl-2b",
+        "passes": 1,
+        "latencyMs": 36447.60000002384,
+        "peakMemoryMb": 3837.0390625,
+        "finish_reason": [
+          "stop"
+        ],
+        "sentImages": [
+          {
+            "originalWidth": 1000,
+            "originalHeight": 1440,
+            "width": 533,
+            "height": 768,
+            "maxImageSide": 768
+          }
+        ],
+        "serverTimings": {
+          "promptMs": 27701.679,
+          "predictedMs": 8560.084,
+          "promptTokens": 595,
+          "predictedTokens": 170
+        }
+      },
+      "issueCodes": [],
+      "deviceTiming": {
+        "totalMs": 36628.80000001192,
+        "modelLoadMs": 0,
+        "modelVerifyMs": 0,
+        "reusedModel": true
+      },
+      "textComparisons": [
+        {
+          "cer": {
+            "errors": 4,
+            "reference": 175,
+            "rate": 0.022857142857142857
+          },
+          "wer": {
+            "errors": 3,
+            "reference": 44,
+            "rate": 0.06818181818181818
+          },
+          "cerWithoutDiacritics": {
+            "errors": 2,
+            "reference": 175,
+            "rate": 0.011428571428571429
+          },
+          "digits": {
+            "errors": 0,
+            "reference": 2,
+            "rate": 0,
+            "accuracy": 1
+          },
+          "vertexLabels": {
+            "errors": 1,
+            "reference": 6,
+            "rate": 0.16666666666666666,
+            "accuracy": 0.8333333333333334
+          },
+          "referenceLines": 11,
+          "predictedLines": 10,
+          "correctLines": 8,
+          "lineRecall": 0.7272727272727273,
+          "wrongLines": 2,
+          "silentLines": 0,
+          "silentLineRate": 0,
+          "confidenceThreshold": 0.85,
+          "struckReferenceLines": 1,
+          "struckReadAsContent": 0,
+          "struckUnassessable": 1,
+          "byRegion": {
+            "question": {
+              "cer": {
+                "errors": 0,
+                "reference": 93,
+                "rate": 0
+              },
+              "wer": {
+                "errors": 0,
+                "reference": 20,
+                "rate": 0
+              },
+              "cerWithoutDiacritics": {
+                "errors": 0,
+                "reference": 93,
+                "rate": 0
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "referenceLines": 2,
+              "predictedLines": 2,
+              "correctLines": 2,
+              "lineRecall": 1,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "figure": {
+              "cer": {
+                "errors": 3,
+                "reference": 18,
+                "rate": 0.16666666666666666
+              },
+              "wer": {
+                "errors": 2,
+                "reference": 7,
+                "rate": 0.2857142857142857
+              },
+              "cerWithoutDiacritics": {
+                "errors": 2,
+                "reference": 18,
+                "rate": 0.1111111111111111
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 1,
+                "reference": 3,
+                "rate": 0.3333333333333333,
+                "accuracy": 0.6666666666666667
+              },
+              "referenceLines": 6,
+              "predictedLines": 5,
+              "correctLines": 4,
+              "lineRecall": 0.6666666666666666,
+              "wrongLines": 1,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "table": {
+              "cer": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "wer": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "cerWithoutDiacritics": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "referenceLines": 0,
+              "predictedLines": 0,
+              "correctLines": 0,
+              "lineRecall": null,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": null,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "solution": {
+              "cer": {
+                "errors": 1,
+                "reference": 62,
+                "rate": 0.016129032258064516
+              },
+              "wer": {
+                "errors": 1,
+                "reference": 17,
+                "rate": 0.058823529411764705
+              },
+              "cerWithoutDiacritics": {
+                "errors": 0,
+                "reference": 62,
+                "rate": 0
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 2,
+                "rate": 0,
+                "accuracy": 1
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 3,
+                "rate": 0,
+                "accuracy": 1
+              },
+              "referenceLines": 3,
+              "predictedLines": 3,
+              "correctLines": 2,
+              "lineRecall": 0.6666666666666666,
+              "wrongLines": 1,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 1,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "01-elements-multigraph-patrick-straight",
+      "meta": {
+        "source": "synthetic_handwriting",
+        "capture": "straight",
+        "blurred": false,
+        "questionFormat": "tu_luan",
+        "synthetic": true,
+        "variant": "patrick-straight",
+        "coreFixture": "01-elements-multigraph",
+        "hasSolution": true,
+        "studentErrors": [],
+        "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
+        "handwritingHashes": {
+          "truth.json": "0069ccff943f7a43e5ceae44926843dfb1ba8c0f18b34237cebe93ffa9006554",
+          "lines.json": "dbc12eaa184397503cd11ea87717695a53abe51b57976156486e4341e1dd6c54",
+          "source.svg": "a231477bb81e70e61fb4696154358087875340af46cd6d80c0013c52554c9f16",
+          "layout.json": "db6b0aa0fe15c42c2fbf052b695775aa1c79b50f91f8a3d7fa8c79adcc939242",
+          "cancellation.json": "3c665c8107d68377207357f3915d13aa7461bf4a284731dc8477a603e5b2c3a7",
+          "1.png": "21a2e6bfa05679e8fad755bb0369361e810f08f910050253785146b033035dba"
+        }
+      },
+      "usage": {
+        "engine": "offline:qwen3-vl-2b",
+        "passes": 1,
+        "latencyMs": 37648.30000001192,
+        "peakMemoryMb": 3837.69140625,
+        "finish_reason": [
+          "stop"
+        ],
+        "sentImages": [
+          {
+            "originalWidth": 1000,
+            "originalHeight": 1440,
+            "width": 533,
+            "height": 768,
+            "maxImageSide": 768
+          }
+        ],
+        "serverTimings": {
+          "promptMs": 27262.49,
+          "predictedMs": 10204.944,
+          "promptTokens": 595,
+          "predictedTokens": 200
+        }
+      },
+      "issueCodes": [],
+      "deviceTiming": {
+        "totalMs": 37797.30000001192,
+        "modelLoadMs": 0,
+        "modelVerifyMs": 0,
+        "reusedModel": true
+      },
+      "textComparisons": [
+        {
+          "cer": {
+            "errors": 20,
+            "reference": 167,
+            "rate": 0.11976047904191617
+          },
+          "wer": {
+            "errors": 11,
+            "reference": 42,
+            "rate": 0.2619047619047619
+          },
+          "cerWithoutDiacritics": {
+            "errors": 16,
+            "reference": 167,
+            "rate": 0.09580838323353294
+          },
+          "digits": {
+            "errors": 1,
+            "reference": 2,
+            "rate": 0.5,
+            "accuracy": 0.5
+          },
+          "vertexLabels": {
+            "errors": 2,
+            "reference": 6,
+            "rate": 0.3333333333333333,
+            "accuracy": 0.6666666666666667
+          },
+          "referenceLines": 11,
+          "predictedLines": 12,
+          "correctLines": 6,
+          "lineRecall": 0.5454545454545454,
+          "wrongLines": 6,
+          "silentLines": 1,
+          "silentLineRate": 0.08333333333333333,
+          "confidenceThreshold": 0.85,
+          "struckReferenceLines": 1,
+          "struckReadAsContent": 0,
+          "struckUnassessable": 0,
+          "byRegion": {
+            "question": {
+              "cer": {
+                "errors": 2,
+                "reference": 93,
+                "rate": 0.021505376344086023
+              },
+              "wer": {
+                "errors": 2,
+                "reference": 20,
+                "rate": 0.1
+              },
+              "cerWithoutDiacritics": {
+                "errors": 0,
+                "reference": 93,
+                "rate": 0
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "referenceLines": 2,
+              "predictedLines": 2,
+              "correctLines": 1,
+              "lineRecall": 0.5,
+              "wrongLines": 1,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "figure": {
+              "cer": {
+                "errors": 22,
+                "reference": 18,
+                "rate": 1.2222222222222223
+              },
+              "wer": {
+                "errors": 8,
+                "reference": 7,
+                "rate": 1.1428571428571428
+              },
+              "cerWithoutDiacritics": {
+                "errors": 21,
+                "reference": 18,
+                "rate": 1.1666666666666667
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 3,
+                "reference": 3,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "referenceLines": 6,
+              "predictedLines": 7,
+              "correctLines": 4,
+              "lineRecall": 0.6666666666666666,
+              "wrongLines": 3,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "table": {
+              "cer": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "wer": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "cerWithoutDiacritics": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "referenceLines": 0,
+              "predictedLines": 0,
+              "correctLines": 0,
+              "lineRecall": null,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": null,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "solution": {
+              "cer": {
+                "errors": 17,
+                "reference": 54,
+                "rate": 0.3148148148148148
+              },
+              "wer": {
+                "errors": 8,
+                "reference": 15,
+                "rate": 0.5333333333333333
+              },
+              "cerWithoutDiacritics": {
+                "errors": 16,
+                "reference": 54,
+                "rate": 0.2962962962962963
+              },
+              "digits": {
+                "errors": 1,
+                "reference": 2,
+                "rate": 0.5,
+                "accuracy": 0.5
+              },
+              "vertexLabels": {
+                "errors": 3,
+                "reference": 3,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "referenceLines": 3,
+              "predictedLines": 3,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 3,
+              "silentLines": 1,
+              "silentLineRate": 0.3333333333333333,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 1,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "07-connectivity-components-dancing-perspective",
+      "meta": {
+        "source": "synthetic_handwriting",
+        "capture": "tilted",
+        "blurred": false,
+        "questionFormat": "tu_luan",
+        "synthetic": true,
+        "variant": "dancing-perspective",
+        "coreFixture": "07-connectivity-components",
+        "hasSolution": true,
+        "studentErrors": [],
+        "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
+        "handwritingHashes": {
+          "truth.json": "128472d4acdaf2264568a7a2ca7f402545ccc6afd24d16ae1aaa6138c9aeb4d0",
+          "lines.json": "754aca83517c06fe380a017ee18210f721a1d1ced9c57f464f506ed7e3e2d474",
+          "source.svg": "ab692f2e08a8050c17a18595e08f4875065d1b295c4d2594064577a3f8d26acd",
+          "layout.json": "24689e8c43b71c8495d32f34f79c2856439dff7e7a534b871fe8c685e8249a61",
+          "cancellation.json": "8b3b4d2466223b918bf797dae7e6039d4a36d8a8e52e33715fe7b6c0ef76bbbc",
+          "1.png": "eebfe6f9c05aa7ad887686d0d7d24badbc016fb72da3941a8309b4d53930ad0d"
+        }
+      },
+      "usage": {
+        "engine": "offline:qwen3-vl-2b",
+        "passes": 1,
+        "latencyMs": 37935.10000002384,
+        "peakMemoryMb": 3876.20703125,
+        "finish_reason": [
+          "stop"
+        ],
+        "sentImages": [
+          {
+            "originalWidth": 1000,
+            "originalHeight": 1440,
+            "width": 533,
+            "height": 768,
+            "maxImageSide": 768
+          }
+        ],
+        "serverTimings": {
+          "promptMs": 28870.628,
+          "predictedMs": 8914.243,
+          "promptTokens": 595,
+          "predictedTokens": 175
+        }
+      },
+      "issueCodes": [],
+      "deviceTiming": {
+        "totalMs": 38101.39999997616,
+        "modelLoadMs": 0,
+        "modelVerifyMs": 0,
+        "reusedModel": true
+      },
+      "textComparisons": [
+        {
+          "cer": {
+            "errors": 13,
+            "reference": 129,
+            "rate": 0.10077519379844961
+          },
+          "wer": {
+            "errors": 8,
+            "reference": 31,
+            "rate": 0.25806451612903225
+          },
+          "cerWithoutDiacritics": {
+            "errors": 10,
+            "reference": 129,
+            "rate": 0.07751937984496124
+          },
+          "digits": {
+            "errors": 0,
+            "reference": 1,
+            "rate": 0,
+            "accuracy": 1
+          },
+          "vertexLabels": {
+            "errors": 4,
+            "reference": 4,
+            "rate": 1,
+            "accuracy": 0
+          },
+          "referenceLines": 8,
+          "predictedLines": 4,
+          "correctLines": 1,
+          "lineRecall": 0.125,
+          "wrongLines": 3,
+          "silentLines": 0,
+          "silentLineRate": 0,
+          "confidenceThreshold": 0.85,
+          "struckReferenceLines": 1,
+          "struckReadAsContent": 0,
+          "struckUnassessable": 1,
+          "byRegion": {
+            "question": {
+              "cer": {
+                "errors": 3,
+                "reference": 68,
+                "rate": 0.04411764705882353
+              },
+              "wer": {
+                "errors": 2,
+                "reference": 16,
+                "rate": 0.125
+              },
+              "cerWithoutDiacritics": {
+                "errors": 1,
+                "reference": 68,
+                "rate": 0.014705882352941176
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "referenceLines": 2,
+              "predictedLines": 2,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 2,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "figure": {
+              "cer": {
+                "errors": 7,
+                "reference": 7,
+                "rate": 1
+              },
+              "wer": {
+                "errors": 4,
+                "reference": 4,
+                "rate": 1
+              },
+              "cerWithoutDiacritics": {
+                "errors": 7,
+                "reference": 7,
+                "rate": 1
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 4,
+                "reference": 4,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "referenceLines": 4,
+              "predictedLines": 0,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": null,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "table": {
+              "cer": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "wer": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "cerWithoutDiacritics": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "referenceLines": 0,
+              "predictedLines": 0,
+              "correctLines": 0,
+              "lineRecall": null,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": null,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "solution": {
+              "cer": {
+                "errors": 2,
+                "reference": 52,
+                "rate": 0.038461538461538464
+              },
+              "wer": {
+                "errors": 2,
+                "reference": 11,
+                "rate": 0.18181818181818182
+              },
+              "cerWithoutDiacritics": {
+                "errors": 1,
+                "reference": 52,
+                "rate": 0.019230769230769232
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 1,
+                "rate": 0,
+                "accuracy": 1
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "referenceLines": 2,
+              "predictedLines": 2,
+              "correctLines": 1,
+              "lineRecall": 0.5,
+              "wrongLines": 1,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 1,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "07-connectivity-components-dancing-straight",
+      "meta": {
+        "source": "synthetic_handwriting",
+        "capture": "straight",
+        "blurred": false,
+        "questionFormat": "tu_luan",
+        "synthetic": true,
+        "variant": "dancing-straight",
+        "coreFixture": "07-connectivity-components",
+        "hasSolution": true,
+        "studentErrors": [
+          {
+            "kind": "conclusion",
+            "written": "Đồ thị liên thông.",
+            "expected": "Đồ thị không liên thông.",
+            "description": "Kết luận liên thông trái với các thành phần đã tìm."
+          }
+        ],
+        "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
+        "handwritingHashes": {
+          "truth.json": "128472d4acdaf2264568a7a2ca7f402545ccc6afd24d16ae1aaa6138c9aeb4d0",
+          "lines.json": "582491862f88d91b31bfbcdb40058306b7a1aac63d32055599666f9e288e0e7e",
+          "source.svg": "ab692f2e08a8050c17a18595e08f4875065d1b295c4d2594064577a3f8d26acd",
+          "layout.json": "f663841c54ad5dafe0624ace11c5ce7d2c6de3ce30f5caeffae13c3506b9ec2d",
+          "cancellation.json": "ee924433fdb85704472ba685bffd97d78f907228edd6c3969cd7c19e879bbc4c",
+          "1.png": "df1ef51ed7a4f40f44245617a47e1276e19c68beb34e46eb46ea5c69e42186f9"
+        }
+      },
+      "usage": {
+        "engine": "offline:qwen3-vl-2b",
+        "passes": 1,
+        "latencyMs": 35701.30000001192,
+        "peakMemoryMb": 3882.44140625,
+        "finish_reason": [
+          "stop"
+        ],
+        "sentImages": [
+          {
+            "originalWidth": 1000,
+            "originalHeight": 1440,
+            "width": 533,
+            "height": 768,
+            "maxImageSide": 768
+          }
+        ],
+        "serverTimings": {
+          "promptMs": 29016.464,
+          "predictedMs": 6537.814,
+          "promptTokens": 595,
+          "predictedTokens": 110
+        }
+      },
+      "issueCodes": [],
+      "deviceTiming": {
+        "totalMs": 35795.19999998808,
+        "modelLoadMs": 0,
+        "modelVerifyMs": 0,
+        "reusedModel": true
+      },
+      "textComparisons": [
+        {
+          "cer": {
+            "errors": 52,
+            "reference": 137,
+            "rate": 0.3795620437956204
+          },
+          "wer": {
+            "errors": 17,
+            "reference": 33,
+            "rate": 0.5151515151515151
+          },
+          "cerWithoutDiacritics": {
+            "errors": 49,
+            "reference": 137,
+            "rate": 0.35766423357664234
+          },
+          "digits": {
+            "errors": 0,
+            "reference": 1,
+            "rate": 0,
+            "accuracy": 1
+          },
+          "vertexLabels": {
+            "errors": 4,
+            "reference": 4,
+            "rate": 1,
+            "accuracy": 0
+          },
+          "referenceLines": 8,
+          "predictedLines": 5,
+          "correctLines": 0,
+          "lineRecall": 0,
+          "wrongLines": 5,
+          "silentLines": 1,
+          "silentLineRate": 0.2,
+          "confidenceThreshold": 0.85,
+          "struckReferenceLines": 1,
+          "struckReadAsContent": 0,
+          "struckUnassessable": 0,
+          "byRegion": {
+            "question": {
+              "cer": {
+                "errors": 2,
+                "reference": 68,
+                "rate": 0.029411764705882353
+              },
+              "wer": {
+                "errors": 2,
+                "reference": 16,
+                "rate": 0.125
+              },
+              "cerWithoutDiacritics": {
+                "errors": 1,
+                "reference": 68,
+                "rate": 0.014705882352941176
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "referenceLines": 2,
+              "predictedLines": 2,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 2,
+              "silentLines": 1,
+              "silentLineRate": 0.5,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "figure": {
+              "cer": {
+                "errors": 39,
+                "reference": 7,
+                "rate": 5.571428571428571
+              },
+              "wer": {
+                "errors": 9,
+                "reference": 4,
+                "rate": 2.25
+              },
+              "cerWithoutDiacritics": {
+                "errors": 39,
+                "reference": 7,
+                "rate": 5.571428571428571
+              },
+              "digits": {
+                "errors": 1,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 4,
+                "reference": 4,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "referenceLines": 4,
+              "predictedLines": 1,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 1,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "table": {
+              "cer": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "wer": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "cerWithoutDiacritics": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "referenceLines": 0,
+              "predictedLines": 0,
+              "correctLines": 0,
+              "lineRecall": null,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": null,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "solution": {
+              "cer": {
+                "errors": 19,
+                "reference": 60,
+                "rate": 0.31666666666666665
+              },
+              "wer": {
+                "errors": 8,
+                "reference": 13,
+                "rate": 0.6153846153846154
+              },
+              "cerWithoutDiacritics": {
+                "errors": 18,
+                "reference": 60,
+                "rate": 0.3
+              },
+              "digits": {
+                "errors": 1,
+                "reference": 1,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "referenceLines": 2,
+              "predictedLines": 2,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 2,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 1,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "07-connectivity-components-patrick-perspective",
+      "meta": {
+        "source": "synthetic_handwriting",
+        "capture": "tilted",
+        "blurred": false,
+        "questionFormat": "tu_luan",
+        "synthetic": true,
+        "variant": "patrick-perspective",
+        "coreFixture": "07-connectivity-components",
+        "hasSolution": true,
+        "studentErrors": [
+          {
+            "kind": "conclusion",
+            "written": "Đồ thị liên thông.",
+            "expected": "Đồ thị không liên thông.",
+            "description": "Kết luận liên thông trái với các thành phần đã tìm."
+          }
+        ],
+        "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
+        "handwritingHashes": {
+          "truth.json": "128472d4acdaf2264568a7a2ca7f402545ccc6afd24d16ae1aaa6138c9aeb4d0",
+          "lines.json": "b86373e901d8c2ae9e993076a5235e2590aaff8cecd52e86afab6e161478cd73",
+          "source.svg": "ab692f2e08a8050c17a18595e08f4875065d1b295c4d2594064577a3f8d26acd",
+          "layout.json": "f79601a3a6738b83632d13411ab6aa0f181f6e9952b97ffac4fce667fdb26e4e",
+          "cancellation.json": "4c6eebf9d495117e8a26df86f11e34d7abd1b55e659aa273693977e24f86347b",
+          "1.png": "86f810046d581464a5e6eb8977e6e65bad1d534f025b6830df219d488a28d045"
+        }
+      },
+      "usage": {
+        "engine": "offline:qwen3-vl-2b",
+        "passes": 1,
+        "latencyMs": 37311.799999952316,
+        "peakMemoryMb": 3882.44140625,
+        "finish_reason": [
+          "stop"
+        ],
+        "sentImages": [
+          {
+            "originalWidth": 1000,
+            "originalHeight": 1440,
+            "width": 533,
+            "height": 768,
+            "maxImageSide": 768
+          }
+        ],
+        "serverTimings": {
+          "promptMs": 32485.997,
+          "predictedMs": 4683.412,
+          "promptTokens": 595,
+          "predictedTokens": 81
+        }
+      },
+      "issueCodes": [],
+      "deviceTiming": {
+        "totalMs": 37416.69999998808,
+        "modelLoadMs": 0,
+        "modelVerifyMs": 0,
+        "reusedModel": true
+      },
+      "textComparisons": [
+        {
+          "cer": {
+            "errors": 10,
+            "reference": 137,
+            "rate": 0.072992700729927
+          },
+          "wer": {
+            "errors": 5,
+            "reference": 33,
+            "rate": 0.15151515151515152
+          },
+          "cerWithoutDiacritics": {
+            "errors": 9,
+            "reference": 137,
+            "rate": 0.06569343065693431
+          },
+          "digits": {
+            "errors": 0,
+            "reference": 1,
+            "rate": 0,
+            "accuracy": 1
+          },
+          "vertexLabels": {
+            "errors": 4,
+            "reference": 4,
+            "rate": 1,
+            "accuracy": 0
+          },
+          "referenceLines": 8,
+          "predictedLines": 3,
+          "correctLines": 1,
+          "lineRecall": 0.125,
+          "wrongLines": 2,
+          "silentLines": 0,
+          "silentLineRate": 0,
+          "confidenceThreshold": 0.85,
+          "struckReferenceLines": 1,
+          "struckReadAsContent": 0,
+          "struckUnassessable": 1,
+          "byRegion": {
+            "question": {
+              "cer": {
+                "errors": 0,
+                "reference": 68,
+                "rate": 0
+              },
+              "wer": {
+                "errors": 0,
+                "reference": 16,
+                "rate": 0
+              },
+              "cerWithoutDiacritics": {
+                "errors": 0,
+                "reference": 68,
+                "rate": 0
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "referenceLines": 2,
+              "predictedLines": 1,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 1,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "figure": {
+              "cer": {
+                "errors": 7,
+                "reference": 7,
+                "rate": 1
+              },
+              "wer": {
+                "errors": 4,
+                "reference": 4,
+                "rate": 1
+              },
+              "cerWithoutDiacritics": {
+                "errors": 7,
+                "reference": 7,
+                "rate": 1
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 4,
+                "reference": 4,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "referenceLines": 4,
+              "predictedLines": 0,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": null,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "table": {
+              "cer": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "wer": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "cerWithoutDiacritics": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "referenceLines": 0,
+              "predictedLines": 0,
+              "correctLines": 0,
+              "lineRecall": null,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": null,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "solution": {
+              "cer": {
+                "errors": 2,
+                "reference": 60,
+                "rate": 0.03333333333333333
+              },
+              "wer": {
+                "errors": 1,
+                "reference": 13,
+                "rate": 0.07692307692307693
+              },
+              "cerWithoutDiacritics": {
+                "errors": 1,
+                "reference": 60,
+                "rate": 0.016666666666666666
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 1,
+                "rate": 0,
+                "accuracy": 1
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "referenceLines": 2,
+              "predictedLines": 2,
+              "correctLines": 1,
+              "lineRecall": 0.5,
+              "wrongLines": 1,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 1,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "07-connectivity-components-patrick-straight",
+      "meta": {
+        "source": "synthetic_handwriting",
+        "capture": "straight",
+        "blurred": false,
+        "questionFormat": "tu_luan",
+        "synthetic": true,
+        "variant": "patrick-straight",
+        "coreFixture": "07-connectivity-components",
+        "hasSolution": true,
+        "studentErrors": [],
+        "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
+        "handwritingHashes": {
+          "truth.json": "128472d4acdaf2264568a7a2ca7f402545ccc6afd24d16ae1aaa6138c9aeb4d0",
+          "lines.json": "e26d803b89835833b5c5a3db2ded4b9c9c3a9f24208b886a1efb1fa275731ef8",
+          "source.svg": "ab692f2e08a8050c17a18595e08f4875065d1b295c4d2594064577a3f8d26acd",
+          "layout.json": "91e5797da3f882ddc945b029d6d350934196e260a0cbb115c8878e76e25ba57d",
+          "cancellation.json": "352e84bb7c186ccb5189d919946aa2793f115554430e08e71a06e98d688af09a",
+          "1.png": "96123fcb546ff1c4a04c4864c9457c9d09884dbf788e6c406f1c2e15e42e71d4"
+        }
+      },
+      "usage": {
+        "engine": "offline:qwen3-vl-2b",
+        "passes": 1,
+        "latencyMs": 39146.30000001192,
+        "peakMemoryMb": 3882.44140625,
+        "finish_reason": [
+          "stop"
+        ],
+        "sentImages": [
+          {
+            "originalWidth": 1000,
+            "originalHeight": 1440,
+            "width": 533,
+            "height": 768,
+            "maxImageSide": 768
+          }
+        ],
+        "serverTimings": {
+          "promptMs": 33079.484,
+          "predictedMs": 5915.473,
+          "promptTokens": 595,
+          "predictedTokens": 108
+        }
+      },
+      "issueCodes": [],
+      "deviceTiming": {
+        "totalMs": 39284.5,
+        "modelLoadMs": 0,
+        "modelVerifyMs": 0,
+        "reusedModel": true
+      },
+      "textComparisons": [
+        {
+          "cer": {
+            "errors": 39,
+            "reference": 129,
+            "rate": 0.3023255813953488
+          },
+          "wer": {
+            "errors": 11,
+            "reference": 31,
+            "rate": 0.3548387096774194
+          },
+          "cerWithoutDiacritics": {
+            "errors": 38,
+            "reference": 129,
+            "rate": 0.29457364341085274
+          },
+          "digits": {
+            "errors": 0,
+            "reference": 1,
+            "rate": 0,
+            "accuracy": 1
+          },
+          "vertexLabels": {
+            "errors": 4,
+            "reference": 4,
+            "rate": 1,
+            "accuracy": 0
+          },
+          "referenceLines": 8,
+          "predictedLines": 5,
+          "correctLines": 3,
+          "lineRecall": 0.375,
+          "wrongLines": 2,
+          "silentLines": 0,
+          "silentLineRate": 0,
+          "confidenceThreshold": 0.85,
+          "struckReferenceLines": 1,
+          "struckReadAsContent": 0,
+          "struckUnassessable": 0,
+          "byRegion": {
+            "question": {
+              "cer": {
+                "errors": 0,
+                "reference": 68,
+                "rate": 0
+              },
+              "wer": {
+                "errors": 0,
+                "reference": 16,
+                "rate": 0
+              },
+              "cerWithoutDiacritics": {
+                "errors": 0,
+                "reference": 68,
+                "rate": 0
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "referenceLines": 2,
+              "predictedLines": 2,
+              "correctLines": 2,
+              "lineRecall": 1,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "figure": {
+              "cer": {
+                "errors": 24,
+                "reference": 7,
+                "rate": 3.4285714285714284
+              },
+              "wer": {
+                "errors": 6,
+                "reference": 4,
+                "rate": 1.5
+              },
+              "cerWithoutDiacritics": {
+                "errors": 24,
+                "reference": 7,
+                "rate": 3.4285714285714284
+              },
+              "digits": {
+                "errors": 1,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 4,
+                "reference": 4,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "referenceLines": 4,
+              "predictedLines": 1,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 1,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "table": {
+              "cer": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "wer": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "cerWithoutDiacritics": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "referenceLines": 0,
+              "predictedLines": 0,
+              "correctLines": 0,
+              "lineRecall": null,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": null,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "solution": {
+              "cer": {
+                "errors": 15,
+                "reference": 52,
+                "rate": 0.28846153846153844
+              },
+              "wer": {
+                "errors": 5,
+                "reference": 11,
+                "rate": 0.45454545454545453
+              },
+              "cerWithoutDiacritics": {
+                "errors": 14,
+                "reference": 52,
+                "rate": 0.2692307692307692
+              },
+              "digits": {
+                "errors": 1,
+                "reference": 1,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "referenceLines": 2,
+              "predictedLines": 2,
+              "correctLines": 1,
+              "lineRecall": 0.5,
+              "wrongLines": 1,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 1,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "09-euler-loop-parallel-dancing-perspective",
+      "meta": {
+        "source": "synthetic_handwriting",
+        "capture": "tilted",
+        "blurred": false,
+        "questionFormat": "tu_luan",
+        "synthetic": true,
+        "variant": "dancing-perspective",
+        "coreFixture": "09-euler-loop-parallel",
+        "hasSolution": true,
+        "studentErrors": [],
+        "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
+        "handwritingHashes": {
+          "truth.json": "ae4c84d4b9f797aaf527da84f56d4bc56da5e7191ccc6ba36ba97ad941cf7306",
+          "lines.json": "24c59d02a88cf2b8a97abee001c5ad4576134b30163a1bdee0ed9d4b04bb6d82",
+          "source.svg": "a231477bb81e70e61fb4696154358087875340af46cd6d80c0013c52554c9f16",
+          "layout.json": "9d90122f6879945ecc079215c5853db30fa8e1bbe16ae06daf27b13ff77e5278",
+          "cancellation.json": "4469597e2c690805bbf8d27e9bfa335094b8bc806e7cd10041af3bbcb49f100c",
+          "1.png": "f1f1e8f5c6c5051bca6affb9b8703ca0dae288030a29efb5945aaa6a413baada"
+        }
+      },
+      "usage": {
+        "engine": "offline:qwen3-vl-2b",
+        "passes": 1,
+        "latencyMs": 43197.59999996424,
+        "peakMemoryMb": 3882.44140625,
+        "finish_reason": [
+          "stop"
+        ],
+        "sentImages": [
+          {
+            "originalWidth": 1000,
+            "originalHeight": 1440,
+            "width": 533,
+            "height": 768,
+            "maxImageSide": 768
+          }
+        ],
+        "serverTimings": {
+          "promptMs": 33760.353,
+          "predictedMs": 9223.044,
+          "promptTokens": 595,
+          "predictedTokens": 172
+        }
+      },
+      "issueCodes": [],
+      "deviceTiming": {
+        "totalMs": 43360.299999952316,
+        "modelLoadMs": 0,
+        "modelVerifyMs": 0,
+        "reusedModel": true
+      },
+      "textComparisons": [
+        {
+          "cer": {
+            "errors": 20,
+            "reference": 156,
+            "rate": 0.1282051282051282
+          },
+          "wer": {
+            "errors": 13,
+            "reference": 42,
+            "rate": 0.30952380952380953
+          },
+          "cerWithoutDiacritics": {
+            "errors": 16,
+            "reference": 156,
+            "rate": 0.10256410256410256
+          },
+          "digits": {
+            "errors": 1,
+            "reference": 1,
+            "rate": 1,
+            "accuracy": 0
+          },
+          "vertexLabels": {
+            "errors": 4,
+            "reference": 11,
+            "rate": 0.36363636363636365,
+            "accuracy": 0.6363636363636364
+          },
+          "referenceLines": 11,
+          "predictedLines": 10,
+          "correctLines": 5,
+          "lineRecall": 0.45454545454545453,
+          "wrongLines": 5,
+          "silentLines": 0,
+          "silentLineRate": 0,
+          "confidenceThreshold": 0.85,
+          "struckReferenceLines": 1,
+          "struckReadAsContent": 0,
+          "struckUnassessable": 1,
+          "byRegion": {
+            "question": {
+              "cer": {
+                "errors": 4,
+                "reference": 50,
+                "rate": 0.08
+              },
+              "wer": {
+                "errors": 3,
+                "reference": 11,
+                "rate": 0.2727272727272727
+              },
+              "cerWithoutDiacritics": {
+                "errors": 4,
+                "reference": 50,
+                "rate": 0.08
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 1,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "referenceLines": 2,
+              "predictedLines": 2,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 2,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "figure": {
+              "cer": {
+                "errors": 3,
+                "reference": 18,
+                "rate": 0.16666666666666666
+              },
+              "wer": {
+                "errors": 2,
+                "reference": 7,
+                "rate": 0.2857142857142857
+              },
+              "cerWithoutDiacritics": {
+                "errors": 2,
+                "reference": 18,
+                "rate": 0.1111111111111111
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 1,
+                "reference": 3,
+                "rate": 0.3333333333333333,
+                "accuracy": 0.6666666666666667
+              },
+              "referenceLines": 6,
+              "predictedLines": 5,
+              "correctLines": 4,
+              "lineRecall": 0.6666666666666666,
+              "wrongLines": 1,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "table": {
+              "cer": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "wer": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "cerWithoutDiacritics": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "referenceLines": 0,
+              "predictedLines": 0,
+              "correctLines": 0,
+              "lineRecall": null,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": null,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "solution": {
+              "cer": {
+                "errors": 13,
+                "reference": 86,
+                "rate": 0.1511627906976744
+              },
+              "wer": {
+                "errors": 8,
+                "reference": 24,
+                "rate": 0.3333333333333333
+              },
+              "cerWithoutDiacritics": {
+                "errors": 10,
+                "reference": 86,
+                "rate": 0.11627906976744186
+              },
+              "digits": {
+                "errors": 1,
+                "reference": 1,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "vertexLabels": {
+                "errors": 2,
+                "reference": 8,
+                "rate": 0.25,
+                "accuracy": 0.75
+              },
+              "referenceLines": 3,
+              "predictedLines": 3,
+              "correctLines": 1,
+              "lineRecall": 0.3333333333333333,
+              "wrongLines": 2,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 1,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "09-euler-loop-parallel-dancing-straight",
+      "meta": {
+        "source": "synthetic_handwriting",
+        "capture": "straight",
+        "blurred": false,
+        "questionFormat": "tu_luan",
+        "synthetic": true,
+        "variant": "dancing-straight",
+        "coreFixture": "09-euler-loop-parallel",
+        "hasSolution": true,
+        "studentErrors": [
+          {
+            "kind": "vertex",
+            "written": "A → A → B → A → A",
+            "expected": "A → A → B → A",
+            "description": "Viết thêm một đỉnh cuối, làm đường Euler thừa một bước."
+          }
+        ],
+        "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
+        "handwritingHashes": {
+          "truth.json": "ae4c84d4b9f797aaf527da84f56d4bc56da5e7191ccc6ba36ba97ad941cf7306",
+          "lines.json": "5b60d681abd86e8ffb100c3c8b032ceb22b43d658bc090331c7038765ea4a88b",
+          "source.svg": "a231477bb81e70e61fb4696154358087875340af46cd6d80c0013c52554c9f16",
+          "layout.json": "cf396663828e62851b31f40d2bd16ad3251288d4320a68112a4556b9583af05b",
+          "cancellation.json": "52332411b6cb3cc6f3bde0bdde5cd52502ee7ce4719c2791e52f0e2982bb921f",
+          "1.png": "4707ffb3911a5129dec6575d41c289fcf64ecce7b37cb59c97660f099365f85a"
+        }
+      },
+      "usage": {
+        "engine": "offline:qwen3-vl-2b",
+        "passes": 1,
+        "latencyMs": 44577,
+        "peakMemoryMb": 3882.44140625,
+        "finish_reason": [
+          "stop"
+        ],
+        "sentImages": [
+          {
+            "originalWidth": 1000,
+            "originalHeight": 1440,
+            "width": 533,
+            "height": 768,
+            "maxImageSide": 768
+          }
+        ],
+        "serverTimings": {
+          "promptMs": 33323.541,
+          "predictedMs": 11054.673,
+          "promptTokens": 595,
+          "predictedTokens": 198
+        }
+      },
+      "issueCodes": [],
+      "deviceTiming": {
+        "totalMs": 44720,
+        "modelLoadMs": 0,
+        "modelVerifyMs": 0,
+        "reusedModel": true
+      },
+      "textComparisons": [
+        {
+          "cer": {
+            "errors": 33,
+            "reference": 167,
+            "rate": 0.19760479041916168
+          },
+          "wer": {
+            "errors": 22,
+            "reference": 47,
+            "rate": 0.46808510638297873
+          },
+          "cerWithoutDiacritics": {
+            "errors": 29,
+            "reference": 167,
+            "rate": 0.17365269461077845
+          },
+          "digits": {
+            "errors": 1,
+            "reference": 1,
+            "rate": 1,
+            "accuracy": 0
+          },
+          "vertexLabels": {
+            "errors": 4,
+            "reference": 12,
+            "rate": 0.3333333333333333,
+            "accuracy": 0.6666666666666667
+          },
+          "referenceLines": 11,
+          "predictedLines": 12,
+          "correctLines": 6,
+          "lineRecall": 0.5454545454545454,
+          "wrongLines": 6,
+          "silentLines": 1,
+          "silentLineRate": 0.08333333333333333,
+          "confidenceThreshold": 0.85,
+          "struckReferenceLines": 1,
+          "struckReadAsContent": 0,
+          "struckUnassessable": 0,
+          "byRegion": {
+            "question": {
+              "cer": {
+                "errors": 4,
+                "reference": 50,
+                "rate": 0.08
+              },
+              "wer": {
+                "errors": 2,
+                "reference": 11,
+                "rate": 0.18181818181818182
+              },
+              "cerWithoutDiacritics": {
+                "errors": 3,
+                "reference": 50,
+                "rate": 0.06
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "referenceLines": 2,
+              "predictedLines": 2,
+              "correctLines": 1,
+              "lineRecall": 0.5,
+              "wrongLines": 1,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "figure": {
+              "cer": {
+                "errors": 30,
+                "reference": 18,
+                "rate": 1.6666666666666667
+              },
+              "wer": {
+                "errors": 9,
+                "reference": 7,
+                "rate": 1.2857142857142858
+              },
+              "cerWithoutDiacritics": {
+                "errors": 30,
+                "reference": 18,
+                "rate": 1.6666666666666667
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 2,
+                "reference": 3,
+                "rate": 0.6666666666666666,
+                "accuracy": 0.33333333333333337
+              },
+              "referenceLines": 6,
+              "predictedLines": 7,
+              "correctLines": 5,
+              "lineRecall": 0.8333333333333334,
+              "wrongLines": 2,
+              "silentLines": 1,
+              "silentLineRate": 0.14285714285714285,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "table": {
+              "cer": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "wer": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "cerWithoutDiacritics": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "referenceLines": 0,
+              "predictedLines": 0,
+              "correctLines": 0,
+              "lineRecall": null,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": null,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "solution": {
+              "cer": {
+                "errors": 40,
+                "reference": 97,
+                "rate": 0.41237113402061853
+              },
+              "wer": {
+                "errors": 19,
+                "reference": 29,
+                "rate": 0.6551724137931034
+              },
+              "cerWithoutDiacritics": {
+                "errors": 39,
+                "reference": 97,
+                "rate": 0.4020618556701031
+              },
+              "digits": {
+                "errors": 1,
+                "reference": 1,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "vertexLabels": {
+                "errors": 3,
+                "reference": 9,
+                "rate": 0.3333333333333333,
+                "accuracy": 0.6666666666666667
+              },
+              "referenceLines": 3,
+              "predictedLines": 3,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 3,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 1,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "09-euler-loop-parallel-patrick-perspective",
+      "meta": {
+        "source": "synthetic_handwriting",
+        "capture": "tilted",
+        "blurred": false,
+        "questionFormat": "tu_luan",
+        "synthetic": true,
+        "variant": "patrick-perspective",
+        "coreFixture": "09-euler-loop-parallel",
+        "hasSolution": true,
+        "studentErrors": [
+          {
+            "kind": "vertex",
+            "written": "A → A → B → A → A",
+            "expected": "A → A → B → A",
+            "description": "Viết thêm một đỉnh cuối, làm đường Euler thừa một bước."
+          }
+        ],
+        "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
+        "handwritingHashes": {
+          "truth.json": "ae4c84d4b9f797aaf527da84f56d4bc56da5e7191ccc6ba36ba97ad941cf7306",
+          "lines.json": "98b08b3fb485c4c79a96c60a8eca7fc343e1872335af880bcff13a1a4a25f2cb",
+          "source.svg": "a231477bb81e70e61fb4696154358087875340af46cd6d80c0013c52554c9f16",
+          "layout.json": "f447a20f9d086b0db22d1313c3135ffe284a7c6e5b4aff5562912a7e6919d60e",
+          "cancellation.json": "435c4100d11b326e8eed02e1c8163812c750ff954afdb42330b039c90ff86c9e",
+          "1.png": "478e1e0f14bc8d45428df7585cdf9ccb457f1e2412a157f64dab39ffdb3b8711"
+        }
+      },
+      "usage": {
+        "engine": "offline:qwen3-vl-2b",
+        "passes": 1,
+        "latencyMs": 42953.19999998808,
+        "peakMemoryMb": 3882.44140625,
+        "finish_reason": [
+          "stop"
+        ],
+        "sentImages": [
+          {
+            "originalWidth": 1000,
+            "originalHeight": 1440,
+            "width": 533,
+            "height": 768,
+            "maxImageSide": 768
+          }
+        ],
+        "serverTimings": {
+          "promptMs": 33942.826,
+          "predictedMs": 8830.44,
+          "promptTokens": 595,
+          "predictedTokens": 162
+        }
+      },
+      "issueCodes": [],
+      "deviceTiming": {
+        "totalMs": 43115.5,
+        "modelLoadMs": 0,
+        "modelVerifyMs": 0,
+        "reusedModel": true
+      },
+      "textComparisons": [
+        {
+          "cer": {
+            "errors": 5,
+            "reference": 167,
+            "rate": 0.029940119760479042
+          },
+          "wer": {
+            "errors": 4,
+            "reference": 47,
+            "rate": 0.0851063829787234
+          },
+          "cerWithoutDiacritics": {
+            "errors": 3,
+            "reference": 167,
+            "rate": 0.017964071856287425
+          },
+          "digits": {
+            "errors": 0,
+            "reference": 1,
+            "rate": 0,
+            "accuracy": 1
+          },
+          "vertexLabels": {
+            "errors": 1,
+            "reference": 12,
+            "rate": 0.08333333333333333,
+            "accuracy": 0.9166666666666666
+          },
+          "referenceLines": 11,
+          "predictedLines": 9,
+          "correctLines": 5,
+          "lineRecall": 0.45454545454545453,
+          "wrongLines": 4,
+          "silentLines": 0,
+          "silentLineRate": 0,
+          "confidenceThreshold": 0.85,
+          "struckReferenceLines": 1,
+          "struckReadAsContent": 0,
+          "struckUnassessable": 1,
+          "byRegion": {
+            "question": {
+              "cer": {
+                "errors": 0,
+                "reference": 50,
+                "rate": 0
+              },
+              "wer": {
+                "errors": 0,
+                "reference": 11,
+                "rate": 0
+              },
+              "cerWithoutDiacritics": {
+                "errors": 0,
+                "reference": 50,
+                "rate": 0
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "referenceLines": 2,
+              "predictedLines": 1,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 1,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "figure": {
+              "cer": {
+                "errors": 3,
+                "reference": 18,
+                "rate": 0.16666666666666666
+              },
+              "wer": {
+                "errors": 2,
+                "reference": 7,
+                "rate": 0.2857142857142857
+              },
+              "cerWithoutDiacritics": {
+                "errors": 2,
+                "reference": 18,
+                "rate": 0.1111111111111111
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 1,
+                "reference": 3,
+                "rate": 0.3333333333333333,
+                "accuracy": 0.6666666666666667
+              },
+              "referenceLines": 6,
+              "predictedLines": 5,
+              "correctLines": 4,
+              "lineRecall": 0.6666666666666666,
+              "wrongLines": 1,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "table": {
+              "cer": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "wer": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "cerWithoutDiacritics": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "referenceLines": 0,
+              "predictedLines": 0,
+              "correctLines": 0,
+              "lineRecall": null,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": null,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "solution": {
+              "cer": {
+                "errors": 2,
+                "reference": 97,
+                "rate": 0.020618556701030927
+              },
+              "wer": {
+                "errors": 2,
+                "reference": 29,
+                "rate": 0.06896551724137931
+              },
+              "cerWithoutDiacritics": {
+                "errors": 1,
+                "reference": 97,
+                "rate": 0.010309278350515464
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 1,
+                "rate": 0,
+                "accuracy": 1
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 9,
+                "rate": 0,
+                "accuracy": 1
+              },
+              "referenceLines": 3,
+              "predictedLines": 3,
+              "correctLines": 1,
+              "lineRecall": 0.3333333333333333,
+              "wrongLines": 2,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 1,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "09-euler-loop-parallel-patrick-straight",
+      "meta": {
+        "source": "synthetic_handwriting",
+        "capture": "straight",
+        "blurred": false,
+        "questionFormat": "tu_luan",
+        "synthetic": true,
+        "variant": "patrick-straight",
+        "coreFixture": "09-euler-loop-parallel",
+        "hasSolution": true,
+        "studentErrors": [],
+        "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
+        "handwritingHashes": {
+          "truth.json": "ae4c84d4b9f797aaf527da84f56d4bc56da5e7191ccc6ba36ba97ad941cf7306",
+          "lines.json": "a95b9bcf9b555c5410509a6e3ce42f413e6d4e1913d5dd72acdf009d23dbb448",
+          "source.svg": "a231477bb81e70e61fb4696154358087875340af46cd6d80c0013c52554c9f16",
+          "layout.json": "d3ba44aca5f0001409f87baa402744181243930284c60fff46b13ee6be592508",
+          "cancellation.json": "425779a96e9e3d14c683fc8c80b50bc34881bd299ad04a2e88ecc8fe26dadce4",
+          "1.png": "e5647e25f69e56bee8b6aa7b0e05eab1fd9ae238cd949e3e3f5c02746b0a1511"
+        }
+      },
+      "usage": {
+        "engine": "offline:qwen3-vl-2b",
+        "passes": 1,
+        "latencyMs": 44273.39999997616,
+        "peakMemoryMb": 3882.44140625,
+        "finish_reason": [
+          "stop"
+        ],
+        "sentImages": [
+          {
+            "originalWidth": 1000,
+            "originalHeight": 1440,
+            "width": 533,
+            "height": 768,
+            "maxImageSide": 768
+          }
+        ],
+        "serverTimings": {
+          "promptMs": 33147.789,
+          "predictedMs": 10947.595,
+          "promptTokens": 595,
+          "predictedTokens": 194
+        }
+      },
+      "issueCodes": [],
+      "deviceTiming": {
+        "totalMs": 44429.700000047684,
+        "modelLoadMs": 0,
+        "modelVerifyMs": 0,
+        "reusedModel": true
+      },
+      "textComparisons": [
+        {
+          "cer": {
+            "errors": 12,
+            "reference": 156,
+            "rate": 0.07692307692307693
+          },
+          "wer": {
+            "errors": 11,
+            "reference": 42,
+            "rate": 0.2619047619047619
+          },
+          "cerWithoutDiacritics": {
+            "errors": 11,
+            "reference": 156,
+            "rate": 0.07051282051282051
+          },
+          "digits": {
+            "errors": 0,
+            "reference": 1,
+            "rate": 0,
+            "accuracy": 1
+          },
+          "vertexLabels": {
+            "errors": 3,
+            "reference": 11,
+            "rate": 0.2727272727272727,
+            "accuracy": 0.7272727272727273
+          },
+          "referenceLines": 11,
+          "predictedLines": 12,
+          "correctLines": 8,
+          "lineRecall": 0.7272727272727273,
+          "wrongLines": 4,
+          "silentLines": 3,
+          "silentLineRate": 0.25,
+          "confidenceThreshold": 0.85,
+          "struckReferenceLines": 1,
+          "struckReadAsContent": 0,
+          "struckUnassessable": 0,
+          "byRegion": {
+            "question": {
+              "cer": {
+                "errors": 0,
+                "reference": 50,
+                "rate": 0
+              },
+              "wer": {
+                "errors": 0,
+                "reference": 11,
+                "rate": 0
+              },
+              "cerWithoutDiacritics": {
+                "errors": 0,
+                "reference": 50,
+                "rate": 0
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "referenceLines": 2,
+              "predictedLines": 2,
+              "correctLines": 2,
+              "lineRecall": 1,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "figure": {
+              "cer": {
+                "errors": 19,
+                "reference": 18,
+                "rate": 1.0555555555555556
+              },
+              "wer": {
+                "errors": 6,
+                "reference": 7,
+                "rate": 0.8571428571428571
+              },
+              "cerWithoutDiacritics": {
+                "errors": 19,
+                "reference": 18,
+                "rate": 1.0555555555555556
+              },
+              "digits": {
+                "errors": 1,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 2,
+                "reference": 3,
+                "rate": 0.6666666666666666,
+                "accuracy": 0.33333333333333337
+              },
+              "referenceLines": 6,
+              "predictedLines": 7,
+              "correctLines": 5,
+              "lineRecall": 0.8333333333333334,
+              "wrongLines": 2,
+              "silentLines": 1,
+              "silentLineRate": 0.14285714285714285,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "table": {
+              "cer": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "wer": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "cerWithoutDiacritics": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "referenceLines": 0,
+              "predictedLines": 0,
+              "correctLines": 0,
+              "lineRecall": null,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": null,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "solution": {
+              "cer": {
+                "errors": 23,
+                "reference": 86,
+                "rate": 0.26744186046511625
+              },
+              "wer": {
+                "errors": 12,
+                "reference": 24,
+                "rate": 0.5
+              },
+              "cerWithoutDiacritics": {
+                "errors": 23,
+                "reference": 86,
+                "rate": 0.26744186046511625
+              },
+              "digits": {
+                "errors": 1,
+                "reference": 1,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "vertexLabels": {
+                "errors": 3,
+                "reference": 8,
+                "rate": 0.375,
+                "accuracy": 0.625
+              },
+              "referenceLines": 3,
+              "predictedLines": 3,
+              "correctLines": 1,
+              "lineRecall": 0.3333333333333333,
+              "wrongLines": 2,
+              "silentLines": 2,
+              "silentLineRate": 0.6666666666666666,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 1,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "10-hamilton-reverse-cycle-dancing-perspective",
+      "meta": {
+        "source": "synthetic_handwriting",
+        "capture": "tilted",
+        "blurred": false,
+        "questionFormat": "tu_luan",
+        "synthetic": true,
+        "variant": "dancing-perspective",
+        "coreFixture": "10-hamilton-reverse-cycle",
+        "hasSolution": true,
+        "studentErrors": [],
+        "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
+        "handwritingHashes": {
+          "truth.json": "3377181720224abd3a5a28213210cb28d1e018460d5ba1b9162d03450effc521",
+          "lines.json": "5ecb3c0851f126ac82b2282f5d3d4cb0e508136098ec65eb0b3db2f6c2c54954",
+          "source.svg": "437413b5764ae104991da8f84ace6d8b4eaa6fc188f255e8681e4bff19448eb6",
+          "layout.json": "3f66d5593097d8c73ef0bea3ff0ea90d4cf4f79368b08f8eba346da9c1970d59",
+          "cancellation.json": "4b65d327b33c9c5706d6e6401db8d62932e64a75212cb202cc27b055a41c906e",
+          "1.png": "557c4edafed0943d498cbf8b1e189030a7d4a3f752b2a3f3f0ae07f7fc10e61c"
+        }
+      },
+      "usage": {
+        "engine": "offline:qwen3-vl-2b",
+        "passes": 1,
+        "latencyMs": 39931.19999998808,
+        "peakMemoryMb": 3882.44140625,
+        "finish_reason": [
+          "stop"
+        ],
+        "sentImages": [
+          {
+            "originalWidth": 1000,
+            "originalHeight": 1440,
+            "width": 533,
+            "height": 768,
+            "maxImageSide": 768
+          }
+        ],
+        "serverTimings": {
+          "promptMs": 33380.832,
+          "predictedMs": 6375.915,
+          "promptTokens": 595,
+          "predictedTokens": 115
+        }
+      },
+      "issueCodes": [],
+      "deviceTiming": {
+        "totalMs": 40086.299999952316,
+        "modelLoadMs": 0,
+        "modelVerifyMs": 0,
+        "reusedModel": true
+      },
+      "textComparisons": [
+        {
+          "cer": {
+            "errors": 17,
+            "reference": 172,
+            "rate": 0.09883720930232558
+          },
+          "wer": {
+            "errors": 11,
+            "reference": 48,
+            "rate": 0.22916666666666666
+          },
+          "cerWithoutDiacritics": {
+            "errors": 13,
+            "reference": 172,
+            "rate": 0.0755813953488372
+          },
+          "digits": {
+            "errors": 0,
+            "reference": 0,
+            "rate": null,
+            "accuracy": null
+          },
+          "vertexLabels": {
+            "errors": 5,
+            "reference": 12,
+            "rate": 0.4166666666666667,
+            "accuracy": 0.5833333333333333
+          },
+          "referenceLines": 10,
+          "predictedLines": 5,
+          "correctLines": 3,
+          "lineRecall": 0.3,
+          "wrongLines": 2,
+          "silentLines": 0,
+          "silentLineRate": 0,
+          "confidenceThreshold": 0.85,
+          "struckReferenceLines": 1,
+          "struckReadAsContent": 0,
+          "struckUnassessable": 1,
+          "byRegion": {
+            "question": {
+              "cer": {
+                "errors": 6,
+                "reference": 58,
+                "rate": 0.10344827586206896
+              },
+              "wer": {
+                "errors": 5,
+                "reference": 13,
+                "rate": 0.38461538461538464
+              },
+              "cerWithoutDiacritics": {
+                "errors": 2,
+                "reference": 58,
+                "rate": 0.034482758620689655
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 1,
+                "rate": 0,
+                "accuracy": 1
+              },
+              "referenceLines": 2,
+              "predictedLines": 2,
+              "correctLines": 1,
+              "lineRecall": 0.5,
+              "wrongLines": 1,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "figure": {
+              "cer": {
+                "errors": 9,
+                "reference": 9,
+                "rate": 1
+              },
+              "wer": {
+                "errors": 5,
+                "reference": 5,
+                "rate": 1
+              },
+              "cerWithoutDiacritics": {
+                "errors": 9,
+                "reference": 9,
+                "rate": 1
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 5,
+                "reference": 5,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "referenceLines": 5,
+              "predictedLines": 0,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": null,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "table": {
+              "cer": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "wer": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "cerWithoutDiacritics": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "referenceLines": 0,
+              "predictedLines": 0,
+              "correctLines": 0,
+              "lineRecall": null,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": null,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "solution": {
+              "cer": {
+                "errors": 1,
+                "reference": 103,
+                "rate": 0.009708737864077669
+              },
+              "wer": {
+                "errors": 1,
+                "reference": 30,
+                "rate": 0.03333333333333333
+              },
+              "cerWithoutDiacritics": {
+                "errors": 1,
+                "reference": 103,
+                "rate": 0.009708737864077669
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 6,
+                "rate": 0,
+                "accuracy": 1
+              },
+              "referenceLines": 3,
+              "predictedLines": 3,
+              "correctLines": 2,
+              "lineRecall": 0.6666666666666666,
+              "wrongLines": 1,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 1,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "10-hamilton-reverse-cycle-dancing-straight",
+      "meta": {
+        "source": "synthetic_handwriting",
+        "capture": "straight",
+        "blurred": false,
+        "questionFormat": "tu_luan",
+        "synthetic": true,
+        "variant": "dancing-straight",
+        "coreFixture": "10-hamilton-reverse-cycle",
+        "hasSolution": true,
+        "studentErrors": [
+          {
+            "kind": "vertex",
+            "written": "A → A → C → D → E → A",
+            "expected": "A → B → C → D → E → A",
+            "description": "Lặp đỉnh đầu ở giữa chu trình Hamilton và bỏ một đỉnh."
+          }
+        ],
+        "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
+        "handwritingHashes": {
+          "truth.json": "3377181720224abd3a5a28213210cb28d1e018460d5ba1b9162d03450effc521",
+          "lines.json": "81e45f2ffdb871bf0ea036c80dc0b594eaf4da2a7287f94406f77783bd027602",
+          "source.svg": "437413b5764ae104991da8f84ace6d8b4eaa6fc188f255e8681e4bff19448eb6",
+          "layout.json": "cf603160063f55e5884faaee863386151f3b3741f806ced24bf0bf04d1601c35",
+          "cancellation.json": "b87ff50237c5810e8b4ff1e05cd5828f5b2207e5245f898d5b88a6ea4166a575",
+          "1.png": "274cd4961692bf25bd5e84ff6e0495f8d24a79a30780bb0a44cd88f6fcd887f9"
+        }
+      },
+      "usage": {
+        "engine": "offline:qwen3-vl-2b",
+        "passes": 1,
+        "latencyMs": 44537.90000003576,
+        "peakMemoryMb": 3882.44140625,
+        "finish_reason": [
+          "stop"
+        ],
+        "sentImages": [
+          {
+            "originalWidth": 1000,
+            "originalHeight": 1440,
+            "width": 533,
+            "height": 768,
+            "maxImageSide": 768
+          }
+        ],
+        "serverTimings": {
+          "promptMs": 36555.247,
+          "predictedMs": 7807.777,
+          "promptTokens": 595,
+          "predictedTokens": 139
+        }
+      },
+      "issueCodes": [],
+      "deviceTiming": {
+        "totalMs": 44677.59999996424,
+        "modelLoadMs": 0,
+        "modelVerifyMs": 0,
+        "reusedModel": true
+      },
+      "textComparisons": [
+        {
+          "cer": {
+            "errors": 63,
+            "reference": 185,
+            "rate": 0.34054054054054056
+          },
+          "wer": {
+            "errors": 33,
+            "reference": 50,
+            "rate": 0.66
+          },
+          "cerWithoutDiacritics": {
+            "errors": 47,
+            "reference": 185,
+            "rate": 0.25405405405405407
+          },
+          "digits": {
+            "errors": 0,
+            "reference": 0,
+            "rate": null,
+            "accuracy": null
+          },
+          "vertexLabels": {
+            "errors": 2,
+            "reference": 12,
+            "rate": 0.16666666666666666,
+            "accuracy": 0.8333333333333334
+          },
+          "referenceLines": 10,
+          "predictedLines": 6,
+          "correctLines": 0,
+          "lineRecall": 0,
+          "wrongLines": 6,
+          "silentLines": 0,
+          "silentLineRate": 0,
+          "confidenceThreshold": 0.85,
+          "struckReferenceLines": 1,
+          "struckReadAsContent": 0,
+          "struckUnassessable": 0,
+          "byRegion": {
+            "question": {
+              "cer": {
+                "errors": 6,
+                "reference": 58,
+                "rate": 0.10344827586206896
+              },
+              "wer": {
+                "errors": 3,
+                "reference": 13,
+                "rate": 0.23076923076923078
+              },
+              "cerWithoutDiacritics": {
+                "errors": 5,
+                "reference": 58,
+                "rate": 0.08620689655172414
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 1,
+                "rate": 0,
+                "accuracy": 1
+              },
+              "referenceLines": 2,
+              "predictedLines": 2,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 2,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "figure": {
+              "cer": {
+                "errors": 53,
+                "reference": 9,
+                "rate": 5.888888888888889
+              },
+              "wer": {
+                "errors": 11,
+                "reference": 5,
+                "rate": 2.2
+              },
+              "cerWithoutDiacritics": {
+                "errors": 53,
+                "reference": 9,
+                "rate": 5.888888888888889
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 1,
+                "reference": 5,
+                "rate": 0.2,
+                "accuracy": 0.8
+              },
+              "referenceLines": 5,
+              "predictedLines": 2,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 2,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "table": {
+              "cer": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "wer": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "cerWithoutDiacritics": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "referenceLines": 0,
+              "predictedLines": 0,
+              "correctLines": 0,
+              "lineRecall": null,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": null,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "solution": {
+              "cer": {
+                "errors": 74,
+                "reference": 116,
+                "rate": 0.6379310344827587
+              },
+              "wer": {
+                "errors": 28,
+                "reference": 32,
+                "rate": 0.875
+              },
+              "cerWithoutDiacritics": {
+                "errors": 65,
+                "reference": 116,
+                "rate": 0.5603448275862069
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 1,
+                "reference": 6,
+                "rate": 0.16666666666666666,
+                "accuracy": 0.8333333333333334
+              },
+              "referenceLines": 3,
+              "predictedLines": 2,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 2,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 1,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "10-hamilton-reverse-cycle-patrick-perspective",
+      "meta": {
+        "source": "synthetic_handwriting",
+        "capture": "tilted",
+        "blurred": false,
+        "questionFormat": "tu_luan",
+        "synthetic": true,
+        "variant": "patrick-perspective",
+        "coreFixture": "10-hamilton-reverse-cycle",
+        "hasSolution": true,
+        "studentErrors": [
+          {
+            "kind": "vertex",
+            "written": "A → A → C → D → E → A",
+            "expected": "A → B → C → D → E → A",
+            "description": "Lặp đỉnh đầu ở giữa chu trình Hamilton và bỏ một đỉnh."
+          }
+        ],
+        "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
+        "handwritingHashes": {
+          "truth.json": "3377181720224abd3a5a28213210cb28d1e018460d5ba1b9162d03450effc521",
+          "lines.json": "511871a8ad1317d88ef667ec8846ef88f1c8c3ff1867e33f79408605ccb36603",
+          "source.svg": "437413b5764ae104991da8f84ace6d8b4eaa6fc188f255e8681e4bff19448eb6",
+          "layout.json": "03afee352317b954619f7babb03c3927382aae327d59bcaae774fc491adf03d7",
+          "cancellation.json": "493ab809ae0893c9e7bb6ad8dfa99dea91a718f32e7a3abe5e312d3dbec14412",
+          "1.png": "f7310822436a45e959ec5aa32a5f6b8308f94132367599d56acc6cdb32768531"
+        }
+      },
+      "usage": {
+        "engine": "offline:qwen3-vl-2b",
+        "passes": 1,
+        "latencyMs": 42371.09999996424,
+        "peakMemoryMb": 3885.05078125,
+        "finish_reason": [
+          "stop"
+        ],
+        "sentImages": [
+          {
+            "originalWidth": 1000,
+            "originalHeight": 1440,
+            "width": 533,
+            "height": 768,
+            "maxImageSide": 768
+          }
+        ],
+        "serverTimings": {
+          "promptMs": 36764.668,
+          "predictedMs": 5415.777,
+          "promptTokens": 595,
+          "predictedTokens": 97
+        }
+      },
+      "issueCodes": [],
+      "deviceTiming": {
+        "totalMs": 42565.40000003576,
+        "modelLoadMs": 0,
+        "modelVerifyMs": 0,
+        "reusedModel": true
+      },
+      "textComparisons": [
+        {
+          "cer": {
+            "errors": 11,
+            "reference": 185,
+            "rate": 0.05945945945945946
+          },
+          "wer": {
+            "errors": 6,
+            "reference": 50,
+            "rate": 0.12
+          },
+          "cerWithoutDiacritics": {
+            "errors": 10,
+            "reference": 185,
+            "rate": 0.05405405405405406
+          },
+          "digits": {
+            "errors": 0,
+            "reference": 0,
+            "rate": null,
+            "accuracy": null
+          },
+          "vertexLabels": {
+            "errors": 5,
+            "reference": 12,
+            "rate": 0.4166666666666667,
+            "accuracy": 0.5833333333333333
+          },
+          "referenceLines": 10,
+          "predictedLines": 3,
+          "correctLines": 0,
+          "lineRecall": 0,
+          "wrongLines": 3,
+          "silentLines": 0,
+          "silentLineRate": 0,
+          "confidenceThreshold": 0.85,
+          "struckReferenceLines": 1,
+          "struckReadAsContent": 0,
+          "struckUnassessable": 1,
+          "byRegion": {
+            "question": {
+              "cer": {
+                "errors": 0,
+                "reference": 58,
+                "rate": 0
+              },
+              "wer": {
+                "errors": 0,
+                "reference": 13,
+                "rate": 0
+              },
+              "cerWithoutDiacritics": {
+                "errors": 0,
+                "reference": 58,
+                "rate": 0
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 1,
+                "rate": 0,
+                "accuracy": 1
+              },
+              "referenceLines": 2,
+              "predictedLines": 1,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 1,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "figure": {
+              "cer": {
+                "errors": 9,
+                "reference": 9,
+                "rate": 1
+              },
+              "wer": {
+                "errors": 5,
+                "reference": 5,
+                "rate": 1
+              },
+              "cerWithoutDiacritics": {
+                "errors": 9,
+                "reference": 9,
+                "rate": 1
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 5,
+                "reference": 5,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "referenceLines": 5,
+              "predictedLines": 0,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": null,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "table": {
+              "cer": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "wer": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "cerWithoutDiacritics": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "referenceLines": 0,
+              "predictedLines": 0,
+              "correctLines": 0,
+              "lineRecall": null,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": null,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "solution": {
+              "cer": {
+                "errors": 1,
+                "reference": 116,
+                "rate": 0.008620689655172414
+              },
+              "wer": {
+                "errors": 1,
+                "reference": 32,
+                "rate": 0.03125
+              },
+              "cerWithoutDiacritics": {
+                "errors": 0,
+                "reference": 116,
+                "rate": 0
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 6,
+                "rate": 0,
+                "accuracy": 1
+              },
+              "referenceLines": 3,
+              "predictedLines": 2,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 2,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 1,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "10-hamilton-reverse-cycle-patrick-straight",
+      "meta": {
+        "source": "synthetic_handwriting",
+        "capture": "straight",
+        "blurred": false,
+        "questionFormat": "tu_luan",
+        "synthetic": true,
+        "variant": "patrick-straight",
+        "coreFixture": "10-hamilton-reverse-cycle",
+        "hasSolution": true,
+        "studentErrors": [],
+        "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
+        "handwritingHashes": {
+          "truth.json": "3377181720224abd3a5a28213210cb28d1e018460d5ba1b9162d03450effc521",
+          "lines.json": "0fb67c6bb45ccf1127040075c622376d70966cdbef1b1f97fa42df350132035c",
+          "source.svg": "437413b5764ae104991da8f84ace6d8b4eaa6fc188f255e8681e4bff19448eb6",
+          "layout.json": "c325d023d38db64b0b10900cb72b0cc0e1fd8345c357f0e27159eba8df2ff678",
+          "cancellation.json": "edbaef8eae9cb222b0f12a4ae1b89516f68109c8bf1fc914310c9f5ab95ed07f",
+          "1.png": "33b2f2ac8519ae00c19e73af91e409d24b259db80785bfe8a016e6db92eaf5c4"
+        }
+      },
+      "usage": {
+        "engine": "offline:qwen3-vl-2b",
+        "passes": 1,
+        "latencyMs": 44900.90000003576,
+        "peakMemoryMb": 3919.015625,
+        "finish_reason": [
+          "stop"
+        ],
+        "sentImages": [
+          {
+            "originalWidth": 1000,
+            "originalHeight": 1440,
+            "width": 533,
+            "height": 768,
+            "maxImageSide": 768
+          }
+        ],
+        "serverTimings": {
+          "promptMs": 36677.533,
+          "predictedMs": 8036.539,
+          "promptTokens": 595,
+          "predictedTokens": 130
+        }
+      },
+      "issueCodes": [],
+      "deviceTiming": {
+        "totalMs": 45065.30000001192,
+        "modelLoadMs": 0,
+        "modelVerifyMs": 0,
+        "reusedModel": true
+      },
+      "textComparisons": [
+        {
+          "cer": {
+            "errors": 25,
+            "reference": 172,
+            "rate": 0.14534883720930233
+          },
+          "wer": {
+            "errors": 17,
+            "reference": 48,
+            "rate": 0.3541666666666667
+          },
+          "cerWithoutDiacritics": {
+            "errors": 24,
+            "reference": 172,
+            "rate": 0.13953488372093023
+          },
+          "digits": {
+            "errors": 0,
+            "reference": 0,
+            "rate": null,
+            "accuracy": null
+          },
+          "vertexLabels": {
+            "errors": 1,
+            "reference": 12,
+            "rate": 0.08333333333333333,
+            "accuracy": 0.9166666666666666
+          },
+          "referenceLines": 10,
+          "predictedLines": 6,
+          "correctLines": 3,
+          "lineRecall": 0.3,
+          "wrongLines": 3,
+          "silentLines": 1,
+          "silentLineRate": 0.16666666666666666,
+          "confidenceThreshold": 0.85,
+          "struckReferenceLines": 1,
+          "struckReadAsContent": 0,
+          "struckUnassessable": 0,
+          "byRegion": {
+            "question": {
+              "cer": {
+                "errors": 0,
+                "reference": 58,
+                "rate": 0
+              },
+              "wer": {
+                "errors": 0,
+                "reference": 13,
+                "rate": 0
+              },
+              "cerWithoutDiacritics": {
+                "errors": 0,
+                "reference": 58,
+                "rate": 0
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 1,
+                "rate": 0,
+                "accuracy": 1
+              },
+              "referenceLines": 2,
+              "predictedLines": 2,
+              "correctLines": 2,
+              "lineRecall": 1,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "figure": {
+              "cer": {
+                "errors": 37,
+                "reference": 9,
+                "rate": 4.111111111111111
+              },
+              "wer": {
+                "errors": 9,
+                "reference": 5,
+                "rate": 1.8
+              },
+              "cerWithoutDiacritics": {
+                "errors": 37,
+                "reference": 9,
+                "rate": 4.111111111111111
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 1,
+                "reference": 5,
+                "rate": 0.2,
+                "accuracy": 0.8
+              },
+              "referenceLines": 5,
+              "predictedLines": 2,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 2,
+              "silentLines": 1,
+              "silentLineRate": 0.5,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "table": {
+              "cer": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "wer": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "cerWithoutDiacritics": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "referenceLines": 0,
+              "predictedLines": 0,
+              "correctLines": 0,
+              "lineRecall": null,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": null,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "solution": {
+              "cer": {
+                "errors": 45,
+                "reference": 103,
+                "rate": 0.4368932038834951
+              },
+              "wer": {
+                "errors": 20,
+                "reference": 30,
+                "rate": 0.6666666666666666
+              },
+              "cerWithoutDiacritics": {
+                "errors": 44,
+                "reference": 103,
+                "rate": 0.42718446601941745
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 6,
+                "rate": 0,
+                "accuracy": 1
+              },
+              "referenceLines": 3,
+              "predictedLines": 2,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 2,
+              "silentLines": 1,
+              "silentLineRate": 0.5,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 1,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "12-dijkstra-tied-order-dancing-perspective",
+      "meta": {
+        "source": "synthetic_handwriting",
+        "capture": "tilted",
+        "blurred": false,
+        "questionFormat": "tu_luan",
+        "synthetic": true,
+        "variant": "dancing-perspective",
+        "coreFixture": "12-dijkstra-tied-order",
+        "hasSolution": true,
+        "studentErrors": [],
+        "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
+        "handwritingHashes": {
+          "truth.json": "3314c460293b9cafc1213ecdfafce738edbcd457f932ec88f3e68b64fa079ee4",
+          "lines.json": "884e6dc0e6d6b4a2200d9f38f207e95f1bb1cb43352a44b08b757024851d8fcc",
+          "source.svg": "9e922cc30a69761746f45940438519d360ee6b3e4f913583d30bc181ddcc0076",
+          "layout.json": "200e37194cc5c528660662fa27a4fe00af9535f660aadb5c68fec5d594e05bc8",
+          "cancellation.json": "ace04a3fdc09ff25fa7b89a72edf0fb034f5482cfd267914de3cf54893a4117e",
+          "1.png": "df344760c5f1abcaa7b7bdf4f89ad6403fec9d25227e142c9ebd2bdfa0a2d4c0"
+        }
+      },
+      "usage": {
+        "engine": "offline:qwen3-vl-2b",
+        "passes": 0,
+        "latencyMs": 0,
+        "peakMemoryMb": 3930.65234375,
+        "sentImages": [
+          {
+            "originalWidth": 1000,
+            "originalHeight": 1440,
+            "width": 533,
+            "height": 768,
+            "maxImageSide": 768
+          }
+        ]
+      },
+      "issueCodes": [],
+      "deviceTiming": {
+        "totalMs": 301038.8000000119,
+        "modelLoadMs": 0,
+        "modelVerifyMs": 0,
+        "reusedModel": true
+      },
+      "errorCode": "http_error",
+      "textComparisons": [
+        {
+          "cer": {
+            "errors": 208,
+            "reference": 208,
+            "rate": 1
+          },
+          "wer": {
+            "errors": 69,
+            "reference": 69,
+            "rate": 1
+          },
+          "cerWithoutDiacritics": {
+            "errors": 208,
+            "reference": 208,
+            "rate": 1
+          },
+          "digits": {
+            "errors": 20,
+            "reference": 20,
+            "rate": 1,
+            "accuracy": 0
+          },
+          "vertexLabels": {
+            "errors": 20,
+            "reference": 20,
+            "rate": 1,
+            "accuracy": 0
+          },
+          "referenceLines": 18,
+          "predictedLines": 0,
+          "correctLines": 0,
+          "lineRecall": 0,
+          "wrongLines": 0,
+          "silentLines": 0,
+          "silentLineRate": null,
+          "confidenceThreshold": 0.85,
+          "struckReferenceLines": 1,
+          "struckReadAsContent": 0,
+          "struckUnassessable": 0,
+          "byRegion": {
+            "question": {
+              "cer": {
+                "errors": 78,
+                "reference": 78,
+                "rate": 1
+              },
+              "wer": {
+                "errors": 18,
+                "reference": 18,
+                "rate": 1
+              },
+              "cerWithoutDiacritics": {
+                "errors": 78,
+                "reference": 78,
+                "rate": 1
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 2,
+                "reference": 2,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "referenceLines": 2,
+              "predictedLines": 0,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": null,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "figure": {
+              "cer": {
+                "errors": 15,
+                "reference": 15,
+                "rate": 1
+              },
+              "wer": {
+                "errors": 8,
+                "reference": 8,
+                "rate": 1
+              },
+              "cerWithoutDiacritics": {
+                "errors": 15,
+                "reference": 15,
+                "rate": 1
+              },
+              "digits": {
+                "errors": 4,
+                "reference": 4,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "vertexLabels": {
+                "errors": 4,
+                "reference": 4,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "referenceLines": 8,
+              "predictedLines": 0,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": null,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "table": {
+              "cer": {
+                "errors": 52,
+                "reference": 52,
+                "rate": 1
+              },
+              "wer": {
+                "errors": 25,
+                "reference": 25,
+                "rate": 1
+              },
+              "cerWithoutDiacritics": {
+                "errors": 52,
+                "reference": 52,
+                "rate": 1
+              },
+              "digits": {
+                "errors": 15,
+                "reference": 15,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "vertexLabels": {
+                "errors": 8,
+                "reference": 8,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "referenceLines": 5,
+              "predictedLines": 0,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": null,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "solution": {
+              "cer": {
+                "errors": 60,
+                "reference": 60,
+                "rate": 1
+              },
+              "wer": {
+                "errors": 18,
+                "reference": 18,
+                "rate": 1
+              },
+              "cerWithoutDiacritics": {
+                "errors": 60,
+                "reference": 60,
+                "rate": 1
+              },
+              "digits": {
+                "errors": 1,
+                "reference": 1,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "vertexLabels": {
+                "errors": 6,
+                "reference": 6,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "referenceLines": 3,
+              "predictedLines": 0,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": null,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 1,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "12-dijkstra-tied-order-dancing-straight",
+      "meta": {
+        "source": "synthetic_handwriting",
+        "capture": "straight",
+        "blurred": false,
+        "questionFormat": "tu_luan",
+        "synthetic": true,
+        "variant": "dancing-straight",
+        "coreFixture": "12-dijkstra-tied-order",
+        "hasSolution": true,
+        "studentErrors": [
+          {
+            "kind": "arithmetic",
+            "written": "Đường đi có độ dài 5.",
+            "expected": "Đường đi có độ dài 4.",
+            "description": "Cộng sai độ dài dù bảng nhãn cho kết quả khác."
+          }
+        ],
+        "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
+        "handwritingHashes": {
+          "truth.json": "3314c460293b9cafc1213ecdfafce738edbcd457f932ec88f3e68b64fa079ee4",
+          "lines.json": "d85d8e98bf74f370525f8536fb4f07a754460f329e38ca9b717ae4b97126a62e",
+          "source.svg": "9e922cc30a69761746f45940438519d360ee6b3e4f913583d30bc181ddcc0076",
+          "layout.json": "5a21728805833254a69ab5e6cbb34a173c69760aefc93dfb96558c781332845e",
+          "cancellation.json": "981c9f2db5443958e0e3bc927f0d53c88966f79c827f14836fadd40c8ecf0cf0",
+          "1.png": "89839f038b9cfc60d56a4ea790db9f22f6d310b4a8dd04fedc4addf671eca291"
+        }
+      },
+      "usage": {
+        "engine": "offline:qwen3-vl-2b",
+        "passes": 0,
+        "latencyMs": 0,
+        "peakMemoryMb": 3769.5625,
+        "sentImages": [
+          {
+            "originalWidth": 1000,
+            "originalHeight": 1440,
+            "width": 533,
+            "height": 768,
+            "maxImageSide": 768
+          }
+        ]
+      },
+      "issueCodes": [],
+      "deviceTiming": {
+        "totalMs": 310656.6999999881,
+        "modelLoadMs": 5379,
+        "modelVerifyMs": 4365,
+        "reusedModel": false
+      },
+      "errorCode": "http_error",
+      "textComparisons": [
+        {
+          "cer": {
+            "errors": 207,
+            "reference": 207,
+            "rate": 1
+          },
+          "wer": {
+            "errors": 69,
+            "reference": 69,
+            "rate": 1
+          },
+          "cerWithoutDiacritics": {
+            "errors": 207,
+            "reference": 207,
+            "rate": 1
+          },
+          "digits": {
+            "errors": 20,
+            "reference": 20,
+            "rate": 1,
+            "accuracy": 0
+          },
+          "vertexLabels": {
+            "errors": 20,
+            "reference": 20,
+            "rate": 1,
+            "accuracy": 0
+          },
+          "referenceLines": 18,
+          "predictedLines": 0,
+          "correctLines": 0,
+          "lineRecall": 0,
+          "wrongLines": 0,
+          "silentLines": 0,
+          "silentLineRate": null,
+          "confidenceThreshold": 0.85,
+          "struckReferenceLines": 1,
+          "struckReadAsContent": 0,
+          "struckUnassessable": 0,
+          "byRegion": {
+            "question": {
+              "cer": {
+                "errors": 78,
+                "reference": 78,
+                "rate": 1
+              },
+              "wer": {
+                "errors": 18,
+                "reference": 18,
+                "rate": 1
+              },
+              "cerWithoutDiacritics": {
+                "errors": 78,
+                "reference": 78,
+                "rate": 1
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 2,
+                "reference": 2,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "referenceLines": 2,
+              "predictedLines": 0,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": null,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "figure": {
+              "cer": {
+                "errors": 15,
+                "reference": 15,
+                "rate": 1
+              },
+              "wer": {
+                "errors": 8,
+                "reference": 8,
+                "rate": 1
+              },
+              "cerWithoutDiacritics": {
+                "errors": 15,
+                "reference": 15,
+                "rate": 1
+              },
+              "digits": {
+                "errors": 4,
+                "reference": 4,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "vertexLabels": {
+                "errors": 4,
+                "reference": 4,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "referenceLines": 8,
+              "predictedLines": 0,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": null,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "table": {
+              "cer": {
+                "errors": 52,
+                "reference": 52,
+                "rate": 1
+              },
+              "wer": {
+                "errors": 25,
+                "reference": 25,
+                "rate": 1
+              },
+              "cerWithoutDiacritics": {
+                "errors": 52,
+                "reference": 52,
+                "rate": 1
+              },
+              "digits": {
+                "errors": 15,
+                "reference": 15,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "vertexLabels": {
+                "errors": 8,
+                "reference": 8,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "referenceLines": 5,
+              "predictedLines": 0,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": null,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "solution": {
+              "cer": {
+                "errors": 59,
+                "reference": 59,
+                "rate": 1
+              },
+              "wer": {
+                "errors": 18,
+                "reference": 18,
+                "rate": 1
+              },
+              "cerWithoutDiacritics": {
+                "errors": 59,
+                "reference": 59,
+                "rate": 1
+              },
+              "digits": {
+                "errors": 1,
+                "reference": 1,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "vertexLabels": {
+                "errors": 6,
+                "reference": 6,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "referenceLines": 3,
+              "predictedLines": 0,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": null,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 1,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "12-dijkstra-tied-order-patrick-perspective",
+      "meta": {
+        "source": "synthetic_handwriting",
+        "capture": "tilted",
+        "blurred": false,
+        "questionFormat": "tu_luan",
+        "synthetic": true,
+        "variant": "patrick-perspective",
+        "coreFixture": "12-dijkstra-tied-order",
+        "hasSolution": true,
+        "studentErrors": [
+          {
+            "kind": "arithmetic",
+            "written": "Đường đi có độ dài 5.",
+            "expected": "Đường đi có độ dài 4.",
+            "description": "Cộng sai độ dài dù bảng nhãn cho kết quả khác."
+          }
+        ],
+        "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
+        "handwritingHashes": {
+          "truth.json": "3314c460293b9cafc1213ecdfafce738edbcd457f932ec88f3e68b64fa079ee4",
+          "lines.json": "1fc3587189d396c3ccd638af8c8f0c03986f2b75347f7ffcb2619c5189b490fd",
+          "source.svg": "9e922cc30a69761746f45940438519d360ee6b3e4f913583d30bc181ddcc0076",
+          "layout.json": "0aa9f0efe09200f0c67501af1a0f6bef22405410fc3d1b0956a2ca150eccacc5",
+          "cancellation.json": "5767e842caef9dc499c49ff99993da1d9d86d5831bd1a8ae6ffc5ea65b097317",
+          "1.png": "6d8c761e0c064070afc624e58fb95e11f6ac35cba3590606cebae4d9eaed913e"
+        }
+      },
+      "usage": {
+        "engine": "offline:qwen3-vl-2b",
+        "passes": 1,
+        "latencyMs": 61982.39999997616,
+        "peakMemoryMb": 3764.03515625,
+        "finish_reason": [
+          "stop"
+        ],
+        "sentImages": [
+          {
+            "originalWidth": 1000,
+            "originalHeight": 1440,
+            "width": 533,
+            "height": 768,
+            "maxImageSide": 768
+          }
+        ],
+        "serverTimings": {
+          "promptMs": 43071.866,
+          "predictedMs": 18574.681,
+          "promptTokens": 595,
+          "predictedTokens": 259
+        }
+      },
+      "issueCodes": [],
+      "deviceTiming": {
+        "totalMs": 74210.19999998808,
+        "modelLoadMs": 7961,
+        "modelVerifyMs": 4026,
+        "reusedModel": false
+      },
+      "textComparisons": [
+        {
+          "cer": {
+            "errors": 11,
+            "reference": 207,
+            "rate": 0.05314009661835749
+          },
+          "wer": {
+            "errors": 8,
+            "reference": 69,
+            "rate": 0.11594202898550725
+          },
+          "cerWithoutDiacritics": {
+            "errors": 11,
+            "reference": 207,
+            "rate": 0.05314009661835749
+          },
+          "digits": {
+            "errors": 5,
+            "reference": 20,
+            "rate": 0.25,
+            "accuracy": 0.75
+          },
+          "vertexLabels": {
+            "errors": 2,
+            "reference": 20,
+            "rate": 0.1,
+            "accuracy": 0.9
+          },
+          "referenceLines": 18,
+          "predictedLines": 14,
+          "correctLines": 7,
+          "lineRecall": 0.3888888888888889,
+          "wrongLines": 7,
+          "silentLines": 1,
+          "silentLineRate": 0.07142857142857142,
+          "confidenceThreshold": 0.85,
+          "struckReferenceLines": 1,
+          "struckReadAsContent": 0,
+          "struckUnassessable": 1,
+          "byRegion": {
+            "question": {
+              "cer": {
+                "errors": 0,
+                "reference": 78,
+                "rate": 0
+              },
+              "wer": {
+                "errors": 0,
+                "reference": 18,
+                "rate": 0
+              },
+              "cerWithoutDiacritics": {
+                "errors": 0,
+                "reference": 78,
+                "rate": 0
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 2,
+                "rate": 0,
+                "accuracy": 1
+              },
+              "referenceLines": 2,
+              "predictedLines": 2,
+              "correctLines": 2,
+              "lineRecall": 1,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "figure": {
+              "cer": {
+                "errors": 8,
+                "reference": 15,
+                "rate": 0.5333333333333333
+              },
+              "wer": {
+                "errors": 5,
+                "reference": 8,
+                "rate": 0.625
+              },
+              "cerWithoutDiacritics": {
+                "errors": 8,
+                "reference": 15,
+                "rate": 0.5333333333333333
+              },
+              "digits": {
+                "errors": 3,
+                "reference": 4,
+                "rate": 0.75,
+                "accuracy": 0.25
+              },
+              "vertexLabels": {
+                "errors": 2,
+                "reference": 4,
+                "rate": 0.5,
+                "accuracy": 0.5
+              },
+              "referenceLines": 8,
+              "predictedLines": 4,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 4,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "table": {
+              "cer": {
+                "errors": 2,
+                "reference": 52,
+                "rate": 0.038461538461538464
+              },
+              "wer": {
+                "errors": 2,
+                "reference": 25,
+                "rate": 0.08
+              },
+              "cerWithoutDiacritics": {
+                "errors": 2,
+                "reference": 52,
+                "rate": 0.038461538461538464
+              },
+              "digits": {
+                "errors": 2,
+                "reference": 15,
+                "rate": 0.13333333333333333,
+                "accuracy": 0.8666666666666667
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 8,
+                "rate": 0,
+                "accuracy": 1
+              },
+              "referenceLines": 5,
+              "predictedLines": 5,
+              "correctLines": 3,
+              "lineRecall": 0.6,
+              "wrongLines": 2,
+              "silentLines": 0,
+              "silentLineRate": 0,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "solution": {
+              "cer": {
+                "errors": 1,
+                "reference": 59,
+                "rate": 0.01694915254237288
+              },
+              "wer": {
+                "errors": 1,
+                "reference": 18,
+                "rate": 0.05555555555555555
+              },
+              "cerWithoutDiacritics": {
+                "errors": 1,
+                "reference": 59,
+                "rate": 0.01694915254237288
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 1,
+                "rate": 0,
+                "accuracy": 1
+              },
+              "vertexLabels": {
+                "errors": 0,
+                "reference": 6,
+                "rate": 0,
+                "accuracy": 1
+              },
+              "referenceLines": 3,
+              "predictedLines": 3,
+              "correctLines": 2,
+              "lineRecall": 0.6666666666666666,
+              "wrongLines": 1,
+              "silentLines": 1,
+              "silentLineRate": 0.3333333333333333,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 1,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "12-dijkstra-tied-order-patrick-straight",
+      "meta": {
+        "source": "synthetic_handwriting",
+        "capture": "straight",
+        "blurred": false,
+        "questionFormat": "tu_luan",
+        "synthetic": true,
+        "variant": "patrick-straight",
+        "coreFixture": "12-dijkstra-tied-order",
+        "hasSolution": true,
+        "studentErrors": [],
+        "notes": "Chữ kiểu viết tay tổng hợp, không phải bài học sinh thật. Bài làm đúng hoặc có lỗi cố ý, truth chép nguyên văn; dòng gạch xóa đánh dấu struck, bôi kín có text null.",
+        "handwritingHashes": {
+          "truth.json": "3314c460293b9cafc1213ecdfafce738edbcd457f932ec88f3e68b64fa079ee4",
+          "lines.json": "c98a821da645c903a8b44740d22f6e9f869e6f43d6fb66b167be923960db4b86",
+          "source.svg": "9e922cc30a69761746f45940438519d360ee6b3e4f913583d30bc181ddcc0076",
+          "layout.json": "4ab1b8e9fa7387360c1442e8dbe1e3a913a59d7a0342f32b648b249bf9c13c0b",
+          "cancellation.json": "f07b4c225570df8fa95056fc662745333f210f712f78051517f4d8fd004c40d3",
+          "1.png": "fe865cdaa96c96ae9f227462370f0cdb45bbcbc357f97b7da222806117551a57"
+        }
+      },
+      "usage": {
+        "engine": "offline:qwen3-vl-2b",
+        "passes": 0,
+        "latencyMs": 0,
+        "peakMemoryMb": 3824.51171875,
+        "sentImages": [
+          {
+            "originalWidth": 1000,
+            "originalHeight": 1440,
+            "width": 533,
+            "height": 768,
+            "maxImageSide": 768
+          }
+        ]
+      },
+      "issueCodes": [],
+      "deviceTiming": {
+        "totalMs": 80226.59999996424,
+        "modelLoadMs": 0,
+        "modelVerifyMs": 0,
+        "reusedModel": true
+      },
+      "errorCode": "aborted",
+      "textComparisons": [
+        {
+          "cer": {
+            "errors": 208,
+            "reference": 208,
+            "rate": 1
+          },
+          "wer": {
+            "errors": 69,
+            "reference": 69,
+            "rate": 1
+          },
+          "cerWithoutDiacritics": {
+            "errors": 208,
+            "reference": 208,
+            "rate": 1
+          },
+          "digits": {
+            "errors": 20,
+            "reference": 20,
+            "rate": 1,
+            "accuracy": 0
+          },
+          "vertexLabels": {
+            "errors": 20,
+            "reference": 20,
+            "rate": 1,
+            "accuracy": 0
+          },
+          "referenceLines": 18,
+          "predictedLines": 0,
+          "correctLines": 0,
+          "lineRecall": 0,
+          "wrongLines": 0,
+          "silentLines": 0,
+          "silentLineRate": null,
+          "confidenceThreshold": 0.85,
+          "struckReferenceLines": 1,
+          "struckReadAsContent": 0,
+          "struckUnassessable": 0,
+          "byRegion": {
+            "question": {
+              "cer": {
+                "errors": 78,
+                "reference": 78,
+                "rate": 1
+              },
+              "wer": {
+                "errors": 18,
+                "reference": 18,
+                "rate": 1
+              },
+              "cerWithoutDiacritics": {
+                "errors": 78,
+                "reference": 78,
+                "rate": 1
+              },
+              "digits": {
+                "errors": 0,
+                "reference": 0,
+                "rate": null,
+                "accuracy": null
+              },
+              "vertexLabels": {
+                "errors": 2,
+                "reference": 2,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "referenceLines": 2,
+              "predictedLines": 0,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": null,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "figure": {
+              "cer": {
+                "errors": 15,
+                "reference": 15,
+                "rate": 1
+              },
+              "wer": {
+                "errors": 8,
+                "reference": 8,
+                "rate": 1
+              },
+              "cerWithoutDiacritics": {
+                "errors": 15,
+                "reference": 15,
+                "rate": 1
+              },
+              "digits": {
+                "errors": 4,
+                "reference": 4,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "vertexLabels": {
+                "errors": 4,
+                "reference": 4,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "referenceLines": 8,
+              "predictedLines": 0,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": null,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "table": {
+              "cer": {
+                "errors": 52,
+                "reference": 52,
+                "rate": 1
+              },
+              "wer": {
+                "errors": 25,
+                "reference": 25,
+                "rate": 1
+              },
+              "cerWithoutDiacritics": {
+                "errors": 52,
+                "reference": 52,
+                "rate": 1
+              },
+              "digits": {
+                "errors": 15,
+                "reference": 15,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "vertexLabels": {
+                "errors": 8,
+                "reference": 8,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "referenceLines": 5,
+              "predictedLines": 0,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": null,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 0,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            },
+            "solution": {
+              "cer": {
+                "errors": 60,
+                "reference": 60,
+                "rate": 1
+              },
+              "wer": {
+                "errors": 18,
+                "reference": 18,
+                "rate": 1
+              },
+              "cerWithoutDiacritics": {
+                "errors": 60,
+                "reference": 60,
+                "rate": 1
+              },
+              "digits": {
+                "errors": 1,
+                "reference": 1,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "vertexLabels": {
+                "errors": 6,
+                "reference": 6,
+                "rate": 1,
+                "accuracy": 0
+              },
+              "referenceLines": 3,
+              "predictedLines": 0,
+              "correctLines": 0,
+              "lineRecall": 0,
+              "wrongLines": 0,
+              "silentLines": 0,
+              "silentLineRate": null,
+              "confidenceThreshold": 0.85,
+              "struckReferenceLines": 1,
+              "struckReadAsContent": 0,
+              "struckUnassessable": 0
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
