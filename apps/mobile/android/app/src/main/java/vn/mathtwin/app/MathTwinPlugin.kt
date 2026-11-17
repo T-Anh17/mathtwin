@@ -63,9 +63,11 @@ class MathTwinPlugin : Plugin() {
     private val requests = ConcurrentHashMap<String, PendingRequest>()
     private val busy = AtomicBoolean(false)
     private val cancellation = AtomicLong(0)
+    @Volatile private var appPressure: JSONObject? = null
     override fun load() {
         store = ModelStore(context); server = ServerRuntime(context, store)
         lifecycle = BenchmarkLifecycle(activity, { requestStop() }, { callback, level ->
+            appPressure = JSONObject().put("callback", callback).put("trimLevel", level ?: JSONObject.NULL)
             // Publish the cause before cancellation or asynchronous process teardown can be observed.
             server.recordMemoryPressure(callback, level) { cancellation.incrementAndGet() }
             controls.execute { server.stop() }
@@ -129,11 +131,42 @@ class MathTwinPlugin : Plugin() {
     @PluginMethod fun importModel(call: PluginCall) = task(call, true) { server.stop(); store.importModel(call.getString("model") ?: ""); null }
     @PluginMethod fun cancelDownload(call: PluginCall) { cancellation.incrementAndGet(); store.cancel(); call.resolve() }
     @PluginMethod fun start(call: PluginCall) = task(call, true) { token ->
+        if (call.getString("model") !in listOf("a", "b")) throw MobileFailure("model_missing")
         val threads = call.getInt("threads") ?: 1
         val minRam = call.getDouble("minRamGb") ?: 6.0
         if (threads !in 1..256 || !minRam.isFinite() || minRam < 1 || minRam > 64) throw MobileFailure("native_error")
         if (deviceData().getLong("totalRamBytes") < minRam * 1e9 && call.getBoolean("allowLowRam") != true) throw MobileFailure("low_ram")
         server.start(call.getString("model") ?: "", threads) { cancellation.get() != token }
+    }
+    /** Verified local paths only; the WebView reads these through Capacitor's file handler. */
+    @PluginMethod fun ocrModels(call: PluginCall) = task(call, true) { token ->
+        server.stop(); appPressure = null
+        val began = android.os.SystemClock.elapsedRealtime()
+        val files = store.verifiedFiles("c").associateBy { it.name }
+        if (cancellation.get() != token) throw MobileFailure("aborted")
+        JSONObject().put("detector", files.getValue("det.onnx").absolutePath)
+            .put("encoder", files.getValue("vietocr_encoder.onnx").absolutePath)
+            .put("decoder", files.getValue("vietocr_decoder.onnx").absolutePath)
+            .put("config", JSONObject(files.getValue("vietocr.json").readText()))
+            .put("verifyMs", android.os.SystemClock.elapsedRealtime() - began)
+    }
+    /** Android app process RSS/high-water mark; separate from llama-server and WebView renderer processes. */
+    @PluginMethod fun appMemory(call: PluginCall) {
+        try {
+            val data = JSObject()
+            File("/proc/self/status").useLines { lines ->
+                lines.forEach { line ->
+                    val key = when {
+                        line.startsWith("VmRSS:") -> "rssMemoryMb"
+                        line.startsWith("VmHWM:") -> "peakMemoryMb"
+                        else -> null
+                    }
+                    if (key != null) Regex("\\d+").find(line)?.value?.toLongOrNull()?.let { data.put(key, it / 1024.0) }
+                }
+            }
+            appPressure?.let { data.put("memoryPressure", it) }
+            call.resolve(data)
+        } catch (_: Exception) { call.reject("native_error", "native_error") }
     }
     @PluginMethod fun status(call: PluginCall) { call.resolve(JSObject(server.status().toString())) }
     @PluginMethod fun post(call: PluginCall) {

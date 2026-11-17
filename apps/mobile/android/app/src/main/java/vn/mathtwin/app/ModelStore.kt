@@ -21,10 +21,10 @@ internal class ModelStore(private val context: Context) {
     fun beginOperation() { cancelled.set(false) }
 
     fun entries(model: String): List<JSONObject> {
-        if (model != "a" && model != "b") throw MobileFailure("model_missing")
+        if (model !in listOf("a", "b", "c")) throw MobileFailure("model_missing")
         val files = manifest.getJSONArray("files")
         return (0 until files.length()).map { files.getJSONObject(it) }.filter { it.getString("model") == model }
-            .also { if (it.size != 2) throw MobileFailure("model_missing") }
+            .also { if (it.size != (if (model == "c") 4 else 2)) throw MobileFailure("model_missing") }
     }
     fun file(entry: JSONObject): File = File(File(root, entry.getString("model")).apply { mkdirs() }, entry.getString("filename"))
     private fun marker(f: File) = File(f.path + ".verified")
@@ -34,7 +34,7 @@ internal class ModelStore(private val context: Context) {
             marker(f).readText() == "${e.getString("sha256")}:${f.lastModified()}:${f.length()}"
     }
     fun states(): JSONArray = JSONArray().apply {
-        for (model in listOf("a", "b")) {
+        for (model in listOf("a", "b", "c")) {
             val items = entries(model)
             put(JSONObject().put("model", model).put("bytes", items.sumOf { it.getLong("bytes") })
                 .put("downloadedBytes", items.sumOf { e ->
@@ -90,7 +90,9 @@ internal class ModelStore(private val context: Context) {
     }
     private fun receive(e: JSONObject, part: File) {
         val url = e.getString("url")
-        val expected = "https://huggingface.co/${e.getString("repository")}/resolve/${e.getString("revision")}/${e.getString("filename")}"
+        val expected = if (e.getString("model") == "c")
+            "https://github.com/${e.getString("repository")}/releases/download/${e.getString("revision")}/${e.getString("filename")}"
+        else "https://huggingface.co/${e.getString("repository")}/resolve/${e.getString("revision")}/${e.getString("filename")}"
         if (url != expected) throw MobileFailure("download_failed")
         var current = URL(url)
         var offset = part.length()

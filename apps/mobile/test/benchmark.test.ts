@@ -26,6 +26,8 @@ function response(text: string, p = 0.95): unknown {
 function fake() {
   let state: ServerState = { alive: true, peakMemoryMb: 1500, rssMemoryMb: 1200, cpuVariant: 'android_armv8.6_1' };
   const plugin: MobilePlugin = {
+    ocrModels: mock.fn(async () => ({ detector: '/det', encoder: '/enc', decoder: '/dec', config: {}, verifyMs: 10 })),
+    appMemory: mock.fn(async () => ({ rssMemoryMb: 120, peakMemoryMb: 150 })),
     device: mock.fn(async () => device), models: mock.fn(async () => ({ models: [] })),
     download: mock.fn(async () => {}), cancelDownload: mock.fn(async () => {}), importModel: mock.fn(async () => {}),
     start: mock.fn(async () => ({ ...session })), status: mock.fn(async () => ({ ...state })), stop: mock.fn(async () => {}),
@@ -473,4 +475,80 @@ describe('Android benchmark flow with fake native plugin (no device/model/networ
     const lines = await runner.run(image, { ...config, model: 'd', mode: 'lines' }, signal());
     expect(lines.errorCode).toBe('graph_only');
   });
+});
+
+
+describe('engine C benchmark with fake worker/plugin', () => {
+  const c: BenchmarkConfig = { ...config, model: 'c', mode: 'lines', passes: 1, readTimeout: 1000 };
+  const output = { linePasses: [{ lines: [{ text: 'ố', conf: 0.6, alternatives: ['ẹ'] }],
+    usage: { engine: 'offline:vietocr-onnx', passes: 1, latencyMs: 20, detectionMs: 5, recognitionMs: 15, lineCount: 1, lineMs: [15] } }],
+    loadMs: 7, wasm: { numThreads: 1, crossOriginIsolated: false, simd: true as const } };
+  it('verifies C, reads original pixels, collects app RAM and exports metadata without local paths', async () => {
+    const { plugin, http, decode } = fake(), ocr = mock.fn(async () => output);
+    const runner = new Benchmark(plugin, http, decode, undefined, ocr);
+    const result = await runner.run(image, c, signal());
+    expect(result.errorCode).toBeUndefined();
+    expect(plugin.ocrModels).toHaveBeenCalledOnce(); expect(plugin.start).not.toHaveBeenCalled(); expect(http.post).not.toHaveBeenCalled();
+    expect(ocr).toHaveBeenCalledWith(expect.objectContaining({ image: decoded.original, threads: 4, passes: 1 }), expect.any(AbortSignal));
+    expect(result).toMatchObject({ engine: 'offline:vietocr-onnx', modelVerifyMs: 10, modelLoadMs: 7, totalMs: expect.any(Number),
+      memory: { rssMemoryMb: 120, peakMemoryMb: 150 }, usage: { lineMs: [15], lineCount: 1 } });
+    const json = exportReport({ version: 1, device, results: [result] });
+    expect(JSON.parse(json)).toMatchObject({ results: [{ wasm: output.wasm, config: { backend: 'WASM' }, linePasses: output.linePasses }] });
+    expect(json).not.toContain('/det'); expect(json).not.toContain('pixels');
+  });
+  it('graph mode fails before model loading', async () => {
+    const { plugin, http, decode } = fake(), ocr = mock.fn(async () => output);
+    const result = await new Benchmark(plugin, http, decode, undefined, ocr).run(image, { ...c, mode: 'graph' }, signal());
+    expect(result.errorCode).toBe('unsupported_mode'); expect(plugin.ocrModels).not.toHaveBeenCalled(); expect(ocr).not.toHaveBeenCalled();
+  });
+  it('checksum failure never invokes inference', async () => {
+    const { plugin, http, decode } = fake(), ocr = mock.fn(async () => output);
+    mock.mocked(plugin.ocrModels).mockRejectedValue({ code: 'checksum' });
+    const result = await new Benchmark(plugin, http, decode, undefined, ocr).run(image, c, signal());
+    expect(result.errorCode).toBe('checksum'); expect(ocr).not.toHaveBeenCalled();
+  });
+  it.each(['aborted', 'timeout'] as const)('%s cancels inference and permits the next image', async (code) => {
+    mock.useFakeTimers();
+    try {
+      const { plugin, http, decode } = fake(), abort = new AbortController();
+      let workerSignal: AbortSignal | undefined;
+      const ocr = mock.fn(async (_request: unknown, s: AbortSignal) => { workerSignal = s; return new Promise<typeof output>(() => {}); });
+      const runner = new Benchmark(plugin, http, decode, undefined, ocr);
+      const pending = runner.run(image, c, abort.signal);
+      for (let i = 0; i < 30 && !workerSignal; i++) await Promise.resolve();
+      expect(workerSignal).toBeDefined();
+      if (code === 'aborted') abort.abort(); else await mock.advanceTimersByTimeAsync(181001);
+      expect((await pending).errorCode).toBe(code); expect(workerSignal!.aborted).toBe(true);
+      ocr.mockResolvedValueOnce(output);
+      expect((await runner.run(image, c, signal())).errorCode).toBeUndefined();
+    } finally { mock.useRealTimers(); }
+  });
+  it('app memory pressure cancels inference and retains the callback', async () => {
+    mock.useFakeTimers();
+    try {
+      const { plugin, http, decode } = fake(); let workerSignal: AbortSignal | undefined;
+      const ocr = mock.fn(async (_request: unknown, s: AbortSignal) => { workerSignal = s; return new Promise<typeof output>(() => {}); });
+      const pending = new Benchmark(plugin, http, decode, undefined, ocr).run(image, c, signal());
+      for (let i = 0; i < 30 && !workerSignal; i++) await Promise.resolve();
+      mock.mocked(plugin.appMemory).mockResolvedValue({ memoryPressure: { callback: 'onLowMemory', trimLevel: null } });
+      await mock.advanceTimersByTimeAsync(251);
+      expect(await pending).toMatchObject({ errorCode: 'memory_pressure', memory: { memoryPressure: { callback: 'onLowMemory' } } });
+      expect(workerSignal!.aborted).toBe(true);
+    } finally { mock.useRealTimers(); }
+  });
+});
+
+it('C cancellation interrupts native SHA verification and waits for its exclusive slot', async () => {
+  const { plugin, http, decode } = fake(), abort = new AbortController();
+  let rejectVerify: (reason: unknown) => void = () => {};
+  mock.mocked(plugin.ocrModels).mockImplementation(() => new Promise((_, reject) => { rejectVerify = reject; }));
+  mock.mocked(plugin.cancelDownload).mockImplementation(async () => { rejectVerify({ code: 'aborted' }); });
+  const ocr = mock.fn(async () => ({ linePasses: [], loadMs: 0, wasm: { numThreads: 1, crossOriginIsolated: false, simd: true as const } }));
+  const runner = new Benchmark(plugin, http, decode, undefined, ocr);
+  const pending = runner.run(image, { ...config, model: 'c', mode: 'lines' }, abort.signal);
+  for (let i = 0; i < 30 && !mock.mocked(plugin.ocrModels).mock.calls.length; i++) await Promise.resolve();
+  expect(plugin.ocrModels).toHaveBeenCalledOnce();
+  abort.abort();
+  expect((await pending).errorCode).toBe('aborted'); expect(plugin.cancelDownload).toHaveBeenCalledOnce();
+  expect(ocr).not.toHaveBeenCalled();
 });

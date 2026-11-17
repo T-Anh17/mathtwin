@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { defaultDry, defaultMaxImageSide, defaultReadTimeout, defaultMaxTokens } from '@mathtwin/reader-llamacpp-shared';
 import manifest from '../../../tools/models/manifest.json';
+import { runOcrWorker } from './ocr.js';
 import { Benchmark, exportReport } from './benchmark.ts';
 import { decodeImage } from './images.ts';
 import { mobile, transport } from './native.ts';
@@ -16,8 +17,10 @@ import type { BenchImage, BenchmarkConfig, Dataset, DeviceInfo, ImageResult, Mod
 
 const gb = (bytes: number): string => `${(bytes / 1e9).toFixed(2)} GB`;
 const ms = (value: number): string => `${Math.round(value)} ms`;
-const modelIds: Model[] = ['a', 'b'];
-const runner = new Benchmark(mobile, transport, decodeImage);
+const modelIds: Model[] = ['a', 'b', 'c'];
+const runner = new Benchmark(mobile, transport, decodeImage, undefined, (request, signal) => runOcrWorker({ ...request,
+  models: { ...request.models, detector: Capacitor.convertFileSrc(request.models.detector),
+    encoder: Capacitor.convertFileSrc(request.models.encoder), decoder: Capacitor.convertFileSrc(request.models.decoder) } }, signal));
 export function BenchmarkScreen() {
   const [tab, setTab] = useState('bench');
   const [device, setDevice] = useState<DeviceInfo | null>(null);
@@ -72,7 +75,7 @@ export function BenchmarkScreen() {
     {device && <p className="device">{device.manufacturer} {device.model} · Android {device.android} · {device.cores} CPU · {vi.ram}: {gb(device.totalRamBytes)} · {vi.storage}: {gb(device.freeStorageBytes)}</p>}
     {message && <p role="status" className="status">{message}</p>}
     {tab === 'models' ? <section><h1>{vi.models}</h1><p>{vi.downloadNote}</p>
-      <p className="warning">{ocrMessages.weightsWarning}</p>
+      <p className="warning">{ocrMessages.weightsWarning}</p><p className="warning">{vi.cLicense}</p>
       {modelIds.map((model) => { const files = manifest.files.filter((f) => f.model === model); const bytes = files.reduce((n, f) => n + f.bytes, 0); const state = models.find((m) => m.model === model);
         return <article key={model}><h2>{vi[model]}</h2><p>{gb(bytes)} · {state?.ready ? vi.ready : vi.missing}</p>
           {files.map((f) => <p className="file" key={f.filename}>{f.filename} · {gb(f.bytes)}</p>)}
@@ -84,9 +87,9 @@ export function BenchmarkScreen() {
       {downloading && <button onClick={() => action(() => mobile.cancelDownload())}>{vi.cancelDownload}</button>}
     </section> : <section><h1>{vi.bench}</h1>
       <fieldset disabled={busy || downloading}><legend>{vi.settings}</legend><div className="settings">
-        <label>{vi.models}<select value={config.model} onChange={(e) => set('model', e.target.value === 'a' ? 'a' : e.target.value === 'd' ? 'd' : 'b')}><option value="a">{vi.a}</option><option value="b">{vi.b}</option><option value="d">{vi.d}</option></select></label>
+        <label>{vi.models}<select value={config.model} onChange={(e) => setConfig((old) => ({ ...old, model: e.target.value === 'a' ? 'a' : e.target.value === 'c' ? 'c' : e.target.value === 'd' ? 'd' : 'b', ...(e.target.value === 'c' ? { mode: 'lines' as const } : {}) }))}><option value="a">{vi.a}</option><option value="b">{vi.b}</option><option value="c">{vi.c}</option><option value="d">{vi.d}</option></select></label>
         <label>{vi.passes}<select value={config.passes} onChange={(e) => set('passes', e.target.value === '1' ? 1 : 2)}><option value={1}>1</option><option value={2}>2</option></select></label>
-        <label>{vi.mode}<select value={config.mode} onChange={(e) => set('mode', e.target.value === 'graph' ? 'graph' : 'lines')}><option value="graph">{vi.graph}</option><option value="lines">{vi.lines}</option></select></label>
+        <label>{vi.mode}<select value={config.mode} onChange={(e) => set('mode', e.target.value === 'graph' ? 'graph' : 'lines')}><option value="graph" disabled={config.model === 'c'}>{vi.graph}</option><option value="lines">{vi.lines}</option></select></label>
         <label>{vi.threads}<input type="number" min="1" max={device?.cores ?? 256} value={config.threads} onChange={(e) => set('threads', Number(e.target.value))}/></label>
         <label>{vi.maxImageSide}<select value={config.maxImageSide} onChange={(e) => set('maxImageSide', Number(e.target.value))}>{[512, 768, 1024].map((side) => <option key={side} value={side}>{side} px</option>)}</select></label>
         <label>{vi.readTimeout}<input type="number" min="1" max="3600" value={config.readTimeout! / 1000} onChange={(e) => set('readTimeout', Number(e.target.value) * 1000)}/></label>
@@ -126,7 +129,8 @@ function Result({ result, image, dataset }: { result: ImageResult; image: BenchI
     {preview && <div className="preview"><img src={preview} alt={result.id} onLoad={(e) => setSize([e.currentTarget.naturalWidth, e.currentTarget.naturalHeight])}/>
       {size && <svg viewBox={`0 0 ${size[0]} ${size[1]}`} aria-label={vi.flags}>{marks.map((m, i) => <rect key={i} x={m.box[0]} y={m.box[1]} width={m.box[2] - m.box[0]} height={m.box[3] - m.box[1]}><title>{m.label}</title></rect>)}</svg>}
     </div>}
-    <p>{vi.total}: {ms(result.totalMs)} · {result.reusedModel ? vi.warm : vi.firstLoad}: {ms(result.modelLoadMs)} · {vi.peak}: {result.memory?.peakMemoryMb === undefined ? vi.noMemory : `${result.memory.peakMemoryMb.toFixed(1)} MB`}</p>
+    <p>{vi.total}: {ms(result.totalMs)} · {result.reusedModel ? vi.warm : vi.firstLoad}: {ms(result.modelLoadMs)} · {result.config.model === 'c' ? vi.appPeak : vi.peak}: {result.memory?.peakMemoryMb === undefined ? vi.noMemory : `${result.memory.peakMemoryMb.toFixed(1)} MB`}</p>
+    {result.wasm && <p>{vi.wasmThreads}: {result.wasm.numThreads} | crossOriginIsolated: {String(result.wasm.crossOriginIsolated)} | SIMD</p>}
     <p>{vi.verify}: {ms(result.modelVerifyMs)}</p>
     {result.memory?.cpuVariant && <p>{vi.cpuVariant}: {result.memory.cpuVariant}</p>}
     <p>{result.usage.serverTimings ? `${vi.prompt}: ${ms(result.usage.serverTimings.promptMs)} · ${vi.predicted}: ${ms(result.usage.serverTimings.predictedMs)}` : vi.noTimings}</p>

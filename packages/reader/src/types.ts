@@ -18,6 +18,7 @@ export interface ReadUsage {
   lineCount?: number;
   detectionMs?: number;
   recognitionMs?: number;
+  lineMs?: number[];
 }
 export type ReadUncertainty = NonNullable<ProblemSpec['uncertain']>[number];
 export interface ReadOutcome {

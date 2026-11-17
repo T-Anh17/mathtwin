@@ -1,8 +1,8 @@
 import type { ReadOutcome, ReadUsage, TextLine } from '@mathtwin/reader';
 import type { DryConfig } from '@mathtwin/reader-llamacpp-shared';
 
-export type Model = 'a' | 'b';
-/** Benchmark engines: llama.cpp models A/B, or D (pure-TS hand-drawn graph structure reader, no model file). */
+export type Model = 'a' | 'b' | 'c';
+/** Benchmark engines: llama.cpp A/B, WASM OCR C, or D (pure-TS hand-drawn graph structure reader, no model file). */
 export type BenchModel = Model | 'd';
 export interface DeviceInfo {
   manufacturer: string; model: string; android: string; sdk: number; cores: number;
@@ -26,8 +26,10 @@ export interface MobilePlugin {
   download(options: { model: Model }): Promise<void>;
   cancelDownload(): Promise<void>;
   importModel(options: { model: Model }): Promise<void>;
-  start(options: { model: Model; threads: number; minRamGb: number; allowLowRam: boolean }): Promise<Session>;
+  start(options: { model: 'a' | 'b'; threads: number; minRamGb: number; allowLowRam: boolean }): Promise<Session>;
   status(): Promise<ServerState>;
+  ocrModels(): Promise<{ detector: string; encoder: string; decoder: string; config: unknown; verifyMs: number }>;
+  appMemory(): Promise<{ rssMemoryMb?: number; peakMemoryMb?: number; memoryPressure?: MemoryPressure }>;
   stop(): Promise<void>;
   setBenchmarkState(options: { running: boolean; backgroundIdleMinutes: number }): Promise<void>;
   cleanupCameraTempFiles(): Promise<void>;
@@ -47,6 +49,7 @@ export interface ImageResult {
   outcome?: ReadOutcome; linePasses?: { lines: TextLine[]; usage: ReadUsage }[];
   usage: ReadUsage; totalMs: number; modelLoadMs: number; modelVerifyMs: number; reusedModel: boolean;
   memory?: ServerState; errorCode?: string; serverRestarted?: boolean;
+  wasm?: { numThreads: number; crossOriginIsolated: boolean; simd: true };
   imageSource: ImageSourceKind; captureMethod?: 'system' | 'webview';
 }
 export interface BenchmarkReport { version: 1; device: DeviceInfo; results: ImageResult[] }

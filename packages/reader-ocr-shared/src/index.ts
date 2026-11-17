@@ -41,6 +41,7 @@ export class VietOcrReader implements TextReader, VisionReader {
     const start = performance.now();
     let detectionMs = 0, recognitionMs = 0;
     const lines: OcrTextLine[] = [];
+    const lineMs: number[] = [];
     const [detector, encoder, decoder] = this.sessions;
     try {
       for (const image of images) {
@@ -64,10 +65,11 @@ export class VietOcrReader implements TextReader, VisionReader {
           const line = await recognizeLine(this.ort, encoder, decoder, tensor, this.config, signal);
           checkAbort(signal);
           lines.push({ ...line, box: normalizedBox(crop, image) });
-          recognitionMs += performance.now() - recognitionStart;
+          const elapsed = performance.now() - recognitionStart;
+          lineMs.push(elapsed); recognitionMs += elapsed;
         }
       }
-      return { lines, usage: { engine: this.engine, passes: 1, latencyMs: performance.now() - start, lineCount: lines.length, detectionMs, recognitionMs } };
+      return { lines, usage: { engine: this.engine, passes: 1, latencyMs: performance.now() - start, lineCount: lines.length, detectionMs, recognitionMs, lineMs } };
     } catch (error) { checkAbort(signal); if (error instanceof OcrError) throw error; throw new OcrError('read_failed'); }
     finally { this.busy = false; }
   }

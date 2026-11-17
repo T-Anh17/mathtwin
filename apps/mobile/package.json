@@ -17,7 +17,9 @@
     "@mathtwin/reader": "0.1.0",
     "@mathtwin/reader-figure": "0.1.0",
     "@mathtwin/reader-llamacpp-shared": "0.1.0",
+    "@mathtwin/reader-ocr-shared": "0.1.0",
     "lucide-react": "0.469.0",
+    "onnxruntime-web": "1.31.1",
     "react": "19.3.1",
     "react-dom": "19.3.1"
   },

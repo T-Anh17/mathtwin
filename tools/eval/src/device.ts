@@ -37,6 +37,8 @@ function usage(value: unknown, engine: string): ReadUsage {
     const t = record(u.serverTimings);
     result.serverTimings = { promptMs: number(t.promptMs), predictedMs: number(t.predictedMs), promptTokens: number(t.promptTokens), predictedTokens: number(t.predictedTokens) };
   }
+  for (const key of ['lineCount', 'detectionMs', 'recognitionMs'] as const) if (u[key] !== undefined) result[key] = number(u[key]);
+  if (u.lineMs !== undefined) result.lineMs = list(u.lineMs).map(number);
   return result;
 }
 function textLine(value: unknown): TextLine {
@@ -113,9 +115,10 @@ export async function evaluateDevice(file: string, root: string, date: string, o
     const result = record(raw); const id = string(result.id); const config = record(result.config);
     const engine = string(result.engine);
     if ((config.passes !== 1 && config.passes !== 2) || !['graph', 'lines'].includes(String(config.mode))
-      || !['a', 'b', 'd'].includes(String(config.model))
-      || engine !== (config.model === 'a' ? 'offline:paddleocr-vl-1.5' : config.model === 'd' ? 'offline:figure-cv' : 'offline:qwen3-vl-2b')
+      || !['a', 'b', 'c', 'd'].includes(String(config.model))
+      || engine !== (config.model === 'a' ? 'offline:paddleocr-vl-1.5' : config.model === 'c' ? 'offline:vietocr-onnx' : config.model === 'd' ? 'offline:figure-cv' : 'offline:qwen3-vl-2b')
       // D (pure-TS figure reader) only drafts graphs, in one pass.
+      || (config.model === 'c' && config.mode !== 'lines')
       || (config.model === 'd' && (config.mode !== 'graph' || config.passes !== 1))) invalid();
     const passes = config.passes as 1 | 2;
     if (options.mode !== 'both' && config.mode !== options.mode) continue;
@@ -139,9 +142,17 @@ export async function evaluateDevice(file: string, root: string, date: string, o
       ...(config.maxImageSide === undefined ? {} : { maxImageSide: number(config.maxImageSide) }),
       ...(config.readTimeout === undefined ? {} : { readTimeout: number(config.readTimeout) }), ...(dry ? { dry } : {}),
       allowLowRam: bool(config.allowLowRam), backgroundIdleMinutes: number(config.backgroundIdleMinutes),
-      backend: config.backend === 'CPU' ? 'CPU' : invalid(), ...(config.cpuVariant === undefined ? {} : { cpuVariant: string(config.cpuVariant) }) };
-    const key = JSON.stringify({ engine, configuration });
-    const group: NonNullable<ReturnType<typeof groups.get>> = groups.get(key) ?? { engine, config: configuration, rows: [], ids: new Set<string>(), passes };
+      backend: config.backend === (config.model === 'c' ? 'WASM' : 'CPU') ? config.backend : invalid(), ...(config.cpuVariant === undefined ? {} : { cpuVariant: string(config.cpuVariant) }) };
+    let wasm: { numThreads: number; crossOriginIsolated: boolean; simd: true } | undefined;
+    if (result.wasm !== undefined) {
+      const w = record(result.wasm), threads = number(w.numThreads);
+      if (config.model !== 'c' || !Number.isInteger(threads) || threads < 1 || threads > 256 || w.simd !== true) invalid();
+      wasm = { numThreads: threads, crossOriginIsolated: bool(w.crossOriginIsolated), simd: true };
+      if (!wasm.crossOriginIsolated && threads !== 1) invalid();
+    }
+    const measuredConfiguration = { ...configuration, ...(wasm ? { wasm } : {}) };
+    const key = JSON.stringify({ engine, configuration: measuredConfiguration });
+    const group: NonNullable<ReturnType<typeof groups.get>> = groups.get(key) ?? { engine, config: measuredConfiguration, rows: [], ids: new Set<string>(), passes };
     if (group.ids.has(id)) throw new Error('Id kết quả bị lặp trong cùng cấu hình; xuất riêng từng lần đo.');
     group.ids.add(id); groups.set(key, group);
     if (options.limit && group.rows.length >= options.limit) continue;

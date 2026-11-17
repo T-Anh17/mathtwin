@@ -248,3 +248,20 @@ describe('app export to desktop evaluation', () => {
     await expect(evaluateDevice(file, root, '2026-11-15', options)).rejects.toThrow();
   });
 });
+
+
+it('imports C lines with WASM threads and line/page timing; keeps D validation unchanged', async () => {
+  const { root, file, result, save } = await setup();
+  const cEngine = 'offline:vietocr-onnx';
+  const c: ImageResult = { ...result, engine: cEngine, config: { ...result.config, model: 'c' },
+    usage: { engine: cEngine, passes: 2, latencyMs: 100, lineCount: 2, detectionMs: 10, recognitionMs: 90, lineMs: [45, 45] },
+    wasm: { numThreads: 1, crossOriginIsolated: false, simd: true },
+    linePasses: result.linePasses!.map(p => ({ ...p, usage: { ...p.usage, engine: cEngine } })) };
+  await save([c]);
+  const { report } = (await evaluateDevice(file, root, '2026-11-17', options))[0]!;
+  expect(report.engine).toBe(cEngine);
+  expect(report.configuration).toMatchObject({ backend: 'WASM', wasm: c.wasm });
+  expect(report.rows[0]!.usage).toMatchObject({ lineMs: [45, 45], detectionMs: 10, recognitionMs: 90, latencyMs: 100 });
+  await save([{ ...c, config: { ...c.config, mode: 'graph' } }]);
+  await expect(evaluateDevice(file, root, '2026-11-17', options)).rejects.toThrow();
+});
