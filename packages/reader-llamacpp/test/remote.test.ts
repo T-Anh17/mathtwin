@@ -29,6 +29,40 @@ it('Node enforces a configurable readTimeout even when HTTP ignores its abort si
   h.fetcher.mockImplementation(async (url) => String(url).endsWith('/health') ? new Response('{}') : new Promise<Response>(() => {}));
   await expect(reader.readLines([image])).rejects.toMatchObject({ reason: 'timeout' });
 });
+it.each([undefined, 1024])('Node sends the effective token limit %s', async (maxTokens) => {
+  const h = remote();
+  const reader = new LlamaCppReader({ ...h.options, ...(maxTokens === undefined ? {} : { maxTokens }) }, h.runtime);
+  await reader.readLines([image]);
+  expect(JSON.parse(String(h.fetcher.mock.calls[1]?.[1]?.body))).toMatchObject({ max_tokens: maxTokens ?? 1536 });
+});
+it.each(['timeout', 'aborted'] as const)('aborts the underlying fetch connection on %s before the next request', async (cause) => {
+  const h = remote(); const abort = new AbortController();
+  const reader = new LlamaCppReader({ ...h.options, readTimeout: 25 }, h.runtime);
+  let disconnected = false;
+  h.fetcher.mockImplementationOnce(async () => new Response('{}'));
+  h.fetcher.mockImplementationOnce(async (_url, init) => {
+    expect(init?.keepalive).toBe(false); expect(init?.headers).toMatchObject({ Connection: 'close' });
+    return new Promise<Response>((_resolve, reject) => {
+      init!.signal!.addEventListener('abort', () => { disconnected = true; reject(new DOMException('', 'AbortError')); }, { once: true });
+      if (cause === 'aborted') abort.abort();
+    });
+  });
+  await expect(reader.readLines([image], abort.signal)).rejects.toMatchObject({ reason: cause });
+  expect(disconnected).toBe(true);
+  await expect(reader.readLines([image])).resolves.toMatchObject({ lines: [{ text: '7' }] });
+});
+it('aborts an in-progress response body read at the HTTP deadline', async () => {
+  const h = remote(); const reader = new LlamaCppReader({ ...h.options, readTimeout: 25 }, h.runtime);
+  let disconnected = false;
+  h.fetcher.mockImplementationOnce(async () => new Response('{}'));
+  h.fetcher.mockImplementationOnce(async (_url, init) => new Response(new ReadableStream<Uint8Array>({
+    start(controller) {
+      init!.signal!.addEventListener('abort', () => { disconnected = true; controller.error(new DOMException('', 'AbortError')); }, { once: true });
+    },
+  })));
+  await expect(reader.readLines([image])).rejects.toMatchObject({ reason: 'timeout' });
+  expect(disconnected).toBe(true);
+});
 
 it.each(['http://10.0.0.1:8080', 'http://172.16.0.1', 'http://172.31.255.254', 'http://192.168.0.1/',
   'http://127.0.0.1', 'http://127.3.2.1:65535', 'http://[::1]:8080'])('accepts literal private/loopback origin %s', (url) => {

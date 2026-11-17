@@ -34,7 +34,7 @@ function unclosedJson(text: string): boolean {
       if (stack.pop() !== (char === '}' ? '{' : '[')) return false;
     }
   }
-  return quoted || stack.length > 0 || !text.trim();
+  return quoted || stack.length > 0;
 }
 /** Read metadata before parsing so failed device records retain the server finish reason. */
 export function completionFinishReason(raw: unknown): string | undefined {

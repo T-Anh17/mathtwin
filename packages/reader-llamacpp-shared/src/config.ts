@@ -1,6 +1,7 @@
 /** Shared request/image defaults for Node and Android. See README for upstream DRY defaults. */
 export { defaultMaxImageSide } from '@mathtwin/reader';
 export const defaultReadTimeout = 300_000;
+export const defaultMaxTokens = 1536;
 export interface DryConfig {
   dry_multiplier: number;
   dry_base: number;

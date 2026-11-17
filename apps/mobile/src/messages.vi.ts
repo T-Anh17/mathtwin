@@ -9,7 +9,7 @@ export const vi = {
   lowRam: 'RAM thấp hơn ngưỡng cấu hình. Máy có thể bị hệ điều hành dừng model khi thiếu bộ nhớ.',
   allowLowRam: 'Tôi đã đọc cảnh báo và muốn thử trên máy RAM thấp', minRam: 'Ngưỡng RAM (GB)', threads: 'Luồng CPU',
   passes: 'Số lượt', mode: 'Chế độ', graph: 'Đồ thị', lines: 'Dòng chữ',
-  maxImageSide: 'Cạnh ảnh tối đa', readTimeout: 'Thời gian chờ mỗi lượt (giây)', dry: 'Chống lặp DRY', enabled: 'Bật', disabled: 'Tắt',
+  maxImageSide: 'Cạnh ảnh tối đa', readTimeout: 'Thời gian chờ mỗi lượt (giây)', maxTokens: 'Số token tối đa mỗi lượt', dry: 'Chống lặp DRY', enabled: 'Bật', disabled: 'Tắt',
   dry_multiplier: 'Hệ số DRY', dry_base: 'Cơ số DRY', dry_allowed_length: 'Độ dài được phép lặp', dry_penalty_last_n: 'Số token xét DRY (-1: toàn bộ)',
   camera: 'Chụp ảnh', gallery: 'Chọn ảnh', dataset: 'Nhập bộ đo', datasetName: 'Tên thư mục bộ đo',
   datasetSummary: (name: string, count: number, location: DatasetLocation): string =>
@@ -17,7 +17,7 @@ export const vi = {
   webViewCamera: 'Chụp WebView (phụ)', backgroundIdle: 'Dừng khi rảnh ở nền (phút)', cpuVariant: 'Biến thể CPU',
   cancel: 'Hủy', clear: 'Xóa ảnh khỏi bộ nhớ', settings: 'Cấu hình đo', results: 'Kết quả',
   showImage: 'Xem ảnh và chỗ gắn cờ', hideImage: 'Đóng ảnh',
-  run: 'Bắt đầu đo', stop: 'Hủy và dừng model', export: 'Xuất kết quả',
+  run: 'Bắt đầu đo', stop: 'Dừng model', export: 'Xuất kết quả',
   empty: 'Chọn ảnh hoặc nhập bộ đo để bắt đầu.', queued: 'Ảnh đã chọn',
   running: 'Đang xử lý trên máy…', done: 'Đã đo xong.', saved: 'Đã lưu kết quả tại',
   textOnly: 'Model A chỉ đọc chữ; chế độ đồ thị trả lỗi text_only.',

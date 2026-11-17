@@ -35,6 +35,33 @@ async function setup() {
 }
 const options = { mode: 'both', threshold: 0.85 } as const;
 describe('app export to desktop evaluation', () => {
+  it('separates token limits and retains the actual runtime and restart marker in each report', async () => {
+    const { root, file, result, save } = await setup();
+    await save([1536, 1024].map((maxTokens) => ({ ...result, serverRestarted: true, config: { ...result.config, maxTokens } })));
+    expect(JSON.parse(await readFile(file, 'utf8'))).toMatchObject({ runtime: { maxTokens: null } });
+    const reports = await evaluateDevice(file, root, '2026-11-17', options);
+    expect(reports).toHaveLength(2);
+    expect(reports.map(({ report }) => report.configuration!.maxTokens)).toEqual([1536, 1024]);
+    for (const { report } of reports) {
+      expect(report.rows[0]!.serverRestarted).toBe(true);
+      expect(report.phoneMeasurements).toMatchObject({ runtime: { maxTokens: report.configuration!.maxTokens } });
+    }
+  });
+  it('uses the runtime limit of a legacy export instead of assuming the new default', async () => {
+    const { root, file, result, save } = await setup(); await save([result]);
+    const legacy = JSON.parse(await readFile(file, 'utf8')) as { runtime: { maxTokens: number }; results: { config: { maxTokens?: number } }[] };
+    legacy.runtime.maxTokens = 4096; delete legacy.results[0]!.config.maxTokens;
+    await writeFile(file, JSON.stringify(legacy));
+    const reports = await evaluateDevice(file, root, '2026-11-17', options);
+    expect(reports[0]!.report.configuration!.maxTokens).toBe(4096);
+  });
+  it.each([0, -1, 1.5, 8193, null])('rejects invalid maxTokens=%s in a device export', async (maxTokens) => {
+    const { root, file, result, save } = await setup(); await save([result]);
+    const data = JSON.parse(await readFile(file, 'utf8')) as { results: { config: Record<string, unknown> }[] };
+    data.results[0]!.config.maxTokens = maxTokens;
+    await writeFile(file, JSON.stringify(data));
+    await expect(evaluateDevice(file, root, '2026-11-17', options)).rejects.toThrow();
+  });
   it('keeps image size/timeout/DRY configurations separate and retains sent dimensions and finish reasons', async () => {
     const { root, file, result, save } = await setup();
     const dry = { dry_multiplier: 0.8, dry_base: 1.75, dry_allowed_length: 2, dry_penalty_last_n: 64 };

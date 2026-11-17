@@ -32,6 +32,8 @@ function fake() {
     dataset: mock.fn(async () => ({ entries: [{ id: 'case-1', file: '1.png' }], location: 'internal' as const })),
     datasetImage: mock.fn(async () => ({ dataUrl: decoded.encoded })), exportResult: mock.fn(async () => ({ path: '/private/results/read.json' })),
     setBenchmarkState: mock.fn(async () => {}), cleanupCameraTempFiles: mock.fn(async () => {}),
+    post: mock.fn(async () => ({ status: 200, data: response(JSON.stringify(graph)) })),
+    cancelRequest: mock.fn(async () => {}), slots: mock.fn(async () => ({ idle: true })),
   };
   const http: HttpTransport = { post: mock.fn(async () => ({ status: 200, data: response(JSON.stringify(graph)) })) };
   const decode = mock.fn(async () => decoded);
@@ -47,19 +49,19 @@ describe('Android benchmark flow with fake native plugin (no device/model/networ
     const result = await runner.run(image, { ...config, passes: 1 }, signal());
     expect(decode).toHaveBeenCalledWith(image.dataUrl, 768);
     expect(http.post).toHaveBeenCalledWith(expect.objectContaining({ readTimeout: 300_000,
-      data: expect.objectContaining({ dry_multiplier: 0.8, dry_base: 1.75, dry_allowed_length: 2, dry_penalty_last_n: 64 }) }));
+      data: expect.objectContaining({ max_tokens: 1536, dry_multiplier: 0.8, dry_base: 1.75, dry_allowed_length: 2, dry_penalty_last_n: 64 }) }));
     expect(result.usage).toMatchObject({ finish_reason: ['stop'], sentImages: [{ maxImageSide: 768 }] });
-    expect(JSON.parse(exportReport({ version: 1, device, results: [result] }))).toMatchObject({ results: [{ config: {
-      maxImageSide: 768, readTimeout: 300_000, dry: { dry_multiplier: 0.8 } } }] });
+    expect(JSON.parse(exportReport({ version: 1, device, results: [result] }))).toMatchObject({ runtime: { maxTokens: 1536 }, results: [{ config: {
+      maxTokens: 1536, maxImageSide: 768, readTimeout: 300_000, dry: { dry_multiplier: 0.8 } } }] });
   });
   it.each([512, 768, 1024])('propagates %dpx, a custom read timeout and disabled DRY to the request/export', async (maxImageSide) => {
     const { runner, http, decode } = fake();
-    const result = await runner.run(image, { ...config, passes: 1, maxImageSide, readTimeout: 450_000,
+    const result = await runner.run(image, { ...config, passes: 1, maxImageSide, readTimeout: 450_000, maxTokens: 1024,
       dry: { dry_multiplier: 0, dry_base: 2, dry_allowed_length: 3, dry_penalty_last_n: -1 } }, signal());
     expect(decode).toHaveBeenCalledWith(image.dataUrl, maxImageSide);
     expect(http.post).toHaveBeenCalledWith(expect.objectContaining({ readTimeout: 450_000,
-      data: expect.objectContaining({ dry_multiplier: 0, dry_base: 2, dry_allowed_length: 3, dry_penalty_last_n: -1 }) }));
-    expect(result.config).toMatchObject({ maxImageSide, readTimeout: 450_000 });
+      data: expect.objectContaining({ max_tokens: 1024, dry_multiplier: 0, dry_base: 2, dry_allowed_length: 3, dry_penalty_last_n: -1 }) }));
+    expect(result.config).toMatchObject({ maxImageSide, readTimeout: 450_000, maxTokens: 1024 });
     expect(result.usage.sentImages?.[0]?.maxImageSide).toBe(maxImageSide);
   });
   it.each(['graph', 'lines'] as const)('retains repetition_loop and finish_reason through failed %s runs and export', async (mode) => {
@@ -78,6 +80,92 @@ describe('Android benchmark flow with fake native plugin (no device/model/networ
     mock.mocked(http.post).mockResolvedValue({ status: 200, data: raw });
     const result = await runner.run(image, { ...config, mode: 'lines', passes: 1 }, signal());
     expect(result.errorCode).toBeUndefined(); expect(result.linePasses?.[0]?.lines[0]?.conf).toBe(0.7);
+  });
+  it.each(['native', 'javascript'] as const)('cancels a %s read timeout, checks slots and allows the next image without the old response', async (source) => {
+    mock.useFakeTimers();
+    try {
+      const { runner, http, plugin } = fake();
+      if (source === 'native') mock.mocked(http.post).mockRejectedValueOnce({ code: 'timeout' });
+      else mock.mocked(http.post).mockImplementationOnce(async () => new Promise(() => {}));
+      const run = runner.run(image, { ...config, passes: 1, readTimeout: 1000 }, signal());
+      await mock.advanceTimersByTimeAsync(source === 'native' ? 0 : 1000);
+      const failed = await run;
+      expect(failed.errorCode).toBe('timeout'); expect(failed.serverRestarted).toBe(false);
+      const requestId = mock.mocked(http.post).mock.calls[0]![0].requestId;
+      expect(plugin.cancelRequest).toHaveBeenCalledWith({ requestId });
+      expect(plugin.slots).toHaveBeenCalledOnce(); expect(plugin.stop).not.toHaveBeenCalled();
+      const next = await runner.run({ ...image, id: 'next' }, { ...config, passes: 1 }, signal());
+      expect(next.errorCode).toBeUndefined();
+      expect(mock.mocked(http.post).mock.calls[1]![0].requestId).not.toBe(requestId);
+      expect(mock.mocked(plugin.cancelRequest).mock.invocationCallOrder[0]).toBeLessThan(mock.mocked(plugin.slots).mock.invocationCallOrder[0]!);
+    } finally { mock.useRealTimers(); }
+  });
+  it.each(['busy', 'unreachable', 'hung'] as const)('stops a %s slot after five seconds and cold-starts the next image', async (state) => {
+    mock.useFakeTimers();
+    try {
+      const { runner, plugin, http } = fake();
+      mock.mocked(http.post).mockRejectedValueOnce({ code: 'timeout' });
+      if (state === 'busy') mock.mocked(plugin.slots).mockResolvedValue({ idle: false });
+      if (state === 'unreachable') mock.mocked(plugin.slots).mockRejectedValue({ code: 'http_error' });
+      if (state === 'hung') mock.mocked(plugin.slots).mockImplementation(async () => new Promise(() => {}));
+      let stopped = false;
+      mock.mocked(plugin.stop).mockImplementation(async () => { stopped = true; });
+      const run = runner.run(image, { ...config, passes: 1 }, signal());
+      await mock.advanceTimersByTimeAsync(4999); expect(plugin.stop).not.toHaveBeenCalled();
+      await mock.advanceTimersByTimeAsync(1);
+      const failed = await run;
+      expect(failed).toMatchObject({ errorCode: 'timeout', serverRestarted: true });
+      expect(plugin.stop).toHaveBeenCalledOnce(); expect(plugin.cancelRequest).toHaveBeenCalledOnce();
+      mock.mocked(plugin.start).mockImplementation(async () => {
+        expect(stopped).toBe(true); return { ...session, reused: false, loadMs: 500 };
+      });
+      const next = await runner.run({ ...image, id: 'next' }, { ...config, passes: 1 }, signal());
+      expect(next).toMatchObject({ reusedModel: false, modelLoadMs: 500, serverRestarted: false });
+      expect(next.errorCode).toBeUndefined();
+      expect(JSON.parse(exportReport({ version: 1, device, results: [failed, next] }))).toMatchObject({ results: [
+        { serverRestarted: true }, { serverRestarted: false },
+      ] });
+    } finally { mock.useRealTimers(); }
+  });
+  it('waits for a temporarily busy slot before reusing the server', async () => {
+    mock.useFakeTimers();
+    try {
+      const { runner, plugin, http } = fake();
+      mock.mocked(http.post).mockRejectedValueOnce({ code: 'timeout' });
+      mock.mocked(plugin.slots).mockResolvedValueOnce({ idle: false });
+      const run = runner.run(image, { ...config, passes: 1 }, signal());
+      await mock.advanceTimersByTimeAsync(100);
+      expect(await run).toMatchObject({ errorCode: 'timeout', serverRestarted: false });
+      expect(plugin.slots).toHaveBeenCalledTimes(2); expect(plugin.stop).not.toHaveBeenCalled();
+    } finally { mock.useRealTimers(); }
+  });
+  it('preserves user cancellation when a busy slot requires stopping the server', async () => {
+    mock.useFakeTimers();
+    try {
+      const { runner, plugin, http } = fake(); const abort = new AbortController();
+      mock.mocked(http.post).mockImplementationOnce(async () => { abort.abort(); return new Promise(() => {}); });
+      mock.mocked(plugin.slots).mockResolvedValue({ idle: false });
+      const run = runner.run(image, { ...config, passes: 1 }, abort.signal);
+      await mock.advanceTimersByTimeAsync(5000);
+      expect(await run).toMatchObject({ errorCode: 'aborted', serverRestarted: true });
+      expect(plugin.cancelRequest).toHaveBeenCalledOnce(); expect(plugin.stop).toHaveBeenCalledOnce();
+    } finally { mock.useRealTimers(); }
+  });
+  it('keeps the total image deadline during a hung preparation before HTTP exists', async () => {
+    mock.useFakeTimers();
+    try {
+      const { runner, plugin, http, decode } = fake();
+      mock.mocked(decode).mockImplementationOnce(async () => new Promise(() => {}));
+      const run = runner.run(image, { ...config, passes: 1, readTimeout: 1000 }, signal());
+      await mock.advanceTimersByTimeAsync(181_000);
+      expect(await run).toMatchObject({ errorCode: 'timeout', serverRestarted: false });
+      expect(plugin.stop).toHaveBeenCalled(); expect(http.post).not.toHaveBeenCalled();
+    } finally { mock.useRealTimers(); }
+  });
+  it.each([0, -1, 1.5, 8193, NaN])('rejects invalid maxTokens=%s before native startup', async (maxTokens) => {
+    const { runner, plugin } = fake();
+    expect((await runner.run(image, { ...config, maxTokens }, signal())).errorCode).toBe('native_error');
+    expect(plugin.start).not.toHaveBeenCalled();
   });
   it('runs independent edges/neighbors requests on authenticated loopback and reuses common parser', async () => {
     const { runner, http } = fake();
@@ -150,10 +238,13 @@ describe('Android benchmark flow with fake native plugin (no device/model/networ
     const result = await runner.run(image, config, abort.signal);
     expect(result.errorCode).toBe('aborted'); expect(plugin.stop).toHaveBeenCalled();
   });
-  it('cancels a hung CapacitorHttp request and stops the child', async () => {
+  it('cancels a hung native request and reuses the server only after its slot is idle', async () => {
     const { runner, http, plugin } = fake(); const abort = new AbortController();
     mock.mocked(http.post).mockImplementation(async () => { abort.abort(); return new Promise(() => {}); });
-    expect((await runner.run(image, config, abort.signal)).errorCode).toBe('aborted'); expect(plugin.stop).toHaveBeenCalled();
+    expect((await runner.run(image, config, abort.signal)).errorCode).toBe('aborted');
+    expect(plugin.cancelRequest).toHaveBeenCalledWith({ requestId: mock.mocked(http.post).mock.calls[0]![0].requestId });
+    expect(plugin.slots).toHaveBeenCalledWith({ url: `http://127.0.0.1:${session.port}/slots`, headers: { Authorization: `Bearer ${session.apiKey}` }, timeout: 500 });
+    expect(plugin.stop).not.toHaveBeenCalled();
   });
   it('detects a killed server despite a late successful HTTP result', async () => {
     const { runner, http, setState } = fake();

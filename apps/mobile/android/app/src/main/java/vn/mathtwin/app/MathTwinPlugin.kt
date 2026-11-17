@@ -15,6 +15,11 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.File
+import java.io.OutputStream
+import java.net.HttpURLConnection
+import java.net.SocketTimeoutException
+import java.net.URL
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
@@ -37,6 +42,24 @@ class MathTwinPlugin : Plugin() {
     private lateinit var lifecycle: BenchmarkLifecycle
     private val worker = Executors.newSingleThreadExecutor()
     private val controls = Executors.newSingleThreadExecutor()
+    // HTTP must not block start/dataset work or the cancel/stop control executor.
+    private val httpWorker = Executors.newCachedThreadPool()
+    private class PendingRequest {
+        val cancelled = AtomicBoolean(false)
+        private var connection: HttpURLConnection? = null
+        // Cancel may arrive before a socket exists. Open the output stream under this lock so a
+        // pre-connect disconnect cannot be followed by a new implicit connection on outputStream.
+        @Synchronized fun output(conn: HttpURLConnection): OutputStream {
+            if (cancelled.get()) { conn.disconnect(); throw MobileFailure("aborted") }
+            connection = conn
+            val output = conn.outputStream
+            if (cancelled.get()) { conn.disconnect(); throw MobileFailure("aborted") }
+            return output
+        }
+        fun cancel() { cancelled.set(true); synchronized(this) { connection?.disconnect() } }
+        @Synchronized fun close() { connection?.disconnect(); connection = null }
+    }
+    private val requests = ConcurrentHashMap<String, PendingRequest>()
     private val busy = AtomicBoolean(false)
     private val cancellation = AtomicLong(0)
     override fun load() {
@@ -106,10 +129,86 @@ class MathTwinPlugin : Plugin() {
         server.start(call.getString("model") ?: "", threads) { cancellation.get() != token }
     }
     @PluginMethod fun status(call: PluginCall) { call.resolve(JSObject(server.status().toString())) }
+    @PluginMethod fun post(call: PluginCall) {
+        val requestId = call.getString("requestId") ?: ""
+        val pending = PendingRequest()
+        if (!requestId.matches(Regex("[A-Za-z0-9-]{1,100}"))) { call.reject("http_error", "http_error"); return }
+        if (requests.putIfAbsent(requestId, pending) != null) { call.reject("busy", "busy"); return }
+        httpWorker.execute {
+            var conn: HttpURLConnection? = null
+            try {
+                val url = call.getString("url") ?: throw MobileFailure("http_error")
+                val authorization = call.getObject("headers")?.getString("Authorization")
+                server.authorizeRequest(url, authorization, "/v1/chat/completions")
+                val connectTimeout = call.getInt("connectTimeout") ?: 5000
+                val readTimeout = call.getInt("readTimeout") ?: 300000
+                if (connectTimeout !in 1..5000 || readTimeout !in 1000..3600000) throw MobileFailure("http_error")
+                val body = (call.getObject("data") ?: throw MobileFailure("http_error")).toString().toByteArray(Charsets.UTF_8)
+                conn = URL(url).openConnection() as HttpURLConnection
+                conn.requestMethod = "POST"; conn.doOutput = true
+                conn.connectTimeout = connectTimeout; conn.readTimeout = readTimeout
+                conn.instanceFollowRedirects = false; conn.useCaches = false
+                // Never return this connection to Android's persistent connection pool.
+                conn.setRequestProperty("Connection", "close")
+                conn.setRequestProperty("Authorization", authorization)
+                conn.setRequestProperty("Content-Type", "application/json")
+                conn.setFixedLengthStreamingMode(body.size)
+                pending.output(conn).use { it.write(body) }
+                if (pending.cancelled.get()) throw MobileFailure("aborted")
+                val status = conn.responseCode
+                val text = (if (status < 400) conn.inputStream else conn.errorStream)?.bufferedReader(Charsets.UTF_8)?.use { it.readText() } ?: ""
+                if (pending.cancelled.get()) throw MobileFailure("aborted")
+                val data = if (status == 200) {
+                    try { JSONObject(text) } catch (_: JSONException) { throw MobileFailure("invalid_json") }
+                } else JSONObject.NULL
+                call.resolve(JSObject().put("status", status).put("data", data))
+            } catch (_: SocketTimeoutException) {
+                val code = if (pending.cancelled.get()) "aborted" else "timeout"
+                call.reject(code, code)
+            } catch (e: MobileFailure) {
+                val code = if (pending.cancelled.get()) "aborted" else e.code
+                call.reject(code, code)
+            } catch (_: Exception) {
+                val code = if (pending.cancelled.get()) "aborted" else "http_error"
+                call.reject(code, code)
+            } finally {
+                pending.close(); conn?.disconnect(); requests.remove(requestId, pending)
+            }
+        }
+    }
+    @PluginMethod fun cancelRequest(call: PluginCall) {
+        val requestId = call.getString("requestId") ?: ""
+        // A request that already finished has closed its socket in finally.
+        controls.execute {
+            requests[requestId]?.cancel()
+            call.resolve()
+        }
+    }
+    @PluginMethod fun slots(call: PluginCall) {
+        httpWorker.execute {
+            var conn: HttpURLConnection? = null
+            try {
+                val url = call.getString("url") ?: throw MobileFailure("http_error")
+                val authorization = call.getObject("headers")?.getString("Authorization")
+                server.authorizeRequest(url, authorization, "/slots")
+                val timeout = call.getInt("timeout") ?: 500
+                if (timeout !in 1..500) throw MobileFailure("http_error")
+                conn = URL(url).openConnection() as HttpURLConnection
+                conn.requestMethod = "GET"; conn.connectTimeout = timeout; conn.readTimeout = timeout
+                conn.instanceFollowRedirects = false; conn.useCaches = false
+                conn.setRequestProperty("Connection", "close"); conn.setRequestProperty("Authorization", authorization)
+                if (conn.responseCode != 200) throw MobileFailure("http_error")
+                val slots = JSONArray(conn.inputStream.bufferedReader(Charsets.UTF_8).use { it.readText() })
+                val idle = slots.length() > 0 && (0 until slots.length()).all { slots.getJSONObject(it).getBoolean("is_processing") == false }
+                call.resolve(JSObject().put("idle", idle))
+            } catch (_: Exception) { call.reject("http_error", "http_error") }
+            finally { conn?.disconnect() }
+        }
+    }
     @PluginMethod fun stop(call: PluginCall) {
         cancellation.incrementAndGet()
         store.cancel()
-        controls.execute { try { server.stop(); call.resolve() } catch (_: Exception) { call.reject("server_exit", "server_exit") } }
+        controls.execute { try { requests.values.forEach { it.cancel() }; server.stop(); call.resolve() } catch (_: Exception) { call.reject("server_exit", "server_exit") } }
     }
     private fun safeName(name: String) = name.matches(Regex("[A-Za-z0-9][A-Za-z0-9._-]{0,99}")) && name != "." && name != ".."
     private fun datasetDir(name: String, location: String? = null): Pair<File, String> {
@@ -169,7 +268,7 @@ class MathTwinPlugin : Plugin() {
     override fun handleOnPause() { activity.runOnUiThread { lifecycle.pause() } }
     override fun handleOnResume() { activity.runOnUiThread { lifecycle.resume() } }
     override fun handleOnDestroy() {
-        lifecycle.close(); cancellation.incrementAndGet(); store.cancel(); server.stop()
-        worker.shutdownNow(); controls.shutdownNow()
+        lifecycle.close(); cancellation.incrementAndGet(); store.cancel(); requests.values.forEach { it.cancel() }; server.stop()
+        worker.shutdownNow(); controls.shutdownNow(); httpWorker.shutdownNow()
     }
 }

@@ -4,6 +4,7 @@ import type { ImageMeta } from './dataset.js';
 export interface EvaluationRow {
   id: string; meta: ImageMeta; comparison?: ReadComparison; usage: ReadUsage; nodeLatencyMs?: number; issueCodes: string[];
   textComparisons?: TextComparison[]; errorCode?: string;
+  serverRestarted?: boolean;
   truncatedLineCount?: number;
   unsupportedSymbolTruthLines?: number;
   memoryPressure?: { callback: 'onTrimMemory' | 'onLowMemory'; trimLevel: number | null };

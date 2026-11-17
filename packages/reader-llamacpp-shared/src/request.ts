@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { ReadDraftSchema } from '@mathtwin/reader';
-import { defaultDry, validateDry } from './config.js';
+import { defaultDry, defaultMaxTokens, validateDry } from './config.js';
 import type { DryConfig } from './config.js';
 
 export const readerInstruction = `Transcribe visible data only. Never solve, grade, correct a student's work, compute degrees or infer missing edges/weights.
@@ -51,7 +51,7 @@ function serverSchema(value: unknown, root: unknown = value): unknown {
   }
   return result;
 }
-export function completionRequest(model: 'a' | 'b', mode: ReadMode, imageUrls: string[], maxTokens = 4096, dry: DryConfig = defaultDry): Record<string, unknown> {
+export function completionRequest(model: 'a' | 'b', mode: ReadMode, imageUrls: string[], maxTokens = defaultMaxTokens, dry: DryConfig = defaultDry): Record<string, unknown> {
   validateDry(dry);
   if (!imageUrls.length || imageUrls.some((url) => !/^data:image\/(?:png|jpeg);base64,[A-Za-z0-9+/]+={0,2}$/.test(url))) throw new Error('Images must be in-memory data URLs.');
   if (!Number.isSafeInteger(maxTokens) || maxTokens < 1) throw new Error('Invalid token limit.');

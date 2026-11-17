@@ -43,7 +43,7 @@ Không tự tải model, mã nguồn, binary hay driver. Manifest nay chỉ pin 
 | `modelsDirectory` | `<repo>/.models/` | Spawn dùng các file trong `a/` hoặc `b/` |
 | `gpuLayers`, `mmprojGpu` | `0`, `false` | Chỉ spawn, CPU mặc định |
 | `threads` | `os.availableParallelism()` | Chỉ spawn; thay số `--threads` cứng, có thể đặt rõ khi phát triển |
-| `contextSize`, `maxTokens` | `8192`, `4096` | Context chỉ spawn; token output mọi mode |
+| `contextSize`, `maxTokens` | `8192`, `1536` | Context chỉ spawn; token output mỗi request/trang, dùng mặc định shared |
 | `readTimeout`, `startupTimeoutMs` | `300000`, `120000` | Hạn mỗi request hoàn chỉnh và chờ `/health`, ms; cả server có sẵn |
 | `timeoutMs` | `180000 + readTimeout` | Hạn tổng một ảnh; nhiều ảnh cộng thêm readTimeout/ảnh. Phải lớn hơn readTimeout. Tương thích caller cũ: nếu chỉ truyền timeoutMs, readTimeout tối đa timeoutMs−1 |
 | `maxImageSide` | `768` | Bilinear RGBA giữ tỉ lệ trước gửi; maxLongEdge là alias cũ, maxImageSide được ưu tiên |
@@ -61,6 +61,16 @@ Nhiều trang text đọc theo thứ tự input; box thuộc trang tương ứng
 
 Nguồn mặc định DRY, lựa chọn multiplier thử nghiệm của app, schema tương thích b12388, căn token fence và lỗi `repetition_loop`/`logprob_alignment`:
 xem [giao thức dùng chung](../reader-llamacpp-shared/README.md#cấu-hình-đo-trên-vivo-lô-27b). Không phục hồi JSON cụt.
+
+Lô 2.7c giữ `stream:false` vì b12388 không bảo đảm giữ đủ logprob token khi không có delta;
+[quyết định và dòng mã](../reader-llamacpp-shared/README.md#giới-hạn-token-lô-27c).
+`maxTokens` cấu hình qua constructor, mặc định 1536 như app. Output rỗng + `length` trả `truncated`;
+JSON chưa đóng + `length` vẫn `repetition_loop`.
+Mỗi POST đặt `Connection: close`, `keepalive:false`. Signal kết hợp hủy người dùng, hạn HTTP và hạn tổng
+được truyền tới fetch, còn hiệu lực suốt `response.json()`, nên abort đóng kết nối đang nhận body.
+HTTP deadline giữ `reason:timeout`, hủy giữ `reason:aborted`, lỗi kết nối giữ `http_error`.
+Test fetch giả kiểm nhận signal abort và bắt đầu lượt kế tiếp; server do adapter sở hữu vẫn luôn được stop
+trong `finally`. Server ngoài không thuộc adapter: chỉ hủy fetch, không gửi lệnh tắt tiến trình từ xa.
 
 `usage.serverTimings` giữ tổng prompt/predicted ms và token của server (chỉ nếu mọi request có `timings`),
 `latencyMs` đo tổng thao tác trên bên gọi, gồm co/mã hóa/giao tiếp/chờ server/inference, chưa gồm dừng process.

@@ -4,6 +4,12 @@ import { completionRequest, graphResult, lineResult, parseCompletion, plainLines
 import { draft, FakeVisionReader, image } from '../../reader/test/fixtures.js';
 
 const encoder = new TextEncoder();
+it.each(['', '   '])('classifies empty length output as truncated: %j', (content) => {
+  expect(() => parseCompletion({ choices: [{ finish_reason: 'length', message: { content } }] }, true)).toThrowError(expect.objectContaining({ reason: 'truncated' }));
+});
+it('uses the shared 1536 token default for completion requests', () => {
+  expect(completionRequest('b', 'lines', ['data:image/png;base64,AA=='])).toMatchObject({ max_tokens: 1536, stream: false });
+});
 interface Change { probability?: number; alternatives?: { text: string; probability: number }[] }
 function response(text: string, changes = new Map<number, Change>()): unknown {
   let offset = 0;

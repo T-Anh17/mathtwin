@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
-import { defaultDry, defaultMaxImageSide, defaultReadTimeout } from '@mathtwin/reader-llamacpp-shared';
+import { defaultDry, defaultMaxImageSide, defaultReadTimeout, defaultMaxTokens } from '@mathtwin/reader-llamacpp-shared';
 import manifest from '../../../tools/models/manifest.json';
 import { Benchmark, exportReport } from './benchmark.ts';
 import { decodeImage } from './images.ts';
@@ -23,7 +23,7 @@ export function BenchmarkScreen() {
   const [device, setDevice] = useState<DeviceInfo | null>(null);
   const [models, setModels] = useState<ModelState[]>([]);
   const [config, setConfig] = useState<BenchmarkConfig>({ model: 'b', passes: 2, mode: 'lines', threads: 4, minRamGb: 6, allowLowRam: false, backgroundIdleMinutes: 5,
-    maxImageSide: defaultMaxImageSide, readTimeout: defaultReadTimeout, dry: { ...defaultDry } });
+    maxImageSide: defaultMaxImageSide, readTimeout: defaultReadTimeout, maxTokens: defaultMaxTokens, dry: { ...defaultDry } });
   const [images, setImages] = useState<BenchImage[]>([]);
   const [dataset, setDataset] = useState<Dataset | null>(null);
   const [datasetName, setDatasetName] = useState('synthetic');
@@ -87,6 +87,7 @@ export function BenchmarkScreen() {
         <label>{vi.threads}<input type="number" min="1" max={device?.cores ?? 256} value={config.threads} onChange={(e) => set('threads', Number(e.target.value))}/></label>
         <label>{vi.maxImageSide}<select value={config.maxImageSide} onChange={(e) => set('maxImageSide', Number(e.target.value))}>{[512, 768, 1024].map((side) => <option key={side} value={side}>{side} px</option>)}</select></label>
         <label>{vi.readTimeout}<input type="number" min="1" max="3600" value={config.readTimeout! / 1000} onChange={(e) => set('readTimeout', Number(e.target.value) * 1000)}/></label>
+        <label>{vi.maxTokens}<input type="number" min="1" max="8192" step="1" value={config.maxTokens} onChange={(e) => set('maxTokens', Number(e.target.value))}/></label>
         <label>{vi.dry}<select value={config.dry!.dry_multiplier === 0 ? 'off' : 'on'} onChange={(e) => set('dry', { ...config.dry!, dry_multiplier: e.target.value === 'off' ? 0 : defaultDry.dry_multiplier })}><option value="on">{vi.enabled}</option><option value="off">{vi.disabled}</option></select></label>
         {(['dry_multiplier', 'dry_base', 'dry_allowed_length', 'dry_penalty_last_n'] as const).map((key) => <label key={key}>{vi[key]}<input type="number" min={key === 'dry_base' ? 1 : key === 'dry_penalty_last_n' ? -1 : 0} step={key === 'dry_multiplier' || key === 'dry_base' ? 0.05 : 1} value={config.dry![key]} onChange={(e) => set('dry', { ...config.dry!, [key]: Number(e.target.value) })}/></label>)}
         <label>{vi.minRam}<input type="number" min="1" max="64" step="0.5" value={config.minRamGb} onChange={(e) => set('minRamGb', Number(e.target.value))}/></label>
@@ -102,7 +103,7 @@ export function BenchmarkScreen() {
       <p>{dataset ? vi.datasetSummary(dataset.name, dataset.entries.length, dataset.location) : images.length ? `${vi.queued}: ${images.length}` : vi.empty}</p>
       <div className="thumbnails">{images.map((image) => <img key={image.id} src={image.dataUrl} alt={image.id}/>)}</div>
       <div className="actions"><button className="primary" disabled={!native || busy || downloading || !ready || (!images.length && !dataset) || (lowRam && !config.allowLowRam)} onClick={() => action(run)}>{vi.run}</button>
-      <button disabled={!native || downloading} onClick={() => action(async () => { abort.current?.abort(); await mobile.stop(); })}>{vi.stop}</button>
+      <button disabled={!native || downloading} onClick={() => action(async () => { if (abort.current) abort.current.abort(); else await mobile.stop(); })}>{busy ? vi.cancel : vi.stop}</button>
       <button disabled={busy} onClick={() => { setImages([]); setDataset(null); setResults([]); }}>{vi.clear}</button></div>
       <h2>{vi.results}</h2>
       {results.map((result, i) => <Result key={i} result={result} image={images.find((p) => p.id === result.id)} dataset={dataset}/>)}

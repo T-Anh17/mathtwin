@@ -1,6 +1,6 @@
 import { readProblem } from '@mathtwin/reader';
 import type { ReadUsage, TextLine, VisionReader } from '@mathtwin/reader';
-import { completionRequest, completionFinishReason, defaultMaxImageSide, defaultReadTimeout, defaultDry, validateDry, imageTimeout, graphResult, lineResult, parseCompletion, spottingLines } from '@mathtwin/reader-llamacpp-shared';
+import { completionRequest, completionFinishReason, defaultMaxImageSide, defaultReadTimeout, defaultMaxTokens, defaultDry, validateDry, imageTimeout, graphResult, lineResult, parseCompletion, spottingLines } from '@mathtwin/reader-llamacpp-shared';
 import type { ReadMode } from '@mathtwin/reader-llamacpp-shared';
 import type { BenchImage, BenchmarkConfig, BenchmarkReport, HttpTransport, ImageResult, MobilePlugin, ServerState, Session } from './contracts.js';
 import type { DecodedImage } from './images.js';
@@ -8,6 +8,7 @@ import { errorCode } from './messages.vi.js';
 import manifest from '../../../tools/models/manifest.json';
 
 const engineFor = (model: 'a' | 'b'): string => model === 'a' ? 'offline:paddleocr-vl-1.5' : 'offline:qwen3-vl-2b';
+let requestSequence = 0;
 function check(signal: AbortSignal): void { if (signal.aborted) throw { code: 'aborted' }; }
 function serverFailure(state: ServerState): string | undefined {
   if (state.memoryPressure) return 'memory_pressure';
@@ -19,6 +20,7 @@ function validateConfig(c: BenchmarkConfig): void {
   try { validateDry(c.dry ?? defaultDry); } catch { throw { code: 'native_error' }; }
   if (!['a', 'b'].includes(c.model) || ![1, 2].includes(c.passes) || !['graph', 'lines'].includes(c.mode)
     || ![512, 768, 1024].includes(c.maxImageSide ?? defaultMaxImageSide)
+    || !Number.isSafeInteger(c.maxTokens ?? defaultMaxTokens) || (c.maxTokens ?? defaultMaxTokens) < 1 || (c.maxTokens ?? defaultMaxTokens) > 8192
     || !Number.isSafeInteger(c.readTimeout ?? defaultReadTimeout) || (c.readTimeout ?? defaultReadTimeout) < 1000 || (c.readTimeout ?? defaultReadTimeout) > 3_600_000
     || !Number.isInteger(c.threads) || c.threads < 1 || c.threads > 256 || !Number.isFinite(c.minRamGb) || c.minRamGb < 1 || c.minRamGb > 64
     || !Number.isFinite(c.backgroundIdleMinutes) || c.backgroundIdleMinutes < 1 || c.backgroundIdleMinutes > 60) throw { code: 'native_error' };
@@ -32,16 +34,19 @@ export class Benchmark {
   async run(image: BenchImage, config: BenchmarkConfig, signal: AbortSignal): Promise<ImageResult> {
     if (this.active) throw { code: 'busy' };
     config = { ...config, maxImageSide: config.maxImageSide ?? defaultMaxImageSide,
-      readTimeout: config.readTimeout ?? defaultReadTimeout, dry: { ...(config.dry ?? defaultDry) } };
+      readTimeout: config.readTimeout ?? defaultReadTimeout, maxTokens: config.maxTokens ?? defaultMaxTokens, dry: { ...(config.dry ?? defaultDry) } };
     this.active = true;
     const start = this.now(), engine = engineFor(config.model);
     const result: ImageResult = { id: image.id, imageSource: image.imageSource, ...(image.captureMethod ? { captureMethod: image.captureMethod } : {}),
-      config: { ...config }, engine, usage: { engine, passes: 0, latencyMs: 0 }, totalMs: 0, modelLoadMs: 0, modelVerifyMs: 0, reusedModel: false };
+      config: { ...config }, engine, usage: { engine, passes: 0, latencyMs: 0 }, totalMs: 0, modelLoadMs: 0, modelVerifyMs: 0, reusedModel: false, serverRestarted: false };
     let timer: ReturnType<typeof setInterval> | undefined;
     let timeout: ReturnType<typeof setTimeout> | undefined;
     let onAbort: (() => void) | undefined;
     let failure: string | undefined;
     let startAttempted = false;
+    let session: Session | undefined;
+    let pendingRequest: string | undefined;
+    let readTimer: ReturnType<typeof setTimeout> | undefined;
     let currentMemory: ServerState | undefined;
     let pendingPoll = false;
     let rejectFatal: (reason: unknown) => void = () => {};
@@ -60,16 +65,22 @@ export class Benchmark {
     };
     try {
       validateConfig(config); check(signal);
-      onAbort = () => { fail('aborted'); void this.plugin.stop().catch(() => {}); };
+      const interrupt = (code: string): void => {
+        fail(code);
+        // During startup there is no HTTP connection to cancel yet. Native stop cancels start too.
+        if (!session) void this.plugin.stop().catch(() => {});
+      };
+      onAbort = () => interrupt('aborted');
       signal.addEventListener('abort', onAbort, { once: true }); check(signal);
-      timeout = setTimeout(() => { fail('timeout'); void this.plugin.stop().catch(() => {}); }, imageTimeout(config.readTimeout!, config.passes));
+      timeout = setTimeout(() => interrupt('timeout'), imageTimeout(config.readTimeout!, config.passes));
       if (config.model === 'a' && config.mode === 'graph') throw { code: 'text_only' };
       const device = await guard(this.plugin.device());
       if (device.totalRamBytes < config.minRamGb * 1e9 && !config.allowLowRam) throw { code: 'low_ram' };
       const decoded = await guard(this.decode(image.dataUrl, config.maxImageSide!)); check(signal);
       startAttempted = true;
-      const session = await guard(this.plugin.start(config));
+      session = await guard(this.plugin.start(config));
       validateSession(session);
+      const currentSession = session;
       result.modelLoadMs = session.loadMs; result.reusedModel = session.reused;
       result.modelVerifyMs = session.verifyMs ?? 0;
       await updateMemory();
@@ -81,18 +92,22 @@ export class Benchmark {
           width: decoded.resized.width, height: decoded.resized.height, maxImageSide: config.maxImageSide! };
         result.usage.sentImages = [...(result.usage.sentImages ?? []), sentImage];
         let response: { status: number; data: unknown };
+        pendingRequest = `read-${Date.now()}-${++requestSequence}`;
+        readTimer = setTimeout(() => fail('timeout'), config.readTimeout!);
         try {
-          response = await guard(this.http.post({ url: `http://127.0.0.1:${session.port}/v1/chat/completions`,
-            headers: { Authorization: `Bearer ${session.apiKey}`, 'Content-Type': 'application/json' },
-            data: completionRequest(config.model, mode, [decoded.encoded], 4096, config.dry), connectTimeout: 5000, readTimeout: config.readTimeout!, disableRedirects: true }));
+          response = await guard(this.http.post({ requestId: pendingRequest, url: `http://127.0.0.1:${currentSession.port}/v1/chat/completions`,
+            headers: { Authorization: `Bearer ${currentSession.apiKey}`, 'Content-Type': 'application/json' },
+            data: completionRequest(config.model, mode, [decoded.encoded], config.maxTokens, config.dry), connectTimeout: 5000, readTimeout: config.readTimeout!, disableRedirects: true }));
           if (response.status !== 200) throw { code: 'http_error' };
         } catch (e) {
           if (failure || signal.aborted) throw e;
           // A killed process often rejects HTTP before the next polling tick. Preserve the real cause.
           currentMemory = await guard(this.plugin.status());
           const code = serverFailure(currentMemory); if (code) throw { code };
-          throw { code: 'http_error' };
-        }
+          const nativeCode = errorCode(e);
+          throw { code: ['timeout', 'aborted', 'invalid_json'].includes(nativeCode) ? nativeCode : 'http_error' };
+        } finally { if (readTimer) clearTimeout(readTimer); }
+        pendingRequest = undefined;
         const finish = completionFinishReason(response.data);
         result.usage.finish_reason = [...(result.usage.finish_reason ?? []), ...(finish ? [finish] : [])];
         const completion = parseCompletion(response.data, config.model === 'b');
@@ -126,6 +141,9 @@ export class Benchmark {
       const code = serverFailure(currentMemory); if (code) throw { code };
       if (failure) throw { code: failure };
     } catch (e) {
+      if (timer) clearInterval(timer);
+      if (timeout) clearTimeout(timeout);
+      if (readTimer) clearTimeout(readTimer);
       // Startup cancellation and HTTP can settle before a polling tick. Native pressure is latched
       // before teardown and survives stop(), so recover its cause/trim metadata before cleanup.
       if (startAttempted && !signal.aborted && failure !== 'timeout') {
@@ -137,7 +155,12 @@ export class Benchmark {
         catch { /* Preserve the already observed failure if status is unavailable. */ }
       }
       result.errorCode = signal.aborted ? 'aborted' : failure ?? errorCode(e);
-      await this.plugin.stop().catch(() => {});
+      if (pendingRequest) await this.plugin.cancelRequest({ requestId: pendingRequest }).catch(() => {});
+      if (session && pendingRequest && ['timeout', 'aborted'].includes(result.errorCode)) {
+        if (!await waitForIdle(this.plugin, session)) {
+          await this.plugin.stop(); result.serverRestarted = true;
+        }
+      } else await this.plugin.stop().catch(() => {});
     } finally {
       if (timer) clearInterval(timer);
       if (timeout) clearTimeout(timeout);
@@ -165,21 +188,44 @@ function addUsage(all: ReadUsage[], engine: string): ReadUsage {
 
 /** Explicit allowlist. Pixel buffers, data URLs, file paths, server key and source are never serialized. */
 export function exportReport(report: BenchmarkReport): string {
+  const tokenLimits = [...new Set(report.results.map((r) => r.config.maxTokens ?? defaultMaxTokens))];
   return JSON.stringify({ version: 1, runtime: { llamaCpp: manifest.llamaCppSource, backend: 'CPU', contextSize: 8192,
-    maxTokens: 4096, alternativesThreshold: 0.1, mmprojOffload: false },
+    maxTokens: tokenLimits.length === 1 ? tokenLimits[0] : null, alternativesThreshold: 0.1, mmprojOffload: false },
   device: { manufacturer: report.device.manufacturer, model: report.device.model,
     android: report.device.android, sdk: report.device.sdk, cores: report.device.cores,
     totalRamBytes: report.device.totalRamBytes, availableRamBytes: report.device.availableRamBytes, freeStorageBytes: report.device.freeStorageBytes },
   results: report.results.map((r) => ({ id: r.id, engine: r.engine, config: { model: r.config.model, passes: r.config.passes,
     mode: r.config.mode, threads: r.config.threads, minRamGb: r.config.minRamGb, allowLowRam: r.config.allowLowRam,
-    maxImageSide: r.config.maxImageSide ?? defaultMaxImageSide, readTimeout: r.config.readTimeout ?? defaultReadTimeout, dry: r.config.dry ?? defaultDry,
+    maxImageSide: r.config.maxImageSide ?? defaultMaxImageSide, readTimeout: r.config.readTimeout ?? defaultReadTimeout, maxTokens: r.config.maxTokens ?? defaultMaxTokens, dry: r.config.dry ?? defaultDry,
     backgroundIdleMinutes: r.config.backgroundIdleMinutes, backend: 'CPU', cpuVariant: r.memory?.cpuVariant, cpuVariantSource: r.memory?.cpuVariantSource },
     imageSource: r.imageSource, captureMethod: r.captureMethod,
     outcome: r.outcome, linePasses: r.linePasses, usage: r.usage, totalMs: r.totalMs, modelLoadMs: r.modelLoadMs,
-    modelVerifyMs: r.modelVerifyMs, reusedModel: r.reusedModel, memory: r.memory, errorCode: r.errorCode })) }, function (this: unknown, key, value: unknown) {
+    modelVerifyMs: r.modelVerifyMs, reusedModel: r.reusedModel, memory: r.memory, errorCode: r.errorCode, serverRestarted: r.serverRestarted ?? false })) }, function (this: unknown, key, value: unknown) {
       // StatementCheck.source is a semantic vertex reference, required for desktop comparison.
       if (key === 'source' && !(this !== null && typeof this === 'object' && 'type' in this && this.type === 'dijkstra_label')) return undefined;
       if (['pixels', 'dataUrl', 'encoded', 'apiKey', 'port', 'image', 'images'].includes(key)) return undefined;
       return value;
     }, 2);
+}
+
+/** A missing/unreachable slots endpoint is inconclusive: stop before accepting another image. */
+async function waitForIdle(plugin: MobilePlugin, session: Session): Promise<boolean> {
+  let finished = false;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      new Promise<boolean>((resolve) => { timer = setTimeout(() => resolve(false), 5000); }),
+      (async () => {
+        while (!finished) {
+          try {
+            const slots = await plugin.slots({ url: `http://127.0.0.1:${session.port}/slots`,
+              headers: { Authorization: `Bearer ${session.apiKey}` }, timeout: 500 });
+            if (slots.idle === true) return true;
+          } catch { /* Retry within the shared five-second budget. */ }
+          if (!finished) await new Promise<void>((resolve) => setTimeout(resolve, 100));
+        }
+        return false;
+      })(),
+    ]);
+  } finally { finished = true; if (timer) clearTimeout(timer); }
 }

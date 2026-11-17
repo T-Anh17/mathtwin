@@ -82,7 +82,12 @@ Xem [adapter](../../packages/reader-ocr/README.md) và
 
 Lấy JSON qua đường dẫn app đã báo khi bấm Xuất kết quả (xem [README app](../../apps/mobile/README.md)). `--from-device` đọc định dạng version 1 do `exportReport()` tạo. Mặc định `both`: đánh giá các record graph và lines có trong file; không tự suy ra graph từ chữ hoặc ngược lại. Model, lượt đọc và cấu hình lấy từ file; không truyền `--engine`/`--passes` cùng `--from-device`. Hai lượt lines được báo riêng, không chọn lượt tốt hơn bằng truth.
 
-Cấu hình `maxImageSide`, `readTimeout` (ms) và bốn tham số `dry` được giữ trong JSON/Markdown, tách nhóm đo khi khác nhau.
+Cấu hình `maxImageSide`, `readTimeout` (ms), `maxTokens` và bốn tham số `dry` được giữ trong JSON/Markdown, tách nhóm đo khi khác nhau.
+`maxTokens` lấy từ config từng ảnh; file cũ chưa có thì lấy `runtime.maxTokens` đã ghi (ví dụ 4096),
+không áp mặc định 1536 mới cho dữ liệu lịch sử. Giới hạn phải là số nguyên từ 1 đến 8192.
+File xuất trộn nhiều giới hạn có `runtime.maxTokens:null`; từng báo cáo nhóm ghi đúng `runtime.maxTokens`
+của nhóm. Mỗi row giữ `serverRestarted` nếu có: Android đã dừng server sau timeout/hủy khi slot không rảnh
+trong 5 giây để lần đo sau khởi động lại. Không gộp các cấu hình token khác nhau vào cùng chỉ số.
 Mỗi row giữ `usage.sentImages` (kích thước gốc/thực gửi/maxImageSide) và `usage.finish_reason` theo thứ tự request.
 File version 1 cũ không có các trường này vẫn nhập được, không suy đoán cấu hình hay metadata còn thiếu.
 `repetition_loop` và `logprob_alignment` giữ mã riêng và tính là lượt thất bại; không loại khỏi mẫu số.

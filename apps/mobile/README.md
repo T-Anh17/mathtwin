@@ -196,10 +196,16 @@ Nguồn thư viện ghi `imageSource:"gallery"`; bộ đo ghi `imageSource:"data
 PNG/JPEG tối đa 10 MiB, 40 triệu pixel; giải mã có EXIF orientation, resize TS theo `maxImageSide`, mặc định 768 px.
 Màn Đo chọn 512 / 768 / 1024 px. Thời gian chờ mỗi lượt mặc định 300 giây, chỉnh được từ 1 đến 3600 giây;
 file config ghi `readTimeout` bằng ms. Hạn tổng mỗi ảnh `180000 + passes * readTimeout` ms luôn lớn hơn thời gian chờ HTTP.
+`maxTokens` chỉnh trên màn Đo từ 1 đến 8192, mặc định **1536** từ `reader-llamacpp-shared/src/config.ts`.
+Mỗi request/trang dùng đúng giới hạn này; config từng ảnh ghi giá trị hiệu lực. `runtime.maxTokens` ở file xuất
+là giới hạn chung nếu mọi ảnh giống nhau, hoặc `null` khi file có nhiều cấu hình; khi đó đọc config từng ảnh.
 Mặc định chọn B và chế độ dòng chữ; A giữ để đối chứng, chỉ hỗ trợ chữ.
 DRY có bật/tắt và chỉnh đủ bốn tham số; mặc định app `dry_multiplier=0.8`, `dry_base=1.75`, `dry_allowed_length=2`, `dry_penalty_last_n=64`.
 Nguồn upstream (multiplier mặc định 0), ngưỡng phát hiện vòng lặp và quy tắc confidence xem [README dùng chung](../../packages/reader-llamacpp-shared/README.md#cấu-hình-đo-trên-vivo-lô-27b).
 Không đóng/sửa JSON cụt. Lặp hoặc hết token khi JSON chưa xong → `repetition_loop`; không căn được token → `logprob_alignment`.
+Output rỗng (kể cả toàn khoảng trắng) với `finish_reason=length` → `truncated`.
+Giữ `stream:false`: b12388 chỉ gắn logprobs khi có delta, nên không bảo đảm confidence đầy đủ khi stream
+(xem [dòng mã và quyết định shared](../../packages/reader-llamacpp-shared/README.md#giới-hạn-token-lô-27c)).
 File xuất ghi cấu hình hiệu lực trên từng ảnh, `usage.sentImages[].maxImageSide` và `usage.finish_reason[]` theo thứ tự request, kể cả lượt thất bại đã có response.
 Tọa độ kết quả quy về ảnh gốc đã xoay. Xóa ảnh khỏi bộ nhớ bằng nút trên màn Đo.
 
@@ -240,8 +246,17 @@ Các mục không có tọa độ được liệt kê trong kết quả; không 
 
 - Kotlin giữ server giữa các ảnh cùng model/số luồng, đổi cấu hình thì dừng và khởi động lại.
   Bind duy nhất `127.0.0.1`, cổng trống, khóa 32 byte ngẫu nhiên mỗi tiến trình.
-  `CapacitorHttp` gửi POST native để tránh mixed content/CORS; không mở mixed content cho WebView.
+  `MathTwinPlugin.post` gửi POST bằng `HttpURLConnection`, chỉ chấp nhận đúng URL loopback/cổng/khóa session
+  cho `/v1/chat/completions`. Không theo redirect; `Connection: close`, `useCaches=false`, `disconnect()` trong
+  `finally` kể cả thành công/lỗi/hết giờ; không tái sử dụng kết nối keep-alive. Không mở mixed content cho WebView.
   Network security chỉ cho HTTP tới loopback; Internet model download dùng HTTPS.
+- Mỗi POST có `requestId`; hủy hoặc hết giờ gọi `cancelRequest` đóng socket, rồi hỏi `GET /slots` có API key
+  tối đa 5 giây (mỗi lần kết nối/đọc tối đa 500 ms). Chỉ giữ model nóng nếu mọi slot `is_processing:false`.
+  Slot còn bận hoặc không kiểm được → `stop()`, ảnh sau khởi động server mới, kết quả ảnh lỗi ghi
+  `serverRestarted:true` (đã dừng để khởi động lại ở lượt sau; không nạp ngay trong cleanup).
+  Slot rảnh → `serverRestarted:false`. Timeout HTTP native và hạn tổng ảnh đều là `timeout`; người dùng hủy
+  là `aborted`; lỗi kết nối khác là `http_error`. JS cũng áp hạn mỗi POST nếu cầu native không trả promise.
+  Loạt đo vẫn dừng khi `timeout`/`aborted`; lần đo tiếp theo đi qua `start()` như thường.
 - `modelVerifyMs`: thời gian kiểm SHA trước cold start, tách khỏi `modelLoadMs` (spawn -> health ready).
   Warm start trả `reusedModel=true`, `modelLoadMs=0`, `modelVerifyMs=0`.
   `totalMs` gồm chuẩn bị ảnh, kiểm file, nạp và đọc; `usage.latencyMs` là phần gọi đọc.
@@ -253,7 +268,8 @@ Các mục không có tọa độ được liệt kê trong kết quả; không 
   để thiếu trường và báo trên màn hình, không ghi 0 giả. `VmRSS` là mẫu gần nhất.
 - `onPause` không dừng server: mở camera hoặc bộ chọn ảnh vẫn giữ được model nóng.
   Suốt `runBatch`, plugin đặt `FLAG_KEEP_SCREEN_ON`; `finally` xóa cờ khi xong, hủy hoặc lỗi.
-  Dừng khi người dùng bấm dừng, timeout, `onDestroy`, `onTrimMemory` mức `RUNNING_CRITICAL`/`COMPLETE`
+  Khi đang đo, nút hủy đi qua quy trình đóng POST/kiểm slot ở trên; khi rảnh nút dừng tắt model ngay.
+  Dừng khi `onDestroy`, `onTrimMemory` mức `RUNNING_CRITICAL`/`COMPLETE`
   hoặc `onLowMemory`. Ở nền mà không đang đo, dừng sau khoảng rảnh cấu hình `backgroundIdleMinutes`
   (mặc định 5 phút, chọn 1–60 ở màn Đo); về foreground thì bỏ hẹn giờ. Khi kết thúc đo ở nền,
   bắt đầu tính khoảng rảnh từ lúc kết thúc, không cắt bộ đo đang chạy dù đã ở nền lâu.

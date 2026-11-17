@@ -11,11 +11,14 @@ export interface Session { port: number; apiKey: string; reused: boolean; loadMs
 export interface MemoryPressure { callback: 'onTrimMemory' | 'onLowMemory'; trimLevel: number | null }
 export interface ServerState { alive: boolean; peakMemoryMb?: number; rssMemoryMb?: number; exitCode?: number; cpuVariant?: string; cpuVariantSource?: 'maps' | 'log'; errorCode?: 'cpu_backend_unknown'; memoryPressure?: MemoryPressure }
 export interface BenchmarkConfig { model: Model; passes: 1 | 2; mode: 'graph' | 'lines'; threads: number; minRamGb: number; allowLowRam: boolean; backgroundIdleMinutes: number;
-  maxImageSide?: number; readTimeout?: number; dry?: DryConfig }
+  maxImageSide?: number; readTimeout?: number; maxTokens?: number; dry?: DryConfig }
 export interface DatasetEntry { id: string; file: string }
 export type DatasetLocation = 'internal' | 'external';
 export interface Dataset { name: string; entries: DatasetEntry[]; location: DatasetLocation }
 export interface MobilePlugin {
+  post(options: PostOptions): Promise<{ status: number; data: unknown }>;
+  cancelRequest(options: { requestId: string }): Promise<void>;
+  slots(options: { url: string; headers: Record<string, string>; timeout: number }): Promise<{ idle: boolean }>;
   device(): Promise<DeviceInfo>;
   models(): Promise<{ models: ModelState[] }>;
   download(options: { model: Model }): Promise<void>;
@@ -31,15 +34,16 @@ export interface MobilePlugin {
   exportResult(options: { json: string }): Promise<{ path: string }>;
 }
 export interface HttpTransport {
-  post(options: { url: string; headers: Record<string, string>; data: Record<string, unknown>; connectTimeout: number; readTimeout: number; disableRedirects: boolean }): Promise<{ status: number; data: unknown }>;
+  post(options: PostOptions): Promise<{ status: number; data: unknown }>;
 }
+export interface PostOptions { requestId: string; url: string; headers: Record<string, string>; data: Record<string, unknown>; connectTimeout: number; readTimeout: number; disableRedirects: boolean }
 export type ImageSourceKind = 'camera' | 'gallery' | 'dataset';
 export interface BenchImage { id: string; dataUrl: string; imageSource: ImageSourceKind; captureMethod?: 'system' | 'webview' }
 export interface ImageResult {
   id: string; engine: string; config: BenchmarkConfig;
   outcome?: ReadOutcome; linePasses?: { lines: TextLine[]; usage: ReadUsage }[];
   usage: ReadUsage; totalMs: number; modelLoadMs: number; modelVerifyMs: number; reusedModel: boolean;
-  memory?: ServerState; errorCode?: string;
+  memory?: ServerState; errorCode?: string; serverRestarted?: boolean;
   imageSource: ImageSourceKind; captureMethod?: 'system' | 'webview';
 }
 export interface BenchmarkReport { version: 1; device: DeviceInfo; results: ImageResult[] }

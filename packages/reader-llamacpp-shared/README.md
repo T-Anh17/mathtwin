@@ -113,6 +113,24 @@ Không sửa/đóng JSON cụt. JSON hoàn chỉnh nhưng finish khác stop vẫ
 `readTimeout` tính bằng **ms**, mặc định **300000** mỗi request. Hạn tổng mỗi ảnh = `180000 + passes * readTimeout`, gồm dự phòng khởi động model.
 Đây là giới hạn chờ, không phải số đo tốc độ model.
 
+## Giới hạn token (Lô 2.7c)
+
+`defaultMaxTokens = 1536` đặt tại `src/config.ts`, dùng cho `completionRequest`, adapter Node và màn Đo Android.
+Caller truyền `maxTokens` để đổi giới hạn mỗi request/trang. Không vá JSON cụt: `length` với JSON chưa đóng
+vẫn là `repetition_loop`; output rỗng/toàn khoảng trắng với `length` là `truncated`.
+
+Giữ **non-stream**. Đã kiểm mã nguồn pin b12388 (commit `1c2adc75f619d05efc5d49ce08eaaa96272ebfa2`):
+[`server-task.cpp:1119–1166`](https://github.com/ggml-org/llama.cpp/blob/1c2adc75f619d05efc5d49ce08eaaa96272ebfa2/tools/server/server-task.cpp#L1119-L1166)
+chỉ tạo delta đầu tiên hoặc từ `oaicompat_msg_diffs`; điều kiện `if (!deltas.empty())` ở dòng **1148** bao
+việc xuất `prob_output` tại **1152–1156**. Token không sinh diff có thể không được gửi logprob; không bảo đảm
+đủ xác suất mọi token để căn byte và tính `conf`. Vì vậy không triển khai cắt sớm bằng SSE trong lô này.
+Giới hạn token và sampler DRY áp dụng như nhau ở chế độ non-stream.
+
+Phía server non-stream gọi `rd.wait_for_all(req.should_stop)` tại
+[`server-context.cpp:5441`](https://github.com/ggml-org/llama.cpp/blob/1c2adc75f619d05efc5d49ce08eaaa96272ebfa2/tools/server/server-context.cpp#L5441)
+để nhận client đóng kết nối. Android đóng socket và kiểm slot; Node truyền AbortSignal trực tiếp cho fetch
+(kể cả khi đang đọc body), không dùng fetch keepalive, POST có `Connection: close`.
+
 ## Kiểm tra và Quyết định & giả định
 
 `npm test` kiểm trực tiếp các hàm khi `Buffer`, `process`, `require` và các global mạng không tồn tại,

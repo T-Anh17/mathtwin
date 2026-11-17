@@ -27,6 +27,11 @@ internal class ServerRuntime(private val context: Context, private val store: Mo
     private var logCpuVariant: String? = null
     private var backendConflict = false
     private var memoryPressure: JSONObject? = null
+    fun authorizeRequest(url: String, authorization: String?, path: String) = synchronized(lock) {
+        val current = session ?: throw MobileFailure("http_error")
+        if (process?.isAlive != true || url != "http://127.0.0.1:${current.getInt("port")}$path" ||
+            authorization != "Bearer ${current.getString("apiKey")}") throw MobileFailure("http_error")
+    }
     private val cpuBackendLine = Regex("^load_backend: loaded CPU backend from [^\\r\\n]+/libggml-cpu-(android_armv(?:8\\.0_1|8\\.2_[12]|8\\.6_1|9\\.0_1|9\\.2_[12]))\\.so$")
     private val cpuBackendFile = Regex("^libggml-cpu-(android_armv(?:8\\.0_1|8\\.2_[12]|8\\.6_1|9\\.0_1|9\\.2_[12]))\\.so$")
 

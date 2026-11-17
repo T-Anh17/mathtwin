@@ -115,7 +115,11 @@ export async function evaluateDevice(file: string, root: string, date: string, o
     }
     if (config.maxImageSide !== undefined && ![512, 768, 1024].includes(number(config.maxImageSide))) invalid();
     if (config.readTimeout !== undefined && (!Number.isSafeInteger(config.readTimeout) || number(config.readTimeout) < 1000 || number(config.readTimeout) > 3_600_000)) invalid();
+    // Old exports stored this only in runtime. Never replace historical 4096 with the new default.
+    const maxTokens = config.maxTokens === undefined ? rawRuntime.maxTokens : config.maxTokens;
+    if (!Number.isSafeInteger(maxTokens) || number(maxTokens) < 1 || number(maxTokens) > 8192) invalid();
     const configuration = { model: config.model, passes, mode: config.mode, threads: number(config.threads), minRamGb: number(config.minRamGb),
+      maxTokens: number(maxTokens),
       ...(config.maxImageSide === undefined ? {} : { maxImageSide: number(config.maxImageSide) }),
       ...(config.readTimeout === undefined ? {} : { readTimeout: number(config.readTimeout) }), ...(dry ? { dry } : {}),
       allowLowRam: bool(config.allowLowRam), backgroundIdleMinutes: number(config.backgroundIdleMinutes),
@@ -129,6 +133,7 @@ export async function evaluateDevice(file: string, root: string, date: string, o
     const errorCode = result.errorCode === undefined ? undefined : string(result.errorCode);
     if (!errorCode && u.passes !== passes) invalid();
     const row: EvaluationRow = { id, meta: sample.meta, usage: u, issueCodes: [],
+      ...(result.serverRestarted === undefined ? {} : { serverRestarted: bool(result.serverRestarted) }),
       deviceTiming: { totalMs: number(result.totalMs), modelLoadMs: number(result.modelLoadMs), modelVerifyMs: number(result.modelVerifyMs), reusedModel: bool(result.reusedModel) },
       ...(errorCode === undefined ? {} : { errorCode }) };
     if (errorCode === 'memory_pressure') {
@@ -163,7 +168,7 @@ export async function evaluateDevice(file: string, root: string, date: string, o
   for (const [key, group] of groups) {
     const report = makeReport(group.engine, options.set ?? 'device-mixed', group.passes, date, group.rows,
       { mode: group.config.mode as 'graph' | 'lines', configuration: group.config, phoneMeasurements: {
-        ...phoneMeasurements, ...(options.set ? { notExportedIds: [...catalog.keys()].filter((id) => sourceSets.get(id) === options.set && !group.ids.has(id)) } : {}) } });
+        ...phoneMeasurements, runtime: { ...runtime, maxTokens: group.config.maxTokens }, ...(options.set ? { notExportedIds: [...catalog.keys()].filter((id) => sourceSets.get(id) === options.set && !group.ids.has(id)) } : {}) } });
     const basename = `read-device-${date}-${createHash('sha256').update(JSON.stringify({ key, set: options.set, threshold: options.threshold, limit: options.limit, export: data })).digest('hex').slice(0, 12)}`;
     await writeFile(join(directory, `${basename}.json`), `${JSON.stringify(report, null, 2)}\n`);
     await writeFile(join(directory, `${basename}.md`), renderReport(report));

@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { setTimeout as delay } from 'node:timers/promises';
 import { resizeImage } from '@mathtwin/reader';
 import type { PreparedImage, ReadDraft, ReadUsage, ServerTimings, TextLine, TextReader, VisionReader } from '@mathtwin/reader';
-import { completionRequest, defaultDry, defaultMaxImageSide, defaultReadTimeout, imageTimeout, validateDry, graphResult, lineResult, parseCompletion, plainLines, spottingLines, LlamaCppReadError } from '@mathtwin/reader-llamacpp-shared';
+import { completionRequest, defaultDry, defaultMaxImageSide, defaultReadTimeout, defaultMaxTokens, imageTimeout, validateDry, graphResult, lineResult, parseCompletion, plainLines, spottingLines, LlamaCppReadError } from '@mathtwin/reader-llamacpp-shared';
 import type { Completion, DryConfig, ReadMode } from '@mathtwin/reader-llamacpp-shared';
 import { imageDataUrl } from './image.js';
 import { nodeRuntime } from './runtime.js';
@@ -72,7 +72,7 @@ export class LlamaCppReader implements VisionReader, TextReader {
     const readTimeout = options.readTimeout ?? Math.min(defaultReadTimeout, (options.timeoutMs ?? Infinity) - 1);
     const maxImageSide = options.maxImageSide ?? options.maxLongEdge ?? defaultMaxImageSide;
     this.options = { modelsDirectory: fileURLToPath(new URL('../../../.models/', import.meta.url)),
-      gpuLayers: 0, mmprojGpu: false, contextSize: 8192, maxTokens: 4096, timeoutMs: imageTimeout(readTimeout), startupTimeoutMs: 120_000,
+      gpuLayers: 0, mmprojGpu: false, contextSize: 8192, maxTokens: defaultMaxTokens, timeoutMs: imageTimeout(readTimeout), startupTimeoutMs: 120_000,
       threads: availableParallelism(), alternativesThreshold: 0.1, paddleTextMode: 'spotting', ...options,
       readTimeout, maxImageSide, maxLongEdge: maxImageSide, dry: { ...(options.dry ?? defaultDry) } };
     const o = this.options;
@@ -136,7 +136,9 @@ export class LlamaCppReader implements VisionReader, TextReader {
       const request = (path: string, body?: unknown, requestSignal = combined): Promise<Response> =>
         cancellable(() => this.runtime.fetch(`${base}${path}`, { method: body === undefined ? 'GET' : 'POST',
           headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-          ...(body === undefined ? {} : { body: JSON.stringify(body) }), signal: requestSignal, redirect: 'error' }), requestSignal);
+          ...(body === undefined ? {} : { body: JSON.stringify(body), keepalive: false,
+            headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json', Connection: 'close' } }),
+          signal: requestSignal, redirect: 'error' }), requestSignal);
       const metrics: (ServerTimings | undefined)[] = [];
       const finishes: string[] = [];
       const work = async (): Promise<T> => {
