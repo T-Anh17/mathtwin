@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { setTimeout as delay } from 'node:timers/promises';
 import { resizeImage } from '@mathtwin/reader';
 import type { PreparedImage, ReadDraft, ReadUsage, ServerTimings, TextLine, TextReader, VisionReader } from '@mathtwin/reader';
-import { completionRequest, defaultDry, defaultMaxImageSide, defaultReadTimeout, defaultMaxTokens, imageTimeout, validateDry, graphResult, lineResult, parseCompletion, plainLines, spottingLines, LlamaCppReadError } from '@mathtwin/reader-llamacpp-shared';
+import { completionRequest, defaultDry, defaultMaxImageSide, defaultReadTimeout, defaultMaxTokens, imageTimeout, validateDry, graphResult, glyphResult, lineResult, parseCompletion, plainLines, spottingLines, LlamaCppReadError } from '@mathtwin/reader-llamacpp-shared';
 import type { Completion, DryConfig, ReadMode } from '@mathtwin/reader-llamacpp-shared';
 import { imageDataUrl } from './image.js';
 import { nodeRuntime } from './runtime.js';
@@ -88,6 +88,12 @@ export class LlamaCppReader implements VisionReader, TextReader {
     if (this.options.model === 'a') throw new LlamaCppReadError('text_only');
     if (pass !== 'edges' && pass !== 'neighbors') throw new LlamaCppReadError('read_failed', 'invalid_json');
     return this.run(images, signal, async (complete) => ({ draft: graphResult(await complete(images, pass), this.options.alternativesThreshold, images) }));
+  }
+  /** Scalar glyph recognition on a CV-supplied crop; no graph or question prompt. */
+  async readCrop(image: PreparedImage, signal?: AbortSignal, role?: 'label' | 'weight' | 'name'): Promise<{ text: string; probability: number }[]> {
+    if (this.options.model !== 'b') throw new LlamaCppReadError('text_only');
+    const result = await this.run([image], signal, async complete => ({ candidates: glyphResult(await complete([image], role ? `glyph-${role}` : 'glyph')) }));
+    return result.candidates;
   }
   async readLines(images: PreparedImage[], signal?: AbortSignal): Promise<{ lines: TextLine[]; usage: ReadUsage }> {
     return this.run(images, signal, async (complete) => {

@@ -296,3 +296,27 @@ export function spottingLines(c: Completion, width: number, height: number, thre
   if (!lines.length) return failed('invalid_json');
   return lines;
 }
+
+/** Scalar-only glyph schema; probabilities from pre-sampling tokens covering the string value. */
+export function glyphResult(c: Completion): { text: string; probability: number }[] {
+  const { value, spans } = jsonValues(c.text), span = spans.get('');
+  if (typeof value !== 'string' || !span) return failed('invalid_json');
+  const result = [{ text: value.normalize('NFC'), probability: valueConfidence(c, span) }];
+  for (const bytes of replacements(c, span, 0)) {
+    try {
+      const raw = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+      const text: unknown = JSON.parse(`"${raw}"`);
+      if (typeof text !== 'string' || text === value) continue;
+      // Score replacements against the actual alternate token, retaining all unchanged scores.
+      let best = 0;
+      for (const token of covering(c, span)) for (const alt of token.alternatives) {
+        if (equal(alt.bytes, c.bytes.subarray(token.start, token.end))) continue;
+        const full = new Uint8Array(c.bytes.length - (token.end - token.start) + alt.bytes.length);
+        full.set(c.bytes.subarray(0, token.start)); full.set(alt.bytes, token.start); full.set(c.bytes.subarray(token.end), token.start + alt.bytes.length);
+        try { if (JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(full)) === text) best = Math.max(best, Math.min(alt.probability, ...covering(c, span).filter(t => t !== token).map(t => t.probability))); } catch { /* Invalid alternate. */ }
+      }
+      result.push({ text: text.normalize('NFC'), probability: best });
+    } catch { /* Invalid alternate. */ }
+  }
+  return result.sort((a, b) => b.probability - a.probability).slice(0, 3);
+}

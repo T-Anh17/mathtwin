@@ -198,3 +198,8 @@ it('encodes a valid in-memory RGBA PNG without reading the image source', () => 
   expect(inflateSync(png.subarray(41, 41 + png.readUInt32BE(33)))).toEqual(Buffer.from([0, 0, 0, 0, 255]));
   expect(() => imageDataUrl({ ...image, width: 2 })).toThrow();
 });
+it('B direct glyph crop stops its local server and sends a scalar schema', async () => {
+  const h=harness(completion('"7"'));const result=await h.reader.readCrop(image,undefined,'weight');
+  expect(result[0]!.text).toBe('7');expect(result[0]!.probability).toBeCloseTo(.92);expect(h.process.stop).toHaveBeenCalledOnce();
+  expect(JSON.parse(String(h.fetcher.mock.calls[1]?.[1]?.body))).toMatchObject({response_format:{schema:{type:'string'}}});
+});

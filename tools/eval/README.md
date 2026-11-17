@@ -152,3 +152,36 @@ của app, Markdown liệt kê tương ứng. `onTrimMemory` phải có mức tr
 JSON có `byRegion` và Markdown có cột vùng `question` / `figure` / `table` / `solution`, cho từng lượt và từng nhóm nguồn ảnh. Để không làm mất lỗi khi reader không trả region, gán dự đoán vào vùng truth bằng căn chỉnh dòng theo thứ tự: thay dòng có chi phí CER chuẩn hóa, thêm/bớt dòng có chi phí 1, hòa ưu tiên thay dòng. Dòng chèn dùng region reader nếu có, nếu không dùng vùng truth lân cận; dòng chép từ vùng gạch xóa đã nhận diện dùng vùng của dòng gạch. Đây chỉ là chia nhóm để đo chữ, không sửa nội dung dự đoán và không phải điểm nhận dạng vùng. Mọi dự đoán đều vào một nhóm, kể cả dòng sai/thêm; reference thiếu ở mỗi vùng vẫn chịu CER/recall. Các phép đối chiếu này chỉ chạy **sau nhận dạng** trong bộ đánh giá, không dùng đáp án để chọn OCR.
 
 Mẫu số rỗng cho rate/accuracy = `null` (N/A), vẫn giữ số lỗi thêm để kiểm toán. CER/WER có thể > 1 do chèn thêm chữ; độ đúng token chặn ở 0. Tổng hợp bằng tổng lỗi / tổng mẫu số, không trung bình phần trăm từng ảnh. JSON giữ từng tử/mẫu để kiểm tra. Báo cáo tách `printed`, `synthetic_handwriting`, `handwritten` thật và nhóm nét bút giả cũ; nghiêng/mờ là nhóm có thể chồng lấn.
+
+Lô 2.11: đọc cấu trúc bằng D trên máy tính (không gọi adb):
+
+```powershell
+npm run eval:read -- --engine offline:figure-cv --glyph oracle --set synthetic-fig --split test
+npm run eval:read -- --engine offline:figure-cv --glyph c --set synthetic-fig --split test
+npm run eval:read -- --engine offline:figure-cv --glyph b --set synthetic-fig --split test --llama-server C:/path/llama-server.exe
+```
+
+Model phải có sẵn trong `.models/`; không tải thêm. B cần binary llama-server máy tính có sẵn. D dùng một lượt; `--passes 2` bị từ chối. Oracle chỉ giải mã crop chữ do CV tìm thấy, không đưa chú thích cấu trúc vào reader. Tên báo cáo chứa glyph/split để không ghi đè; `.json` giữ outcome/draft từng ảnh, topology và toàn bộ đồ thị được tách riêng. Thiếu câu hỏi không được coi là bằng chứng đã gắn cờ đủ lỗi đồ thị. Thời gian Node chỉ tham khảo. Chi tiết thuật toán và công thức confidence: `packages/reader-figure/README.md`.
+
+
+### Chẩn đoán D sau review 2.11-r1 (chỉ dev)
+
+```powershell
+npm run eval:read -- --engine offline:figure-cv --glyph oracle --set synthetic-fig --split dev
+npm run eval:read -- --engine offline:figure-cv --glyph oracle --geometry oracle --set synthetic-fig --split dev
+```
+
+D bắt buộc chọn split tường minh. CLI và API chỉ chấp nhận geometry oracle với glyph oracle và split dev. Subclass đo chỉ cấp tâm/bán kính đỉnh: bán kính từng trục lấy từ đường bao thật; chỉ nhãn dùng nửa kích thước labelBox. Mọi ellipse loại trừ dùng cùng kind ring, không cấp style truth cho reader. Không cấp vùng hình, nhãn cho khâu gán, polyline, cạnh hay trọng số; không sinh thêm đỉnh. Reader thật không có tùy chọn hình học oracle. Chế độ này cô lập lần cạnh với đỉnh thật, vẫn chịu ảnh hưởng của tìm vùng và tách chữ.
+
+Báo cáo dev, checkpoint và quan sát từng ảnh nằm trong reports/.debug/, đã gitignore; không commit. Mẫu thất bại vẫn tính với quan sát rỗng. Có 196 ảnh đồ thị dev; 8 ảnh meta.hasFigure:false được đo riêng làm âm tính, không làm tăng tỉ lệ đồ thị đúng. Pack synthetic-fig cũng bỏ qua chúng.
+
+- IoU: giao/hợp giữa box D và figure.json.box, trung bình theo ảnh. Không tìm thấy hình có IoU 0.
+- Đỉnh: ghép một-một toàn cục theo khoảng cách tăng dần, tâm cách không quá bán kính truth + 10 pixel ảnh gốc, không dùng nhãn. Bán kính là khoảng cách lớn nhất từ tâm tới đường bao; chỉ nhãn dùng nửa cạnh dài labelBox. Giữ TP/predicted/truth để tính precision/recall/F1 micro. Strata open/double/dot/label-only lấy style truth của đỉnh đã ghép. Dự đoán thừa quy vào style của truth gần nhất cùng nhóm hình học (vòng/chấm/chỉ nhãn; không có nhóm tương ứng thì dùng open/dot/label-only). Đây là phân tầng lỗi phát hiện, không phải độ đúng phân loại style.
+- Nhãn: số nhãn đúng sau normalizeLabel / số đỉnh ghép đúng; không lấy alternatives. Cổng này dùng glyph oracle với đỉnh D phát hiện, không dùng số của geometry oracle.
+- Cạnh: đổi hai đầu qua phép ghép tâm, so multiset không hướng {u,v}. Đầu không ghép dùng id riêng nên luôn tính sai. Cạnh song song ghép một-một theo khoảng cách polyline tăng dần để đo thuộc tính, không chọn cặp theo trọng số đúng. Giữ TP/predicted/truth cho F1 micro; khuyên tính riêng. Đa cạnh: hợp các cặp không khuyên có bội số ít nhất 2 ở truth hoặc dự đoán; báo F1 và số nhóm đúng đủ bội số/tổng nhóm. Nhóm đa cạnh bịa vẫn tính sai.
+- Giao cắt có/không chấm: F1 trên các ảnh có loại giao cắt tương ứng, gồm mọi cạnh của các ảnh đó; hai nhóm có thể chồng lấn.
+- Trọng số/tên: số giá trị khớp / số cạnh ghép đúng hai đầu. null khớp null cũng đúng. Không dùng chú thích chữ để cấp vị trí/cạnh.
+
+Oracle glyph chỉ khớp crop do CV đề xuất: IoU ít nhất 0,05 hoặc khoảng cách tâm không quá 0,75 chiều cao chữ truth; chiều cao crop không quá 2,5 lần và chiều rộng không quá 3 lần chữ truth. Chọn theo IoU + 0,3/(1 + khoảng cách/chiều cao truth); nếu ứng viên thứ hai đạt ít nhất 80% điểm cao nhất thì trả rỗng. Không khớp hộp nào cũng trả rỗng. Giới hạn kích thước ngăn nguyên một khuyên bị nhận là nhãn ở đầu khuyên; oracle không đề xuất crop hay hình học.
+
+Chỉ khi F1 đỉnh đạt 95% (mỗi style 90%), gán nhãn 95%, F1 cạnh geometry oracle 95% (khuyên và đa cạnh 90%), toàn bộ đồ thị glyph oracle 80%, mới chạy test một lần cho oracle và C. Không đạt sau các thử nghiệm dev hợp lý thì báo khâu kẹt và dừng, không đánh giá lại test. JSON test trước review là dữ liệu lịch sử, không đại diện cho code sau sửa.

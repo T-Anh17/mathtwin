@@ -22,7 +22,7 @@ export const linesPrompt = `Transcribe each visible text line in reading order, 
 Return JSON lines matching the response schema. region and box are optional.
 Boxes use Qwen3-VL relative coordinates 0..1000: [x1,y1,x2,y2]. Omit box if not identifiable.
 Do not invent alternative readings, missing text or coordinates. No solving or correcting.`;
-export type ReadMode = 'edges' | 'neighbors' | 'lines' | 'ocr' | 'spotting';
+export type ReadMode = 'edges' | 'neighbors' | 'lines' | 'ocr' | 'spotting' | 'glyph' | 'glyph-label' | 'glyph-weight' | 'glyph-name';
 const lineSchema = z.strictObject({ lines: z.array(z.strictObject({ text: z.string().min(1),
   region: z.enum(['question', 'figure', 'solution', 'table']).optional(), box: z.tuple([z.number(), z.number(), z.number(), z.number()]).optional() })).min(1) });
 /** llama.cpp b12388 accepts homogeneous arrays, not draft-2020 tuple keywords. */
@@ -56,8 +56,8 @@ export function completionRequest(model: 'a' | 'b', mode: ReadMode, imageUrls: s
   if (!imageUrls.length || imageUrls.some((url) => !/^data:image\/(?:png|jpeg);base64,[A-Za-z0-9+/]+={0,2}$/.test(url))) throw new Error('Images must be in-memory data URLs.');
   if (!Number.isSafeInteger(maxTokens) || maxTokens < 1) throw new Error('Invalid token limit.');
   if ((model === 'a') !== (mode === 'ocr' || mode === 'spotting')) throw new Error('Unsupported model/mode.');
-  const prompt = mode === 'edges' || mode === 'neighbors' ? graphPrompt(mode) : mode === 'ocr' ? 'OCR:' : mode === 'spotting' ? 'Spotting:' : linesPrompt;
-  const schema = serverSchema(z.toJSONSchema(mode === 'lines' ? lineSchema : ReadDraftSchema, { unrepresentable: 'any', reused: 'ref' }));
+  const prompt = mode === 'edges' || mode === 'neighbors' ? graphPrompt(mode) : mode === 'ocr' ? 'OCR:' : mode === 'spotting' ? 'Spotting:' : mode.startsWith('glyph') ? `Transcribe only ${mode === 'glyph-label' ? 'one vertex label: a letter or v followed by digits (including subscripts)' : mode === 'glyph-weight' ? 'one positive integer edge weight' : mode === 'glyph-name' ? 'one edge name: a, b or m' : 'the single label, positive integer weight or edge name'} in this crop. Return one JSON string; empty string when unreadable. No explanation.` : linesPrompt;
+  const schema = serverSchema(z.toJSONSchema(mode.startsWith('glyph') ? z.string() : mode === 'lines' ? lineSchema : ReadDraftSchema, { unrepresentable: 'any', reused: 'ref' }));
   return {
     messages: [...(model === 'a' ? [] : [{ role: 'system', content: readerInstruction }]), { role: 'user', content: [
       ...imageUrls.map((url) => ({ type: 'image_url', image_url: { url } })), { type: 'text', text: prompt },

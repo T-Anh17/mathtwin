@@ -37,5 +37,6 @@
     "figure.json": "7083f1227ba91eff75de8990b914fedcebeb00e4d4a20c003b7157f08dd984e7",
     "lines.json": "b62613724182313d0450b6290dd777bf319af5d7775be1f060c0eeb5c4c14838",
     "source.svg": "719d1fc269719627dddcc27560a33d1bf575ec7d9ef7a77e237831e5bd9e51bc"
-  }
+  },
+  "hasFigure": false
 }

@@ -4,5 +4,5 @@ export { defaultMaxImageSide, defaultReadTimeout, defaultMaxTokens, defaultDry, 
 export type { DryConfig } from './config.js';
 export { LlamaCppReadError } from './errors.js';
 export type { LlamaFailureReason } from './errors.js';
-export { parseCompletion, completionFinishReason, graphResult, lineResult, plainLines, spottingLines, normalizedBox, valueConfidence } from './response.js';
+export { parseCompletion, glyphResult, completionFinishReason, graphResult, lineResult, plainLines, spottingLines, normalizedBox, valueConfidence } from './response.js';
 export type { Completion, ScoredToken, TokenAlternative } from './response.js';

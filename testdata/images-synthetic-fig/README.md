@@ -41,3 +41,21 @@ npm run eval:read -- --engine fake --set synthetic-fig --split dev --mode graph
 ```
 
 Reader `fake` chỉ kiểm pipeline với truth, không đọc pixel và không phải số đo nhận dạng. Bộ đo đóng gói trong `.build-cache/datasets/synthetic-fig[-test]/` chỉ có ảnh và `ids.json`, không kèm truth/chú thích. Lô này không cài bộ đọc D, không gọi thiết bị hay tải model.
+
+
+## Sửa sau review 2.11-r1
+
+8 ảnh dev của hai fixture dãy bậc (`fig-04-degree-sequence-simple-impossible-*`, `fig-05-degree-sequence-multigraph-*`) không có hình. Chỉ thêm `meta.hasFigure:false`, giữ nguyên ảnh, truth, chú thích và hash artifact. Giữ các ảnh này làm ca âm tính; loại khỏi mẫu số đồ thị và pack synthetic-fig. Generator ghi hasFigure theo số đỉnh để tái sinh không mất quy tắc này. loadCases vẫn đọc đầy đủ để kiểm toàn vẹn/âm tính; bộ đo và pack mới lọc.
+
+| Bộ đo đồ thị | Vùng hình | Trang vở | Tổng |
+| --- | ---: | ---: | ---: |
+| dev | 147 | 49 | 196 |
+| test | 87 | 29 | 116 |
+| Tổng đủ điều kiện | 234 | 78 | 312 |
+
+Corpus vật lý vẫn có 320 ảnh / 44 hash đồ thị gốc; dev đồ thị gồm 25 hash khác nhau. 8 âm tính không được cộng thành đồ thị đọc đúng. Chưa đánh giá lại test khi cổng dev chưa đạt.
+
+Hash chỉ mục sau khi lọc: SHA-256 của các dòng UTF-8 `JSON.stringify([id, hasFigure !== false, Object.entries(figureHashes).sort(([a],[b]) => a.localeCompare(b, 'en'))])`, thứ tự id như loadCases, nối LF và kết thúc LF. Không băm chính meta.json; cờ thiếu được hiểu là true để tương thích dữ liệu cũ.
+
+- Toàn bộ 320 mục: `5cdef70161c662aba3a5370c999b918ab841c0e562bcd79aba47a7d5d350ded4`.
+- 196 ảnh đồ thị dev: `f47ce9c6c676d1f03d58a8cfe07b23d0a436866eed81a20b999d8b2b80969646`.

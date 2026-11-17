@@ -209,3 +209,15 @@ it('actual 712-byte vocab is pinned by hash and contains every Vietnamese letter
   expect(unsupportedSymbols(actual.vocab)).toEqual(['→', '×', '∞', '≥', '≤', '≠']);
   expect(unsupportedSymbols([...actual.vocab, '→', '∞'])).toEqual(['×', '≥', '≤', '≠']);
 });
+it('direct C glyph crops bypass detection and retain actual alternate probabilities', async () => {
+  const fake=fakeRuntime(), reader=await VietOcrReader.create(fake.ort,models,config);
+  const candidates=await reader.readCrop(image);
+  expect(fake.sessions[0]!.run).not.toHaveBeenCalled();expect(candidates).toHaveLength(3);
+  expect(candidates[0]!.probability).toBeCloseTo(.6);expect(candidates[1]!.probability).toBeCloseTo(.25);expect(candidates[2]!.probability).toBeCloseTo(.15);
+  for(const value of fake.allocated)expect(value.dispose).toHaveBeenCalledTimes(1);
+  await reader.close();await expect(reader.readCrop(image)).rejects.toMatchObject({code:'read_failed'});
+});
+it('direct C glyph crops fail closed without log probabilities', async () => {
+  const fake=fakeRuntime({missing:true}),reader=await VietOcrReader.create(fake.ort,models,config);
+  await expect(reader.readCrop(image)).rejects.toMatchObject({code:'missing_log_probs'});await reader.close();
+});

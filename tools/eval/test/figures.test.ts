@@ -21,6 +21,9 @@ const directory = join(repositoryRoot, 'testdata/images-synthetic-fig');
 describe('difficult synthetic figure corpus', () => {
   it('covers all 60 core sources, seeded extra graphs, variants and leakage-free original-graph splits', async () => {
     const cases = await loadCases(directory);
+    const negatives = cases.filter(c => c.meta.hasFigure === false);
+    expect(negatives).toHaveLength(8);
+    expect(negatives.every(c => c.meta.split === 'dev' && c.truth.graph.vertices.length === 0)).toBe(true);
     expect(cases.filter((c) => c.meta.form === 'crop').length).toBeGreaterThanOrEqual(200);
     expect(cases.filter((c) => c.meta.form === 'page').length).toBeGreaterThanOrEqual(60);
     const fixtures = (await readdir(join(repositoryRoot, 'testdata/core'), { withFileTypes: true })).filter((e) => e.isDirectory()).map((e) => e.name);

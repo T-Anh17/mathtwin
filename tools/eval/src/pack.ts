@@ -8,7 +8,7 @@ import { repositoryRoot } from './cli.js';
 
 /** App protocol v1 accepts a single image per id. Fail rather than silently dropping pages. */
 export async function packDataset(set: DatasetSet, root = repositoryRoot, split?: 'dev' | 'test'): Promise<string> {
-  const cases = (await loadCases(join(root, 'testdata', setFolders[set]))).filter((c) => !split || c.meta.split === split);
+  const cases = (await loadCases(join(root, 'testdata', setFolders[set]))).filter(c => set !== 'synthetic-fig' || c.meta.hasFigure !== false).filter((c) => !split || c.meta.split === split);
   if (!cases.length || cases.some((c) => c.files.length !== 1 || !/^[a-zA-Z0-9_.-]+$/.test(c.id))) throw new Error('Bộ đo cần id an toàn và đúng một ảnh mỗi đề; không bỏ trang.');
   const output = join(root, '.build-cache/datasets', split ? `${set}-${split}` : set);
   await mkdir(output, { recursive: true });

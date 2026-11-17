@@ -19,6 +19,7 @@ export interface ImageMeta {
   split?: 'dev' | 'test';
   originalGraph?: string;
   form?: 'crop' | 'page';
+  hasFigure?: boolean;
   parameters?: import('./figures.js').FigureParameters;
   figureHashes?: Record<string, string>;
   coreFixture?: string;
@@ -44,6 +45,8 @@ function checkedMeta(value: unknown, truth: ProblemSpec, id: string): ImageMeta 
     && (!Array.isArray(meta.studentErrors) || meta.studentErrors.some((error) => error === null || typeof error !== 'object'
       || !['arithmetic', 'vertex', 'conclusion'].includes(error.kind) || typeof error.written !== 'string'
       || typeof error.expected !== 'string' || typeof error.description !== 'string')))) throw new Error(`Metadata bài làm không hợp lệ: ${id}`);
+  if (meta.hasFigure !== undefined && typeof meta.hasFigure !== 'boolean') throw new Error(`Invalid hasFigure: ${id}`);
+  if (meta.hasFigure === false && truth.graph.vertices.length > 0) throw new Error(`hasFigure false with nonempty graph: ${id}`);
   return meta;
 }
 export async function loadCases(directory: string, limit?: number): Promise<ImageCase[]> {

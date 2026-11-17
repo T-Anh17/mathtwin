@@ -71,6 +71,20 @@ export class VietOcrReader implements TextReader, VisionReader {
     } catch (error) { checkAbort(signal); if (error instanceof OcrError) throw error; throw new OcrError('read_failed'); }
     finally { this.busy = false; }
   }
+  /** Recognize one CV-supplied line crop without invoking the text detector. */
+  async readCrop(image: PreparedImage, signal?: AbortSignal): Promise<{ text: string; probability: number }[]> {
+    checkAbort(signal); validateImage(image);
+    if (this.busy) throw new OcrError('busy');
+    if (this.closed) throw new OcrError('read_failed');
+    this.busy = true;
+    try {
+      const box: [number, number, number, number] = [0, 0, image.width, image.height], size = lineSize(box, this.config);
+      const input = this.ort.tensor('float32', imageTensor(image, box, size.width, size.height), [1, 3, size.height, size.width]);
+      let candidates: { text: string; probability: number }[] = [];
+      await recognizeLine(this.ort, this.sessions[1], this.sessions[2], input, this.config, signal, values => { candidates = values; });
+      return candidates;
+    } finally { this.busy = false; }
+  }
   async close(): Promise<void> {
     if (this.busy) throw new OcrError('busy');
     if (this.closed) return;

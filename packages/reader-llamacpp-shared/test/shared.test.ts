@@ -263,3 +263,12 @@ it('executes shared parsing, request construction and resize without Node or net
   expect(request).toHaveProperty('response_format.type', 'json_schema');
   expect(resized).toMatchObject({ width: 1, height: 1, pixels: new Uint8ClampedArray([50, 50, 50, 255]) });
 });
+it('B glyph requests use one scalar string and measured UTF-8 value probabilities', async () => {
+  const {glyphResult}=await import('../src/index.js');
+  const request=completionRequest('b','glyph',['data:image/png;base64,AA=='],32);
+  expect(request).toMatchObject({response_format:{schema:{type:'string'}},max_tokens:32,post_sampling_probs:false});
+  const result=glyphResult(scored('"17"',new Map([[1,{probability:.8,alternatives:[{text:'7',probability:.15}]}]])));
+  expect(result[0]).toEqual({text:'17',probability:.8});expect(result[1]!.text).toBe('77');expect(result[1]!.probability).toBeCloseTo(.15);
+  expect(()=>glyphResult(scored('{"text":"17"}'))).toThrow();
+  expect(()=>parseCompletion({choices:[{finish_reason:'stop',message:{content:'"17"'}}]},true)).toThrow();
+});

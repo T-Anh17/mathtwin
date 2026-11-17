@@ -228,7 +228,7 @@ export async function generateFigures(root: string): Promise<number> {
     await writeFile(join(directory, 'meta.json'), text({ source: 'synthetic_handwriting', capture: 'tilted', blurred: parameters.blur > 0,
       questionFormat: source.truth.questionFormat, notes: 'Hình vẽ tay tổng hợp bằng code và font OFL, không phải ảnh thật.', synthetic: true,
       coreFixture: source.id, originalGraph: graphKey(source.truth.graph), split: graphSplit(source.truth.graph),
-      form, parameters, variants: rendered.variants, hasSolution: form === 'page',
+      form, hasFigure: source.truth.graph.vertices.length > 0, parameters, variants: rendered.variants, hasSolution: form === 'page',
       figureHashes: Object.fromEntries(Object.entries(artifacts).map(([file, data]) => [file, createHash('sha256').update(data).digest('hex')])) }));
     count++;
   }

@@ -20,12 +20,21 @@ export function rankedLogProbs(tensor: OrtTensor | undefined, config: VietOcrCon
 
 /** Export README ABI: image -> [hidden, encoder_outputs], step(tgt,hidden,encoder_outputs) -> [logp,hidden]. */
 export async function recognizeLine(ort: OrtLike, encoder: OrtSession, decoder: OrtSession, input: OrtTensor,
-  config: VietOcrConfig, signal?: AbortSignal): Promise<Omit<OcrTextLine, 'box'>> {
+  config: VietOcrConfig, signal?: AbortSignal, candidateSink?: (values: { text: string; probability: number }[]) => void): Promise<Omit<OcrTextLine, 'box'>> {
   const vocabulary = Array.from(config.vocab);
   const chars: string[] = [], charConf: number[] = [], logProbs: number[] = [];
   const choices: string[][] = [];
+  const choiceProbabilities: number[][] = [];
   const finish = (eosConf: number, reason?: OcrTextLine['truncationReason']): Omit<OcrTextLine, 'box'> => {
     const text = chars.join('').normalize('NFC');
+    if (candidateSink) {
+      const candidates = [{ text, probability: reason ? 0 : charConf.length ? Math.min(...charConf) : eosConf }];
+      for (let i = 0; i < chars.length; i++) for (let j = 0; j < (choices[i]?.length ?? 0); j++) {
+        candidates.push({ text: chars.map((c, k) => k === i ? choices[i]![j]! : c).join('').normalize('NFC'),
+          probability: reason ? 0 : Math.min(choiceProbabilities[i]![j]!, ...charConf.filter((_, k) => k !== i)) });
+      }
+      candidateSink(candidates.sort((a, b) => b.probability - a.probability).slice(0, 3));
+    }
     const weakest = charConf.indexOf(Math.min(...charConf));
     const alternatives = weakest < 0 ? [] : (choices[weakest] ?? []).map((char) => chars.map((c, i) => i === weakest ? char : c).join('').normalize('NFC'));
     return { text, charConf, logProbs, conf: reason ? 0 : charConf.length ? Math.min(...charConf) : eosConf,
@@ -59,6 +68,7 @@ export async function recognizeLine(ort: OrtLike, encoder: OrtSession, decoder: 
         if (char === undefined) return finish(0, 'invalid_output');
         chars.push(char); charConf.push(Math.exp(best.logProb)); logProbs.push(best.logProb);
         choices.push(ranking.slice(1, 3).flatMap(({ id }) => vocabulary[id - config.offset] === undefined ? [] : [vocabulary[id - config.offset]!]));
+        choiceProbabilities.push(ranking.slice(1, 3).filter(({ id }) => vocabulary[id - config.offset] !== undefined).map(c => Math.exp(c.logProb)));
         token = best.id;
         if (hidden !== features && hidden !== nextHidden && !Object.values(encoded).includes(hidden)) hidden.dispose();
         hidden = nextHidden;
