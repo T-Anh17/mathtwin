@@ -15,6 +15,7 @@
     "@fontsource/be-vietnam-pro": "^5.3.0",
     "@mathtwin/core": "0.1.0",
     "@mathtwin/reader": "0.1.0",
+    "@mathtwin/work": "0.1.0",
     "@mathtwin/reader-figure": "0.1.0",
     "@mathtwin/reader-llamacpp-shared": "0.1.0",
     "@mathtwin/reader-ocr-shared": "0.1.0",

@@ -10,6 +10,8 @@ import { vi, messageFor } from './messages.vi.ts';
 import { captureImage, captureWebViewImage, fileDataUrl } from './capture.ts';
 import { flagOverlays } from './overlays.ts';
 import { runBatch } from './batch.ts';
+import { productVi as m } from './product-messages.vi.js';
+import { readWorkSpecs } from './work-benchmark.js';
 import type { Graph as GraphModel } from '@mathtwin/core';
 import type { ReadUncertainty } from '@mathtwin/reader';
 import { ocrMessages } from '@mathtwin/reader';
@@ -36,6 +38,7 @@ export function BenchmarkScreen() {
   const [message, setMessage] = useState('');
   const abort = useRef<AbortController | null>(null);
   const input = useRef<HTMLInputElement | null>(null);
+  const specInput = useRef<HTMLInputElement | null>(null);
   const native = Capacitor.isNativePlatform();
   const refresh = async () => { if (native) { setDevice(await mobile.device()); setModels((await mobile.models()).models); } };
   useEffect(() => { refresh().catch((e: unknown) => setMessage(messageFor(e)));
@@ -68,6 +71,7 @@ export function BenchmarkScreen() {
   };
   const lowRam = device !== null && device.totalRamBytes < config.minRamGb * 1e9;
   const ready = config.model === 'd' || models.find((m) => m.model === config.model)?.ready;
+  const workReady = config.mode !== 'work' || (dataset?.entries ?? images).every((image) => config.workSpecs?.[image.id]);
   return <main className="benchmark-screen">
     <header><span className="brand">{vi.title}</span><span>{vi.subtitle}</span></header>
     <nav aria-label={vi.title}><button className={tab === 'bench' ? 'selected' : ''} onClick={() => setTab('bench')}>{vi.bench}</button><button className={tab === 'models' ? 'selected' : ''} onClick={() => setTab('models')}>{vi.models}</button></nav>
@@ -87,9 +91,10 @@ export function BenchmarkScreen() {
       {downloading && <button onClick={() => action(() => mobile.cancelDownload())}>{vi.cancelDownload}</button>}
     </section> : <section><h1>{vi.bench}</h1>
       <fieldset disabled={busy || downloading}><legend>{vi.settings}</legend><div className="settings">
-        <label>{vi.models}<select value={config.model} onChange={(e) => setConfig((old) => ({ ...old, model: e.target.value === 'a' ? 'a' : e.target.value === 'c' ? 'c' : e.target.value === 'd' ? 'd' : 'b', ...(e.target.value === 'c' ? { mode: 'lines' as const } : {}) }))}><option value="a">{vi.a}</option><option value="b">{vi.b}</option><option value="c">{vi.c}</option><option value="d">{vi.d}</option></select></label>
+        <label>{vi.models}<select value={config.model} onChange={(e) => setConfig((old) => ({ ...old, model: e.target.value === 'a' ? 'a' : e.target.value === 'c' ? 'c' : e.target.value === 'd' ? 'd' : 'b',
+          ...(e.target.value === 'c' && old.mode === 'graph' || old.mode === 'work' && !['b', 'c'].includes(e.target.value) ? { mode: 'lines' as const } : {}) }))}><option value="a">{vi.a}</option><option value="b">{vi.b}</option><option value="c">{vi.c}</option><option value="d">{vi.d}</option></select></label>
         <label>{vi.passes}<select value={config.passes} onChange={(e) => set('passes', e.target.value === '1' ? 1 : 2)}><option value={1}>1</option><option value={2}>2</option></select></label>
-        <label>{vi.mode}<select value={config.mode} onChange={(e) => set('mode', e.target.value === 'graph' ? 'graph' : 'lines')}><option value="graph" disabled={config.model === 'c'}>{vi.graph}</option><option value="lines">{vi.lines}</option></select></label>
+        <label>{vi.mode}<select value={config.mode} onChange={(e) => set('mode', e.target.value === 'graph' ? 'graph' : e.target.value === 'work' ? 'work' : 'lines')}><option value="graph" disabled={config.model === 'c'}>{vi.graph}</option><option value="lines">{vi.lines}</option><option value="work" disabled={!['b', 'c'].includes(config.model)}>{m.work.benchmark}</option></select></label>
         <label>{vi.threads}<input type="number" min="1" max={device?.cores ?? 256} value={config.threads} onChange={(e) => set('threads', Number(e.target.value))}/></label>
         <label>{vi.maxImageSide}<select value={config.maxImageSide} onChange={(e) => set('maxImageSide', Number(e.target.value))}>{[512, 768, 1024].map((side) => <option key={side} value={side}>{side} px</option>)}</select></label>
         <label>{vi.readTimeout}<input type="number" min="1" max="3600" value={config.readTimeout! / 1000} onChange={(e) => set('readTimeout', Number(e.target.value) * 1000)}/></label>
@@ -99,6 +104,15 @@ export function BenchmarkScreen() {
         <label>{vi.minRam}<input type="number" min="1" max="64" step="0.5" value={config.minRamGb} onChange={(e) => set('minRamGb', Number(e.target.value))}/></label>
         <label>{vi.backgroundIdle}<input type="number" min="1" max="60" value={config.backgroundIdleMinutes} onChange={(e) => set('backgroundIdleMinutes', Number(e.target.value))}/></label>
       </div>
+      {config.mode === 'work' && <div className="dataset"><p>{m.work.specNote}</p>
+        <button onClick={() => specInput.current?.click()}>{m.work.specFile}</button>
+        <input ref={specInput} hidden type="file" accept="application/json,.json" onChange={(event) => {
+          const file = event.target.files?.[0]; event.target.value = '';
+          if (file) void file.text().then((json) => { const specs = readWorkSpecs(json); set('workSpecs', specs); setMessage(m.work.specReady(Object.keys(specs).length)); })
+            .catch(() => { setConfig(({ workSpecs: _old, ...rest }) => rest); setMessage(m.work.invalidSpecs); });
+        }}/>
+        {!workReady && <p className="warning">{m.work.invalidSpecs}</p>}
+      </div>}
       {config.model === 'a' && config.mode === 'graph' && <p className="warning">{vi.textOnly}</p>}
       {lowRam && <div className="warning"><p>{vi.lowRam}</p><label><input type="checkbox" checked={config.allowLowRam} onChange={(e) => set('allowLowRam', e.target.checked)}/>{vi.allowLowRam}</label></div>}
       <div className="actions"><button disabled={!native} onClick={() => action(async () => addPhoto(await captureImage(), 'camera', 'system'))}>{vi.camera}</button>
@@ -108,7 +122,7 @@ export function BenchmarkScreen() {
       </fieldset>
       <p>{dataset ? vi.datasetSummary(dataset.name, dataset.entries.length, dataset.location) : images.length ? `${vi.queued}: ${images.length}` : vi.empty}</p>
       <div className="thumbnails">{images.map((image) => <img key={image.id} src={image.dataUrl} alt={image.id}/>)}</div>
-      <div className="actions"><button className="primary" disabled={!native || busy || downloading || !ready || (!images.length && !dataset) || (lowRam && !config.allowLowRam)} onClick={() => action(run)}>{vi.run}</button>
+      <div className="actions"><button className="primary" disabled={!native || busy || downloading || !ready || !workReady || (!images.length && !dataset) || (lowRam && !config.allowLowRam)} onClick={() => action(run)}>{vi.run}</button>
       <button disabled={!native || downloading} onClick={() => action(async () => { if (abort.current) abort.current.abort(); else await mobile.stop(); })}>{busy ? vi.cancel : vi.stop}</button>
       <button disabled={busy} onClick={() => { setImages([]); setDataset(null); setResults([]); }}>{vi.clear}</button></div>
       <h2>{vi.results}</h2>
@@ -124,17 +138,18 @@ function Result({ result, image, dataset }: { result: ImageResult; image: BenchI
   useEffect(() => { setPreview(image?.dataUrl); }, [image]);
   const previewEntry = dataset?.entries.find((e) => e.id === result.id);
   const marks = flagOverlays(result);
-  return <article><h3>{result.id} · {vi[result.config.model]} · {vi[result.config.mode]} · {result.config.passes}</h3>
+  return <article><h3>{result.id} · {vi[result.config.model]} · {result.config.mode === 'work' ? m.work.benchmark : vi[result.config.mode]} · {result.config.passes}</h3>
     {previewEntry && dataset && <button onClick={() => { if (preview) setPreview(null); else void mobile.datasetImage({ name: dataset.name, file: previewEntry.file, location: dataset.location }).then(({ dataUrl }) => setPreview(dataUrl)).catch(() => {}); }}>{preview ? vi.hideImage : vi.showImage}</button>}
     {preview && <div className="preview"><img src={preview} alt={result.id} onLoad={(e) => setSize([e.currentTarget.naturalWidth, e.currentTarget.naturalHeight])}/>
-      {size && <svg viewBox={`0 0 ${size[0]} ${size[1]}`} aria-label={vi.flags}>{marks.map((m, i) => <rect key={i} x={m.box[0]} y={m.box[1]} width={m.box[2] - m.box[0]} height={m.box[3] - m.box[1]}><title>{m.label}</title></rect>)}</svg>}
+      {size && <svg viewBox={result.config.mode === 'work' ? '0 0 1000 1000' : `0 0 ${size[0]} ${size[1]}`} preserveAspectRatio="none" aria-label={vi.flags}>{marks.map((m, i) => <rect key={i} x={m.box[0]} y={m.box[1]} width={m.box[2] - m.box[0]} height={m.box[3] - m.box[1]}><title>{m.label}</title></rect>)}</svg>}
     </div>}
     <p>{vi.total}: {ms(result.totalMs)} · {result.reusedModel ? vi.warm : vi.firstLoad}: {ms(result.modelLoadMs)} · {result.config.model === 'c' ? vi.appPeak : vi.peak}: {result.memory?.peakMemoryMb === undefined ? vi.noMemory : `${result.memory.peakMemoryMb.toFixed(1)} MB`}</p>
     {result.wasm && <p>{vi.wasmThreads}: {result.wasm.numThreads} | crossOriginIsolated: {String(result.wasm.crossOriginIsolated)} | SIMD</p>}
     <p>{vi.verify}: {ms(result.modelVerifyMs)}</p>
     {result.memory?.cpuVariant && <p>{vi.cpuVariant}: {result.memory.cpuVariant}</p>}
     <p>{result.usage.serverTimings ? `${vi.prompt}: ${ms(result.usage.serverTimings.promptMs)} · ${vi.predicted}: ${ms(result.usage.serverTimings.predictedMs)}` : vi.noTimings}</p>
-    {result.errorCode && <p className="warning">{result.errorCode}: {vi.errors[result.errorCode]}</p>}
+    {result.errorCode && <p className="warning">{result.errorCode}: {result.errorCode === 'invalid_work_spec' ? m.work.invalidSpecs : vi.errors[result.errorCode]}</p>}
+    {result.grade && <p>{m.verdictNames[result.grade.result.verdict.toLowerCase() as keyof typeof m.verdictNames]} · {result.grade.result.message}</p>}
     {result.outcome && <><Graph graph={result.outcome.graph} flags={result.outcome.spec?.uncertain ?? result.outcome.graphUncertain}/><p>{vi.noBox}</p><pre>{JSON.stringify(result.outcome, null, 2)}</pre></>}
     {result.linePasses?.map((pass, i) => <div key={i}><h4>{vi.linePass} {i + 1}</h4>{pass.lines.map((line, j) => <p key={j} className={line.conf < 0.85 || line.alternatives.length ? 'flag' : ''}>{line.text} <small>{line.conf.toFixed(3)}{line.alternatives.length ? ` · ${line.alternatives.join(' / ')}` : ''}</small></p>)}</div>)}
   </article>;

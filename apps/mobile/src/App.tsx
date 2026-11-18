@@ -6,6 +6,8 @@ import { ConfirmScreen } from './ConfirmScreen.js';
 import { GraphEditScreen } from './GraphEditScreen.js';
 import { HomeScreen } from './HomeScreen.js';
 import { ResultScreen } from './ResultScreen.js';
+import { WorkScreen } from './WorkScreen.js';
+import { sampleWorkLines, sampleWorkPages, sampleWorkSpec } from './work-sample.js';
 import { HistoryScreen, SettingsScreen } from './SecondaryScreens.js';
 import { Topbar } from './product-ui.js';
 import { productVi as m } from './product-messages.vi.js';
@@ -15,7 +17,7 @@ import { workerRunner } from './figure-suggest.js';
 import { emptyProductActions, sampleConfirmation, sampleCorrect, sampleHistory, sampleInsufficient, samplePending, sampleReader, sampleWrong } from './sample-data.js';
 import type { HistoryItem, ResultData, Tab } from './product-types.js';
 
-type Page = Tab | 'confirm' | 'result' | 'benchmark' | 'graph';
+type Page = Tab | 'confirm' | 'result' | 'benchmark' | 'graph' | 'work';
 /** The figure reader works on a 1000 px copy; the photo itself is never stored. */
 const decodeForFigure = async (dataUrl: string) => (await decodeImage(dataUrl, 1000)).resized;
 
@@ -53,7 +55,8 @@ export function App() {
     }}/>
     {page === 'home' && <HomeScreen state="du-lieu" reader={sampleReader} history={sampleHistory} actions={actions} onNavigate={setPage} onOpenHistory={openHistory}/>}
     {page === 'history' && <HistoryScreen history={sampleHistory} onNavigate={setPage} onOpenHistory={openHistory}/>}
-    {page === 'settings' && <SettingsScreen reader={sampleReader} onNavigate={setPage} onBenchmark={() => setPage('benchmark')}/>}
+    {page === 'settings' && <SettingsScreen reader={sampleReader} onNavigate={setPage} onBenchmark={() => setPage('benchmark')} onWork={() => setPage('work')}/>}
+    {page === 'work' && <WorkScreen spec={sampleWorkSpec} initialLines={sampleWorkLines} pages={sampleWorkPages} onBack={() => setPage('settings')}/>}
     {page === 'confirm' && <ConfirmScreen state="du-lieu" data={sampleConfirmation} actions={actions} onBack={back}/>}
     {page === 'graph' && <GraphEditScreen key={graphKey} photo={photo} decode={decodeForFigure} runner={workerRunner}
       onBack={() => { setPhoto(null); back(); }} onPickPhoto={pickPhoto}/>}

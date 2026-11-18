@@ -4,6 +4,31 @@ import { ConfirmScreen } from './ConfirmScreen.js';
 import { productVi as m } from './product-messages.vi.js';
 import { Actions, Crop, LoadingScreen, Topbar } from './product-ui.js';
 import type { CorrectResult, InsufficientResult, PendingResult, ProductActions, ResultData, WrongResult } from './product-types.js';
+import { WorkCrop } from './WorkCrop.js';
+import type { WorkPage, WorkReview } from './work-session.js';
+import type { WorkQuestion } from '@mathtwin/work';
+
+/** Real pure-function grading of sample work; no UI-1 numeric assumptions. */
+export function WorkResultScreen({ review, pages, onBack, onQuestion }: {
+  review: WorkReview; pages: WorkPage[]; onBack: () => void; onQuestion: (question: WorkQuestion) => void;
+}) {
+  const [confirmed, setConfirmed] = React.useState<string | null>(null);
+  const { result, readingCheck, questions } = review.grade;
+  const verdict = result.verdict.toLowerCase() as keyof typeof m.verdictNames;
+  const style = { dung: 'v-ok', sai: 'v-wrong', can_xac_nhan: 'v-confirm', khong_du_can_cu: 'v-none' }[verdict];
+  const signature = JSON.stringify(readingCheck);
+  return <div className="screen work-screen"><Topbar title={m.work.result} onBack={onBack}/><div className="content">
+    <div className={`verdict ${style}`} role="status"><div><h2>{result.verdict === 'SAI' && result.firstErrorStep ? m.wrongStep(result.firstErrorStep) : m.verdictNames[verdict]}</h2><p>{result.message}</p></div></div>
+    {result.verdict === 'SAI' && readingCheck && <div className="card question-card">
+      <WorkCrop pages={pages} page={readingCheck.page} box={readingCheck.box}/>
+      <h2 className="section-title">{m.work.readingCheck}</h2><p className="work-text math">{readingCheck.shownText}</p>
+      {confirmed === signature ? <p role="status">{m.work.confirmed}</p> : <button className="btn btn-primary" onClick={() => setConfirmed(signature)}>{m.work.yes}</button>}
+      <button className="btn btn-outline" onClick={() => onQuestion(readingCheck)}>{m.work.edit}</button>
+    </div>}
+    {questions.map((question, index) => <button className="card work-step" key={index} onClick={() => onQuestion(question)}>
+      <b>{m.work.question}</b><span className="work-text">{question.shownText}</span></button>)}
+  </div><Actions><button className="btn btn-outline btn-block" onClick={onBack}>{m.work.review}</button></Actions></div>;
+}
 
 // Wireframe states: data = SAI, empty = ĐÚNG, error = KHÔNG ĐỦ CĂN CỨ.
 // Require matching data at the boundary so UI never fabricates a verdict or a number.

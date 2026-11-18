@@ -8,6 +8,8 @@ import type { DecodedImage } from './images.js';
 import { errorCode } from './messages.vi.js';
 import manifest from '../../../tools/models/manifest.json';
 import type { OcrRunner } from './ocr.js';
+import { benchmarkWork, normalizedWorkLines } from './work-benchmark.js';
+import { validateSpec } from '@mathtwin/core';
 
 export const engineFor = (model: BenchModel): string => model === 'a' ? 'offline:paddleocr-vl-1.5' : model === 'c' ? 'offline:vietocr-onnx' : model === 'd' ? 'offline:figure-cv' : 'offline:qwen3-vl-2b';
 /** Parse failures happen after a complete HTTP response; the server is healthy and stays warm. */
@@ -38,6 +40,32 @@ export class Benchmark {
 
   async run(image: BenchImage, config: BenchmarkConfig, signal: AbortSignal): Promise<ImageResult> {
     if (this.active) throw { code: 'busy' };
+    if (config.mode === 'work') {
+      const spec = config.workSpecs?.[image.id];
+      if (!['b', 'c'].includes(config.model) || !spec || !validateSpec(spec).ok) {
+        const engine = engineFor(config.model);
+        return { id: image.id, imageSource: image.imageSource, config, engine, errorCode: 'invalid_work_spec',
+          usage: { engine, passes: 0, latencyMs: 0 }, totalMs: 0, modelLoadMs: 0, modelVerifyMs: 0, reusedModel: false };
+      }
+      const began = this.now();
+      const result = await this.run(image, { ...config, mode: 'lines' }, signal);
+      result.config = { ...config };
+      if (!result.errorCode && result.linePasses?.[0]) {
+        this.active = true;
+        try {
+          check(signal);
+          const decoded = await this.decode(image.dataUrl, config.maxImageSide ?? defaultMaxImageSide);
+          check(signal);
+          for (const pass of result.linePasses) pass.lines = normalizedWorkLines(pass.lines, decoded.original, config.model as 'b' | 'c');
+          Object.assign(result, benchmarkWork(spec, result.linePasses[0].lines, decoded.original));
+          // Keep the device import contract; includes page/index and cancellation evidence.
+          result.linePasses[0].lines = result.lines!;
+        } catch (error) { result.errorCode = signal.aborted ? 'aborted' : errorCode(error); }
+        finally { this.active = false; }
+      }
+      result.totalMs = this.now() - began;
+      return result;
+    }
     if (config.model === 'd') return this.runFigure(image, config, signal);
     if (config.model === 'c') return this.runOcr(image, config, signal);
     config = { ...config, maxImageSide: config.maxImageSide ?? defaultMaxImageSide,
@@ -281,7 +309,7 @@ export function exportReport(report: BenchmarkReport): string {
     maxImageSide: r.config.maxImageSide ?? defaultMaxImageSide, readTimeout: r.config.readTimeout ?? defaultReadTimeout, maxTokens: r.config.maxTokens ?? defaultMaxTokens, dry: r.config.dry ?? defaultDry,
     backgroundIdleMinutes: r.config.backgroundIdleMinutes, backend: r.config.model === 'c' ? 'WASM' : 'CPU', cpuVariant: r.memory?.cpuVariant, cpuVariantSource: r.memory?.cpuVariantSource },
     imageSource: r.imageSource, captureMethod: r.captureMethod,
-    outcome: r.outcome, linePasses: r.linePasses?.map((pass) => ({ ...pass, lines: pass.lines.map((line) => ({ ...line,
+    outcome: r.outcome, lines: r.lines, parsed: r.parsed, grade: r.grade, linePasses: r.linePasses?.map((pass) => ({ ...pass, lines: pass.lines.map((line) => ({ ...line,
       ...(line.charConf ? { charConf: [...line.charConf] } : {}) })) })), usage: r.usage, totalMs: r.totalMs, modelLoadMs: r.modelLoadMs,
     modelVerifyMs: r.modelVerifyMs, reusedModel: r.reusedModel, memory: r.memory, wasm: r.wasm, errorCode: r.errorCode, serverRestarted: r.serverRestarted ?? false })) }, function (this: unknown, key, value: unknown) {
       // StatementCheck.source is a semantic vertex reference, required for desktop comparison.

@@ -1,5 +1,7 @@
 import type { ReadOutcome, ReadUsage, TextLine } from '@mathtwin/reader';
 import type { DryConfig } from '@mathtwin/reader-llamacpp-shared';
+import type { ProblemSpec } from '@mathtwin/core';
+import type { ParsedWork, WorkGrade, WorkLine } from '@mathtwin/work';
 
 export type Model = 'a' | 'b' | 'c';
 /** Benchmark engines: llama.cpp A/B, WASM OCR C, or D (pure-TS hand-drawn graph structure reader, no model file). */
@@ -12,7 +14,8 @@ export interface ModelState { model: Model; bytes: number; downloadedBytes: numb
 export interface Session { port: number; apiKey: string; reused: boolean; loadMs: number; verifyMs?: number }
 export interface MemoryPressure { callback: 'onTrimMemory' | 'onLowMemory'; trimLevel: number | null }
 export interface ServerState { alive: boolean; peakMemoryMb?: number; rssMemoryMb?: number; exitCode?: number; cpuVariant?: string; cpuVariantSource?: 'maps' | 'log'; errorCode?: 'cpu_backend_unknown'; memoryPressure?: MemoryPressure }
-export interface BenchmarkConfig { model: BenchModel; passes: 1 | 2; mode: 'graph' | 'lines'; threads: number; minRamGb: number; allowLowRam: boolean; backgroundIdleMinutes: number;
+export interface BenchmarkConfig { model: BenchModel; passes: 1 | 2; mode: 'graph' | 'lines' | 'work'; threads: number; minRamGb: number; allowLowRam: boolean; backgroundIdleMinutes: number;
+  workSpecs?: Record<string, ProblemSpec>;
   maxImageSide?: number; readTimeout?: number; maxTokens?: number; dry?: DryConfig }
 export interface DatasetEntry { id: string; file: string }
 export type DatasetLocation = 'internal' | 'external';
@@ -47,6 +50,7 @@ export interface BenchImage { id: string; dataUrl: string; imageSource: ImageSou
 export interface ImageResult {
   id: string; engine: string; config: BenchmarkConfig;
   outcome?: ReadOutcome; linePasses?: { lines: TextLine[]; usage: ReadUsage }[];
+  lines?: WorkLine[]; parsed?: ParsedWork; grade?: WorkGrade;
   usage: ReadUsage; totalMs: number; modelLoadMs: number; modelVerifyMs: number; reusedModel: boolean;
   memory?: ServerState; errorCode?: string; serverRestarted?: boolean;
   wasm?: { numThreads: number; crossOriginIsolated: boolean; simd: true };

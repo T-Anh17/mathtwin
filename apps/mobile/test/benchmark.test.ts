@@ -4,6 +4,12 @@ import { flagOverlays } from '../src/overlays.js';
 import { runBatch } from '../src/batch.js';
 import type { BenchmarkConfig, DeviceInfo, HttpTransport, MobilePlugin, Session, ServerState } from '../src/contracts.js';
 import type { DecodedImage } from '../src/images.js';
+import { sampleWorkSpec } from '../src/work-sample.js';
+import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import sharp from 'sharp';
+import { evaluateWork } from '../../../tools/eval/src/work-eval.js';
 
 const device: DeviceInfo = { manufacturer: 'Test', model: 'Phone', android: '16', sdk: 36, cores: 8,
   totalRamBytes: 8e9, availableRamBytes: 5e9, freeStorageBytes: 20e9 };
@@ -45,6 +51,57 @@ function fake() {
 }
 const image = { id: 'case-1', dataUrl: decoded.encoded, imageSource: 'gallery' as const };
 const signal = () => new AbortController().signal;
+
+describe('work benchmark B/C (fake readers, no device or model)', () => {
+  it.each(['b', 'c'] as const)('exports %s lines with charConf, parsed, grade and the device linePasses contract', async (model) => {
+    const { plugin, http } = fake();
+    const pixels = new Uint8ClampedArray(200 * 100 * 4).fill(255);
+    const decode = mock.fn(async () => ({ ...decoded, original: { width: 200, height: 100, pixels } }));
+    mock.mocked(http.post).mockResolvedValue({ status: 200, data: response('{"lines":[{"text":"Đồ thị có 3 đỉnh.","box":[100,200,900,600],"region":"solution"}]}') });
+    const lines = [{ text: 'Đồ thị có 3 đỉnh.', conf: 0.99, charConf: Array.from('Đồ thị có 3 đỉnh.', () => 0.99),
+      box: [100, 200, 900, 600] as [number, number, number, number], alternatives: [], region: 'solution' as const }];
+    const ocr = mock.fn(async () => ({ linePasses: [{ lines, usage: { engine: 'offline:vietocr-onnx', passes: 1, latencyMs: 1 } }],
+      loadMs: 0, wasm: { numThreads: 1, crossOriginIsolated: false, simd: true as const } }));
+    const runner = new Benchmark(plugin, http, decode, undefined, ocr);
+    const result = await runner.run(image, { ...config, model, mode: 'work', passes: 1, workSpecs: { [image.id]: sampleWorkSpec } }, signal());
+    expect(result.errorCode).toBeUndefined(); expect(result.grade?.result.verdict).toBe('DUNG');
+    expect(result.lines?.[0]).toMatchObject({ box: [100, 200, 900, 600], page: 0, index: 0 });
+    const exported = JSON.parse(exportReport({ version: 1, device, results: [result] }));
+    expect(exported.results[0]).toMatchObject({ config: { mode: 'work' }, lines: [{ charConf: expect.any(Array) }],
+      parsed: { steps: [{ lines: [0] }] }, grade: { result: { verdict: 'DUNG' } } });
+    expect(exported.results[0].linePasses[0].lines).toEqual(exported.results[0].lines);
+    expect(exported.results[0].config.workSpecs).toBeUndefined();
+    expect(JSON.stringify(exported)).not.toMatch(/data:image|apiKey|private\.jpg|pixels/);
+    // Exercise the actual eval:work --lines device loader against a local fixture,
+    // independent of the sealed work-text/work-text-tables datasets.
+    const folder = await mkdtemp(join(tmpdir(), 'mathtwin-work-device-'));
+    try {
+      const sample = join(folder, 'testdata/images-synthetic-hw', image.id);
+      await mkdir(sample, { recursive: true });
+      await writeFile(join(sample, 'truth.json'), JSON.stringify(sampleWorkSpec));
+      await writeFile(join(sample, 'meta.json'), JSON.stringify({ source: 'synthetic_handwriting', capture: 'straight',
+        blurred: false, synthetic: true, notes: '', questionFormat: 'tu_luan' }));
+      await writeFile(join(sample, 'lines.json'), JSON.stringify(result.lines));
+      await writeFile(join(sample, 'work.json'), JSON.stringify({ claims: [{ type: 'vertex_count', value: 3, step: 1, raw: lines[0]!.text }],
+        lineOf: { 1: [0] }, expected: { verdict: 'DUNG' }, prose: [] }));
+      await sharp({ create: { width: 200, height: 100, channels: 4, background: '#fff' } }).png().toFile(join(sample, '1.png'));
+      const file = join(folder, 'device.json'); await writeFile(file, JSON.stringify(exported));
+      const report = await evaluateWork(['--set', 'synthetic-hw', '--lines', 'device', file, '--parser', 'real'], folder, 'test');
+      expect(report.summary.total).toBe(1); expect(report.summary.completeCorrect).toBe(1);
+      expect(report.summary.verdictCorrect).toBe(1);
+    } finally {
+      if (!folder.startsWith(join(tmpdir(), 'mathtwin-work-device-'))) throw new Error('Unexpected test directory');
+      await rm(folder, { recursive: true, force: true });
+    }
+  });
+  it('refuses a missing spec and unsupported models before touching native readers', async () => {
+    const { runner, plugin, http } = fake();
+    for (const model of ['a', 'b', 'c', 'd'] as const) {
+      expect((await runner.run(image, { ...config, model, mode: 'work' }, signal())).errorCode).toBe('invalid_work_spec');
+    }
+    expect(plugin.start).not.toHaveBeenCalled(); expect(plugin.ocrModels).not.toHaveBeenCalled(); expect(http.post).not.toHaveBeenCalled();
+  });
+});
 
 describe('Android benchmark flow with fake native plugin (no device/model/network)', () => {
   it('defaults to 768px, 300s and shared DRY, and exports the effective settings', async () => {

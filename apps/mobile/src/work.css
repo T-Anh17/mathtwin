@@ -1,0 +1,14 @@
+.work-screen .work-buttons { display: flex; flex-wrap: wrap; gap: 10px; width: 100%; }
+.work-screen .work-buttons > .btn { flex: 1 1 180px; height: auto; min-height: 48px; white-space: normal; padding: 12px; }
+.work-step { display: flex; flex-direction: column; gap: 8px; width: 100%; text-align: left; border: 0; background: transparent; padding: 12px 0; cursor: pointer; font: inherit; }
+.work-step[aria-pressed="true"] { color: var(--primary); text-decoration: underline; }
+.work-line.work-unknown { background: var(--warning-bg); border-color: var(--warning); }
+.work-line.work-struck { background: var(--neutral-bg); border-style: dashed; }
+.work-deleted { text-decoration: line-through; }
+.work-editor, .work-field { display: flex; flex-direction: column; gap: 10px; }
+.work-field { font-size: 14px; }
+.work-field textarea { font: inherit; color: var(--foreground); background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--radius); padding: 12px; min-height: 88px; width: 100%; resize: vertical; }
+.work-screen :is(button, textarea):focus-visible { outline: 2px solid var(--border-focus); outline-offset: 3px; }
+.work-crop { width: 100%; display: block; border-radius: var(--radius); border: 1px solid var(--border-strong); background: var(--surface); }
+.work-text { white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; }
+.work-screen .option { white-space: pre-wrap; height: auto; min-height: 48px; }

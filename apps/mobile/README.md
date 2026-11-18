@@ -341,6 +341,76 @@ adb pull /sdcard/Android/data/vn.mathtwin.app/files/results ./reports/device-res
 
 Lệnh lấy về do reviewer chạy trong lô đo thiết bị; không chạy trong Lô 2.5.
 
+## Lô 3.7 — Bài làm máy đọc (dữ liệu mẫu)
+
+Mở **Cài đặt → Bài làm máy đọc · dữ liệu mẫu**. Đây là một bản mẫu độc lập, chưa nối luồng
+chụp đề → xác nhận → chụp bài → chấm (giai đoạn 4). `work-sample.ts` chứa đề, các dòng và ảnh SVG
+vẽ bằng code khớp vùng dòng; không phải ảnh hay kết quả OCR thật. Các màn UI-1 cũ vẫn dùng mẫu cũ.
+
+- Chạm bước đã hiểu hoặc một dòng để mở vùng cắt đúng trang. Dòng chưa hiểu có nền cảnh báo;
+  dòng gạch có nền trung tính, viền đứt và chữ gạch. Dòng thiếu box hiện cả trang kèm thông báo.
+- Sửa ô chữ cập nhật ngay qua `applyWorkAnswers → parseWork → gradeWork` trong `work-session.ts`.
+  Chữ trên dòng gạch vẫn bị bỏ qua cho tới khi chọn **Dòng này không bị gạch**.
+- **Kết quả** dùng `WorkResultScreen` trong `ResultScreen.tsx`, nhận kết quả thật của các hàm thuần
+  trên dữ liệu mẫu. CẦN XÁC NHẬN mở từng `WorkQuestion`: vùng cắt, chữ đang hiểu, lựa chọn nhanh,
+  ô gõ riêng cho từng dòng (kể cả nhiều trang), xác nhận gạch và **Bỏ qua dòng này**.
+- SAI có `readingCheck`, xác nhận một chạm **Đúng là em viết vậy** hoặc sửa rồi chấm lại.
+  Xác nhận chữ không đổi kết luận SAI. Không lưu ảnh/chữ hay trạng thái mẫu sau khi rời màn.
+- Token/font/class UI-1 trong `tokens.css` và `ui.css` được giữ nguyên; phần mới dùng cùng token
+  và bổ sung `work.css`. Chuỗi sản phẩm mới nằm trong `product-messages.vi.ts`.
+
+### Đo chế độ work bằng B/C
+
+Trong **Cài đặt → Đo hiệu năng (kỹ thuật)**, chọn B hoặc C, chế độ **Bài làm (work)** và nạp JSON
+ánh xạ mã ảnh sang `ProblemSpec` đã xác nhận. Ví dụ cấu trúc file:
+
+```json
+{
+  "photo-1": {
+    "graph": {
+      "directed": false,
+      "vertices": [{ "id": "A", "label": "A" }, { "id": "B", "label": "B" }],
+      "edges": [{ "id": "AB", "u": "A", "v": "B", "w": 1 }]
+    },
+    "task": { "type": "elements" },
+    "questionFormat": "tu_luan"
+  }
+}
+```
+
+Ảnh chọn riêng dùng `photo-1`, `photo-2`…; bộ ảnh dùng đúng `entries[].id` của bộ Đo.
+Nạp đủ đề cho các mã ảnh mới bật đo; không dùng đề mẫu thay cho đề thiếu. Mỗi mã là **một ảnh / một trang**
+theo hợp đồng bộ Đo hiện tại, chưa ghép nhiều ảnh thành một bài. Bộ đọc B/C và các thiết lập cũ được dùng lại.
+Lượt chữ đầu tiên được hiểu, dò gạch và chấm; các lượt chữ còn lại vẫn có trong file xuất.
+
+File xuất và file lưu tiến độ có `results[].lines` (`page`, `index`, `box` 0–1000, `charConf` nếu bộ đọc
+cung cấp, `struck`, `strikeScore`), `parsed`, `grade`. B trả box pixel nên riêng `work` đổi sang 0–1000;
+C đã trả 0–1000. `linePasses[0].lines` chứa cùng các dòng đã chuẩn hóa để CLI hiện tại đọc được;
+không thay CLI/parser/grade. Không tự tạo `charConf` nếu bộ đọc không cung cấp.
+Thời gian tổng gồm đọc, giải mã lại ảnh cục bộ để dò gạch, hiểu và chấm; `usage` giữ số đo bộ đọc.
+
+Sau khi người dùng tự đưa file xuất lên máy tính, với bộ ảnh và mã bài tương ứng:
+
+```powershell
+npm run eval:work -- --set synthetic-hw --lines device path/to/export.json --parser real
+```
+
+CLI yêu cầu file đủ mọi mã trong tập đã chọn. Ảnh/chữ không gửi tới dịch vụ ngoài máy; chỉ thao tác
+**Xuất kết quả** hoặc lưu tiến độ của màn Đo mới ghi chữ/JSON vào máy. File không chứa pixel, data URL,
+khóa server hay đường dẫn ảnh. Lô 3.7 không chạy Đo trên điện thoại, không gọi adb, không tải model.
+
+### Đối chiếu bộ nhận diện
+
+| Khối | Bản dựng Lô 3.7 |
+| --- | --- |
+| Nền giấy, card trang, chữ/nút mực | Dùng nguyên token UI-1; không sửa `tokens.css` / `ui.css` |
+| Khung hỏi từng chỗ | Dùng `Topbar`, `Actions`, `.card.question-card`, `.options/.option`; tách WorkQuestion vì cần chữ và nhiều dòng/trang |
+| Kết quả + vùng trên ảnh | Dùng `.verdict`, bốn màu nghĩa, crop theo box thật 0–1000; không dùng tọa độ ảnh cố định của mẫu UI-1 |
+| Bài làm máy đọc | Khối mới theo yêu cầu 3.7; nền cảnh báo cho chưa hiểu, trung tính cho gạch; không có wireframe riêng |
+
+Test mới dùng bộ đọc/plugin giả, ảnh trắng cục bộ và mẫu tự tạo; kiểm cả file xuất B/C qua bộ nạp thật
+`eval:work --lines device`, không mở bộ mẫu `work-text` / `work-text-tables`.
+
 ## Kiểm tra
 
 `npm test` typecheck strict TS và chạy Vitest với plugin/HTTP/decoder giả: graph hai lượt độc lập,
