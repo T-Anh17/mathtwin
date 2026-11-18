@@ -3,6 +3,7 @@ import type { ParsedStep, ParsedWork, WorkLine, WorkVocabulary } from '../types.
 import { workMessages } from '../messages.vi.js';
 import { parsePrimary } from './primary.js';
 import { tableLike, validTableReading } from './table.js';
+import { strikeUncertain } from '../strikes.js';
 
 const bodyOf = ({ step: _step, raw: _raw, conf: _conf, box: _box, ...body }: ParsedStep['claim']): ClaimBody => body;
 const key = (step: ParsedStep): string => step.lines.join(',');
@@ -14,7 +15,7 @@ export function parseWork(lines: WorkLine[], vocab: WorkVocabulary, opts?: { con
   const protectedLines = new Set(lines.some((line) => line.alternatives.length)
     ? parsePrimary(selected, vocab, opts).ignored.filter((item) => ['question', 'figure', 'struck'].includes(item.reason)).map((item) => item.line) : []);
   const replace = (position: number, text: string): WorkLine[] => selected.map((line, i) => i === position ? { ...line, text } : line);
-  const eligible = (line: WorkLine): boolean => !protectedLines.has(line.index) && !line.skipped && !line.struck && line.region !== 'question' && line.region !== 'figure';
+  const eligible = (line: WorkLine): boolean => !protectedLines.has(line.index) && !line.skipped && !line.struck && !strikeUncertain(line) && line.region !== 'question' && line.region !== 'figure';
   for (let i = 0; i < selected.length; i++) {
     const line = selected[i]!;
     if (!eligible(line) || !line.alternatives.length) continue;

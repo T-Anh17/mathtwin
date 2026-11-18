@@ -7,6 +7,7 @@ import type { ProseContext } from './prose.js';
 import { language, sameQuestion, symbols } from './text.js';
 import { parseTable, tableLike } from './table.js';
 import { clauseEvidence, readingConfidence, stepConfidence } from './confidence.js';
+import { strikeUncertain } from '../strikes.js';
 
 export function parsePrimary(lines: WorkLine[], vocab: WorkVocabulary, opts?: { confThreshold?: number }): ParsedWork {
   const parsed: ParsedWork = { steps: [], ignored: [], unchecked: [], issues: [] };
@@ -18,7 +19,7 @@ export function parsePrimary(lines: WorkLine[], vocab: WorkVocabulary, opts?: { 
     if (line.struck) return 'struck';
     if (line.region === 'question') return 'question';
     if (line.region === 'figure') return 'figure';
-    if (!line.text.trim() && readingConfidence(line) >= threshold) return 'empty';
+    if (!line.text.trim() && !strikeUncertain(line) && readingConfidence(line) >= threshold) return 'empty';
     if (vocab.questionText.some((q) => sameQuestion(line.text, q))) return 'question';
     // A copied true/false prompt is not an answer. Bare a) Đ / a) S is handled below.
     if (vocab.questionFormat === 'dung_sai' && /^[a-z][).:]\s+/u.test(language(line.text, vocab.vertexLabels))
@@ -28,7 +29,7 @@ export function parsePrimary(lines: WorkLine[], vocab: WorkVocabulary, opts?: { 
   const tableLines = new Set<number>();
   for (let start = 0; start < ordered.length;) {
     let end = start;
-    while (end < ordered.length && !ignoredReason(ordered[end]!) && tableLike(ordered[end]!, vocab)) end++;
+    while (end < ordered.length && !ignoredReason(ordered[end]!) && !strikeUncertain(ordered[end]!) && tableLike(ordered[end]!, vocab)) end++;
     if (end - start >= 3) for (const row of ordered.slice(start, end)) tableLines.add(row.index);
     start = Math.max(start + 1, end);
   }
@@ -60,9 +61,12 @@ export function parsePrimary(lines: WorkLine[], vocab: WorkVocabulary, opts?: { 
       if (ignored === 'figure' && /\d|=|[\p{L}]/u.test(line.text)) issue('figure_annotations', [line], 'warning');
       continue;
     }
+    if (strikeUncertain(line)) {
+      parsed.unchecked.push(line.index); issue('struck_uncertain', [line]); continue;
+    }
     if (line.region === 'table' || tableLines.has(line.index)) {
       const sources: WorkLine[] = [];
-      while (i < ordered.length && !ignoredReason(ordered[i]!) && (ordered[i]!.region === 'table' || tableLines.has(ordered[i]!.index))) sources.push(ordered[i++]!);
+      while (i < ordered.length && !ignoredReason(ordered[i]!) && !strikeUncertain(ordered[i]!) && (ordered[i]!.region === 'table' || tableLines.has(ordered[i]!.index))) sources.push(ordered[i++]!);
       i--;
       const found = vocab.task === 'shortest_path' ? parseTable(sources, vocab) : undefined;
       if (found) for (const entry of found) append(entry.body, entry.sources, entry.inferred ? 'inferred' : 'table', entry.evidence);
@@ -72,7 +76,7 @@ export function parsePrimary(lines: WorkLine[], vocab: WorkVocabulary, opts?: { 
     const sources = [line];
     while (/(?:→|-|=|\+|×|:)\s*$/u.test(symbols(sources.at(-1)!.text))) {
       const next = ordered[i + 1];
-      if (!next || next.page > sources.at(-1)!.page + 1 || ignoredReason(next) || next.region === 'table' || tableLines.has(next.index)) break;
+      if (!next || next.page > sources.at(-1)!.page + 1 || ignoredReason(next) || strikeUncertain(next) || next.region === 'table' || tableLines.has(next.index)) break;
       const route = /(?:→|-)\s*$/u.test(symbols(sources.at(-1)!.text));
       if (!route) {
         if (!/^[\d∞(+\-]/u.test(symbols(next.text)) || /[\p{L}]/u.test(symbols(next.text))) break;

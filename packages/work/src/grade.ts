@@ -72,13 +72,15 @@ export function gradeWork(spec: ProblemSpec, parsed: ParsedWork, opts?: { confTh
   const relevant = (indices: number[]): boolean => !first || indices.some((line) => first.lines.some((index) => line === index || before(line, index)));
   // A doubtful earlier action may change all subsequent state, even if core accepts it.
   const uncertain = parsed.steps.filter((step) => (step.claim.conf ?? 1) < threshold && relevant(step.lines));
-  const unchecked = [...new Set(parsed.unchecked)].filter((line) => relevant([line]));
+  const struck = new Set(parsed.issues.filter((issue) => issue.code === 'struck_uncertain').flatMap((issue) => issue.lines ?? []));
+  const unchecked = [...new Set(parsed.unchecked)].filter((line) => struck.has(line) || relevant([line]));
   if (unchecked.length || uncertain.length) {
     const { errorCode: _errorCode, ...rest } = result;
     output.result = { ...rest, verdict: 'CAN_XAC_NHAN', message: workMessages.confirm_unparsed };
     output.questions.push(...uncertain.map((step) => question('reading', step.lines, step)));
     output.questions.push(...unchecked.map((index) => {
       const line = source.find((item) => item.index === index);
+      if (struck.has(index)) return { ...question('struck', [index]), options: [workMessages.struck_yes, workMessages.struck_no] };
       return question(line && readingConfidence(line) < threshold ? 'reading' : 'unparsed', [index]);
     }));
   }

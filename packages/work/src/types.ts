@@ -1,7 +1,11 @@
 import type { Claim, ClaimBody, GradeResult, ProblemSpec, Task } from '@mathtwin/core';
 import type { TextLine } from '@mathtwin/reader';
 
-export interface WorkLine extends TextLine { page: number; index: number; skipped?: boolean }
+export interface WorkLine extends TextLine {
+  page: number; index: number; skipped?: boolean;
+  /** Pixel cancellation evidence; user struck answers clear this score. */
+  strikeScore?: number;
+}
 export interface WorkVocabulary {
   vertexLabels: string[]; edgeNames: string[]; task: Task['type'];
   questionFormat: ProblemSpec['questionFormat']; statementIds: string[]; questionText: string[];
