@@ -4,9 +4,9 @@ import { productVi as m } from './product-messages.vi.js';
 import { BottomNav, HistoryRows } from './product-ui.js';
 import type { HistoryItem, ReaderStatus, Tab } from './product-types.js';
 
-export function HistoryScreen({ history, onNavigate, onOpenHistory }: { history: readonly HistoryItem[]; onNavigate: (tab: Tab) => void; onOpenHistory: (item: HistoryItem) => void }) {
+export function HistoryScreen({ history, onNavigate, onOpenHistory, onRemove }: { history: readonly HistoryItem[]; onNavigate: (tab: Tab) => void; onOpenHistory: (item: HistoryItem) => void; onRemove?: (item: HistoryItem) => void }) {
   return <div className="screen"><div className="topbar" style={{ paddingLeft: 16 }}><h1>{m.history}</h1></div>
-    <div className="content"><HistoryRows rows={history} onOpen={onOpenHistory}/></div><BottomNav active="history" onNavigate={onNavigate}/></div>;
+    <div className="content">{history.length ? <HistoryRows rows={history} onOpen={onOpenHistory} {...(onRemove ? { onRemove } : {})}/> : <p>{m.noHistory}</p>}</div><BottomNav active="history" onNavigate={onNavigate}/></div>;
 }
 export function SettingsScreen({ reader, onNavigate, onBenchmark, onWork }: { reader: ReaderStatus; onNavigate: (tab: Tab) => void; onBenchmark: () => void; onWork?: () => void }) {
   return <div className="screen"><div className="topbar" style={{ paddingLeft: 16 }}><h1>{m.settings}</h1></div><div className="content">

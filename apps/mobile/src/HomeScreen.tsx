@@ -6,10 +6,12 @@ import { BottomNav, HistoryRows, LoadingScreen } from './product-ui.js';
 import type { HistoryItem, ProductActions, ReaderStatus, ScreenState, Tab } from './product-types.js';
 
 export interface HomeProps {
-  state: ScreenState; reader: ReaderStatus; history: readonly HistoryItem[]; actions: ProductActions;
+  state: ScreenState; reader: ReaderStatus; history: readonly HistoryItem[];
+  actions: Pick<ProductActions, 'onCapture' | 'onManualInput' | 'onDownloadReader' | 'onCancel'>;
   onNavigate: (tab: Tab) => void; onOpenHistory: (item: HistoryItem) => void;
+  onRemove?: (item: HistoryItem) => void;
 }
-export function HomeScreen({ state, reader, history, actions, onNavigate, onOpenHistory }: HomeProps) {
+export function HomeScreen({ state, reader, history, actions, onNavigate, onOpenHistory, onRemove }: HomeProps) {
   if (state === 'dang-tai') return <LoadingScreen title={m.loading.home} onCancel={actions.onCancel}/>;
   const ready = state !== 'loi' && reader.ready;
   return <div className="screen"><div className="topbar" style={{ padding: '0 12px 0 16px' }}>
@@ -22,7 +24,7 @@ export function HomeScreen({ state, reader, history, actions, onNavigate, onOpen
     </div><div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}><span className="section-title">{m.recent}</span>
       {state !== 'rong' && <button className="btn btn-ghost" onClick={() => onNavigate('history')}>{m.viewAll}</button>}</div>
     {state === 'rong' ? <div className="card empty"><div className="empty-icon"><NotebookPen/></div><div className="section-title">{m.noHistory}</div><p className="text-sm muted" style={{ margin: 0 }}>{m.noHistoryDescription}</p></div>
-      : <HistoryRows rows={history.slice(0, 3)} onOpen={onOpenHistory}/>}
+      : <HistoryRows rows={history.slice(0, 3)} onOpen={onOpenHistory} {...(onRemove ? { onRemove } : {})}/>}
     <button className="btn btn-outline btn-block" onClick={actions.onManualInput}><PencilRuler/>{m.manualProblem}</button>
     </div><BottomNav active="home" onNavigate={onNavigate}/></div>;
 }

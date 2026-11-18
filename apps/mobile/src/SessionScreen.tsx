@@ -1,0 +1,20 @@
+import React from 'react';
+import { Topbar } from './product-ui.js';
+import { sessionVi as m } from './flow/messages.vi.js';
+import type { Session, SessionEvent } from './flow/types.js';
+
+/** Stage-driven resume surface. Detailed capture/review/result screens belong to batches 4.2–4.5. */
+export function SessionScreen({ session: s, busy, onEvent, onBack }: {
+  session: Session; busy: boolean; onEvent: (event: SessionEvent) => void; onBack: () => void;
+}) {
+  return <div className="screen" data-stage={s.stage}><Topbar title={m.stages[s.stage]} onBack={onBack}/>
+    <div className="content"><div className="card">
+      <h2 className="section-title">{s.spec ? m.tasks[s.spec.task.type] : m.untitled}</h2>
+      <p>{m.saved}</p>
+      <p>{m.photos(s.problemPhotos.length + s.workPhotos.length)}</p>
+      {s.workLines.map((line) => <p className="math" key={line.index}>{line.text}</p>)}
+    </div>
+    <button className="btn btn-outline btn-block" disabled={busy} onClick={() => onEvent({ type: 'retake', target: 'problem' })}>{m.retakeProblem}</button>
+    {s.specConfirmed && <button className="btn btn-outline btn-block" disabled={busy} onClick={() => onEvent({ type: 'retake', target: 'work' })}>{m.retakeWork}</button>}
+    </div></div>;
+}

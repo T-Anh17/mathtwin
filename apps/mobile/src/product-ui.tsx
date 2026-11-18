@@ -1,5 +1,6 @@
 import React from 'react';
-import { ArrowRight, Camera, ChevronLeft, CircleCheck, CircleDashed, CircleHelp, CircleX, FileQuestion, History, LoaderCircle, RotateCcw, Settings2, X } from 'lucide-react';
+import { ArrowRight, Camera, ChevronLeft, CircleCheck, CircleDashed, CircleHelp, CircleX, FileQuestion, History, LoaderCircle, RotateCcw, Settings2, Trash2, X } from 'lucide-react';
+import { sessionVi } from './flow/messages.vi.js';
 import type { ReactNode } from 'react';
 import { productVi as m } from './product-messages.vi.js';
 import type { CropData, GraphDrawing, HistoryItem, Tab, Verdict } from './product-types.js';
@@ -20,14 +21,15 @@ export function BottomNav({ active, onNavigate }: { active: Tab; onNavigate: (ta
     onClick={(event) => { event.preventDefault(); onNavigate(id); }}><Icon/>{title}</a>)}</nav>;
 }
 
-export function HistoryRows({ rows, onOpen }: { rows: readonly HistoryItem[]; onOpen: (item: HistoryItem) => void }) {
+export function HistoryRows({ rows, onOpen, onRemove }: { rows: readonly HistoryItem[]; onOpen: (item: HistoryItem) => void; onRemove?: (item: HistoryItem) => void }) {
   return <div className="list">{rows.map((row) => {
     const { className, Icon } = verdictStyle[row.verdict];
-    return <div className="list-row" key={row.id} role="button" tabIndex={0} onClick={() => onOpen(row)}
-      onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onOpen(row); } }}>
+    return <div className="list-row" key={row.id}>
+      <button className="history-open" onClick={() => onOpen(row)}>
       <div className={`row-icon ${className}`}><Icon aria-hidden="true"/></div>
       <div className="row-main"><div className="row-title">{row.title}</div><div className="row-meta">{row.meta}</div></div>
-      <span className={`badge ${className}`}>{m.verdictLabels[row.verdict]}</span></div>;
+      <span className={`badge ${className}`}>{row.status ?? m.verdictLabels[row.verdict]}</span></button>
+      {onRemove && <button className="icon-btn" aria-label={`${sessionVi.remove}: ${row.title}`} onClick={() => onRemove(row)}><Trash2/></button>}</div>;
   })}</div>;
 }
 

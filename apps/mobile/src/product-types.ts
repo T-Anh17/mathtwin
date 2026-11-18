@@ -3,7 +3,7 @@ export type Verdict = 'dung' | 'sai' | 'can_xac_nhan' | 'khong_du_can_cu';
 export type Tab = 'home' | 'history' | 'settings';
 export interface ImageRegion { left: number; top: number; width: number; height: number }
 export interface CropData { x: number; y: number; zoom: number; height: number; region: ImageRegion }
-export interface HistoryItem { id: string; verdict: Verdict; title: string; meta: string }
+export interface HistoryItem { id: string; verdict: Verdict; title: string; meta: string; status?: string }
 export interface ReaderStatus { ready: boolean; size: string }
 export interface GraphDrawing {
   edges: readonly { x1: number; y1: number; x2: number; y2: number; uncertain?: boolean }[];

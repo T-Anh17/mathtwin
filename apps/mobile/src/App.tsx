@@ -1,68 +1,81 @@
-import React from 'react';
-import { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { BenchmarkScreen } from './BenchmarkScreen.js';
-import { ConfirmScreen } from './ConfirmScreen.js';
-import { GraphEditScreen } from './GraphEditScreen.js';
 import { HomeScreen } from './HomeScreen.js';
-import { ResultScreen } from './ResultScreen.js';
-import { WorkScreen } from './WorkScreen.js';
-import { sampleWorkLines, sampleWorkPages, sampleWorkSpec } from './work-sample.js';
 import { HistoryScreen, SettingsScreen } from './SecondaryScreens.js';
+import { SessionScreen } from './SessionScreen.js';
 import { Topbar } from './product-ui.js';
 import { productVi as m } from './product-messages.vi.js';
-import { captureImage, fileDataUrl } from './capture.js';
-import { decodeImage } from './images.js';
-import { workerRunner } from './figure-suggest.js';
-import { emptyProductActions, sampleConfirmation, sampleCorrect, sampleHistory, sampleInsufficient, samplePending, sampleReader, sampleWrong } from './sample-data.js';
-import type { HistoryItem, ResultData, Tab } from './product-types.js';
+import { sessionVi } from './flow/messages.vi.js';
+import { createSession, sessionReducer } from './flow/sessionReducer.js';
+import { historyItem } from './flow/history.js';
+import { createIndexedDBStorage } from './storage/indexeddb.js';
+import { mobile } from './native.js';
+import type { Session, SessionEvent } from './flow/types.js';
+import type { SessionStore } from './flow/store.js';
+import type { HistoryItem, ReaderStatus, Tab } from './product-types.js';
 
-type Page = Tab | 'confirm' | 'result' | 'benchmark' | 'graph' | 'work';
-/** The figure reader works on a 1000 px copy; the photo itself is never stored. */
-const decodeForFigure = async (dataUrl: string) => (await decodeImage(dataUrl, 1000)).resized;
+type Page = Tab | 'session' | 'benchmark';
 
-export function App() {
+export function App({ sessionStore }: { sessionStore?: SessionStore } = {}) {
+  const [storage] = useState(() => createIndexedDBStorage());
+  const store = sessionStore ?? storage.sessions;
   const [page, setPage] = useState<Page>('home');
   const [returnPage, setReturnPage] = useState<Tab>('home');
-  const [result, setResult] = useState<ResultData>(sampleWrong);
-  const [photo, setPhoto] = useState<string | null>(null);
-  const [graphKey, setGraphKey] = useState(0);
-  const file = useRef<HTMLInputElement | null>(null);
-  const back = () => setPage(returnPage);
-  const openGraph = (dataUrl: string | null) => { setPhoto(dataUrl); setGraphKey((k) => k + 1); setPage('graph'); };
-  // Native: system camera. Browser preview: file picker. A cancelled capture leaves the page unchanged.
-  const pickPhoto = () => {
-    if (Capacitor.isNativePlatform()) captureImage().then(openGraph).catch(() => {});
-    else file.current?.click();
+  const [session, setSession] = useState<Session | null>(null);
+  const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [reader, setReader] = useState<ReaderStatus>({ ready: false, size: 'B' });
+  const [error, setError] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const locked = useRef(false);
+  const refresh = async () => setHistory((await store.list()).map(historyItem));
+  useEffect(() => {
+    let live = true;
+    store.list().then((items) => { if (live) setHistory(items.map(historyItem)); }).catch(() => { if (live) setError(true); });
+    if (Capacitor.isNativePlatform()) mobile.models().then(({ models }) => {
+      const b = models.find((model) => model.model === 'b');
+      if (live && b) setReader({ ready: b.ready, size: sessionVi.readerBytes(b.bytes) });
+    }).catch(() => {});
+    return () => { live = false; };
+  }, [store]);
+  useEffect(() => () => { void storage.close(); }, [storage]);
+
+  const run = async (action: () => Promise<void>) => {
+    if (locked.current) return;
+    locked.current = true; setBusy(true); setError(false);
+    try { await action(); } catch { setError(true); }
+    finally { locked.current = false; setBusy(false); }
   };
-  // Grading integration is phase 4; the graph screen is the real reading/review step for now.
-  const actions = { ...emptyProductActions,
-    onCapture: () => { setReturnPage('home'); pickPhoto(); },
-    onManualInput: () => { setReturnPage('home'); openGraph(null); },
-    onEdit: () => openGraph(photo),
-    onConfirm: () => { emptyProductActions.onConfirm(); setResult(sampleWrong); setPage('result'); },
-    onCancel: back,
+  const start = (source: Session['specSource']) => void run(async () => {
+    const next = { ...createSession(crypto.randomUUID(), new Date().toISOString()), specSource: source };
+    await store.put(next); await refresh();
+    setSession(next); setReturnPage('home'); setPage('session');
+  });
+  const dispatch = (event: SessionEvent) => void run(async () => {
+    if (!session) return;
+    const next = sessionReducer(session, event);
+    await store.put(next); setSession(next); await refresh();
+  });
+  const openHistory = (item: HistoryItem) => void run(async () => {
+    const saved = await store.get(item.id);
+    if (!saved) { await refresh(); return; }
+    setSession(saved); setReturnPage(page === 'history' ? 'history' : 'home'); setPage('session');
+  });
+  const remove = (item: HistoryItem) => void run(async () => {
+    await store.remove(item.id);
+    if (session?.id === item.id) setSession(null);
+    await refresh();
+  });
+  const actions = {
+    onCapture: () => start('photo'), onManualInput: () => start('manual'), onDownloadReader: () => setPage('settings'),
+    onCancel: () => setPage('home'),
   };
-  const openHistory = (item: HistoryItem) => {
-    setReturnPage(page === 'history' ? 'history' : 'home');
-    const results = { sai: sampleWrong, dung: sampleCorrect, can_xac_nhan: samplePending, khong_du_can_cu: sampleInsufficient };
-    setResult(results[item.verdict]); setPage('result');
-  };
-  return <div className="product-app">
-    <input ref={file} type="file" accept="image/png,image/jpeg" hidden onChange={(e) => {
-      const chosen = e.currentTarget.files?.[0]; e.currentTarget.value = '';
-      if (chosen) fileDataUrl(chosen).then(openGraph).catch(() => {});
-    }}/>
-    {page === 'home' && <HomeScreen state="du-lieu" reader={sampleReader} history={sampleHistory} actions={actions} onNavigate={setPage} onOpenHistory={openHistory}/>}
-    {page === 'history' && <HistoryScreen history={sampleHistory} onNavigate={setPage} onOpenHistory={openHistory}/>}
-    {page === 'settings' && <SettingsScreen reader={sampleReader} onNavigate={setPage} onBenchmark={() => setPage('benchmark')} onWork={() => setPage('work')}/>}
-    {page === 'work' && <WorkScreen spec={sampleWorkSpec} initialLines={sampleWorkLines} pages={sampleWorkPages} onBack={() => setPage('settings')}/>}
-    {page === 'confirm' && <ConfirmScreen state="du-lieu" data={sampleConfirmation} actions={actions} onBack={back}/>}
-    {page === 'graph' && <GraphEditScreen key={graphKey} photo={photo} decode={decodeForFigure} runner={workerRunner}
-      onBack={() => { setPhoto(null); back(); }} onPickPhoto={pickPhoto}/>}
-    {page === 'result' && (result.verdict === 'dung' ? <ResultScreen state="rong" data={result} actions={actions} onBack={back}/>
-      : result.verdict === 'khong_du_can_cu' ? <ResultScreen state="loi" data={result} actions={actions} onBack={back}/>
-      : <ResultScreen state="du-lieu" data={result} actions={actions} onBack={back}/>)}
+  return <div className="product-app" aria-busy={busy}>
+    {error && <div className="card" role="alert">{sessionVi.storageError}<button className="btn btn-outline" disabled={busy} onClick={() => void run(refresh)}>{sessionVi.retry}</button></div>}
+    {page === 'home' && <HomeScreen state={history.length ? 'du-lieu' : 'rong'} reader={reader} history={history} actions={actions} onNavigate={setPage} onOpenHistory={openHistory} onRemove={remove}/>}
+    {page === 'history' && <HistoryScreen history={history} onNavigate={setPage} onOpenHistory={openHistory} onRemove={remove}/>}
+    {page === 'settings' && <SettingsScreen reader={reader} onNavigate={setPage} onBenchmark={() => setPage('benchmark')}/>}
+    {page === 'session' && session && <SessionScreen session={session} busy={busy} onEvent={dispatch} onBack={() => setPage(returnPage)}/>}
     {page === 'benchmark' && <div><Topbar title={m.benchmark} onBack={() => setPage('settings')}/><BenchmarkScreen/></div>}
   </div>;
 }
