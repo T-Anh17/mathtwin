@@ -216,3 +216,40 @@ Review 3.4-r1: mỗi vòng trả lời chạy lại parseWork toàn bài rồi g
 
 
 Sửa review 3.2-r1: thêm 16 tổ hợp `dev-paraphrase*` (2 tiền tố × 2 từ đồng nghĩa × 2 từ nối × 2 thứ tự), mỗi tổ hợp có đủ nhiễu a–d; tổng work-text là 5.040 mẫu. Seed/noiseEngine của các họ cũ giữ nguyên, họ mới xếp sau test trong thứ tự cấp seed. Renderer dùng chung cho dev/test chỉ in nhãn đầu mút của walk, bỏ phần chữ edgeIds; `work.json` vẫn giữ các trường claim core. Vì bộ đo vẫn so claim đầy đủ, walk thiếu edgeIds trong phần chữ có thể làm precision/recall thấp dù dãy nhãn khớp; không đổi metric để bù việc này. Chỉ đo test sau khi chốt parser, không dùng các dòng test để sửa parser.
+
+### Báo cáo đi/dừng Lô 3.6
+
+`npm run eval:work -- --set synthetic-hw --lines engine offline:vietocr-onnx --parser real`
+đăng ký adapter Node C, chỉ dùng model sẵn có `.models/c`, kiểm bytes/SHA-256,
+đóng session sau đo; thiếu/sai model thì dừng, không tải. B dùng `--lines device
+reports/.debug/device-vivo-app-b768-2026-11-17-40.json` (conf dòng khi thiếu charConf).
+
+Sau khi đo work-text và work-text-tables với `--split test --lines truth --parser real`
+(không lọc variant để đo đủ a–d), synthetic-hw truth/B/C, chạy
+`node tools/eval/dist/work-report-cli.js YYYY-MM-DD`. Công cụ cần năm JSON nguồn cùng
+ngày và `reports/.debug/work-gates-YYYY-MM-DD.json` ghi kết quả cổng kiểm tra; nó chỉ
+đọc kết quả, không chạy lại OCR hay sinh corpus. Đầu ra gồm báo cáo tổng hợp
+`reports/work-eval-YYYY-MM-DD.md` và `work-summary-3.6-YYYY-MM-DD.json` không chứa mẫu.
+Phần sau marker `BEGIN AUTO-GENERATED PER-CASE DETAILS` dành cho reviewer; khi giữ
+split test kín, chỉ đọc summary JSON, không mở phần từng bài.
+
+JSON eval bổ sung `task`, `tasks/afterTasks`, `charConfidenceLines`, `audit/afterAudit`.
+Audit chạy sau inference, so token số/nhãn và các dòng thiếu claim/unchecked; các cờ
+chẩn đoán có thể chồng lấn, không được dùng để sửa chữ hoặc chọn claim. Eval chữ
+không gọi detectStrikes. Review 3.6-r1: B/C dùng `work-alignment.ts` căn dòng đơn
+điệu bằng DP edit distance (bỏ dấu/chữ thường/bỏ dấu câu), có gap hai phía,
+1:N/N:1 tối đa 4 dòng và IoU box phụ khi cả hai có box. Không dùng claim/expected
+hay conf để căn. Các fixture chữ vẫn giữ index nguồn đã biết.
+
+Cùng ánh xạ dùng cho trả lời truth, nguồn claim/lỗi đầu, readingMismatch và audit.
+readingMismatch phân biệt (ii)/(iii) theo chữ ở nhóm chứa dòng lỗi được báo,
+đúng định nghĩa chỉ số; sai đọc ở dòng trước đó được giữ trong audit nguyên nhân.
+OCR gộp nhận chữ truth nối; OCR thừa nhận skip; truth gạch nhận struck. OCR tách
+nhận chữ truth một lần ở mảnh đầu, mảnh còn lại skip cùng lượt để không nhân claim.
+Ánh xạ cố định trong vòng hỏi lại; dòng truth mất không được tự chèn vào inference.
+Truth gạch rỗng có thể là gap nằm giữa một nhóm OCR gộp; không đưa dòng gap này
+vào chữ trả lời hay nguồn claim. Điều này giữ phần claim khi OCR gộp văn xuôi với
+nội dung ở hai phía của dòng gạch bị mất.
+Audit giữ nhóm nguyên nhân a/b/c/d, dòng claim mất, sai conf cao và region; dòng
+hình/đề lẫn được đếm riêng ở đầu vào và ở claim/unchecked. OCR chưa căn được
+không mặc nhiên là chữ hình. Căn dòng vẫn là ước lượng cần kiểm trên ảnh thật.

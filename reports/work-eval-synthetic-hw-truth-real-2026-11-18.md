@@ -1,6 +1,6 @@
 # Đo bài làm — parser real
 
-Parser Lô 3.3: văn xuôi, Dijkstra, nn_step, postman_duplicate, bảng và nhiều trang. Chấm trực tiếp bằng core.grade để đo; chưa có gradeWork, readingCheck hay nâng unchecked thành hỏi lại (Lô 3.4). Các chỉ số chấm là chẩn đoán, không phải pipeline an toàn hoàn chỉnh. Chưa đủ căn cứ trên bài thật.
+Pipeline Lô 3.4: chọn chữ bằng từ vựng, gradeWork và hỏi lại bằng chữ truth đã căn dòng; tính cả soát dòng SAI. OCR thừa trả skip, truth gạch trả struck; mảnh OCR tách được khôi phục chung một lần. Truth chưa hiểu vẫn để hỏi lại. Chưa đủ căn cứ trên bài thật.
 
 Nguồn: synthetic-hw / truth.
 
@@ -18,6 +18,10 @@ Nguồn: synthetic-hw / truth.
 
 Tổng: 40; hiểu hoàn toàn 100%; claim 128/128; đúng dòng 128/128; hỏi lại 0; không đủ căn cứ 0; bước từ dòng gạch 0; sai thầm lặng (i)/(ii)/(iii): 0/0/0; văn xuôi unchecked 2.
 
-Thiếu bằng chứng chữ (readingMismatch = null) được xếp bảo thủ vào (ii).
+B/C dùng căn dòng OCR–truth trước đo, trả lời và chẩn đoán. readingMismatch xét chữ trên nhóm căn dòng chứa dòng lỗi được báo; OCR thừa không có truth là đọc khác. Fixture chữ giữ index nguồn chuẩn.
 
 Quy tắc 6 (chỉ thống kê): (i) có/không unchecked 0/0; (ii) có/không unchecked trước dòng sai đầu tiên 0/0.
+
+Sau hỏi lại: 40/40 kết luận đúng; lỗi đầu 20/20; còn hỏi lại 0; sai thầm lặng (i)/(ii)/(iii) 0/0/0; câu hỏi trung bình/tối đa 0.5/1.
+
+ContentAsProse conf dòng thấp/cao: 0/0 → 0/0. Sau hỏi lại, sai thầm lặng có/không dòng đọc sai conf ≥ 0,85: 0/0; vi phạm giới hạn câu hỏi: 0.
