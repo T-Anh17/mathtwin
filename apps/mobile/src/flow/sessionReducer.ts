@@ -58,12 +58,16 @@ export function sessionReducer(s: Session, e: SessionEvent): Session {
       if (!validateSpec(e.spec).ok || e.spec.uncertain?.length) return s;
       const spec = structuredClone(e.spec);
       const changed = JSON.stringify(s.spec) !== JSON.stringify(spec);
-      const { workGrade: _grade, ...rest } = s;
+      const { workGrade: _grade, graphLayout: oldLayout, ...rest } = s;
+      const graphLayout = e.graphLayout ?? (JSON.stringify(s.spec?.graph) === JSON.stringify(spec.graph) ? oldLayout : undefined);
       const { solve: _solveMs, grade: _gradeMs, ...timings } = s.timings;
-      return regrade({ ...rest, spec, specConfirmed: true, specSource: e.type === 'manual_spec' ? 'manual' : s.specSource,
+      return regrade({ ...rest, spec, ...(graphLayout ? { graphLayout: structuredClone(graphLayout) } : {}), specConfirmed: true, specSource: e.type === 'manual_spec' ? 'manual' : s.specSource,
         solution: solve(spec), stage: s.stage === 'work_reading' || s.stage === 'work_capture' ? s.stage : 'solution',
         timings, reviewAcknowledged: changed ? false : s.reviewAcknowledged });
     }
+    case 'work_capture':
+      return s.stage === 'solution' && s.specConfirmed && s.solution
+        ? { ...s, stage: 'work_capture', workSource: e.source } : s;
     case 'work_photos': {
       if (!s.specConfirmed || !s.solution || !e.photos.length) return s;
       return { ...clearWork(s), workPhotos: structuredClone(e.photos), workSource: 'photo', stage: 'work_reading' };

@@ -14,7 +14,7 @@ import { ProblemConfirmScreen } from '../src/ProblemConfirmScreen.js';
 import { ProblemFlowScreen } from '../src/ProblemFlowScreen.js';
 import { ProblemForm, defaultTask } from '../src/ProblemForm.js';
 import { editorFromGraph, toGraph } from '../src/graph-editor.js';
-import { problemVi as m } from '../src/problem.vi.js';
+import { problemVi as m, confirmationQuestionText } from '../src/problem.vi.js';
 
 const image = { width: 2, height: 2, pixels: new Uint8ClampedArray(16) };
 const fresh = () => createSession('problem-test', '2026-11-18T00:00:00Z');
@@ -70,7 +70,7 @@ describe('4.2 problem confirmation', () => {
       photos: [{ image: 'blob:real-photo', width: 2, height: 2 }], manual: false, busy: false,
       runner: previewReaders().figure!, onBack: () => {}, onDone: () => {} }));
     expect(html).toContain('blob:real-photo'); expect(html).toContain(m.edit); expect(html).toContain(m.other);
-    for (const q of read.spec!.uncertain!) expect(html).toContain(m.question(q.item));
+    for (const q of read.spec!.uncertain!) expect(html).toContain(confirmationQuestionText(read.spec!, q.item));
     expect(html).toContain('viewBox="100 300 380 80"'); expect(html).toContain(m.from); expect(html).toContain(m.to);
     expect(html).toContain(m.format); expect(html).toContain('disabled');
   });

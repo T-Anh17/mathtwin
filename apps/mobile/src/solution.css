@@ -1,0 +1,17 @@
+.solution-screen .content { min-width: 0; }
+.solution-answer { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.65; }
+.solution-graph { display: block; width: 100%; height: auto; }
+.solution-graph text, .solution-graph text.w, .solution-graph text.distance { font-size: var(--solution-font-size); }
+.solution-graph circle { fill: var(--surface); }
+.solution-graph .edge-label rect { fill: var(--surface); }
+.solution-graph .w, .solution-graph .distance { paint-order: stroke; stroke: var(--surface); stroke-width: 5px; stroke-linejoin: round; }
+.solution-graph .selected-vertex circle { fill: color-mix(in srgb, var(--primary) 6%, var(--surface)); stroke: var(--primary); stroke-width: 3; }
+.solution-graph circle.settled { fill: none; stroke: var(--primary); stroke-width: 2; }
+.solution-graph .distance { fill: var(--primary); }
+.solution-steps { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 8px; }
+.solution-step { width: 100%; min-height: 44px; padding: 12px 8px; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; text-align: left; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--foreground); font: inherit; line-height: 1.6; overflow-wrap: anywhere; cursor: pointer; }
+.solution-step[aria-pressed="true"] { border-color: var(--primary); background: var(--primary-light); }
+.solution-step:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.solution-number { align-self: start; display: grid; place-items: center; height: 28px; border-radius: 50%; background: var(--secondary); color: var(--primary); }
+.solution-input { display: grid; gap: 8px; width: 100%; }
+.solution-input .btn { min-height: 44px; }

@@ -82,8 +82,8 @@ export function ProblemFlowScreen({ session: s, busy, photoStore, readers, reade
   const retainedOutcome = s.problemRead ?? (s.problemPages?.length ? combineProblemPages(s.problemPages) : undefined);
   if (manual || s.stage === 'problem_confirm') return <div data-stage={s.stage}>{banner}<ProblemConfirmScreen
     {...(retainedOutcome ? { outcome: retainedOutcome } : {})} pages={s.problemPages ?? []} photos={photos} manual={manual} busy={busy}
-    runner={readers?.figure ?? workerRunner} onBack={back} onDone={(spec) => {
-      void Promise.resolve(onEvent({ type: manual ? 'manual_spec' : 'spec_confirmed', spec })).catch(() => setError(m.failed));
+    runner={readers?.figure ?? workerRunner} onBack={back} onDone={(spec, graphLayout) => {
+      void Promise.resolve(onEvent({ type: manual ? 'manual_spec' : 'spec_confirmed', spec, ...(graphLayout ? { graphLayout } : {}) })).catch(() => setError(m.failed));
     }}/>{error && <p role="alert">{error}</p>}</div>;
   return <div className="screen" data-stage={s.stage}><Topbar title={sessionVi.stages[s.stage]} onBack={back}/><div className="content">
     {banner}

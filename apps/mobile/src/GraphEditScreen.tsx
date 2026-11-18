@@ -3,7 +3,8 @@ import { CircleCheckBig, Eye, EyeOff, ImagePlus, Link2, LoaderCircle, Plus, Spar
 import type { Graph } from '@mathtwin/core';
 import type { PreparedImage } from '@mathtwin/reader';
 import { graphEditorVi as m } from './graph-editor.vi.js';
-import { addEdge, addVertex, clearFlag, edgeShapes, edgeTitle, emptyEditorGraph, flaggedCount, removeEdge, removeVertex, renameVertex, toGraph, updateEdge } from './graph-editor.js';
+import { addEdge, addVertex, clearFlag, edgeShapes, edgeTitle, editorLayout, emptyEditorGraph, flaggedCount, removeEdge, removeVertex, renameVertex, toGraph, updateEdge } from './graph-editor.js';
+import type { GraphLayout } from './flow/types.js';
 import type { EditorGraph } from './graph-editor.js';
 import { suggestGraph } from './figure-suggest.js';
 import type { FigureRunner } from './figure-suggest.js';
@@ -18,17 +19,18 @@ export interface GraphEditProps {
   runner: FigureRunner;
   onBack: () => void;
   onPickPhoto?: () => void;
-  onDone?: (graph: Graph) => void;
+  onDone?: (graph: Graph, layout: GraphLayout) => void;
   initial?: EditorGraph;
+  initialAspect?: number;
 }
 const WIDTH = 1000;
 
-export function GraphEditScreen({ photo, decode, runner, onBack, onPickPhoto, onDone, initial }: GraphEditProps) {
+export function GraphEditScreen({ photo, decode, runner, onBack, onPickPhoto, onDone, initial, initialAspect }: GraphEditProps) {
   const [graph, setGraph] = useState<EditorGraph>(initial ?? emptyEditorGraph());
   const [mode, setMode] = useState<Mode>('vertex');
   const [from, setFrom] = useState<string | null>(null);
   const [showPhoto, setShowPhoto] = useState(true);
-  const [aspect, setAspect] = useState(0.75);
+  const [aspect, setAspect] = useState(initialAspect ?? 0.75);
   const [suggesting, setSuggesting] = useState<AbortController | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [done, setDone] = useState<Graph | null>(null);
@@ -75,7 +77,7 @@ export function GraphEditScreen({ photo, decode, runner, onBack, onPickPhoto, on
       if (!controller.signal.aborted) setNotice(m.suggestFailed);
     } finally { setSuggesting(null); }
   };
-  const confirm = () => { if (!result.graph) return; setDone(result.graph); onDone?.(result.graph); };
+  const confirm = () => { if (!result.graph) return; setDone(result.graph); onDone?.(result.graph, editorLayout(graph, aspect)); };
 
   if (done) return <div className="screen">
     <Topbar title={m.doneTitle} onBack={onBack}/>

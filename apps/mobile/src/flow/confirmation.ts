@@ -8,11 +8,13 @@ export interface ConfirmationQuestion { item: string; candidates: unknown[]; pag
 export function confirmationQuestions(outcome: ReadOutcome, page = 0): ConfirmationQuestion[] {
   const flags = outcome.spec?.uncertain ?? outcome.graphUncertain;
   return flags.map((flag) => {
+    const graph = outcome.spec?.graph ?? outcome.graph;
+    const vertexLabel = graph?.vertices.find((v) => flag.item === v.id || flag.item === `${v.id}.label`)?.label ?? flag.item;
     let offset = 0;
     const index = /^e(\d+)(?:\.|$)/.exec(flag.item);
     for (const [draftPage, draft] of outcome.drafts.entries()) {
       const edge = index ? draft.edges[Number(index[1]) - 1 - offset] : undefined;
-      const vertex = draft.vertices.find((v) => v.label === flag.item);
+      const vertex = draft.vertices.find((v) => v.label === vertexLabel);
       const a = edge ? draft.vertices.find((v) => v.label === edge.u)?.box : undefined;
       const b = edge ? draft.vertices.find((v) => v.label === edge.v)?.box : undefined;
       const box: ConfirmationQuestion['box'] = vertex?.box ?? (a && b

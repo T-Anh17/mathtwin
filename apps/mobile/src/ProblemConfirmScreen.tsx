@@ -10,20 +10,10 @@ import type { EditorGraph } from './graph-editor.js';
 import type { ProblemPageRead, FigureDraftRunner } from './flow/reading.js';
 import { confirmationQuestions, confirmationValue, confirmProblem, initialProblem, replaceGraph } from './flow/confirmation.js';
 import { decodeImage } from './images.js';
-import { problemVi as m } from './problem.vi.js';
-import { sessionVi } from './flow/messages.vi.js';
+import { problemVi as m, confirmationQuestionText, confirmationCandidateText } from './problem.vi.js';
+import type { GraphLayout } from './flow/types.js';
 
 export interface ProblemPhoto { image: string; width: number; height: number }
-function candidateLabel(item: string, value: unknown): string {
-  if (value === true) return m.true;
-  if (value === false) return m.false;
-  if (value === null) return m.null;
-  if (item === 'task.type' && typeof value === 'string' && Object.hasOwn(sessionVi.tasks, value)) return sessionVi.tasks[value as keyof typeof sessionVi.tasks];
-  if (item === 'questionFormat' && typeof value === 'string' && Object.hasOwn(m.formats, value)) return m.formats[value as keyof typeof m.formats];
-  if (Array.isArray(value)) return value.map(String).join(', ');
-  if (typeof value === 'object') return item === 'graph' ? m.keepGraph : m.statements;
-  return String(value);
-}
 function GraphReadPreview({ spec }: { spec: ProblemSpec }) {
   const editor = editorFromGraph(spec.graph);
   return <svg viewBox="0 0 400 400" role="img" aria-label={m.graph} className="problem-graph">
@@ -33,10 +23,11 @@ function GraphReadPreview({ spec }: { spec: ProblemSpec }) {
 }
 export function ProblemConfirmScreen({ outcome, pages = [], photos, manual, busy, runner, onBack, onDone }: {
   outcome?: ReadOutcome; pages?: ProblemPageRead[]; photos: ProblemPhoto[]; manual: boolean; busy: boolean;
-  runner: FigureDraftRunner; onBack: () => void; onDone: (spec: ProblemSpec) => void;
+  runner: FigureDraftRunner; onBack: () => void; onDone: (spec: ProblemSpec, layout?: GraphLayout) => void;
 }) {
   const [spec, setSpec] = useState(() => initialProblem(outcome));
   const [editing, setEditing] = useState<EditorGraph | null>(null);
+  const [graphLayout, setGraphLayout] = useState<GraphLayout | undefined>();
   const [photoPage, setPhotoPage] = useState(0);
   const [taskReviewed, setTaskReviewed] = useState(manual || !!outcome?.spec);
   const [graphReviewed, setGraphReviewed] = useState(manual || !!outcome?.spec);
@@ -47,13 +38,14 @@ export function ProblemConfirmScreen({ outcome, pages = [], photos, manual, busy
     try { setSpec(applyConfirmation(spec, { [item]: value })); setError(''); } catch { setError(m.invalid); }
   };
   if (editing) return <GraphEditScreen initial={editing} photo={photos[photoPage]?.image ?? null}
+    {...(graphLayout ? { initialAspect: graphLayout.aspect } : {})}
     runner={runner} decode={async (data) => (await decodeImage(data)).original}
-    onBack={() => setEditing(null)} onDone={(graph) => { setSpec(replaceGraph(spec, graph)); setGraphReviewed(true); setEditing(null); }}/ >;
+    onBack={() => setEditing(null)} onDone={(graph, layout) => { setSpec(replaceGraph(spec, graph)); setGraphLayout(layout); setGraphReviewed(true); setEditing(null); }}/ >;
   const submit = () => {
     try {
       if (!taskReviewed || (!graphReviewed && spec.task.type !== 'degree_sequence')) throw new Error(m.noSpec);
       if (!spec.graph.vertices.length && spec.task.type !== 'degree_sequence') throw new Error(m.noGraph);
-      onDone(confirmProblem(spec, {})); setError('');
+      onDone(confirmProblem(spec, {}), graphLayout); setError('');
     } catch (e) { setError(e instanceof Error ? e.message : m.invalid); }
   };
   return <div className="screen"><Topbar title={manual ? m.manual : m.confirm} onBack={onBack}/><div className="content">
@@ -62,16 +54,16 @@ export function ProblemConfirmScreen({ outcome, pages = [], photos, manual, busy
     {outcome?.drafts.map((draft, i) => draft.question?.rawText && <p className="card" key={i}>{draft.question.rawText}</p>)}
     <div className="problem-comparison"><div>{photos.map((photo, page) => <button className="problem-photo" key={page} onClick={() => setPhotoPage(page)} aria-label={m.page(page)} aria-pressed={photoPage === page}>
       <img src={photo.image} alt={m.source}/><span>{m.page(page)}</span></button>)}</div>
-      <div className="card"><GraphReadPreview spec={spec}/><button className="btn btn-outline btn-block" onClick={() => setEditing(editorFromGraph(spec.graph))}>{m.edit}</button></div></div>
+      <div className="card"><GraphReadPreview spec={spec}/><button className="btn btn-outline btn-block" onClick={() => setEditing(editorFromGraph(spec.graph, graphLayout))}>{m.edit}</button></div></div>
     {pages.some((p) => p.figure?.vertices.length) && <div className="card"><p>{m.draftNote}</p>{pages.filter((p) => p.figure?.vertices.length).map((p) =>
       <button key={p.page} className="btn btn-outline btn-block" onClick={() => { setPhotoPage(p.page); setEditing(fromDraft(p.figure!)); }}>{m.draft} · {m.page(p.page)}</button>)}</div>}
     {questions.map((q) => <section className="card question-card" key={q.item}>
-      <h2 className="section-title">{m.question(q.item)}</h2>
+      <h2 className="section-title">{confirmationQuestionText(spec, q.item)}</h2>
       {photos[q.page] && <svg viewBox={q.box ? `${q.box[0]} ${q.box[1]} ${Math.max(1, q.box[2] - q.box[0])} ${Math.max(1, q.box[3] - q.box[1])}` : '0 0 1000 1000'} role="img" aria-label={m.source} className="problem-crop">
         <image href={photos[q.page]!.image} width="1000" height="1000" preserveAspectRatio="none"/></svg>}
       {!q.box && <p className="text-xs muted">{m.noBox}</p>}
       <div className="options">{q.candidates.map((value, i) => <button className="option" key={i} onClick={() => answer(q.item, value)}>
-        {candidateLabel(q.item, value)}</button>)}</div>
+        {confirmationCandidateText(spec, q.item, value)}</button>)}</div>
       <label>{m.other}<input value={inputs[q.item] ?? ''} onChange={(e) => setInputs({ ...inputs, [q.item]: e.target.value })}/></label>
       <button className="btn btn-outline" disabled={!inputs[q.item]?.trim()} onClick={() => answer(q.item, confirmationValue(inputs[q.item] ?? ''))}>{m.answer}</button>
     </section>)}
