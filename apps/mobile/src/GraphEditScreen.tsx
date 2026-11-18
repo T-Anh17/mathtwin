@@ -17,7 +17,7 @@ export interface GraphEditProps {
   decode: (dataUrl: string) => Promise<PreparedImage>;
   runner: FigureRunner;
   onBack: () => void;
-  onPickPhoto: () => void;
+  onPickPhoto?: () => void;
   onDone?: (graph: Graph) => void;
   initial?: EditorGraph;
 }
@@ -113,7 +113,7 @@ export function GraphEditScreen({ photo, decode, runner, onBack, onPickPhoto, on
       </div>
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         {photo ? <button className="btn btn-ghost" onClick={() => setShowPhoto((s) => !s)}>{showPhoto ? <EyeOff/> : <Eye/>}{showPhoto ? m.hidePhoto : m.showPhoto}</button>
-          : <button className="btn btn-ghost" onClick={onPickPhoto}><ImagePlus/>{m.choosePhoto}</button>}
+          : onPickPhoto && <button className="btn btn-ghost" onClick={onPickPhoto}><ImagePlus/>{m.choosePhoto}</button>}
         {photo && (suggesting
           ? <button className="btn btn-ghost" onClick={() => suggesting.abort()}><LoaderCircle className="spin"/>{m.suggesting}<X/></button>
           : <button className="btn btn-ghost" onClick={() => void suggest()}><Sparkles/>{m.suggest}</button>)}

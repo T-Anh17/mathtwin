@@ -1,0 +1,14 @@
+.problem-form { display: flex; flex-direction: column; gap: 14px; }
+.problem-form label, .question-card label { display: flex; flex-direction: column; gap: 6px; }
+.problem-form input, .problem-form select, .problem-form textarea, .question-card input { min-height: 44px; width: 100%; min-width: 0; padding: 10px; font: inherit; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
+.problem-form input[type=checkbox] { width: 44px; }
+.problem-form textarea { min-height: 140px; }
+.problem-comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
+.problem-photo { width: 100%; min-height: 44px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; padding: 4px; }
+.problem-photo img { width: 100%; display: block; }
+.problem-graph { width: 100%; max-height: 300px; }
+.problem-graph path { fill: none; stroke: var(--foreground); stroke-width: 2; }
+.problem-graph circle { fill: var(--surface); stroke: var(--foreground); stroke-width: 2; }
+.problem-graph text { fill: var(--foreground); text-anchor: middle; font-size: 18px; }
+.problem-crop { display: block; width: 100%; max-height: 260px; }
+@media (max-width: 380px) { .problem-comparison { grid-template-columns: 1fr; } }

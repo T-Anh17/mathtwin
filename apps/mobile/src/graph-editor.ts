@@ -13,6 +13,15 @@ export interface EditorEdge { key: string; u: string; v: string; w: string; name
 export interface EditorGraph { vertices: EditorVertex[]; edges: EditorEdge[]; nextKey: number }
 
 export const emptyEditorGraph = (): EditorGraph => ({ vertices: [], edges: [], nextKey: 1 });
+/** Reopen a confirmed/read graph using the editor's existing geometry. */
+export function editorFromGraph(graph: Graph): EditorGraph {
+  const keys = new Map(graph.vertices.map((v, i) => [v.id, `v${i + 1}`]));
+  const vertices = graph.vertices.map((v, i) => ({ key: keys.get(v.id)!, label: v.label,
+    x: 0.5 + 0.34 * Math.cos(i * 2 * Math.PI / Math.max(1, graph.vertices.length)),
+    y: 0.5 + 0.34 * Math.sin(i * 2 * Math.PI / Math.max(1, graph.vertices.length)), flagged: false }));
+  return { vertices, edges: graph.edges.map((e, i) => ({ key: `e${vertices.length + i + 1}`, u: keys.get(e.u)!, v: keys.get(e.v)!,
+    w: e.w === undefined ? '' : String(e.w), name: e.name ?? '', flagged: false })), nextKey: graph.vertices.length + graph.edges.length + 1 };
+}
 const clamp = (n: number): number => Math.min(1, Math.max(0, Number.isFinite(n) ? n : 0.5));
 const unreadLabel = /^unreadable\d+$/;
 

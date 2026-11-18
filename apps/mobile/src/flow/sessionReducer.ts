@@ -29,6 +29,15 @@ function regrade(s: Session): Session {
 
 export function sessionReducer(s: Session, e: SessionEvent): Session {
   switch (e.type) {
+    case 'problem_capture':
+      return { ...createSession(s.id, s.createdAt), problemPhotos: structuredClone(e.photos) };
+    case 'problem_page': {
+      if (s.stage !== 'problem_reading' || !Number.isInteger(e.reading.page) || e.reading.page < 0 || e.reading.page >= s.problemPhotos.length) return s;
+      const reading = structuredClone(e.reading);
+      const pages = [...(s.problemPages ?? []).filter((p) => p.page !== reading.page), reading].sort((a, b) => a.page - b.page);
+      return { ...s, problemPages: pages, timings: { ...s.timings,
+        problemRead: pages.reduce((n, p) => n + p.ms, 0), figureDraft: pages.reduce((n, p) => n + p.figureMs, 0) } };
+    }
     case 'reset': return createSession(s.id, s.createdAt);
     case 'retake': {
       if (e.target === 'problem') return createSession(s.id, s.createdAt);
@@ -42,7 +51,7 @@ export function sessionReducer(s: Session, e: SessionEvent): Session {
       if (s.stage !== 'problem_reading') return s;
       const outcome = structuredClone(e.outcome);
       return { ...s, stage: 'problem_confirm', problemRead: outcome, ...(outcome.spec ? { spec: outcome.spec } : {}),
-        timings: { ...s.timings, problemRead: e.ms }, readerId: outcome.usage.engine };
+        timings: { ...s.timings, problemRead: s.problemPages?.reduce((n, p) => n + p.ms, 0) ?? e.ms }, readerId: outcome.usage.engine };
     }
     case 'manual_spec': case 'spec_confirmed': {
       if (e.type === 'spec_confirmed' && s.stage !== 'problem_confirm' && !s.specConfirmed) return s;

@@ -2,11 +2,17 @@ import React from 'react';
 import { Topbar } from './product-ui.js';
 import { sessionVi as m } from './flow/messages.vi.js';
 import type { Session, SessionEvent } from './flow/types.js';
+import type { PhotoStore } from './flow/store.js';
+import type { Readers } from './flow/reading.js';
+import { ProblemFlowScreen } from './ProblemFlowScreen.js';
 
 /** Stage-driven resume surface. Detailed capture/review/result screens belong to batches 4.2–4.5. */
-export function SessionScreen({ session: s, busy, onEvent, onBack }: {
-  session: Session; busy: boolean; onEvent: (event: SessionEvent) => void; onBack: () => void;
+export function SessionScreen({ session: s, busy, onEvent, onBack, ...reading }: {
+  session: Session; busy: boolean; onEvent: (event: SessionEvent) => void | Promise<void>; onBack: () => void;
+  photoStore?: PhotoStore; readers?: Readers; readerReady?: boolean; preview?: boolean; onSettings?: () => void;
 }) {
+  if (['problem_capture', 'problem_reading', 'problem_confirm'].includes(s.stage)) return <ProblemFlowScreen
+    session={s} busy={busy} onEvent={onEvent} onBack={onBack} {...reading}/>;
   return <div className="screen" data-stage={s.stage}><Topbar title={m.stages[s.stage]} onBack={onBack}/>
     <div className="content"><div className="card">
       <h2 className="section-title">{s.spec ? m.tasks[s.spec.task.type] : m.untitled}</h2>
