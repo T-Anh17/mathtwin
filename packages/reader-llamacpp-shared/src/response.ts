@@ -1,4 +1,4 @@
-import { ReadDraftSchema } from '@mathtwin/reader';
+import { ReadDraftSchema, normalizeCharConfidence } from '@mathtwin/reader';
 import type { ReadDraft, ServerTimings, TextLine } from '@mathtwin/reader';
 import { failed, LlamaCppReadError } from './errors.js';
 import { jsonValues } from './json-spans.js';
@@ -141,6 +141,27 @@ export function valueConfidence(c: Completion, span: Pick<ValueSpan, 'start' | '
   return Math.min(...scores.map((t) => t.probability));
 }
 
+/** Token probabilities cover UTF-8 bytes, including JSON escapes and split multibyte characters. */
+function characterScores(c: Completion, span: Pick<ValueSpan, 'start' | 'end'>, json = false): number[] | undefined {
+  const raw = new TextDecoder().decode(c.bytes.subarray(span.start, span.end));
+  const parts = json ? raw.match(/\\u[\da-fA-F]{4}|\\["\\/bfnrt]|[^\\]/gu) ?? [] : [...raw];
+  const scores: number[] = [];
+  let text = '', offset = span.start;
+  for (let i = 0; i < parts.length; i++) {
+    let part = parts[i]!;
+    // A surrogate pair is one code point after JSON decoding.
+    if (json && /^\\u[dD][89aAbB][\da-fA-F]{2}$/u.test(part) && /^\\u[dD][c-fC-F][\da-fA-F]{2}$/u.test(parts[i + 1] ?? '')) part += parts[++i]!;
+    const end = offset + new TextEncoder().encode(part).length;
+    const tokens = covering(c, { start: offset, end });
+    if (!tokens.length || tokens[0]!.start > offset || tokens.at(-1)!.end < end) return;
+    const decoded = json ? JSON.parse(`"${part}"`) as string : part;
+    text += decoded;
+    scores.push(...[...decoded].map(() => Math.min(...tokens.map((t) => t.probability))));
+    offset = end;
+  }
+  return normalizeCharConfidence(text, scores);
+}
+
 /** Replace ONE token, requiring any part outside this value to stay byte-identical. */
 function replacements(c: Completion, span: Pick<ValueSpan, 'start' | 'end'>, threshold: number): Uint8Array[] {
   const results: Uint8Array[] = [];
@@ -229,6 +250,8 @@ export function lineResult(c: Completion, width: number, height: number, thresho
     const l = object(entry), s = spans.get(`/lines/${i}/text`) ?? failed('invalid_json');
     if (Object.keys(l).some((k) => !['text', 'box', 'region'].includes(k)) || typeof l.text !== 'string' || !l.text.trim()) return failed('invalid_json');
     const line: TextLine = { text: l.text.normalize('NFC'), conf: valueConfidence(c, s), alternatives: strings(alternatives(c, s, threshold), l.text) };
+    const charConf = characterScores(c, s, true);
+    if (charConf) line.charConf = charConf;
     if (l.region !== undefined) {
       if (l.region !== 'question' && l.region !== 'figure' && l.region !== 'solution' && l.region !== 'table') return failed('invalid_json');
       line.region = l.region;
@@ -250,7 +273,8 @@ export function plainLines(c: Completion, threshold = 0.1): TextLine[] {
       for (const bytes of replacements(c, span, threshold)) {
         try { const v = new TextDecoder('utf-8', { fatal: true }).decode(bytes); if (!/[\r\n]/.test(v)) candidates.push(v); } catch { /* Invalid UTF-8. */ }
       }
-      lines.push({ text: text.normalize('NFC'), conf: valueConfidence(c, span), alternatives: strings(candidates, text) });
+      const charConf = characterScores(c, span);
+      lines.push({ text: text.normalize('NFC'), conf: valueConfidence(c, span), alternatives: strings(candidates, text), ...(charConf ? { charConf } : {}) });
     }
     offset += length + encoder.encode(match[2]!).length;
   }
@@ -278,8 +302,9 @@ export function spottingLines(c: Completion, width: number, height: number, thre
     const xs = values.filter((_, i) => i % 2 === 0), ys = values.filter((_, i) => i % 2 === 1);
     const box = values.length === 8 && values.every((n) => n >= 0 && n <= 1000)
       ? normalizedBox([Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)], width, height) : undefined;
+    const charConf = characterScores(c, { start, end });
     lines.push({ text: text.normalize('NFC'), conf: valueConfidence(partial, { start: 0, end: partial.bytes.length }),
-      alternatives: strings(candidates, text), ...(box ? { box } : {}) });
+      alternatives: strings(candidates, text), ...(box ? { box } : {}), ...(charConf ? { charConf } : {}) });
   };
   const annotated = [...c.text.matchAll(/<\|TEXT_START\|>([\s\S]*?)<\|TEXT_END\|>\s*<\|LOC_BEGIN\|>([\s\S]*?)<\|LOC_END\|>/g)];
   if (annotated.length) {

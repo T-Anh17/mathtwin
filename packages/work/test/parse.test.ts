@@ -80,9 +80,9 @@ describe('prose work parser, batch 3.2', () => {
     expect(parseWork(source, vocab)).toMatchObject({ steps: [], unchecked: [3, 4, 5], ignored: [{ line: 0, reason: 'prose' }, { line: 1, reason: 'prose' }, { line: 2, reason: 'prose' }] });
     expect(parseWork(lines(['Cập nhật nhãn v1 qua cạnh AB.']), { ...vocab, vertexLabels: ['A', 'B', 'v1'] }).unchecked).toEqual([]);
   });
-  it('does not repair labels, choose alternatives or interpret actions for unrelated tasks', () => {
+  it('selects a vocabulary-valid alternative and rejects unrelated algorithm actions', () => {
     const source = lines(['A → E → D']); source[0]!.alternatives = ['A → B → D'];
-    expect(parseWork(source, vocab)).toMatchObject({ steps: [], unchecked: [0], issues: expect.arrayContaining([expect.objectContaining({ code: 'unknown_label' })]) });
+    expect(parseWork(source, vocab)).toMatchObject({ steps: [{ claim: { type: 'walk', vertices: ['A', 'B', 'D'], conf: 0.84 } }], unchecked: [] });
     for (const text of ['Gán nhãn A = 0, các đỉnh khác ∞', 'Khoanh tròn C', 'n(B) = n(C) + w(CB) = 1 + 3 = 2', 'Từ A đi đến B (gần nhất)', 'A → B vì AB = 1 nhỏ nhất', 'Lặp lại đường B → C → D']) expect(bodies([text], { ...vocab, task: 'path' })).toEqual([]);
     const table = lines(['Chọn A B C D', 'A 0 1 3 4']); table.forEach((l) => { l.region = 'table'; });
     expect(parseWork(table, vocab)).toMatchObject({ steps: [], unchecked: [0, 1] });

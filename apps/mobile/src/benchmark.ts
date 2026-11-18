@@ -281,7 +281,8 @@ export function exportReport(report: BenchmarkReport): string {
     maxImageSide: r.config.maxImageSide ?? defaultMaxImageSide, readTimeout: r.config.readTimeout ?? defaultReadTimeout, maxTokens: r.config.maxTokens ?? defaultMaxTokens, dry: r.config.dry ?? defaultDry,
     backgroundIdleMinutes: r.config.backgroundIdleMinutes, backend: r.config.model === 'c' ? 'WASM' : 'CPU', cpuVariant: r.memory?.cpuVariant, cpuVariantSource: r.memory?.cpuVariantSource },
     imageSource: r.imageSource, captureMethod: r.captureMethod,
-    outcome: r.outcome, linePasses: r.linePasses, usage: r.usage, totalMs: r.totalMs, modelLoadMs: r.modelLoadMs,
+    outcome: r.outcome, linePasses: r.linePasses?.map((pass) => ({ ...pass, lines: pass.lines.map((line) => ({ ...line,
+      ...(line.charConf ? { charConf: [...line.charConf] } : {}) })) })), usage: r.usage, totalMs: r.totalMs, modelLoadMs: r.modelLoadMs,
     modelVerifyMs: r.modelVerifyMs, reusedModel: r.reusedModel, memory: r.memory, wasm: r.wasm, errorCode: r.errorCode, serverRestarted: r.serverRestarted ?? false })) }, function (this: unknown, key, value: unknown) {
       // StatementCheck.source is a semantic vertex reference, required for desktop comparison.
       if (key === 'source' && !(this !== null && typeof this === 'object' && 'type' in this && this.type === 'dijkstra_label')) return undefined;

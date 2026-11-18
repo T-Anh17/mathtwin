@@ -53,7 +53,7 @@ it('aligns stripped JSON fences, split UTF-8 bytes, per-value confidence and top
         top_logprobs: i === target ? [{ bytes: [...encoder.encode('1')], logprob: Math.log(0.3) }] : [] })), fence('\n'), fence('```')],
   } }] }, true);
   expect(lineResult(completion, 100, 100)).toEqual([
-    { text: 'Đề 7', conf: 0.4, alternatives: ['Đề 1'] }, { text: 'B', conf: 0.99, alternatives: [] },
+    { text: 'Đề 7', conf: 0.4, alternatives: ['Đề 1'], charConf: [0.99, 0.99, 0.99, 0.4] }, { text: 'B', conf: 0.99, alternatives: [], charConf: [0.99] },
   ]);
   expect(completion.finish_reason).toBe('stop');
 });
@@ -64,7 +64,7 @@ it('handles a token spanning fence/content boundaries without corrupting byte of
   const c = parseCompletion({ choices: [{ finish_reason: 'stop', message: { content: text },
     logprobs: { content: [{ bytes: [...encoder.encode(wrapped)], logprob: Math.log(0.6),
       top_logprobs: [{ bytes: [...encoder.encode(wrapped.replace('Đề', 'Đê'))], logprob: Math.log(0.2) }] }] } }] });
-  expect(lineResult(c, 1, 1)[0]).toEqual({ text: 'Đề', conf: 0.6, alternatives: ['Đê'] });
+  expect(lineResult(c, 1, 1)[0]).toEqual({ text: 'Đề', conf: 0.6, alternatives: ['Đê'], charConf: [0.6, 0.6] });
 });
 
 it.each(['prefix data', '```json\n{"lines":[]}\n```'])('rejects unmatched token content with logprob_alignment: %s', (tokens) => {
@@ -168,8 +168,8 @@ it('scores only each JSON text value and forms single-token alternatives, never 
     [text.indexOf('A7') + 1, { probability: 0.4, alternatives: [{ text: '1', probability: 0.35 }, { text: '', probability: 0.12 }] }],
     [text.indexOf('"text"'), { probability: 0.001 }],
   ])), 4000, 3000);
-  expect(result[0]).toEqual({ text: 'A7', conf: 0.4, alternatives: ['B7', 'A1', 'A'] });
-  expect(result[1]).toEqual({ text: 'Đề "7" 😀', conf: 0.99, alternatives: [], box: [400, 600, 3600, 2400] });
+  expect(result[0]).toEqual({ text: 'A7', conf: 0.4, alternatives: ['B7', 'A1', 'A'], charConf: [0.8, 0.4] });
+  expect(result[1]).toEqual({ text: 'Đề "7" 😀', conf: 0.99, alternatives: [], box: [400, 600, 3600, 2400], charConf: Array(8).fill(0.99) });
   expect(result[0]?.alternatives).not.toContain('B1');
 });
 
@@ -181,6 +181,18 @@ it('maps UTF-8 fragments and escaped JSON bytes to the right value', () => {
   } }] });
   const lines = lineResult(c, 100, 100);
   expect(lines[0]?.text).toBe('Đề'); expect(lines[0]?.conf).toBeCloseTo(0.45); expect(lines[1]?.conf).toBeCloseTo(0.98);
+  expect(lines[0]?.charConf).toEqual([0.98, 0.45]);
+  expect(lines[1]?.charConf).toEqual([0.98, 0.98]);
+});
+
+it('aligns NFC composition, escaped surrogate pairs and tokens containing several characters', () => {
+  const text = '{"lines":[{"text":"o\\u0302\\u0301 \\ud83d\\ude00 7"}]}';
+  const result = lineResult(scored(text, new Map([[text.indexOf('0301'), { probability: 0.3 }],
+    [text.indexOf('ude00'), { probability: 0.4 }]])), 1, 1)[0]!;
+  expect(result.text).toBe('ố 😀 7'); expect(result.charConf).toEqual([expect.closeTo(0.3), 0.99, 0.4, 0.99, 0.99]);
+  const grouped = parseCompletion({ choices: [{ finish_reason: 'stop', message: { content: 'ABC' }, logprobs: {
+    content: [{ bytes: [...encoder.encode('ABC')], logprob: Math.log(0.7) }] } }] });
+  expect(plainLines(grouped)[0]!.charConf).toEqual([0.7, 0.7, 0.7]);
 });
 
 it('permits tokens straddling quotes/punctuation only when outside-value bytes are preserved', () => {
@@ -200,13 +212,13 @@ it('plain Paddle OCR is scored by line, excluding newline tokens', () => {
   const text = 'Đề\r\nA7\nB8';
   const result = plainLines(scored(text, new Map([[text.indexOf('7'), { probability: 0.4, alternatives: [{ text: '1', probability: 0.35 }] }],
     [text.indexOf('\r'), { probability: 0.001 }]])));
-  expect(result).toEqual([{ text: 'Đề', conf: 0.99, alternatives: [] }, { text: 'A7', conf: 0.4, alternatives: ['A1'] },
-    { text: 'B8', conf: 0.99, alternatives: [] }]);
+  expect(result).toEqual([{ text: 'Đề', conf: 0.99, alternatives: [], charConf: [0.99, 0.99] }, { text: 'A7', conf: 0.4, alternatives: ['A1'], charConf: [0.99, 0.4] },
+    { text: 'B8', conf: 0.99, alternatives: [], charConf: [0.99, 0.99] }]);
 });
 
 it.each([[0, 0, 1100, 900], [2, 3, 1, 4], [0, 0, 0, 0], [-1, 0, 2, 4], [0, 0, 3], 'bad'])('drops bad boxes but keeps recognized lines: %j', (box) => {
   const text = JSON.stringify({ lines: [{ text: '7', box }] });
-  expect(lineResult(scored(text), 4000, 3000)).toEqual([{ text: '7', conf: 0.99, alternatives: [] }]);
+  expect(lineResult(scored(text), 4000, 3000)).toEqual([{ text: '7', conf: 0.99, alternatives: [], charConf: [0.99] }]);
 });
 
 it('parses Paddle spotting polygons, measures text only and maps box to original pixels', () => {
@@ -214,7 +226,7 @@ it('parses Paddle spotting polygons, measures text only and maps box to original
   const text = `<|TEXT_START|>A7<|TEXT_END|><|LOC_BEGIN|>${loc}<|LOC_END|>`;
   const result = spottingLines(scored(text, new Map([[0, { probability: 0.001 }],
     [text.indexOf('7'), { probability: 0.4, alternatives: [{ text: '1', probability: 0.35 }] }]])), 4000, 3000);
-  expect(result).toEqual([{ text: 'A7', conf: 0.4, alternatives: ['A1'], box: [400, 600, 3600, 2400] }]);
+  expect(result).toEqual([{ text: 'A7', conf: 0.4, alternatives: ['A1'], box: [400, 600, 3600, 2400], charConf: [0.99, 0.4] }]);
   expect(spottingLines(scored(`A7${loc}`), 4000, 3000)[0]?.box).toEqual([400, 600, 3600, 2400]);
   expect(spottingLines(scored(text.replace('LOC_100', 'LOC_1001')), 4000, 3000)[0]?.box).toBeUndefined();
 });
@@ -258,7 +270,7 @@ it('executes shared parsing, request construction and resize without Node or net
   } finally {
     names.forEach((name, i) => { const descriptor = descriptors[i]; if (descriptor) Object.defineProperty(globalThis, name, descriptor); else Reflect.deleteProperty(globalThis, name); });
   }
-  expect(result).toEqual([{ text: 'Đề', conf: 0.99, alternatives: [] }]);
+  expect(result).toEqual([{ text: 'Đề', conf: 0.99, alternatives: [], charConf: [0.99, 0.99] }]);
   expect(graph).toHaveProperty('vertices.0.conf', 0.99);
   expect(request).toHaveProperty('response_format.type', 'json_schema');
   expect(resized).toMatchObject({ width: 1, height: 1, pixels: new Uint8ClampedArray([50, 50, 50, 255]) });

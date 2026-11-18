@@ -1,4 +1,5 @@
 import type { OcrTextLine, OrtLike, OrtSession, OrtTensor, VietOcrConfig } from './types.js';
+import { normalizeCharConfidence } from '@mathtwin/reader';
 import { checkAbort, OcrError } from './errors.js';
 
 export function output(outputs: Record<string, OrtTensor>, name: string | undefined): OrtTensor {
@@ -37,7 +38,7 @@ export async function recognizeLine(ort: OrtLike, encoder: OrtSession, decoder: 
     }
     const weakest = charConf.indexOf(Math.min(...charConf));
     const alternatives = weakest < 0 ? [] : (choices[weakest] ?? []).map((char) => chars.map((c, i) => i === weakest ? char : c).join('').normalize('NFC'));
-    return { text, charConf, logProbs, conf: reason ? 0 : charConf.length ? Math.min(...charConf) : eosConf,
+    return { text, charConf: normalizeCharConfidence(chars.join(''), charConf)!, logProbs, conf: reason ? 0 : charConf.length ? Math.min(...charConf) : eosConf,
       alternatives: [...new Set(alternatives)].filter((candidate) => candidate !== text).slice(0, 3),
       ...(reason ? { truncated: true, truncationReason: reason } : {}) };
   };

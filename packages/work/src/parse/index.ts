@@ -1,124 +1,65 @@
 import type { ClaimBody } from '@mathtwin/core';
-import type { ParsedWork, WorkIssueCode, WorkLine, WorkVocabulary } from '../types.js';
+import type { ParsedStep, ParsedWork, WorkLine, WorkVocabulary } from '../types.js';
 import { workMessages } from '../messages.vi.js';
-import { labelList, LabelError } from './labels.js';
-import { gradingContent, isHeading, proseClause, splitClauses, walkKind } from './prose.js';
-import type { ProseContext } from './prose.js';
-import { language, sameQuestion, symbols } from './text.js';
-import { parseTable, tableLike } from './table.js';
+import { parsePrimary } from './primary.js';
+import { tableLike, validTableReading } from './table.js';
+
+const bodyOf = ({ step: _step, raw: _raw, conf: _conf, box: _box, ...body }: ParsedStep['claim']): ClaimBody => body;
+const key = (step: ParsedStep): string => step.lines.join(',');
+const equalBody = (a: ClaimBody, b: ClaimBody): boolean => JSON.stringify(a) === JSON.stringify(b);
 
 export function parseWork(lines: WorkLine[], vocab: WorkVocabulary, opts?: { confThreshold?: number }): ParsedWork {
-  const parsed: ParsedWork = { steps: [], ignored: [], unchecked: [], issues: [] };
-  const context: ProseContext = {};
-  const ordered = [...lines].sort((a, b) => a.page - b.page || a.index - b.index);
-  const ignoredReason = (line: WorkLine): ParsedWork['ignored'][number]['reason'] | undefined => {
-    if (line.struck) return 'struck';
-    if (!line.text.trim()) return 'empty';
-    if (line.region === 'question') return 'question';
-    if (line.region === 'figure') return 'figure';
-    if (vocab.questionText.some((q) => sameQuestion(line.text, q))) return 'question';
-    // A copied true/false prompt is not an answer. Bare a) Đ / a) S is handled below.
-    if (vocab.questionFormat === 'dung_sai' && /^[a-z][).:]\s+/u.test(language(line.text, vocab.vertexLabels))
-      && !/^[a-z][).:]\s*(?:dung|sai|d|s)(?:$|[\s.;,])/u.test(language(line.text, vocab.vertexLabels))) return 'question';
-    return undefined;
-  };
-  const tableLines = new Set<number>();
-  for (let start = 0; start < ordered.length;) {
-    let end = start;
-    while (end < ordered.length && !ignoredReason(ordered[end]!) && tableLike(ordered[end]!, vocab)) end++;
-    if (end - start >= 3) for (const row of ordered.slice(start, end)) tableLines.add(row.index);
-    start = Math.max(start + 1, end);
-  }
-  const issue = (code: keyof typeof workMessages, sources: WorkLine[], severity: 'blocking' | 'warning' = 'blocking'): void => {
-    parsed.issues.push({ code: code as WorkIssueCode, severity, lines: sources.map((l) => l.index), message: workMessages[code] });
-  };
-  const append = (body: ClaimBody, sources: WorkLine[], origin: 'text' | 'table' | 'inferred'): void => {
-    const first = sources[0]!;
-    const boxes = sources.flatMap((s) => s.box && s.page === first.page ? [s.box] : []);
-    const samePage = sources.filter((s) => s.page === first.page);
-    const box: [number, number, number, number] | undefined = boxes.length === samePage.length
-      ? [Math.min(...boxes.map((b) => b[0])), Math.min(...boxes.map((b) => b[1])), Math.max(...boxes.map((b) => b[2])), Math.max(...boxes.map((b) => b[3]))] : undefined;
-    const conf = Math.min(...sources.map((s) => s.conf), origin === 'inferred' ? (opts?.confThreshold ?? 0.85) - 0.01 : 1);
-    parsed.steps.push({ claim: { ...body, step: parsed.steps.length + 1, raw: sources.map((s) => s.text).join('\n'), conf, ...(box ? { box } : {}) },
-      lines: sources.map((s) => s.index), page: first.page, ...(box ? { box } : {}), candidates: [body], origin });
-    if (body.type === 'walk') context.walk = body.vertices;
-  };
-  const pages = new Set(ordered.map((l) => l.page));
-  for (let page = 0; page <= Math.max(-1, ...pages); page++) {
-    const pageLines = ordered.filter((l) => l.page === page);
-    if (!pageLines.length || pageLines.every((l) => ['empty', 'question'].includes(ignoredReason(l) ?? ''))) issue('page_order', pageLines, 'warning');
-  }
-  for (let i = 0; i < ordered.length; i++) {
-    const line = ordered[i]!;
-    const ignored = ignoredReason(line);
-    if (ignored) {
-      parsed.ignored.push({ line: line.index, reason: ignored });
-      if (ignored === 'figure' && /\d|=|[\p{L}]/u.test(line.text)) issue('figure_annotations', [line], 'warning');
-      continue;
-    }
-    if (line.region === 'table' || tableLines.has(line.index)) {
-      const sources: WorkLine[] = [];
-      while (i < ordered.length && !ignoredReason(ordered[i]!) && (ordered[i]!.region === 'table' || tableLines.has(ordered[i]!.index))) sources.push(ordered[i++]!);
-      i--;
-      const found = vocab.task === 'shortest_path' ? parseTable(sources, vocab) : undefined;
-      if (found) for (const entry of found) append(entry.body, entry.sources, entry.inferred ? 'inferred' : 'table');
-      else { parsed.unchecked.push(...sources.map((s) => s.index)); issue('table_unrecognized', sources, 'warning'); }
-      continue;
-    }
-    const sources = [line];
-    while (/(?:→|-|=|\+|×|:)\s*$/u.test(symbols(sources.at(-1)!.text))) {
-      const next = ordered[i + 1];
-      if (!next || next.page > sources.at(-1)!.page + 1 || ignoredReason(next) || next.region === 'table' || tableLines.has(next.index)) break;
-      const route = /(?:→|-)\s*$/u.test(symbols(sources.at(-1)!.text));
-      if (!route) {
-        if (!/^[\d∞(+\-]/u.test(symbols(next.text)) || /[\p{L}]/u.test(symbols(next.text))) break;
-        sources.push(next); i++; continue;
+  const threshold = opts?.confThreshold ?? 0.85;
+  const selected = lines.map((line) => ({ ...line, text: line.text.normalize('NFC') }));
+  const protectedLines = new Set(lines.some((line) => line.alternatives.length)
+    ? parsePrimary(selected, vocab, opts).ignored.filter((item) => ['question', 'figure', 'struck'].includes(item.reason)).map((item) => item.line) : []);
+  const replace = (position: number, text: string): WorkLine[] => selected.map((line, i) => i === position ? { ...line, text } : line);
+  const eligible = (line: WorkLine): boolean => !protectedLines.has(line.index) && !line.skipped && !line.struck && line.region !== 'question' && line.region !== 'figure';
+  for (let i = 0; i < selected.length; i++) {
+    const line = selected[i]!;
+    if (!eligible(line) || !line.alternatives.length) continue;
+    const table = line.region === 'table' || tableLike(line, vocab);
+    for (const text of [line.text, ...line.alternatives].map((s) => s.normalize('NFC'))) {
+      const trialLine = { ...line, text };
+      let valid: boolean;
+      if (table) valid = validTableReading(trialLine, vocab);
+      else {
+        const trial = parsePrimary(replace(i, text), vocab, opts);
+        valid = trial.steps.some((s) => s.lines.includes(line.index)) && !trial.unchecked.includes(line.index);
       }
-      // A wrapped route may consume only route text, not the next independent claim.
-      if (!/^[\p{L}\p{N}_\s→,-]+[.]?$/u.test(symbols(next.text))) break;
-      try { labelList(symbols(next.text).replace(/(?:→|-)\s*$/u, ''), vocab.vertexLabels); }
-      catch (error) { if (error instanceof LabelError) break; throw error; }
-      sources.push(next); i++;
-    }
-    const text = sources.map((l) => l.text).join(' ');
-    const normalized = language(text, vocab.vertexLabels);
-    if (isHeading(normalized)) {
-      context.kind = walkKind(normalized, vocab);
-      parsed.ignored.push({ line: line.index, reason: 'prose' }); continue;
-    }
-    try {
-      const bodies: ClaimBody[] = [];
-      let incomplete = false;
-      // Keep algorithm explanations and equalities together; their numbers are literal.
-      const algorithm = /\b(?:chon|danh dau|co dinh|khoanh|nhan(?! (?:thay|xet|duoc|ra|so|tong|do|bac|cac)\b)|gan nhan|lap lai|canh lap|them canh|gan nhat|nho nhat)\b/u.test(normalized) && !/duong di ngan nhat/u.test(normalized)
-        || /\b(?:n|l)\s*\(/u.test(normalized);
-      const clauses = algorithm ? [text] : splitClauses(text, vocab);
-      const local: ProseContext = { ...context };
-      local.lastGradingLine = !ordered.slice(i + 1).some((next) => !ignoredReason(next)
-        && (next.region === 'table' || gradingContent(next.text, vocab) || (() => {
-          try { return labelList(next.text, vocab.vertexLabels).length >= 2; } catch { return false; }
-        })()));
-      local.reason = /dirac/u.test(normalized) ? 'dirac' : /\bore\b/u.test(normalized) ? 'ore'
-        : /bac 1\b/u.test(normalized) ? 'degree1' : /bat buoc|bac 2\b/u.test(normalized) ? 'forced_edges'
-        : /tim thay/u.test(normalized) ? 'found' : undefined;
-      for (const clause of clauses) {
-        const found = proseClause(clause, vocab, local);
-        if (found) {
-          bodies.push(...found);
-          for (const body of found) if (body.type === 'walk') local.walk = body.vertices;
-        } else if (gradingContent(clause, vocab)) incomplete = true;
+      if (!valid) continue;
+      if (text !== line.text) {
+        const { charConf: _charConf, ...withoutScores } = line;
+        selected[i] = { ...withoutScores, text, conf: Math.min(line.conf, threshold - 0.01) };
       }
-      if (bodies.length) {
-        for (const body of bodies) append(body, sources, 'text');
-      }
-      if (incomplete) {
-        parsed.unchecked.push(...sources.map((s) => s.index)); issue('unparsed_line', sources);
-      } else if (!bodies.length) parsed.ignored.push(...sources.map((s) => ({ line: s.index, reason: 'prose' as const })));
-    } catch (error) {
-      if (!(error instanceof LabelError)) throw error;
-      parsed.unchecked.push(...sources.map((s) => s.index)); issue(error.code, sources); issue('unparsed_line', sources);
+      break;
     }
   }
-  if (!parsed.steps.length && !parsed.unchecked.length) issue('no_solution_lines', []);
+  const parsed = parsePrimary(selected, vocab, opts);
+  parsed.sourceLines = selected;
+  for (const step of parsed.steps) step.candidateTexts = [step.claim.raw];
+  // Change one transcription at a time with the already selected context. No cartesian search.
+  for (let i = 0; i < selected.length; i++) {
+    const line = selected[i]!;
+    if (!eligible(line)) continue;
+    for (const text of [...new Set([lines[i]!.text, ...line.alternatives])]) {
+      if (text.normalize('NFC') === line.text) continue;
+      const trial = parsePrimary(replace(i, text.normalize('NFC')), vocab, opts);
+      if (trial.unchecked.includes(line.index)) continue;
+      const counts = new Map<string, number>();
+      for (const step of parsed.steps) {
+        const source = key(step), index = counts.get(source) ?? 0;
+        counts.set(source, index + 1);
+        const other = trial.steps.filter((s) => key(s) === source)[index];
+        if (!other) continue;
+        const body = bodyOf(other.claim);
+        if (step.candidates.some((candidate) => equalBody(candidate, body))) continue;
+        step.candidates.push(body); step.candidateTexts!.push(other.claim.raw);
+        if (!parsed.issues.some((issue) => issue.code === 'ambiguous_line' && issue.lines?.includes(line.index))) {
+          parsed.issues.push({ code: 'ambiguous_line', severity: 'warning', lines: [line.index], message: workMessages.ambiguous_line });
+        }
+      }
+    }
+  }
   return parsed;
 }

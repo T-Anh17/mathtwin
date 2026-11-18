@@ -4,7 +4,7 @@ import sharp from 'sharp';
 import { grade } from '@mathtwin/core';
 import type { ProblemSpec } from '@mathtwin/core';
 import type { TextReader } from '@mathtwin/reader';
-import { compareWork, parseWork, vocabularyOf } from '@mathtwin/work';
+import { applyWorkAnswers, compareWork, gradeWork, parseWork, vocabularyOf } from '@mathtwin/work';
 import type { ParsedWork, WorkComparison, WorkGrade, WorkLine, WorkTruth } from '@mathtwin/work';
 import { loadCases, prepareImages, readJson } from './dataset.js';
 import { jsonText } from './work-generate.js';
@@ -43,7 +43,7 @@ export function oracleWork(spec: ProblemSpec, truth: WorkTruth, lines: WorkLine[
     kind: 'reading', lines: truth.lineOf[String(item.step)] ?? [], page: 0, shownText: truth.claims.find((c) => c.step === item.step)?.raw ?? '', options: [] })) : [],
     ...(result.firstErrorStep === undefined ? {} : { firstErrorLines: truth.lineOf[String(result.firstErrorStep)]! }) } };
 }
-/** Diagnostic core grading only; does not implement the batch 3.4 confirmation policy. */
+/** Parse with vocabulary only, then grade at the boundary with the confirmed spec. */
 export function realWork(spec: ProblemSpec, lines: WorkLine[]): { parsed: ParsedWork; grade: WorkGrade } {
   const parsed = parseWork(lines, vocabularyOf(spec));
   // Vocabulary contains display labels only. Map to core ids at the grading boundary.
@@ -69,13 +69,44 @@ export function realWork(spec: ProblemSpec, lines: WorkLine[]): { parsed: Parsed
       default: return claim;
     }
   });
-  const result = grade(spec, claims);
-  const gradedParsed: ParsedWork = { ...parsed, steps: parsed.steps.map((s, i) => ({ ...s, claim: claims[i]!, candidates: [claims[i]!] })) };
-  return { parsed: gradedParsed, grade: { result, questions: [], ...(result.firstErrorStep === undefined ? {} : {
-    firstErrorLines: parsed.steps.find((s) => s.claim.step === result.firstErrorStep)?.lines ?? [],
-  }) } };
+  const workGrade = gradeWork(spec, parsed);
+  const gradedParsed: ParsedWork = { ...parsed, steps: parsed.steps.map((s, i) => ({ ...s, claim: claims[i]! })) };
+  return { parsed: gradedParsed, grade: workGrade };
 }
-/** Diagnostics for rule 6 only; applying the confirmation policy belongs to 3.4. */
+/** Each source line can be answered once. Unsupported truth remains unresolved, never auto-skipped. */
+export function replayWorkAnswers(spec: ProblemSpec, observed: WorkLine[], truth: WorkLine[]) {
+  let lines = observed;
+  let prediction = realWork(spec, lines);
+  const answered = new Set<number>();
+  const eligible = new Set(observed.filter((line) => !line.struck && !line.skipped && line.region !== 'question' && line.region !== 'figure').map((line) => line.index));
+  let questions = 0;
+  for (let round = 0; round < eligible.size; round++) {
+    const pending = [...prediction.grade.questions, ...(prediction.grade.readingCheck ? [prediction.grade.readingCheck] : [])];
+    const answers: { line: number; text: string }[] = [];
+    for (const question of pending) {
+      const fresh = question.lines.filter((line) => eligible.has(line) && !answered.has(line));
+      const references = fresh.map((line) => truth.find((l) => l.index === line));
+      if (!fresh.length || references.some((l) => !l)) continue;
+      questions++;
+      fresh.forEach((line, i) => { answered.add(line); answers.push({ line, text: references[i]!.text }); });
+    }
+    if (!answers.length) break;
+    lines = applyWorkAnswers(lines, answers);
+    prediction = realWork(spec, lines);
+  }
+  return { prediction, questions, answeredLines: answered.size, lines, solutionLines: eligible.size };
+}
+/** Partition only residual silent errors; corrected lines no longer count as reading mismatches. */
+export function silentReadingPartition(comparison: WorkComparison, observed: WorkLine[], truth: WorkLine[], threshold = 0.85) {
+  const silent = comparison.silentFalseCorrect || comparison.silentFalseWrongParse || comparison.silentFalseWrongReading;
+  const high = observed.some((line) => {
+    if (line.struck || line.skipped || line.region === 'question' || line.region === 'figure' || line.conf < threshold) return false;
+    const reference = truth.find((item) => item.index === line.index);
+    return reference !== undefined && line.text.normalize('NFC').trim() !== reference.text.normalize('NFC').trim();
+  });
+  return { withHighConfidenceMisread: Number(silent && high), withoutHighConfidenceMisread: Number(silent && !high) };
+}
+/** Diagnostic partition retained alongside the applied rule 6 confirmation policy. */
 export function uncheckedGuard(comparison: WorkComparison, unchecked: number[], firstErrorLines: number[]) {
   const prior = firstErrorLines.length > 0 && unchecked.some((line) => line < Math.min(...firstErrorLines));
   return {
@@ -130,8 +161,18 @@ export async function evaluateWork(args: string[], root: string, date: string, r
   if (!samples.length) throw new Error('Bộ bài làm rỗng; chưa đủ căn cứ để đo.');
   const rows = samples.map((s) => {
     const prediction = options.parser === 'real' ? realWork(s.spec, s.observed) : oracleWork(s.spec, s.truth, s.lines);
+    const replay = options.parser === 'real' ? replayWorkAnswers(s.spec, s.observed, s.lines) : { prediction, questions: 0, answeredLines: 0, lines: s.observed, solutionLines: s.observed.length };
+    const afterComparison = compareWork(replay.prediction, { ...s.truth, lines: s.lines });
+    afterComparison.questions = replay.questions;
+    const comparison = compareWork(prediction, { ...s.truth, lines: s.lines });
     return { id: s.id, group: s.group, variant: s.variant, observedLines: s.observedCount,
-      comparison: compareWork(prediction, { ...s.truth, lines: s.lines }), expected: s.truth.expected,
+      afterComparison, questionsAsked: replay.questions, answeredLines: replay.answeredLines,
+      solutionLines: replay.solutionLines,
+      silentReadingPartition: silentReadingPartition(comparison, s.observed, s.lines),
+      afterSilentReadingPartition: silentReadingPartition(afterComparison, replay.lines, s.lines),
+      afterVerdict: replay.prediction.grade.result.verdict, afterUnchecked: replay.prediction.parsed.unchecked,
+      afterFirstErrorLines: replay.prediction.grade.firstErrorLines ?? [],
+      comparison, expected: s.truth.expected,
       predictedClaimTypes: prediction.parsed.steps.map((step) => step.claim.type), unchecked: prediction.parsed.unchecked,
       issues: prediction.parsed.issues.map((issue) => ({ code: issue.code, lines: issue.lines })),
       firstErrorLines: prediction.grade.firstErrorLines ?? [],
@@ -140,10 +181,10 @@ export async function evaluateWork(args: string[], root: string, date: string, r
       deferredTruth: s.truth.claims.some((c) => ['dijkstra_init', 'dijkstra_select', 'dijkstra_label', 'nn_step', 'postman_duplicate'].includes(c.type)),
     };
   });
-  const summarize = (subset: typeof rows) => {
-    const comparison = subset.map((r) => r.comparison);
+  const summarize = (subset: typeof rows, after = false) => {
+    const comparison = subset.map((r) => after ? r.afterComparison : r.comparison);
     const sum = (fn: (c: WorkComparison) => number): number => comparison.reduce((n, c) => n + fn(c), 0);
-    const guards = subset.map((r) => uncheckedGuard(r.comparison, r.unchecked, r.firstErrorLines));
+    const guards = subset.map((r) => uncheckedGuard(after ? r.afterComparison : r.comparison, after ? r.afterUnchecked : r.unchecked, after ? r.afterFirstErrorLines : r.firstErrorLines));
     const guardSum = (key: keyof ReturnType<typeof uncheckedGuard>) => guards.reduce((n, g) => n + g[key], 0);
     return { total: subset.length, completeCorrect: sum((c) => Number(c.completeCorrect)),
       claimMatched: sum((c) => c.claims.matched), claimPredicted: sum((c) => c.claims.predicted), claimReference: sum((c) => c.claims.reference),
@@ -153,6 +194,10 @@ export async function evaluateWork(args: string[], root: string, date: string, r
       firstErrorCorrect: sum((c) => Number(c.firstErrorCorrect === true)), firstErrorReference: sum((c) => Number(c.firstErrorCorrect !== null)),
       silentFalseCorrect: sum((c) => Number(c.silentFalseCorrect)), silentFalseWrongParse: sum((c) => Number(c.silentFalseWrongParse)),
       silentFalseWrongReading: sum((c) => Number(c.silentFalseWrongReading)), proseAsUnchecked: sum((c) => c.proseAsUnchecked),
+      contentAsProse: { lowConfidence: sum((c) => c.contentAsProse.lowConfidence), highConfidence: sum((c) => c.contentAsProse.highConfidence) },
+      silentWithHighConfidenceMisread: subset.reduce((n, r) => n + (after ? r.afterSilentReadingPartition : r.silentReadingPartition).withHighConfidenceMisread, 0),
+      silentWithoutHighConfidenceMisread: subset.reduce((n, r) => n + (after ? r.afterSilentReadingPartition : r.silentReadingPartition).withoutHighConfidenceMisread, 0),
+      questionBoundViolations: subset.filter((r) => r.questionsAsked > r.solutionLines || r.answeredLines > r.solutionLines).length,
       silentFalseCorrectWithUnchecked: guardSum('silentFalseCorrectWithUnchecked'),
       silentFalseCorrectWithoutUnchecked: guardSum('silentFalseCorrectWithoutUnchecked'),
       silentFalseWrongParseWithPriorUnchecked: guardSum('silentFalseWrongParseWithPriorUnchecked'),
@@ -171,6 +216,9 @@ export async function evaluateWork(args: string[], root: string, date: string, r
     insufficientRate: counts.total ? counts.insufficient / counts.total : 0,
   });
   const summary = withRates(summarize(rows));
+  const afterSummary = withRates(summarize(rows, true));
+  const afterGroups = Object.fromEntries([...new Set(rows.map((r) => r.group))].map((g) => [g, withRates(summarize(rows.filter((r) => r.group === g), true))]));
+  const afterVariants = Object.fromEntries([...new Set(rows.map((r) => r.variant))].map((v) => [v, withRates(summarize(rows.filter((r) => r.variant === v), true))]));
   const groups = Object.fromEntries([...new Set(rows.map((r) => r.group))].map((g) => [g, withRates(summarize(rows.filter((r) => r.group === g)))]));
   const variants = Object.fromEntries([...new Set(rows.map((r) => r.variant))].map((v) => [v, withRates(summarize(rows.filter((r) => r.variant === v)))]));
   const silentErrors = rows.filter((r) => r.comparison.silentFalseCorrect || r.comparison.silentFalseWrongParse || r.comparison.silentFalseWrongReading)
@@ -178,14 +226,16 @@ export async function evaluateWork(args: string[], root: string, date: string, r
       firstErrorLines: r.firstErrorLines, expectedErrorLines: r.expectedErrorLines, unchecked: r.unchecked }));
   const parser = options.parser ?? 'oracle';
   const report = { date, ...options, parser, fixtureOnly: true,
-    note: parser === 'real' ? 'Parser Lô 3.3: văn xuôi, Dijkstra, nn_step, postman_duplicate, bảng và nhiều trang. Chấm trực tiếp bằng core.grade để đo; chưa có gradeWork, readingCheck hay nâng unchecked thành hỏi lại (Lô 3.4). Các chỉ số chấm là chẩn đoán, không phải pipeline an toàn hoàn chỉnh. Chưa đủ căn cứ trên bài thật.' : 'Parser oracle trả claims truth, bỏ qua chữ quan sát khi tạo claim. 100% chỉ kiểm bộ đo. Không phải độ chính xác đọc/hiểu, không mô phỏng hỏi lại (Lô 3.4). Chưa đủ căn cứ trên bài thật.',
-    summary, proseOnly: withRates(summarize(rows.filter((r) => !r.deferredTruth))), groups, variants, silentErrors, rows };
+    note: parser === 'real' ? 'Pipeline Lô 3.4: chọn chữ bằng từ vựng, gradeWork và hỏi lại bằng chữ truth; tính cả soát dòng SAI. Mỗi dòng chỉ được trả lời một lần; truth chưa hiểu được vẫn để hỏi lại, không tự bỏ qua. Chưa đủ căn cứ trên bài thật.' : 'Parser oracle trả claims truth, chỉ kiểm bộ đo; không đo khả năng đọc/hiểu hay hỏi lại.',
+    summary, afterSummary, afterGroups, afterVariants, proseOnly: withRates(summarize(rows.filter((r) => !r.deferredTruth))), groups, variants, silentErrors, rows };
   const source = `${options.set}-${options.source}${options.split ? '-' + options.split : ''}${options.engine ? '-' + options.engine.replace(/[^a-zA-Z0-9-]/g, '-') : ''}${options.variant ? '-' + options.variant : ''}${parser === 'real' ? '-real' : ''}`;
   const output = join(reportRoot, 'reports', `work-eval-${source}-${date}`); await mkdir(join(reportRoot, 'reports'), { recursive: true });
   const md = `# Đo bài làm — parser ${parser}\n\n${report.note}\n\nNguồn: ${options.set} / ${options.source}.\n\n| Nhóm | Bài | Hiểu hoàn toàn | Kết luận đúng / so được | Đúng lỗi đầu / bài SAI | Sai thầm lặng (i) | SAI hiểu sai (ii) | SAI đọc sai (iii) | Văn xuôi unchecked |\n| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |\n`
     + Object.entries(groups).map(([g, s]) => `| ${g} | ${s.total} | ${s.completeCorrect} | ${s.verdictCorrect}/${s.verdictComparable} | ${s.firstErrorCorrect}/${s.firstErrorReference} | ${s.silentFalseCorrect} | ${s.silentFalseWrongParse} | ${s.silentFalseWrongReading} | ${s.proseAsUnchecked} |`).join('\n')
     + `\n\nTổng: ${summary.total}; hiểu hoàn toàn ${summary.completeRate * 100}%; claim ${summary.claimMatched}/${summary.claimReference}; đúng dòng ${summary.sourceCorrect}/${summary.sourceMatched}; hỏi lại ${summary.confirmations}; không đủ căn cứ ${summary.insufficient}; bước từ dòng gạch ${summary.struckAsContent}; sai thầm lặng (i)/(ii)/(iii): ${summary.silentFalseCorrect}/${summary.silentFalseWrongParse}/${summary.silentFalseWrongReading}; văn xuôi unchecked ${summary.proseAsUnchecked}.\n\nThiếu bằng chứng chữ (readingMismatch = null) được xếp bảo thủ vào (ii).\n`
     + `\nQuy tắc 6 (chỉ thống kê): (i) có/không unchecked ${summary.silentFalseCorrectWithUnchecked}/${summary.silentFalseCorrectWithoutUnchecked}; (ii) có/không unchecked trước dòng sai đầu tiên ${summary.silentFalseWrongParseWithPriorUnchecked}/${summary.silentFalseWrongParseWithoutPriorUnchecked}.\n`
+    + `\nSau hỏi lại: ${afterSummary.verdictCorrect}/${afterSummary.verdictComparable} kết luận đúng; lỗi đầu ${afterSummary.firstErrorCorrect}/${afterSummary.firstErrorReference}; còn hỏi lại ${afterSummary.confirmations}; sai thầm lặng (i)/(ii)/(iii) ${afterSummary.silentFalseCorrect}/${afterSummary.silentFalseWrongParse}/${afterSummary.silentFalseWrongReading}; câu hỏi trung bình/tối đa ${afterSummary.questionsMean}/${afterSummary.questionsMax}.\n`
+    + `\nContentAsProse conf dòng thấp/cao: ${summary.contentAsProse.lowConfidence}/${summary.contentAsProse.highConfidence} → ${afterSummary.contentAsProse.lowConfidence}/${afterSummary.contentAsProse.highConfidence}. Sau hỏi lại, sai thầm lặng có/không dòng đọc sai conf ≥ 0,85: ${afterSummary.silentWithHighConfidenceMisread}/${afterSummary.silentWithoutHighConfidenceMisread}; vi phạm giới hạn câu hỏi: ${afterSummary.questionBoundViolations}.\n`
     + (silentErrors.length ? '\n' + silentErrors.map((e) => `- ${e.id}: (${e.type}); dòng lỗi dự đoán [${e.firstErrorLines}], truth [${e.expectedErrorLines}]; unchecked [${e.unchecked}].`).join('\n') + '\n' : '');
   await writeFile(output + '.json', jsonText(report)); await writeFile(output + '.md', md);
   return report;

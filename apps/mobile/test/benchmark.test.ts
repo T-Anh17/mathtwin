@@ -480,7 +480,7 @@ describe('Android benchmark flow with fake native plugin (no device/model/networ
 
 describe('engine C benchmark with fake worker/plugin', () => {
   const c: BenchmarkConfig = { ...config, model: 'c', mode: 'lines', passes: 1, readTimeout: 1000 };
-  const output = { linePasses: [{ lines: [{ text: 'ố', conf: 0.6, alternatives: ['ẹ'] }],
+  const output = { linePasses: [{ lines: [{ text: 'ố', conf: 0.6, alternatives: ['ẹ'], charConf: [0.6] }],
     usage: { engine: 'offline:vietocr-onnx', passes: 1, latencyMs: 20, detectionMs: 5, recognitionMs: 15, lineCount: 1, lineMs: [15] } }],
     loadMs: 7, wasm: { numThreads: 1, crossOriginIsolated: false, simd: true as const } };
   it('verifies C, reads original pixels, collects app RAM and exports metadata without local paths', async () => {
@@ -494,6 +494,8 @@ describe('engine C benchmark with fake worker/plugin', () => {
       memory: { rssMemoryMb: 120, peakMemoryMb: 150 }, usage: { lineMs: [15], lineCount: 1 } });
     const json = exportReport({ version: 1, device, results: [result] });
     expect(JSON.parse(json)).toMatchObject({ results: [{ wasm: output.wasm, config: { backend: 'WASM' }, linePasses: output.linePasses }] });
+    const oldResult = { ...result, linePasses: [{ ...output.linePasses[0]!, lines: [{ text: 'ố', conf: 0.6, alternatives: ['ẹ'] }] }] };
+    expect(exportReport({ version: 1, device, results: [oldResult] })).not.toContain('charConf');
     expect(json).not.toContain('/det'); expect(json).not.toContain('pixels');
   });
   it('graph mode fails before model loading', async () => {

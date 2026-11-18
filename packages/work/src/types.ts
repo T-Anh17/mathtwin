@@ -1,7 +1,7 @@
 import type { Claim, ClaimBody, GradeResult, ProblemSpec, Task } from '@mathtwin/core';
 import type { TextLine } from '@mathtwin/reader';
 
-export interface WorkLine extends TextLine { page: number; index: number; charConf?: number[] }
+export interface WorkLine extends TextLine { page: number; index: number; skipped?: boolean }
 export interface WorkVocabulary {
   vertexLabels: string[]; edgeNames: string[]; task: Task['type'];
   questionFormat: ProblemSpec['questionFormat']; statementIds: string[]; questionText: string[];
@@ -9,11 +9,15 @@ export interface WorkVocabulary {
 export interface ParsedStep {
   claim: Claim; lines: number[]; page: number; box?: [number, number, number, number];
   candidates: ClaimBody[]; origin: 'text' | 'table' | 'inferred';
+  /** Transcriptions aligned with candidates, for reading question options. */
+  candidateTexts?: string[];
 }
 export type WorkIssueCode = 'no_solution_lines' | 'unparsed_line' | 'ambiguous_line' | 'unknown_label'
   | 'struck_uncertain' | 'table_unrecognized' | 'figure_annotations' | 'page_order' | 'read_failed';
 export interface WorkIssue { code: WorkIssueCode; severity: 'blocking' | 'warning'; lines?: number[]; message: string }
 export interface ParsedWork {
+  /** Selected transcriptions, also retained for lines without a parsed step. */
+  sourceLines?: WorkLine[];
   steps: ParsedStep[];
   ignored: { line: number; reason: 'struck' | 'question' | 'figure' | 'prose' | 'empty' }[];
   unchecked: number[]; issues: WorkIssue[];
@@ -42,5 +46,6 @@ export interface WorkComparison {
   firstErrorCorrect: boolean | null;
   silentFalseCorrect: boolean; silentFalseWrongParse: boolean; silentFalseWrongReading: boolean; readingMismatch: boolean | null;
   proseAsUnchecked: number;
+  contentAsProse: { lowConfidence: number; highConfidence: number };
   struckAsContent: number; insufficient: boolean; insufficientReasons: string[]; questions: number;
 }

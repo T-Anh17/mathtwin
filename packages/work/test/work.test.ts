@@ -66,6 +66,25 @@ describe('pure work package', () => {
     expect(compareWork(p, truth)).toMatchObject({ readingMismatch: null, silentFalseWrongParse: true });
     expect(compareWork(predicted([a, b], result), withoutLines)).toMatchObject({ readingMismatch: false, silentFalseWrongParse: true });
   });
+  it('checks all reading evidence through the error, including content lost before it', () => {
+    const result: GradeResult = { verdict: 'SAI', firstErrorStep: 2, errorCode: 'SAI_PHEP_TINH', message: '', notes: [] };
+    const p = predicted([{ ...a, raw: 'Số cạnh: 9.' }, b], result);
+    expect(compareWork(p, truth)).toMatchObject({ readingMismatch: true, silentFalseWrongReading: true, silentFalseWrongParse: false });
+    p.parsed.steps[0]!.claim.raw = a.raw;
+    expect(compareWork(p, truth)).toMatchObject({ readingMismatch: false, silentFalseWrongParse: true });
+    const missing = predicted([{ ...b, step: 1 }], { ...result, firstErrorStep: 1 }, [[1]]);
+    missing.parsed.sourceLines = truth.lines!.map((line) => line.index === 0 ? { ...line, text: 'nhiễu', conf: 0.3 } : line);
+    missing.parsed.ignored = [{ line: 0, reason: 'prose' }];
+    expect(compareWork(missing, truth)).toMatchObject({ readingMismatch: true, silentFalseWrongReading: true,
+      contentAsProse: { lowConfidence: 1, highConfidence: 0 } });
+    missing.parsed.sourceLines[0]!.conf = 0.99;
+    expect(compareWork(missing, truth).contentAsProse).toEqual({ lowConfidence: 0, highConfidence: 1 });
+    missing.parsed.sourceLines[0]!.text = a.raw;
+    expect(compareWork(missing, truth)).toMatchObject({ readingMismatch: false, silentFalseWrongParse: true });
+    // A later misread must not contaminate the prefix classification.
+    const early = predicted([a, { ...b, raw: 'nhiễu sau lỗi' }], { ...result, firstErrorStep: 1 });
+    expect(compareWork(early, truth).readingMismatch).toBe(false);
+  });
   it('counts distinct prose truth lines put in unchecked', () => {
     const p = predicted([a, b]); p.parsed.unchecked = [2, 2, 3, 4];
     expect(compareWork(p, { ...truth, prose: [2, 3, 5] }).proseAsUnchecked).toBe(2);

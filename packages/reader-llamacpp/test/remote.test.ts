@@ -157,6 +157,6 @@ it('Paddle spotting uses a real LOC prompt by default, keeping text even if poly
   const loc = '<|LOC_1001|><|LOC_0|><|LOC_100|><|LOC_0|><|LOC_100|><|LOC_100|><|LOC_0|><|LOC_100|>';
   const h = remote(response(`7${loc}`)), reader = new LlamaCppReader({ ...h.options, model: 'a' }, h.runtime);
   const result = await reader.readLines([image]);
-  expect(result.lines).toEqual([{ text: '7', conf: 0.95, alternatives: [] }]);
+  expect(result.lines).toEqual([{ text: '7', conf: 0.95, alternatives: [], charConf: [0.95] }]);
   expect(String(h.fetcher.mock.calls[1]?.[1]?.body)).toContain('Spotting:');
 });

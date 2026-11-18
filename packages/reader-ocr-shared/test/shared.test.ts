@@ -71,6 +71,15 @@ it('greedy uses true log-probs: NFC text, minimum char confidence and two altern
   await reader.close(); await reader.close();
   for (const s of sessions) expect(s.release).toHaveBeenCalledTimes(1);
 });
+it('composes decoder characters to NFC and keeps one confidence per output code point', async () => {
+  const fake = fakeRuntime();
+  const reader = await VietOcrReader.create(fake.ort, models, { ...config, vocab: 'o\u0302AB ' });
+  const result = await reader.readLines([image]);
+  expect(result.lines[0]!.text).toBe('ô');
+  expect(result.lines[0]!.charConf).toHaveLength(1);
+  expect(result.lines[0]!.charConf[0]).toBeCloseTo(0.6);
+  await reader.close();
+});
 it('missing log-prob output is an error, never a confident line', async () => {
   const fake = fakeRuntime({ missing: true }); const reader = await VietOcrReader.create(fake.ort, models, config);
   await expect(reader.readLines([image])).rejects.toMatchObject({ code: 'missing_log_probs' });

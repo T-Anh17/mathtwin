@@ -3,29 +3,41 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import type { ProblemSpec } from '@mathtwin/core';
-import { evaluateWork, realWork, readWorkOptions, uncheckedGuard } from '../src/work-eval.js';
+import { evaluateWork, realWork, readWorkOptions, replayWorkAnswers, silentReadingPartition, uncheckedGuard } from '../src/work-eval.js';
 import { compareWork } from '@mathtwin/work';
 const spec: ProblemSpec = { graph: { directed: false, vertices: [{ id: 'v1', label: 'A' }], edges: [] }, task: { type: 'degree', vertices: ['v1'] }, questionFormat: 'tu_luan' };
 describe('real parser evaluation switch', { timeout: 60000 }, () => {
-  it('partitions silent errors by the future unchecked guard without changing the verdict', () => {
+  it('guards unchecked and bounds truth replay, including unchanged unparsed truth', () => {
     const lines = (texts: string[]) => texts.map((text,index)=>({text,index,page:0,conf:1,alternatives:[]}));
-    const prediction = realWork(spec, lines(['x = ?', 'deg(A) = 3']));
-    const reference = {claims:[],lineOf:{},expected:{verdict:'DUNG' as const}};
-    const comparison = compareWork(prediction, reference);
-    expect(uncheckedGuard(comparison,[0],[1])).toMatchObject({silentFalseWrongParseWithPriorUnchecked:1,silentFalseWrongParseWithoutPriorUnchecked:0});
-    for(const unchecked of [[],[1],[2]]) expect(uncheckedGuard(comparison,unchecked,[1])).toMatchObject({silentFalseWrongParseWithPriorUnchecked:0,silentFalseWrongParseWithoutPriorUnchecked:1});
-    expect(uncheckedGuard(comparison,[0],[]).silentFalseWrongParseWithoutPriorUnchecked).toBe(1);
-    expect(prediction.grade.result.verdict).toBe('SAI');
-    const correct = realWork(spec,lines(['x = ?', 'deg(A) = 0']));
-    const falseCorrect = compareWork(correct,{...reference,expected:{verdict:'SAI'}});
-    expect(uncheckedGuard(falseCorrect,[0],[]).silentFalseCorrectWithUnchecked).toBe(1);
-    expect(uncheckedGuard(falseCorrect,[],[]).silentFalseCorrectWithoutUnchecked).toBe(1);
+    const observed = lines(['x = ?', 'deg(A) = 3']);
+    expect(realWork(spec, observed).grade.result.verdict).toBe('CAN_XAC_NHAN');
+    const replay = replayWorkAnswers(spec, observed, lines(['x = ?', 'deg(A) = 0']));
+    expect(replay).toMatchObject({ questions: 1, answeredLines: 1, prediction: { grade: { result: { verdict: 'CAN_XAC_NHAN' } } } });
+    const reading = replayWorkAnswers(spec, lines(['deg(A) = 3']), lines(['deg(A) = 0']));
+    expect(reading).toMatchObject({ questions: 1, prediction: { grade: { result: { verdict: 'DUNG' } } } });
+    const same = replayWorkAnswers(spec, lines(['deg(A) = 3']), lines(['deg(A) = 3']));
+    expect(same).toMatchObject({ questions: 1, prediction: { grade: { result: { verdict: 'SAI' } } } });
+    const rounds = replayWorkAnswers(spec, observed, lines(['Số cạnh = 0', 'deg(A) = 0']));
+    expect(rounds).toMatchObject({ questions: 2, answeredLines: 2, prediction: { grade: { result: { verdict: 'DUNG' } } } });
+    const comparison = compareWork(realWork(spec, lines(['deg(A) = 3'])), {claims:[],lineOf:{},expected:{verdict:'DUNG'}});
+    expect(uncheckedGuard(comparison,[0],[1]).silentFalseWrongParseWithPriorUnchecked).toBe(1);
   });
   it('maps display labels at the grading boundary, including nested final answers', () => {
     const line = (text: string) => [{ text, index: 0, page: 0, conf: 1, alternatives: [] }];
     expect(realWork(spec, line('deg(A) = 0')).grade.result.verdict).toBe('DUNG');
     expect(realWork(spec, line('Đáp số: bậc của A là 0')).grade.result.verdict).toBe('DUNG');
     expect(realWork(spec, line('deg(A) = 3')).grade).toMatchObject({ result: { verdict: 'SAI', firstErrorStep: 1 }, firstErrorLines: [0] });
+  });
+  it('reparses after each answer and checks newly exposed errors, within solution-line bounds', () => {
+    const lines = (texts: string[]) => texts.map((text, index) => ({ text, index, page: 0, conf: 0.3, alternatives: [] }));
+    const reference = lines(['Số cạnh = 0', 'deg(A) = 0', 'Đề', 'Gạch']);
+    const observed = lines(['chữ hỏng', 'deg(A) = 3', 'Đề', 'Gạch']);
+    const input = observed.map((line) => ({ ...line, ...(line.index === 2 ? { region: 'question' as const } : {}), ...(line.index === 3 ? { struck: true } : {}) }));
+    const replay = replayWorkAnswers(spec, input, reference);
+    expect(replay).toMatchObject({ questions: 2, answeredLines: 2, solutionLines: 2, prediction: { grade: { result: { verdict: 'DUNG' } } } });
+    const comparison = compareWork(realWork(spec, [{ ...input[1]!, index: 0, conf: 1 }]), { claims: [], lineOf: {}, expected: { verdict: 'DUNG' } });
+    expect(silentReadingPartition(comparison, [{ ...input[1]!, index: 1, conf: 0.9 }], reference)).toEqual({ withHighConfidenceMisread: 1, withoutHighConfidenceMisread: 0 });
+    expect(silentReadingPartition(comparison, input, reference)).toEqual({ withHighConfidenceMisread: 0, withoutHighConfidenceMisread: 1 });
   });
   it('selects variants and runs observed text through the parser instead of copying truth', async () => {
     const root = await mkdtemp(join(tmpdir(), 'mathtwin-work-parser-'));
@@ -57,6 +69,7 @@ describe('real parser evaluation switch', { timeout: 60000 }, () => {
       const noiseReport = await evaluateWork(['--set', 'work-text', '--lines', 'truth', '--split', 'dev', '--variant', 'b', '--parser', 'real'], root, '2000-01-01');
       expect(noiseReport.summary).toMatchObject({ total: 1, silentFalseWrongReading: 1, silentFalseWrongParse: 0 });
       expect(noiseReport.rows[0]!.comparison.readingMismatch).toBe(true);
+      expect(noiseReport.afterSummary).toMatchObject({ verdictCorrect: 1, confirmations: 0, silentFalseWrongReading: 0, questionsMean: 1, questionsMax: 1 });
     } finally {
       if (!resolve(root).startsWith(resolve(tmpdir(), 'mathtwin-work-parser-'))) throw new Error('Unexpected temporary path');
       await rm(root, { recursive: true, force: true });

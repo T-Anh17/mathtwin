@@ -35,6 +35,8 @@ export interface VisionReader {
 }
 export interface TextLine {
   text: string;
+  /** One probability per code point of NFC text; absent when unavailable. */
+  charConf?: number[];
   struck?: boolean;
   box?: [number, number, number, number];
   conf: number;

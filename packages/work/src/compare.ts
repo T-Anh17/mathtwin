@@ -19,7 +19,7 @@ export function claimKey(claim: ClaimBody): string {
   return canonical(body);
 }
 const sameLines = (a: number[], b: number[]): boolean => canonical([...new Set(a)].sort((x, y) => x - y)) === canonical([...new Set(b)].sort((x, y) => x - y));
-export function compareWork(predicted: { parsed: ParsedWork; grade: WorkGrade }, truth: WorkTruth): WorkComparison {
+export function compareWork(predicted: { parsed: ParsedWork; grade: WorkGrade }, truth: WorkTruth, opts?: { confThreshold?: number }): WorkComparison {
   const steps = predicted.parsed.steps;
   const p = steps.map((s) => claimKey(s.claim)); const t = truth.claims.map(claimKey);
   const lcs = Array.from({ length: p.length + 1 }, () => new Array<number>(t.length + 1).fill(0));
@@ -40,13 +40,34 @@ export function compareWork(predicted: { parsed: ParsedWork; grade: WorkGrade },
   let readingMismatch: boolean | null = null;
   if (result.verdict === 'SAI') {
     const failing = steps.find((s) => s.claim.step === result.firstErrorStep);
-    if (failing && truth.lines && errorLines.length) {
-      const source = errorLines.map((index) => truth.lines!.find((l) => l.index === index)?.text);
-      if (source.every((s) => s !== undefined)) readingMismatch = failing.claim.raw.normalize('NFC').trim() !== source.join('\n').normalize('NFC').trim();
-    } else if (failing && errorLines.length) {
-      const sameSource = truth.claims.filter((c) => sameLines(truth.lineOf[String(c.step)] ?? [], errorLines));
-      if (sameSource.length) readingMismatch = !sameSource.some((c) => c.raw === failing.claim.raw);
+    if (failing && errorLines.length) {
+      const prefix = steps.slice(0, steps.indexOf(failing) + 1);
+      const checks: (boolean | null)[] = prefix.map((step) => {
+        const source = step.lines.map((index) => truth.lines?.find((l) => l.index === index)?.text);
+        if (source.length && source.every((s) => s !== undefined)) return step.claim.raw.normalize('NFC').trim() !== source.join('\n').normalize('NFC').trim();
+        const sameSource = truth.claims.filter((c) => sameLines(truth.lineOf[String(c.step)] ?? [], step.lines));
+        return sameSource.length ? !sameSource.some((c) => c.raw === step.claim.raw) : null;
+      });
+      const source = predicted.parsed.sourceLines ?? [];
+      const position = (index: number): [number, number] => [source.find((l) => l.index === index)?.page ?? truth.lines?.find((l) => l.index === index)?.page ?? 0, index];
+      const throughError = (index: number): boolean => errorLines.some((last) => {
+        const a = position(index), b = position(last); return a[0] < b[0] || a[0] === b[0] && a[1] <= b[1];
+      });
+      // Include truth content lost to prose/ignored before the predicted error.
+      const missing = new Set(Object.values(truth.lineOf).flat().filter((index) => throughError(index) && !prefix.some((s) => s.lines.includes(index))));
+      for (const index of missing) {
+        const actual = source.find((l) => l.index === index), expected = truth.lines?.find((l) => l.index === index);
+        checks.push(actual && expected ? actual.text.normalize('NFC').trim() !== expected.text.normalize('NFC').trim() : null);
+      }
+      readingMismatch = checks.includes(true) ? true : checks.includes(null) ? null : false;
     }
+  }
+  const threshold = opts?.confThreshold ?? 0.85;
+  const content = new Set(Object.values(truth.lineOf).flat());
+  const contentAsProse = { lowConfidence: 0, highConfidence: 0 };
+  for (const index of new Set(predicted.parsed.ignored.filter((item) => item.reason === 'prose' && content.has(item.line)).map((item) => item.line))) {
+    const line = predicted.parsed.sourceLines?.find((l) => l.index === index) ?? truth.lines?.find((l) => l.index === index);
+    if (line && line.conf < threshold) contentAsProse.lowConfidence++; else contentAsProse.highConfidence++;
   }
   const falseWrong = result.verdict === 'SAI' && (truth.expected.verdict === 'DUNG' || truth.expected.verdict === 'SAI' && !overlap);
   return {
@@ -63,9 +84,10 @@ export function compareWork(predicted: { parsed: ParsedWork; grade: WorkGrade },
     silentFalseWrongReading: falseWrong && readingMismatch === true,
     readingMismatch,
     proseAsUnchecked: new Set(predicted.parsed.unchecked.filter((line) => truth.prose?.includes(line))).size,
+    contentAsProse,
     struckAsContent: steps.filter((s) => s.lines.some((index) => truth.lines?.some((l) => l.index === index && l.struck))).length,
     insufficient: result.verdict === 'KHONG_DU_CAN_CU',
     insufficientReasons: result.verdict === 'KHONG_DU_CAN_CU' ? predicted.parsed.issues.map((issue) => issue.code) : [],
-    questions: predicted.grade.questions.length,
+    questions: predicted.grade.questions.length + Number(predicted.grade.readingCheck !== undefined),
   };
 }

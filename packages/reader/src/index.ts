@@ -1,6 +1,7 @@
 export { ReadDraftSchema, TaskDraftSchema, StatementCheckDraftSchema, QuestionDraftSchema } from './schema.js';
 export type { ReadDraft, TaskDraft, StatementCheckDraft, QuestionDraft } from './schema.js';
 export type * from './types.js';
+export { normalizeCharConfidence } from './char-confidence.js';
 export { normalizeLabel, CONFIDENCE_THRESHOLD } from './model.js';
 export { normalizeDraft } from './normalize.js';
 export { reconcile } from './reconcile.js';
