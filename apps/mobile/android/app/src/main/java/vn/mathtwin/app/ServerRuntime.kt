@@ -79,6 +79,7 @@ internal class ServerRuntime(private val context: Context, private val store: Mo
     fun status(): JSONObject = synchronized(lock) {
         if (process?.isAlive == true) sample()
         JSONObject().put("alive", process?.isAlive == true).also { result ->
+            if (process?.isAlive == true) result.put("model", configuration.substringBefore(":"))
             highWaterKb?.let { result.put("peakMemoryMb", it / 1024.0) }
             rssKb?.let { result.put("rssMemoryMb", it / 1024.0) }
             if (backendConflict) result.put("errorCode", "cpu_backend_unknown")

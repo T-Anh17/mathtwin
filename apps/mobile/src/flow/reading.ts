@@ -6,6 +6,8 @@ export interface Readers {
   text: TextReader;
   problem: (photos: PreparedImage[], signal?: AbortSignal) => Promise<ReadOutcome>;
   figure?: FigureDraftRunner;
+  /** Caller holds this lease across decoding, OCR, drafts and durable checkpoints. */
+  activity?: (running: boolean) => Promise<void>;
 }
 export interface ProblemPageRead { page: number; outcome: ReadOutcome; figure?: ReadDraft; ms: number; figureMs: number }
 export interface ReadingProgress { page: number; total: number; phase: 'problem' | 'figure' }
@@ -21,11 +23,28 @@ export function cancellable<T>(work: () => Promise<T>, signal: AbortSignal): Pro
   });
 }
 
+/** Bound even a non-cooperative fake/worker, and propagate the deadline to native cancellation. */
+export async function readingTask<T>(work: (signal: AbortSignal) => Promise<T>, parent: AbortSignal, timeoutMs = 180_000): Promise<T> {
+  parent.throwIfAborted();
+  const controller = new AbortController();
+  const abort = () => controller.abort(parent.reason);
+  parent.addEventListener('abort', abort, { once: true });
+  const timer = setTimeout(() => controller.abort({ code: 'timeout' }), timeoutMs);
+  try { return await cancellable(() => work(controller.signal), controller.signal); }
+  finally { clearTimeout(timer); parent.removeEventListener('abort', abort); }
+}
+
+export function checkImage(image: PreparedImage): PreparedImage {
+  if (!Number.isInteger(image.width) || !Number.isInteger(image.height) || image.width < 1 || image.height < 1
+    || image.width * image.height > 40_000_000 || image.pixels.length !== image.width * image.height * 4) throw { code: 'image_invalid' };
+  return image;
+}
+
 /** One page in memory, one durable checkpoint at a time. Callers supply all platform operations. */
 export async function readProblemPages(options: {
   count: number; load: (page: number) => Promise<PreparedImage>; readers: Readers; signal: AbortSignal;
   saved?: ProblemPageRead[]; progress: (value: ReadingProgress) => void;
-  checkpoint: (value: ProblemPageRead) => Promise<void>; now?: () => number;
+  checkpoint: (value: ProblemPageRead) => Promise<void>; now?: () => number; timeoutMs?: number;
 }): Promise<ReadOutcome> {
   const { readers, signal } = options, now = options.now ?? (() => performance.now());
   if (!Number.isInteger(options.count) || options.count < 1) throw { code: 'image_invalid' };
@@ -34,9 +53,9 @@ export async function readProblemPages(options: {
     signal.throwIfAborted();
     if (pages.some((p) => p.page === page)) continue;
     options.progress({ page, total: options.count, phase: 'problem' });
-    const image = await cancellable(() => options.load(page), signal);
+    const image = checkImage(await readingTask(() => options.load(page), signal, options.timeoutMs));
     const began = now();
-    const outcome = await cancellable(() => readers.problem([image], signal), signal);
+    const outcome = await readingTask((signal) => readers.problem([image], signal), signal, options.timeoutMs);
     const ms = now() - began;
     const result: ProblemPageRead = { page, outcome, ms, figureMs: 0 };
     signal.throwIfAborted();
@@ -45,7 +64,7 @@ export async function readProblemPages(options: {
     if (readers.figure) {
       options.progress({ page, total: options.count, phase: 'figure' });
       const started = now();
-      try { figure = await cancellable(() => readers.figure!(image, signal), signal); }
+      try { figure = await readingTask((signal) => readers.figure!(image, signal), signal, options.timeoutMs); }
       catch { signal.throwIfAborted(); /* D is optional; B's result and manual editing survive. */ }
       figureMs = now() - started;
     }

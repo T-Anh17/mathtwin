@@ -12,6 +12,7 @@ import { HistoryScreen, SettingsScreen } from '../src/SecondaryScreens.js';
 import { Logo } from '../src/Logo.js';
 import { emptyProductActions as actions, sampleConfirmation, sampleCorrect, sampleHistory, sampleInsufficient, samplePending, sampleReader, sampleWrong } from '../src/sample-data.js';
 import { productVi as m } from '../src/product-messages.vi.js';
+import { settingsVi } from '../src/settings.vi.js';
 import type { ScreenState } from '../src/product-types.js';
 import type { ResultProps } from '../src/ResultScreen.js';
 
@@ -75,10 +76,8 @@ describe('Nội dung và các điểm nối', () => {
   it('Lịch sử có đủ bốn kết quả và Cài đặt có trạng thái/dung lượng + màn Đo', () => {
     const html = renderToStaticMarkup(createElement(HistoryScreen, { history: sampleHistory, onNavigate: noop, onOpenHistory: noop }));
     for (const row of sampleHistory) expect(html).toContain(m.verdictLabels[row.verdict]);
-    const settings = renderToStaticMarkup(createElement(SettingsScreen, { reader: sampleReader, onNavigate: noop, onBenchmark: noop }));
-    expect(settings).toContain(m.downloaded); expect(settings).toContain(sampleReader.size); expect(settings).toContain(m.benchmark);
-    const missing = renderToStaticMarkup(createElement(SettingsScreen, { reader: { ...sampleReader, ready: false }, onNavigate: noop, onBenchmark: noop }));
-    expect(missing).toContain(m.notDownloaded);
+    const settings = renderToStaticMarkup(createElement(SettingsScreen, { onNavigate: noop, onBenchmark: noop }));
+    expect(settings).toContain(m.notDownloaded); expect(settings).toContain(settingsVi.sha); expect(settings).toContain(m.benchmark);
   });
   it('kết quả chưa chắc dùng đúng màn hỏi xác nhận, không kết luận sai', () => {
     const html = renderResult({ state: 'du-lieu', data: samplePending, actions, onBack: noop });

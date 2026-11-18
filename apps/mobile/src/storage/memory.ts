@@ -28,6 +28,10 @@ export function createMemoryStorage(data = createMemoryData()) {
     async remove(id) { removePhoto(id); },
   };
   const sessions: SessionStore = {
+    async usage() { return { sessions: data.sessions.size,
+      historyBytes: [...data.sessions.values()].reduce((n, s) => n + new Blob([JSON.stringify(s)]).size, 0),
+      photoBytes: [...data.photos.values()].reduce((n, b) => n + b.size, 0) }; },
+    async clear() { data.sessions.clear(); for (const id of data.photos.keys()) removePhoto(id); },
     async list() { return [...data.sessions.values()].map(summarize).sort(newestFirst); },
     async get(id) { return structuredClone(data.sessions.get(id) ?? null); },
     async put(s) {

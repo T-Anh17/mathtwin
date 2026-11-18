@@ -12,7 +12,8 @@ import { combineProblemPages, readProblemPages } from './flow/reading.js';
 import type { Readers, ReadingProgress } from './flow/reading.js';
 import type { Session, SessionEvent } from './flow/types.js';
 import type { PhotoStore } from './flow/store.js';
-import { messageFor } from './messages.vi.js';
+import { readingError } from './flow/reading-error.vi.js';
+import { settingsVi } from './settings.vi.js';
 import './problem.css';
 
 function blobOf(data: string): Blob {
@@ -36,7 +37,7 @@ export function ProblemFlowScreen({ session: s, busy, photoStore, readers, reade
   useEffect(() => {
     let live = true;
     if (photoStore) Promise.all(s.problemPhotos.map(async (p) => ({ image: await photoStore.url(p.id), width: p.width, height: p.height })))
-      .then((values) => { if (live) setPhotos(values); }).catch(() => { if (live) setError(m.failed); });
+      .then((values) => { if (live) setPhotos(values); }).catch(() => { if (live) setError(settingsVi.failures.image); });
     return () => { live = false; };
   }, [photoKey, photoStore]);
   useEffect(() => {
@@ -45,7 +46,9 @@ export function ProblemFlowScreen({ session: s, busy, photoStore, readers, reade
     let live = true;
     setWorking(true); setError('');
     const run = async () => {
+      let acquired = false;
       try {
+        await readers.activity?.(true); acquired = true;
         const outcome = await readProblemPages({ count: s.problemPhotos.length, readers, signal: controller.signal,
           saved: current.current.problemPages ?? [],
           load: async (page) => {
@@ -58,8 +61,12 @@ export function ProblemFlowScreen({ session: s, busy, photoStore, readers, reade
         });
         if (live && !controller.signal.aborted) await onEvent({ type: 'problem_read', outcome,
           ms: current.current.timings.problemRead ?? outcome.usage.latencyMs });
-      } catch (e) { if (live && !controller.signal.aborted) setError(`${messageFor(e)} ${m.failed}`); }
-      finally { if (live) setWorking(false); }
+      } catch (e) { if (live) setError(readingError(e)); }
+      finally {
+        try { if (acquired) await readers.activity?.(false); }
+        catch (e) { if (live) setError(readingError(e)); }
+        if (live) setWorking(false);
+      }
     };
     void run();
     return () => { live = false; controller.abort(); };
@@ -67,7 +74,7 @@ export function ProblemFlowScreen({ session: s, busy, photoStore, readers, reade
   const action = async (work: () => Promise<void>) => {
     if (working || busy) return;
     setWorking(true); setError('');
-    try { await work(); } catch (e) { setError(messageFor(e)); } finally { setWorking(false); }
+    try { await work(); } catch (e) { setError(readingError(e)); } finally { setWorking(false); }
   };
   const add = async (data: string) => {
     if (!photoStore) return;
@@ -92,7 +99,7 @@ export function ProblemFlowScreen({ session: s, busy, photoStore, readers, reade
     {s.stage === 'problem_reading' ? <div className="card">
       <p role="status">{progress ? m.progress(progress.page, progress.total, progress.phase === 'figure') : sessionVi.stages.problem_reading}</p>
       <progress max={s.problemPhotos.length} value={s.problemPages?.length ?? 0} aria-label={m.read}/>
-      {working ? <button className="btn btn-outline" onClick={() => { abort.current?.abort(); setWorking(false); }}>{m.cancel}</button>
+      {working ? <button className="btn btn-outline" onClick={() => { abort.current?.abort(); setError(settingsVi.cancelled); setWorking(false); }}>{m.cancel}</button>
         : <button className="btn btn-primary" disabled={!readerReady || busy} onClick={() => setAttempt((v) => v + 1)}>{m.resume}</button>}
     </div> : <>
       {photos.map((photo, page) => <div className="card" key={s.problemPhotos[page]?.id ?? page}>

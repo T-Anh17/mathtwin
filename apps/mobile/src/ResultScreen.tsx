@@ -78,7 +78,7 @@ export function ResultScreen({ state, data, actions, onBack, pages = [], graph, 
     {graph && (data.verdict === 'sai' || data.verdict === 'dung') && <div className="card"><SolutionGraph graph={graph} highlight={highlight} {...(layout ? { layout } : {})}/></div>}
     {!!data.notes.length && <section className="card"><h3 className="section-title">{r.notes}</h3><ul>{data.notes.map((note, i) => <li key={i}>{note}</li>)}</ul></section>}
   </div><Actions><div className="work-buttons">
-    <button className="btn btn-outline" disabled={busy} onClick={actions.onEdit}>{r.review}</button>
+    <button className="btn btn-outline" disabled={busy} onClick={actions.onEdit}>{showPhotos ? r.review : r.manualReview}</button>
     <button className="btn btn-primary" disabled={busy} onClick={actions.onSolution}><BookOpen/>{r.solution}</button>
   </div></Actions></div>;
 }

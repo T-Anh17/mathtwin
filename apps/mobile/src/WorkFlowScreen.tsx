@@ -17,7 +17,8 @@ import { workVi as m } from './work.vi.js';
 import { problemVi } from './problem.vi.js';
 import { sessionVi } from './flow/messages.vi.js';
 import { solutionVi } from './solution.vi.js';
-import { messageFor } from './messages.vi.js';
+import { readingError } from './flow/reading-error.vi.js';
+import { settingsVi } from './settings.vi.js';
 import { readWorkRegion, readWorkPages, ignoredWorkLines } from './flow/work-reading.js';
 import type { Readers } from './flow/reading.js';
 import type { PhotoStore } from './flow/store.js';
@@ -47,7 +48,7 @@ export function WorkFlowScreen({ session: s, busy, photoStore, readers, readerRe
   useEffect(() => {
     let live = true;
     if (photoStore) void Promise.all(s.workPhotos.map(async (p) => ({ image: await photoStore.url(p.id), width: p.width, height: p.height })))
-      .then((values) => { if (live) setPhotos(values); }).catch(() => { if (live) setError(m.failed); });
+      .then((values) => { if (live) setPhotos(values); }).catch(() => { if (live) setError(settingsVi.failures.image); });
     return () => { live = false; };
   }, [photoKey, photoStore]);
   const load = async (index: number) => {
@@ -60,20 +61,26 @@ export function WorkFlowScreen({ session: s, busy, photoStore, readers, readerRe
     const abort = new AbortController(); controller.current = abort; let live = true;
     setWorking(true); setError('');
     void (async () => {
+      let acquired = false;
       try {
+        await readers.activity?.(true); acquired = true;
         await readWorkPages({ count: s.workPhotos.length, reader: readers.text, vocab: vocabularyOf(s.spec!), signal: abort.signal,
           saved: current.current.workPages ?? [], load, progress: (p) => { if (live) setPage(p); },
           checkpoint: async (reading) => { if (live && !abort.signal.aborted) await onEvent({ type: 'work_page', reading }); } });
         if (live && !abort.signal.aborted) await onEvent({ type: 'work_read', lines: [], ms: 0 });
-      } catch (e) { if (live && !abort.signal.aborted) setError(`${messageFor(e)} ${m.failed}`); }
-      finally { if (live) setWorking(false); }
+      } catch (e) { if (live) setError(readingError(e)); }
+      finally {
+        try { if (acquired) await readers.activity?.(false); }
+        catch (e) { if (live) setError(readingError(e)); }
+        if (live) setWorking(false);
+      }
     })();
     return () => { live = false; abort.abort(); };
   }, [s.id, s.stage, readers, readerReady, photoStore, manual, manualPage, attempt]);
   const action = async (fn: () => Promise<void>) => {
     if (working || busy) return;
     setWorking(true); setError('');
-    try { await fn(); } catch (e) { setError(`${messageFor(e)} ${m.failed}`); } finally { setWorking(false); }
+    try { await fn(); } catch (e) { setError(readingError(e)); } finally { setWorking(false); }
   };
   const back = () => { controller.current?.abort(); onBack(); };
   const switchManual = () => { controller.current?.abort(); setWorking(false); setManual(true); };
@@ -142,7 +149,7 @@ export function WorkFlowScreen({ session: s, busy, photoStore, readers, readerRe
     {s.stage === 'work_reading' ? <div className="card">
       {working ? <><p role="status">{m.progress(page, s.workPhotos.length)}</p>
         <progress aria-label={m.read} max={s.workPhotos.length} value={s.workPages?.length ?? 0}/>
-        <button className="btn btn-outline" onClick={() => { controller.current?.abort(); setWorking(false); }}>{m.cancel}</button></>
+        <button className="btn btn-outline" onClick={() => { controller.current?.abort(); setError(settingsVi.cancelled); setWorking(false); }}>{m.cancel}</button></>
         : failed ? <WorkPageFailure page={failed.page} busy={busy} onRetry={() => setAttempt((v) => v + 1)} onManual={() => { setText(''); setManualPage(failed.page); }}/>
         : unresolved && photos[unresolved.page] ? <RegionPicker key={unresolved.page} photo={photos[unresolved.page]!} {...(unresolved.suggestedRegion ? { suggestedRegion: unresolved.suggestedRegion } : {})} busy={busy} onDone={(region) => void action(async () => {
           if (!readers || !s.spec) return;

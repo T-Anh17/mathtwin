@@ -110,6 +110,7 @@ class MathTwinPlugin : Plugin() {
             }
             catch (e: DatasetFailure) { call.reject("dataset_invalid", "dataset_invalid", e.data()) }
             catch (e: MobileFailure) { call.reject(e.code, e.code) }
+            catch (_: OutOfMemoryError) { requestStop(); call.reject("memory_pressure", "memory_pressure") }
             catch (_: Exception) { call.reject("native_error", "native_error") }
             finally { if (exclusive) busy.set(false) }
         }
@@ -124,10 +125,21 @@ class MathTwinPlugin : Plugin() {
     }
     @PluginMethod fun device(call: PluginCall) { call.resolve(JSObject(deviceData().toString())) }
     @PluginMethod fun models(call: PluginCall) {
-        try { call.resolve(JSObject().put("models", JSArray(store.states().toString()))) }
+        try {
+            val states = store.states()
+            val runtime = server.status()
+            if (runtime.optBoolean("alive") && runtime.has("cpuVariant") && !runtime.has("errorCode")) {
+                for (index in 0 until states.length()) {
+                    val state = states.getJSONObject(index)
+                    if (state.getString("model") == runtime.optString("model")) state.put("cpuVariant", runtime.getString("cpuVariant"))
+                }
+            }
+            call.resolve(JSObject().put("models", JSArray(states.toString())))
+        }
         catch (_: Exception) { call.reject("native_error", "native_error") }
     }
     @PluginMethod fun download(call: PluginCall) = task(call, true) { server.stop(); store.download(call.getString("model") ?: ""); null }
+    @PluginMethod fun deleteModel(call: PluginCall) = task(call, true) { server.stop(); store.remove(call.getString("model") ?: ""); null }
     @PluginMethod fun importModel(call: PluginCall) = task(call, true) { server.stop(); store.importModel(call.getString("model") ?: ""); null }
     @PluginMethod fun cancelDownload(call: PluginCall) { cancellation.incrementAndGet(); store.cancel(); call.resolve() }
     @PluginMethod fun start(call: PluginCall) = task(call, true) { token ->

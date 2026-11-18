@@ -7,19 +7,21 @@ import { SessionScreen } from './SessionScreen.js';
 import { Topbar } from './product-ui.js';
 import { productVi as m } from './product-messages.vi.js';
 import { sessionVi } from './flow/messages.vi.js';
-import { createSession, sessionReducer } from './flow/sessionReducer.js';
+import { createSession } from './flow/sessionReducer.js';
+import { runSessionEvent } from './session-runner.js';
+import { DemoScreen } from './DemoScreen.js';
 import { historyItem } from './flow/history.js';
 import { createIndexedDBStorage } from './storage/indexeddb.js';
 import { mobile } from './native.js';
 import type { Session, SessionEvent } from './flow/types.js';
-import type { SessionStore, PhotoStore } from './flow/store.js';
+import type { SessionStore, PhotoStore, StorageUsage } from './flow/store.js';
 import type { Readers } from './flow/reading.js';
 import { nativeProblemReaders } from './problem-readers.js';
 import { previewReaders } from './preview-readers.js';
 import { problemVi } from './problem.vi.js';
 import type { HistoryItem, ReaderStatus, Tab } from './product-types.js';
 
-type Page = Tab | 'session' | 'benchmark';
+type Page = Tab | 'session' | 'benchmark' | 'demo';
 
 export function App({ sessionStore, photoStore, readers: injectedReaders }: { sessionStore?: SessionStore; photoStore?: PhotoStore; readers?: Readers } = {}) {
   const [storage] = useState(() => createIndexedDBStorage());
@@ -32,6 +34,8 @@ export function App({ sessionStore, photoStore, readers: injectedReaders }: { se
   const [returnPage, setReturnPage] = useState<Tab>('home');
   const [session, setSession] = useState<Session | null>(null);
   const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [usage, setUsage] = useState<StorageUsage>();
+  const [resumed, setResumed] = useState(false);
   const [reader, setReader] = useState<ReaderStatus>({ ready: preview || !!injectedReaders, size: 'B' });
   const [error, setError] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -40,6 +44,7 @@ export function App({ sessionStore, photoStore, readers: injectedReaders }: { se
   const refresh = async () => setHistory((await store.list()).map(historyItem));
   useEffect(() => {
     let live = true;
+    if (page === 'settings') store.usage().then((value) => { if (live) setUsage(value); }).catch(() => { if (live) setError(true); });
     store.list().then((items) => { if (live) setHistory(items.map(historyItem)); }).catch(() => { if (live) setError(true); });
     if (Capacitor.isNativePlatform()) mobile.models().then(({ models }) => {
       const b = models.find((model) => model.model === 'b');
@@ -58,13 +63,13 @@ export function App({ sessionStore, photoStore, readers: injectedReaders }: { se
   const start = (source: Session['specSource']) => void run(async () => {
     const next = { ...createSession(crypto.randomUUID(), new Date().toISOString()), specSource: source };
     await store.put(next); await refresh();
-    activeSession.current = next; setSession(next); setReturnPage('home'); setPage('session');
+    activeSession.current = next; setSession(next); setResumed(false); setReturnPage('home'); setPage('session');
   });
   const dispatch = async (event: SessionEvent): Promise<void> => {
     if (!activeSession.current || locked.current) throw new Error(sessionVi.storageError);
     locked.current = true; setBusy(true);
     try {
-      const next = sessionReducer(activeSession.current, event);
+      const next = runSessionEvent(activeSession.current, event);
       await store.put(next); activeSession.current = next; setSession(next); await refresh();
     } catch (e) { setError(true); throw e; }
     finally { locked.current = false; setBusy(false); }
@@ -72,11 +77,11 @@ export function App({ sessionStore, photoStore, readers: injectedReaders }: { se
   const openHistory = (item: HistoryItem) => void run(async () => {
     const saved = await store.get(item.id);
     if (!saved) { await refresh(); return; }
-    activeSession.current = saved; setSession(saved); setReturnPage(page === 'history' ? 'history' : 'home'); setPage('session');
+    activeSession.current = saved; setSession(saved); setResumed(true); setReturnPage(page === 'history' ? 'history' : 'home'); setPage('session');
   });
   const remove = (item: HistoryItem) => void run(async () => {
     await store.remove(item.id);
-    if (session?.id === item.id) setSession(null);
+    if (session?.id === item.id) { activeSession.current = null; setSession(null); }
     await refresh();
   });
   const actions = {
@@ -88,14 +93,14 @@ export function App({ sessionStore, photoStore, readers: injectedReaders }: { se
     {error && <div className="card" role="alert">{sessionVi.storageError}<button className="btn btn-outline" disabled={busy} onClick={() => void run(refresh)}>{sessionVi.retry}</button></div>}
     {page === 'home' && <HomeScreen state={history.length ? 'du-lieu' : 'rong'} reader={reader} history={history} actions={actions} onNavigate={setPage} onOpenHistory={openHistory} onRemove={remove}/>}
     {page === 'history' && <HistoryScreen history={history} onNavigate={setPage} onOpenHistory={openHistory} onRemove={remove}/>}
-    {page === 'settings' && <SettingsScreen reader={reader} onNavigate={setPage} onBenchmark={() => setPage('benchmark')} busy={busy}
-      {...(!preview ? { onDownloadReader: () => void run(async () => {
-        await mobile.download({ model: 'b' });
-        const b = (await mobile.models()).models.find((model) => model.model === 'b');
-        if (b) setReader({ ready: b.ready, size: sessionVi.readerBytes(b.bytes) });
-      }) } : {})}/>}
-    {page === 'session' && session && <SessionScreen key={session.id} session={session} busy={busy} onEvent={dispatch} onBack={() => setPage(returnPage)}
+    {page === 'settings' && <SettingsScreen onNavigate={setPage} onBenchmark={() => setPage('benchmark')} onDemo={() => setPage('demo')} busy={busy}
+      {...(usage ? { usage } : {})} {...(!preview ? { modelApi: mobile } : {})}
+      onClear={async () => {
+        await store.clear(); activeSession.current = null; setSession(null); await refresh(); setUsage(await store.usage());
+      }}/>}
+    {page === 'session' && session && <SessionScreen key={session.id} session={session} resumed={resumed} busy={busy} onEvent={dispatch} onBack={() => setPage(returnPage)}
       photoStore={photos} readers={readers} readerReady={preview || !!injectedReaders || reader.ready} preview={preview} onSettings={() => setPage('settings')}/>}
     {page === 'benchmark' && <div><Topbar title={m.benchmark} onBack={() => setPage('settings')}/><BenchmarkScreen/></div>}
+    {page === 'demo' && <DemoScreen onBack={() => setPage('settings')}/>}
   </div>;
 }

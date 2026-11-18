@@ -16,9 +16,12 @@ function clearWork(s: Session): Session {
   return { ...rest, workPhotos: [], workLines: [], workAnswers: [], reviewAcknowledged: false, timings };
 }
 
-function regrade(s: Session): Session {
+export interface SessionOperations { solve: typeof solve; gradeWork: typeof gradeWork }
+const operations: SessionOperations = { solve, gradeWork };
+
+function regrade(s: Session, ops: SessionOperations): Session {
   if (!s.specConfirmed || !s.spec || !s.solution || !s.workSource || s.stage === 'work_reading' || s.workPages?.some((p) => p.needsRegion)) return s;
-  let workGrade = gradeWork(s.spec, parseWork(s.workLines, vocabularyOf(s.spec)));
+  let workGrade = ops.gradeWork(s.spec, parseWork(s.workLines, vocabularyOf(s.spec)));
   const needsReview = s.workSource === 'photo' && !s.reviewAcknowledged && (workGrade.result.verdict === 'DUNG'
     || workGrade.result.verdict === 'SAI' && !!s.workPages?.some((p) => p.missingLineCheckUnavailable));
   if (workGrade.questions.length || needsReview) {
@@ -29,13 +32,13 @@ function regrade(s: Session): Session {
   return { ...s, timings, workGrade, stage: workGrade.result.verdict === 'CAN_XAC_NHAN' ? 'work_review' : 'result' };
 }
 
-export function sessionReducer(s: Session, e: SessionEvent): Session {
+export function sessionReducer(s: Session, e: SessionEvent, ops: SessionOperations = operations): Session {
   switch (e.type) {
     case 'work_restore': {
       if (!['work_review', 'result'].includes(s.stage) || !s.workLines.some((l) => l.index === e.line && (l.region === 'question' || l.region === 'figure'))) return s;
       const workLines = s.workLines.map((l) => l.index === e.line ? { ...l, region: 'solution' as const, regionConf: 1 } : l);
       const workPages = s.workPages?.map((p) => ({ ...p, lines: workLines.filter((l) => l.page === p.page).map((l, index) => ({ ...l, index })) }));
-      return regrade({ ...s, workLines, ...(workPages ? { workPages } : {}), reviewAcknowledged: false });
+      return regrade({ ...s, workLines, ...(workPages ? { workPages } : {}), reviewAcknowledged: false }, ops);
     }
     case 'work_manual_page': {
       if (s.stage !== 'work_reading' || !s.workPages?.some((p) => p.page === e.page && p.failed) || !e.lines.some((l) => l.trim())) return s;
@@ -44,7 +47,7 @@ export function sessionReducer(s: Session, e: SessionEvent): Session {
         needsRegion: false, inspected: true, missingLineCheckUnavailable: true, region: [0, 0, 1000, 1000] as [number, number, number, number] });
       const next = { ...s, workPages, workLines: combinedWorkLines(workPages), reviewAcknowledged: false };
       return workPages.length === s.workPhotos.length && workPages.every((p) => p.inspected && !p.needsRegion)
-        ? regrade({ ...next, stage: 'work_review' }) : next;
+        ? regrade({ ...next, stage: 'work_review' }, ops) : next;
     }
     case 'work_capture_photos': {
       if (!s.specConfirmed || !s.solution) return s;
@@ -93,8 +96,8 @@ export function sessionReducer(s: Session, e: SessionEvent): Session {
       const graphLayout = e.graphLayout ?? (JSON.stringify(s.spec?.graph) === JSON.stringify(spec.graph) ? oldLayout : undefined);
       const { solve: _solveMs, grade: _gradeMs, ...timings } = s.timings;
       return regrade({ ...rest, spec, ...(graphLayout ? { graphLayout: structuredClone(graphLayout) } : {}), specConfirmed: true, specSource: e.type === 'manual_spec' ? 'manual' : s.specSource,
-        solution: solve(spec), stage: s.stage === 'work_reading' || s.stage === 'work_capture' ? s.stage : 'solution',
-        timings, reviewAcknowledged: changed ? false : s.reviewAcknowledged });
+        solution: ops.solve(spec), stage: s.stage === 'work_reading' || s.stage === 'work_capture' ? s.stage : 'solution',
+        timings, reviewAcknowledged: changed ? false : s.reviewAcknowledged }, ops);
     }
     case 'work_capture':
       return s.stage === 'solution' && s.specConfirmed && s.solution
@@ -113,24 +116,24 @@ export function sessionReducer(s: Session, e: SessionEvent): Session {
       const { workGrade: _grade, ...rest } = s;
       return regrade({ ...rest, stage: e.complete === false ? 'work_reading' : 'work_review',
         workLines: [...lines.values()].sort((a, b) => a.page - b.page || a.index - b.index),
-        reviewAcknowledged: false, timings: { ...s.timings, workRead: (s.timings.workRead ?? 0) + e.ms } });
+        reviewAcknowledged: false, timings: { ...s.timings, workRead: (s.timings.workRead ?? 0) + e.ms } }, ops);
     }
     case 'manual_work': {
       if (!s.specConfirmed || !s.solution) return s;
       return regrade({ ...clearWork(s), stage: 'work_review', workSource: 'manual', workLines: e.lines.map((text, index) => ({
         text, index, page: 0, conf: 1, alternatives: [], region: 'solution',
-      })) });
+      })) }, ops);
     }
     case 'work_answer': {
       if (!s.workSource || !['work_review', 'result'].includes(s.stage) || !s.workLines.some((line) => line.index === e.answer.line)) return s;
       const workLines = applyWorkAnswers(s.workLines, [e.answer]);
       const workPages = s.workPages?.map((p) => ({ ...p, lines: workLines.filter((l) => l.page === p.page).map((l, index) => ({ ...l, index })) }));
       return regrade({ ...s, workLines, ...(workPages ? { workPages } : {}),
-        workAnswers: [...s.workAnswers, structuredClone(e.answer)], reviewAcknowledged: false });
+        workAnswers: [...s.workAnswers, structuredClone(e.answer)], reviewAcknowledged: false }, ops);
     }
     case 'review_ack': {
       if (s.stage !== 'work_review' || s.workSource !== 'photo' || !s.workGrade || s.workGrade.questions.length) return s;
-      return regrade({ ...s, reviewAcknowledged: true });
+      return regrade({ ...s, reviewAcknowledged: true }, ops);
     }
   }
 }

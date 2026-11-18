@@ -66,6 +66,15 @@ internal class ModelStore(private val context: Context) {
         val f = file(e); marker(f).writeText("${e.getString("sha256")}:${f.lastModified()}:${f.length()}")
     }
     fun cancel() { cancelled.set(true); connection?.disconnect() }
+    fun remove(model: String) {
+        // Exact manifest files only, including partial downloads and verification markers.
+        for (entry in entries(model)) {
+            val target = file(entry)
+            for (candidate in listOf(target, File(target.path + ".part"), marker(target))) {
+                if (candidate.exists() && !candidate.delete()) throw MobileFailure("native_error")
+            }
+        }
+    }
     fun download(model: String) {
         val items = entries(model)
         val remaining = items.sumOf { e -> if (isVerified(e)) 0L else

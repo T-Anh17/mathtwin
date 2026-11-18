@@ -22,16 +22,25 @@ export function nativeProblemReaders(): Readers {
 
 export function createProblemReaders(benchmark: Pick<Benchmark, 'run'>, lifecycle: Pick<MobilePlugin, 'setBenchmarkState'>,
   encodeImage: (image: PreparedImage) => string, figure: FigureDraftRunner): Readers {
+  let leases = 0;
+  const activity = async (running: boolean) => {
+    if (running) {
+      if (leases++ === 0) {
+        try { await lifecycle.setBenchmarkState({ running: true, backgroundIdleMinutes: 5 }); }
+        catch (error) { leases--; throw error; }
+      }
+    } else if (leases > 0 && --leases === 0) await lifecycle.setBenchmarkState({ running: false, backgroundIdleMinutes: 5 });
+  };
   const run = async (images: PreparedImage[], mode: 'graph' | 'lines', signal = new AbortController().signal) => {
     if (images.length !== 1) throw { code: 'image_invalid' };
     signal.throwIfAborted();
+    await activity(true);
     try {
-      await lifecycle.setBenchmarkState({ running: true, backgroundIdleMinutes: 5 });
       const result = await benchmark.run({ id: 'problem', dataUrl: encodeImage(images[0]!), imageSource: 'gallery' },
         { model: 'b', passes: 1, mode, threads: 4, minRamGb: 6, allowLowRam: false, backgroundIdleMinutes: 5 }, signal);
       if (result.errorCode) throw { code: result.errorCode };
       return result;
-    } finally { await lifecycle.setBenchmarkState({ running: false, backgroundIdleMinutes: 5 }); }
+    } finally { await activity(false); }
   };
   const text: TextReader = { engine: engineFor('b'), readLines: async (images, signal) => {
     const result = await run(images, 'lines', signal);
@@ -53,5 +62,8 @@ export function createProblemReaders(benchmark: Pick<Benchmark, 'run'>, lifecycl
     const variant = result.memory?.cpuVariant;
     if (variant) result.outcome.usage.engine += `:${variant}`;
     return result.outcome;
-  }, figure };
+  }, activity, figure: async (image, signal) => {
+    signal.throwIfAborted(); await activity(true);
+    try { return await figure(image, signal); } finally { await activity(false); }
+  } };
 }

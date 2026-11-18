@@ -82,10 +82,12 @@ export function BenchmarkScreen() {
       <p className="warning">{ocrMessages.weightsWarning}</p><p className="warning">{vi.cLicense}</p>
       {modelIds.map((model) => { const files = manifest.files.filter((f) => f.model === model); const bytes = files.reduce((n, f) => n + f.bytes, 0); const state = models.find((m) => m.model === model);
         return <article key={model}><h2>{vi[model]}</h2><p>{gb(bytes)} · {state?.ready ? vi.ready : vi.missing}</p>
-          {files.map((f) => <p className="file" key={f.filename}>{f.filename} · {gb(f.bytes)}</p>)}
+          <p>{vi.cpuVariant}: {state?.cpuVariant ?? vi.unknownCpu}</p>
+          {files.map((f) => <p className="file" key={f.filename}>{f.filename} · {gb(f.bytes)}<br/>{vi.sha}: {f.sha256}</p>)}
           <progress max={bytes} value={state?.downloadedBytes ?? 0} aria-label={vi.download}/>
           <div className="actions"><button disabled={!native || busy || downloading || state?.ready || (device !== null && device.freeStorageBytes < bytes - (state?.downloadedBytes ?? 0) + 67108864)} onClick={() => action(() => modelAction(model, false))}>{vi.download}</button>
-          <button disabled={!native || busy || downloading} onClick={() => action(() => modelAction(model, true))}>{vi.importModel}</button></div>
+          <button disabled={!native || busy || downloading} onClick={() => action(() => modelAction(model, true))}>{vi.importModel}</button>
+          <button disabled={!native || busy || downloading || !state?.downloadedBytes} onClick={() => action(async () => { await mobile.deleteModel({ model }); await refresh(); })}>{vi.deleteModel}</button></div>
           {device && device.freeStorageBytes < bytes - (state?.downloadedBytes ?? 0) + 67108864 && <p className="warning">{vi.errors.no_space}</p>}
         </article>; })}
       {downloading && <button onClick={() => action(() => mobile.cancelDownload())}>{vi.cancelDownload}</button>}

@@ -35,7 +35,7 @@ function fake() {
     ocrModels: mock.fn(async () => ({ detector: '/det', encoder: '/enc', decoder: '/dec', config: {}, verifyMs: 10 })),
     appMemory: mock.fn(async () => ({ rssMemoryMb: 120, peakMemoryMb: 150 })),
     device: mock.fn(async () => device), models: mock.fn(async () => ({ models: [] })),
-    download: mock.fn(async () => {}), cancelDownload: mock.fn(async () => {}), importModel: mock.fn(async () => {}),
+    download: mock.fn(async () => {}), deleteModel: mock.fn(async () => {}), cancelDownload: mock.fn(async () => {}), importModel: mock.fn(async () => {}),
     start: mock.fn(async () => ({ ...session })), status: mock.fn(async () => ({ ...state })), stop: mock.fn(async () => {}),
     dataset: mock.fn(async () => ({ entries: [{ id: 'case-1', file: '1.png' }], location: 'internal' as const })),
     datasetImage: mock.fn(async () => ({ dataUrl: decoded.encoded })), exportResult: mock.fn(async () => ({ path: '/private/results/read.json' })),

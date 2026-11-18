@@ -58,6 +58,26 @@ export function createIndexedDBStorage(name = 'mathtwin-sessions') {
     },
   };
   const sessions: SessionStore = {
+    async usage() {
+      return transaction(['sessions', 'photos'], 'readonly', (tx, result) => {
+        const usage = { sessions: 0, historyBytes: 0, photoBytes: 0 };
+        const records = tx.objectStore('sessions').openCursor();
+        records.onsuccess = () => { const cursor = records.result; if (cursor) {
+          usage.sessions++; usage.historyBytes += new Blob([JSON.stringify(cursor.value as Session)]).size; cursor.continue();
+        } };
+        const images = tx.objectStore('photos').openCursor();
+        images.onsuccess = () => { const cursor = images.result; if (cursor) {
+          usage.photoBytes += (cursor.value as { blob: Blob }).blob.size; cursor.continue();
+        } };
+        result(usage);
+      });
+    },
+    async clear() {
+      await transaction<void>(['sessions', 'photos'], 'readwrite', (tx) => {
+        tx.objectStore('sessions').clear(); tx.objectStore('photos').clear();
+      });
+      for (const id of [...urls.keys()]) revoke(id);
+    },
     async list() {
       const records = await transaction<Session[]>(['sessions'], 'readonly', (tx, result) => {
         const request = tx.objectStore('sessions').getAll();

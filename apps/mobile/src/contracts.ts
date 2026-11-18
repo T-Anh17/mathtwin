@@ -10,7 +10,7 @@ export interface DeviceInfo {
   manufacturer: string; model: string; android: string; sdk: number; cores: number;
   totalRamBytes: number; availableRamBytes: number; freeStorageBytes: number;
 }
-export interface ModelState { model: Model; bytes: number; downloadedBytes: number; ready: boolean }
+export interface ModelState { model: Model; bytes: number; downloadedBytes: number; ready: boolean; cpuVariant?: string }
 export interface Session { port: number; apiKey: string; reused: boolean; loadMs: number; verifyMs?: number }
 export interface MemoryPressure { callback: 'onTrimMemory' | 'onLowMemory'; trimLevel: number | null }
 export interface ServerState { alive: boolean; peakMemoryMb?: number; rssMemoryMb?: number; exitCode?: number; cpuVariant?: string; cpuVariantSource?: 'maps' | 'log'; errorCode?: 'cpu_backend_unknown'; memoryPressure?: MemoryPressure }
@@ -27,6 +27,7 @@ export interface MobilePlugin {
   device(): Promise<DeviceInfo>;
   models(): Promise<{ models: ModelState[] }>;
   download(options: { model: Model }): Promise<void>;
+  deleteModel(options: { model: Model }): Promise<void>;
   cancelDownload(): Promise<void>;
   importModel(options: { model: Model }): Promise<void>;
   start(options: { model: 'a' | 'b'; threads: number; minRamGb: number; allowLowRam: boolean }): Promise<Session>;

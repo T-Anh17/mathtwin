@@ -7,7 +7,9 @@ export interface SessionSummary {
 export interface SessionStore {
   list(): Promise<SessionSummary[]>; get(id: string): Promise<Session | null>;
   put(s: Session): Promise<void>; remove(id: string): Promise<void>;
+  usage(): Promise<StorageUsage>; clear(): Promise<void>;
 }
+export interface StorageUsage { sessions: number; historyBytes: number; photoBytes: number }
 export interface PhotoStore {
   put(blob: Blob, meta: Omit<PhotoRef, 'id'>): Promise<PhotoRef>;
   url(id: string): Promise<string>; remove(id: string): Promise<void>;

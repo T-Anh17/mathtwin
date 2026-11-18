@@ -2,7 +2,7 @@
 export const productVi = {
   work: {
     title: 'Bài làm máy đọc', demo: 'Bài làm máy đọc · dữ liệu mẫu',
-    sampleNote: 'Dữ liệu mẫu để thử sửa chữ và chấm lại trên máy. Chưa nối luồng chụp bài.',
+    sampleNote: 'Dữ liệu mẫu để thử sửa chữ và chấm lại trên máy.',
     steps: 'Các bước đã hiểu', lines: 'Các dòng trên ảnh', noSteps: 'Chưa hiểu được bước nào.',
     line: (index: number, page: number) => `Dòng ${index + 1} · trang ${page + 1}`,
     step: (step: number) => `Bước ${step}`, unknown: 'Chưa hiểu', struck: 'Đã gạch', skipped: 'Đã bỏ qua',

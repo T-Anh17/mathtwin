@@ -1,7 +1,7 @@
 import { detectMissingLines, filterWorkRegions, readWork, validWorkBox, validWorkLineBox, suggestWorkRegion } from '@mathtwin/work';
 import type { WorkBox, WorkLine, WorkVocabulary } from '@mathtwin/work';
 import type { PreparedImage, TextReader } from '@mathtwin/reader';
-import { cancellable } from './reading.js';
+import { checkImage, readingTask } from './reading.js';
 
 export interface WorkPageRead {
   page: number; raw: WorkLine[]; lines: WorkLine[]; ms: number;
@@ -40,7 +40,7 @@ export async function readWorkRegion(image: PreparedImage, reading: WorkPageRead
   const width = right - left, height = bottom - top, pixels = new Uint8ClampedArray(width * height * 4);
   for (let y = 0; y < height; y++) pixels.set(image.pixels.subarray(((top + y) * image.width + left) * 4, ((top + y) * image.width + right) * 4), y * width * 4);
   const started = performance.now();
-  const read = await cancellable(() => readWork([{ pixels, width, height }], { reader, vocab, signal }), signal);
+  const read = await readingTask((signal) => readWork([{ pixels, width, height }], { reader, vocab, signal }), signal);
   const cropLines = read.lines.map(({ box, ...l }): WorkLine => ({ ...l, page: reading.page, ...(box && validWorkLineBox(box) ? {
     box: [(left + box[0] * width / 1000) / image.width * 1000, (top + box[1] * height / 1000) / image.height * 1000,
       (left + box[2] * width / 1000) / image.width * 1000, (top + box[3] * height / 1000) / image.height * 1000],
@@ -59,7 +59,7 @@ export async function readWorkPages(options: {
   count: number; reader: TextReader; vocab: WorkVocabulary; signal: AbortSignal;
   load: (page: number) => Promise<PreparedImage>; saved?: WorkPageRead[];
   figures?: (image: PreparedImage, signal: AbortSignal) => Promise<WorkBox[]>;
-  progress: (page: number) => void; checkpoint: (page: WorkPageRead) => Promise<void>; now?: () => number;
+  progress: (page: number) => void; checkpoint: (page: WorkPageRead) => Promise<void>; now?: () => number; timeoutMs?: number;
 }): Promise<boolean> {
   const { signal } = options, now = options.now ?? (() => performance.now());
   for (let page = 0; page < options.count; page++) {
@@ -67,13 +67,20 @@ export async function readWorkPages(options: {
     const saved = options.saved?.find((p) => p.page === page);
     if (saved?.inspected) continue;
     options.progress(page);
-    const image = await cancellable(() => options.load(page), signal), started = now();
-    if (saved && !saved.failed) { await options.checkpoint(processWorkPage(image, saved, saved.region)); continue; }
-    let result: Awaited<ReturnType<typeof readWork>>;
-    try { result = await cancellable(() => readWork([image], { reader: options.reader, vocab: options.vocab, signal }), signal); }
+    const started = now();
+    let image: PreparedImage;
+    try { image = checkImage(await readingTask(() => options.load(page), signal, options.timeoutMs)); }
     catch (error) {
       signal.throwIfAborted();
-      await options.checkpoint({ page, raw: [], lines: [], ms: now() - started, needsRegion: true, failed: true });
+      await options.checkpoint({ ...saved, page, raw: saved?.raw ?? [], lines: saved?.lines ?? [], ms: now() - started, needsRegion: true, inspected: false, failed: true });
+      throw error;
+    }
+    if (saved && !saved.failed) { await options.checkpoint(processWorkPage(image, saved, saved.region)); continue; }
+    let result: Awaited<ReturnType<typeof readWork>>;
+    try { result = await readingTask((signal) => readWork([image], { reader: options.reader, vocab: options.vocab, signal }), signal, options.timeoutMs); }
+    catch (error) {
+      signal.throwIfAborted();
+      await options.checkpoint({ ...saved, page, raw: saved?.raw ?? [], lines: saved?.lines ?? [], ms: now() - started, needsRegion: true, inspected: false, failed: true });
       throw error;
     }
     const raw = result.lines.map((l) => ({ ...l, page }));
@@ -82,7 +89,7 @@ export async function readWorkPages(options: {
     await options.checkpoint(reading);
     signal.throwIfAborted();
     if (options.figures) {
-      try { reading.figures = await cancellable(() => options.figures!(image, signal), signal); }
+      try { reading.figures = await readingTask((signal) => options.figures!(image, signal), signal, options.timeoutMs); }
       catch { signal.throwIfAborted(); }
     }
     const completed = processWorkPage(image, reading);

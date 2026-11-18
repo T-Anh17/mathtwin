@@ -5,7 +5,7 @@ export const resultVi = {
   title: 'Kết quả chấm bài', location: 'Chỗ sai', reason: 'Vì sao sai', correction: 'Bước đúng phải là gì', next: 'Hướng làm tiếp',
   previous: 'Các bước trước đó', previousCorrect: 'Các bước kiểm tra được trước bước này đều đúng.',
   noPrevious: 'Đây là bước sai đầu tiên; chưa có bước trước đó được xác nhận đúng.',
-  solution: 'Xem lời giải chuẩn', review: 'Xem bài máy đọc', question: 'Trả lời câu hỏi còn lại',
+  solution: 'Xem lời giải chuẩn', review: 'Xem bài máy đọc', manualReview: 'Xem bài đã gõ', question: 'Trả lời câu hỏi còn lại',
   pending: 'Cần kiểm tra phần máy đọc trước khi kết luận.', unconfirmed: 'Cần xác nhận đề bài trước khi chấm.',
   incomplete: 'Chưa đọc xong các trang bài làm.', missing: 'Chưa có bài làm đủ dữ kiện để kiểm tra. Hãy bổ sung các bước giải.',
   retake: 'Chụp lại bài làm', addPage: 'Thêm trang bài làm', manual: 'Gõ tay bài làm',
