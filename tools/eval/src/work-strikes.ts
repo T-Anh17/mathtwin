@@ -18,7 +18,7 @@ const json = async <T>(path: string): Promise<T> => JSON.parse(await readFile(pa
 
 /** Source layout supplies row geometry for ALL rows (lines.json only boxes cancellations).
  * No cancellation marker, cancellation.json, text or answer affects these boxes. */
-function layoutBoxes(placements: Placement[], tilted: boolean, width: number, height: number): Box[] {
+export function layoutBoxes(placements: Placement[], tilted: boolean, width: number, height: number): Box[] {
   const rows: Placement[][] = [];
   for (const p of placements) {
     if (p.region === 'table' && rows.at(-1)?.[0]?.region === 'table' && rows.at(-1)![0]!.y === p.y) rows.at(-1)!.push(p);

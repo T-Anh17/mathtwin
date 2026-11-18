@@ -6,3 +6,6 @@ export { gradeWork } from './grade.js';
 export { applyWorkAnswers } from './answers.js';
 export { detectStrikes, STRIKE_NO, STRIKE_YES } from './strikes.js';
 export { readWork } from './read.js';
+export { filterWorkRegions, validWorkBox, validWorkLineBox, suggestWorkRegion } from './regions.js';
+export type { WorkBox } from './regions.js';
+export { detectMissingLines, inspectMissingLines } from './missing.js';

@@ -85,6 +85,14 @@ export function gradeWork(spec: ProblemSpec, parsed: ParsedWork, opts?: { confTh
     }));
   }
   output.questions = output.questions.filter((q, i, all) => all.findIndex((other) => other.lines.join(',') === q.lines.join(',')) === i);
+  const missing = source.filter((l) => l.missing && !l.skipped);
+  if (missing.length) {
+    output.questions = output.questions.filter((q) => !q.lines.some((index) => missing.some((l) => l.index === index)));
+    output.questions.push(...missing.map((l): WorkQuestion => ({ kind: 'reading', reason: 'missing', lines: [l.index], page: l.page,
+      ...(l.box ? { box: l.box } : {}), shownText: workMessages.missing_line, options: [] })));
+    output.result = { verdict: 'CAN_XAC_NHAN', message: workMessages.missing_line, notes: [] };
+  }
+  output.questions.sort((a, b) => a.page - b.page || Math.min(...a.lines) - Math.min(...b.lines));
   if (output.result.verdict === 'SAI' && first) output.readingCheck = question('reading', first.lines, first);
   return output;
 }

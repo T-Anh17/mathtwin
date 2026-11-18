@@ -2,6 +2,7 @@ import { solve, validateSpec } from '@mathtwin/core';
 import { applyWorkAnswers, gradeWork, parseWork, vocabularyOf } from '@mathtwin/work';
 import type { Session, SessionEvent } from './types.js';
 import { sessionVi } from './messages.vi.js';
+import { combinedWorkLines } from './work-reading.js';
 
 /** Identity and clock belong to the caller, keeping all transitions deterministic. */
 export function createSession(id: string, createdAt: string): Session {
@@ -10,18 +11,19 @@ export function createSession(id: string, createdAt: string): Session {
 }
 
 function clearWork(s: Session): Session {
-  const { workGrade: _grade, workSource: _source, ...rest } = s;
+  const { workGrade: _grade, workSource: _source, workPages: _pages, ...rest } = s;
   const { workRead: _read, grade: _ms, ...timings } = s.timings;
   return { ...rest, workPhotos: [], workLines: [], workAnswers: [], reviewAcknowledged: false, timings };
 }
 
 function regrade(s: Session): Session {
-  if (!s.specConfirmed || !s.spec || !s.solution || !s.workSource || s.stage === 'work_reading') return s;
+  if (!s.specConfirmed || !s.spec || !s.solution || !s.workSource || s.stage === 'work_reading' || s.workPages?.some((p) => p.needsRegion)) return s;
   let workGrade = gradeWork(s.spec, parseWork(s.workLines, vocabularyOf(s.spec)));
-  const needsReview = s.workSource === 'photo' && !s.reviewAcknowledged && workGrade.result.verdict === 'DUNG';
+  const needsReview = s.workSource === 'photo' && !s.reviewAcknowledged && (workGrade.result.verdict === 'DUNG'
+    || workGrade.result.verdict === 'SAI' && !!s.workPages?.some((p) => p.missingLineCheckUnavailable));
   if (workGrade.questions.length || needsReview) {
     // Never expose a definitive verdict while questions or the photo review remain.
-    workGrade = { ...workGrade, result: { verdict: 'CAN_XAC_NHAN', message: sessionVi.review, notes: [] } };
+    workGrade = { ...workGrade, result: { verdict: 'CAN_XAC_NHAN', message: needsReview ? sessionVi.review : workGrade.result.message, notes: [] } };
   }
   const { grade: _ms, ...timings } = s.timings;
   return { ...s, timings, workGrade, stage: workGrade.result.verdict === 'CAN_XAC_NHAN' ? 'work_review' : 'result' };
@@ -29,6 +31,35 @@ function regrade(s: Session): Session {
 
 export function sessionReducer(s: Session, e: SessionEvent): Session {
   switch (e.type) {
+    case 'work_restore': {
+      if (!['work_review', 'result'].includes(s.stage) || !s.workLines.some((l) => l.index === e.line && (l.region === 'question' || l.region === 'figure'))) return s;
+      const workLines = s.workLines.map((l) => l.index === e.line ? { ...l, region: 'solution' as const, regionConf: 1 } : l);
+      const workPages = s.workPages?.map((p) => ({ ...p, lines: workLines.filter((l) => l.page === p.page).map((l, index) => ({ ...l, index })) }));
+      return regrade({ ...s, workLines, ...(workPages ? { workPages } : {}), reviewAcknowledged: false });
+    }
+    case 'work_manual_page': {
+      if (s.stage !== 'work_reading' || !s.workPages?.some((p) => p.page === e.page && p.failed) || !e.lines.some((l) => l.trim())) return s;
+      const lines = e.lines.filter((l) => l.trim()).map((text, index) => ({ text, index, page: e.page, conf: 1, alternatives: [], region: 'solution' as const, struck: false }));
+      const workPages = s.workPages.map((p) => p.page !== e.page ? p : { page: p.page, raw: lines, lines, ms: p.ms,
+        needsRegion: false, inspected: true, missingLineCheckUnavailable: true, region: [0, 0, 1000, 1000] as [number, number, number, number] });
+      const next = { ...s, workPages, workLines: combinedWorkLines(workPages), reviewAcknowledged: false };
+      return workPages.length === s.workPhotos.length && workPages.every((p) => p.inspected && !p.needsRegion)
+        ? regrade({ ...next, stage: 'work_review' }) : next;
+    }
+    case 'work_capture_photos': {
+      if (!s.specConfirmed || !s.solution) return s;
+      const pages = (s.workPages ?? []).flatMap((p) => {
+        const page = e.photos.findIndex((photo) => photo.id === s.workPhotos[p.page]?.id);
+        return page < 0 ? [] : [{ ...p, page }];
+      });
+      return { ...clearWork(s), stage: 'work_capture', workSource: 'photo', workPhotos: structuredClone(e.photos.map((p, page) => ({ ...p, page }))),
+        workPages: structuredClone(pages), workLines: combinedWorkLines(pages) };
+    }
+    case 'work_page': {
+      if (s.stage !== 'work_reading' || !Number.isInteger(e.reading.page) || e.reading.page < 0 || e.reading.page >= s.workPhotos.length) return s;
+      const pages = [...(s.workPages ?? []).filter((p) => p.page !== e.reading.page), structuredClone(e.reading)].sort((a, b) => a.page - b.page);
+      return { ...s, workPages: pages, workLines: combinedWorkLines(pages), timings: { ...s.timings, workRead: pages.reduce((n, p) => n + p.ms, 0) } };
+    }
     case 'problem_capture':
       return { ...createSession(s.id, s.createdAt), problemPhotos: structuredClone(e.photos) };
     case 'problem_page': {
@@ -70,10 +101,12 @@ export function sessionReducer(s: Session, e: SessionEvent): Session {
         ? { ...s, stage: 'work_capture', workSource: e.source } : s;
     case 'work_photos': {
       if (!s.specConfirmed || !s.solution || !e.photos.length) return s;
-      return { ...clearWork(s), workPhotos: structuredClone(e.photos), workSource: 'photo', stage: 'work_reading' };
+      const same = s.stage === 'work_capture' && JSON.stringify(s.workPhotos) === JSON.stringify(e.photos);
+      return { ...(same ? s : clearWork(s)), workPhotos: structuredClone(e.photos), workSource: 'photo', stage: 'work_reading' };
     }
     case 'work_read': {
       if (!s.specConfirmed || !s.solution || s.workSource !== 'photo' || !['work_reading', 'work_review', 'result'].includes(s.stage)) return s;
+      if (e.complete !== false && s.workPages && (s.workPages.length !== s.workPhotos.length || s.workPages.some((p) => p.needsRegion))) return s;
       // Each event can checkpoint one page; globally unique line indices replace earlier readings.
       const lines = new Map(s.workLines.map((line) => [line.index, line]));
       for (const line of structuredClone(e.lines)) lines.set(line.index, line);
@@ -90,7 +123,9 @@ export function sessionReducer(s: Session, e: SessionEvent): Session {
     }
     case 'work_answer': {
       if (!s.workSource || !['work_review', 'result'].includes(s.stage) || !s.workLines.some((line) => line.index === e.answer.line)) return s;
-      return regrade({ ...s, workLines: applyWorkAnswers(s.workLines, [e.answer]),
+      const workLines = applyWorkAnswers(s.workLines, [e.answer]);
+      const workPages = s.workPages?.map((p) => ({ ...p, lines: workLines.filter((l) => l.page === p.page).map((l, index) => ({ ...l, index })) }));
+      return regrade({ ...s, workLines, ...(workPages ? { workPages } : {}),
         workAnswers: [...s.workAnswers, structuredClone(e.answer)], reviewAcknowledged: false });
     }
     case 'review_ack': {

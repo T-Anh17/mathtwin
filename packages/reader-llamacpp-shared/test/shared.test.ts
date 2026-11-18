@@ -21,6 +21,28 @@ function response(text: string, changes = new Map<number, Change>()): unknown {
 }
 function scored(text: string, changes?: Map<number, Change>) { return parseCompletion(response(text, changes)); }
 
+it('requires region in B schema and measures its tokens independently from text confidence', () => {
+  const text = JSON.stringify({ lines: [{ text: 'A', region: 'figure', box: [1, 2, 3, 4] }] });
+  const result = lineResult(scored(text, new Map([[text.indexOf('figure'), { probability: .4 }]])), 1000, 1000);
+  expect(result[0]).toMatchObject({ text: 'A', conf: .99, region: 'figure', regionConf: .4 });
+  expect(JSON.stringify(completionRequest('b', 'lines', ['data:image/png;base64,AA==']))).toContain('region');
+});
+
+it('requires boxes for work lines while problem reading keeps optional boxes', () => {
+  const required: string[][] = [];
+  const visit = (value: unknown): void => {
+    if (!value || typeof value !== 'object') return;
+    if ('required' in value && Array.isArray(value.required) && value.required.includes('text')) required.push(value.required as string[]);
+    Object.values(value).forEach(visit);
+  };
+  visit(completionRequest('b', 'lines', ['data:image/png;base64,AA==']).response_format);
+  expect(required).toHaveLength(1); expect(required[0]).toContain('box');
+  const prompt = JSON.stringify(completionRequest('b', 'lines', ['data:image/png;base64,AA==']));
+  expect(prompt).toContain('Every line MUST include'); expect(prompt).not.toContain('box is optional');
+  const problem = JSON.stringify(completionRequest('b', 'edges', ['data:image/png;base64,AA==']));
+  expect(problem).toContain('Omit box if not identifiable');
+});
+
 it.each(['lines', 'edges', 'neighbors'] as const)('emits only llama.cpp-compatible array items throughout %s schema', (mode) => {
   const request = completionRequest('b', mode, ['data:image/png;base64,AA==']);
   const boxes: unknown[] = [];
@@ -216,7 +238,7 @@ it('plain Paddle OCR is scored by line, excluding newline tokens', () => {
     { text: 'B8', conf: 0.99, alternatives: [], charConf: [0.99, 0.99] }]);
 });
 
-it.each([[0, 0, 1100, 900], [2, 3, 1, 4], [0, 0, 0, 0], [-1, 0, 2, 4], [0, 0, 3], 'bad'])('drops bad boxes but keeps recognized lines: %j', (box) => {
+it.each([[0, 0, 1100, 900], [2, 3, 1, 4], [0, 0, 0, 0], [-1, 0, 2, 4], [0, 0, 1000, 1000], [20, 20, 980, 980], [0, 0, 3], 'bad'])('drops bad boxes but keeps recognized lines: %j', (box) => {
   const text = JSON.stringify({ lines: [{ text: '7', box }] });
   expect(lineResult(scored(text), 4000, 3000)).toEqual([{ text: '7', conf: 0.99, alternatives: [], charConf: [0.99] }]);
 });

@@ -1,4 +1,5 @@
 export const workMessages = {
+  missing_line: 'Có thể sót dòng ở vùng này. Hãy gõ lại hoặc xác nhận không có gì ở đây.',
   no_solution_lines: 'Không có dòng bài làm để kiểm tra.',
   confirm_unparsed: 'Cần xác nhận các dòng chưa hiểu trước khi kết luận bài làm.',
   skip_line: 'Bỏ qua dòng này',

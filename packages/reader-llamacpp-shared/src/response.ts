@@ -255,8 +255,12 @@ export function lineResult(c: Completion, width: number, height: number, thresho
     if (l.region !== undefined) {
       if (l.region !== 'question' && l.region !== 'figure' && l.region !== 'solution' && l.region !== 'table') return failed('invalid_json');
       line.region = l.region;
+      line.regionConf = valueConfidence(c, spans.get(`/lines/${i}/region`) ?? failed('invalid_json'));
     }
-    const box = normalizedBox(l.box, width, height);
+    const candidate = normalizedBox(l.box, 1000, 1000);
+    // A line covering >=80% of the page carries no useful localization evidence.
+    const box = candidate && (candidate[2] - candidate[0]) * (candidate[3] - candidate[1]) < 800_000
+      ? normalizedBox(l.box, width, height) : undefined;
     if (box) line.box = box;
     return line;
   });

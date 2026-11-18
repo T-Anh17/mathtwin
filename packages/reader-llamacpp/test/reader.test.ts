@@ -92,10 +92,10 @@ it('rejects a length-truncated completion even if its content happens to be vali
   expect(h.process.stop).toHaveBeenCalledOnce();
 });
 
-it('returns NFC lines, measured confidence and optional page-local coordinates from Qwen', async () => {
-  const h = harness(completion(JSON.stringify({ lines: [{ text: 'Đề sai 7', region: 'solution', box: [0, 0, 1000, 1000] }] }), Math.log(0.7)));
+it('returns NFC lines, measured confidence and valid page-local coordinates from Qwen', async () => {
+  const h = harness(completion(JSON.stringify({ lines: [{ text: 'Đề sai 7', region: 'solution', box: [100, 200, 900, 300] }] }), Math.log(0.7)));
   const result = await h.reader.readLines([image]);
-  expect(result.lines).toEqual([{ text: 'Đề sai 7', region: 'solution', box: [0, 0, 1, 1], conf: 0.7, alternatives: [], charConf: Array(8).fill(0.7) }]);
+  expect(result.lines).toEqual([{ text: 'Đề sai 7', region: 'solution', regionConf: 0.7, box: [0.1, 0.2, 0.9, 0.3], conf: 0.7, alternatives: [], charConf: Array(8).fill(0.7) }]);
 });
 
 it('reads Paddle text with OCR: in page order and refuses graph extraction without fabricating edges', async () => {

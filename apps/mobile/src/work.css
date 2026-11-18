@@ -11,4 +11,12 @@
 .work-screen :is(button, textarea):focus-visible { outline: 2px solid var(--border-focus); outline-offset: 3px; }
 .work-crop { width: 100%; display: block; border-radius: var(--radius); border: 1px solid var(--border-strong); background: var(--surface); }
 .work-text { white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; }
-.work-screen .option { white-space: pre-wrap; height: auto; min-height: 48px; }
+.work-screen .options { grid-template-columns: 1fr; }
+.work-screen .option { white-space: pre-wrap; height: auto; min-height: 48px; font: inherit; text-align: left; padding: 12px; }
+
+.work-region { width: 100%; touch-action: none; display: block; }
+.work-bounds { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
+.work-bounds input { width: 100%; min-height: 44px; }
+.work-tools { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 20px 90px; }
+.work-buttons .btn { min-height: 44px; }
+.work-screen summary { min-height: 44px; padding: 12px 0; cursor: pointer; }

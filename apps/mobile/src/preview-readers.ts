@@ -1,6 +1,7 @@
 import { normalizeDraft } from '@mathtwin/reader';
 import type { ReadDraft } from '@mathtwin/reader';
 import type { Readers } from './flow/reading.js';
+import { workVi } from './work.vi.js';
 
 /** Explicitly labelled web preview only, never selected on Android. */
 export function previewReaders(): Readers {
@@ -10,7 +11,9 @@ export function previewReaders(): Readers {
       { u: 'B', v: 'C', w: 2, wAlternatives: [], name: null, conf: 1 }],
     statedFacts: { vertexCount: 3, edgeCount: 2, weightUnit: null },
     question: { rawText: '', format: 'tu_luan', task: { type: 'shortest_path', from: 'A', to: 'C' }, options: [], conf: 1 }, unreadable: [] };
-  return { text: { engine: 'preview:fake', readLines: async () => ({ lines: [], usage: { engine: 'preview:fake', passes: 1, latencyMs: 0 } }) },
+  return { text: { engine: 'preview:fake', readLines: async (_images, signal) => { signal?.throwIfAborted(); return {
+    lines: [{ text: workVi.previewLine, conf: .6, alternatives: [], region: 'solution', regionConf: 1, box: [50, 600, 950, 650] }],
+    usage: { engine: 'preview:fake', passes: 1, latencyMs: 0 } }; } },
     problem: async (_photos, signal) => { signal?.throwIfAborted(); return { ...normalizeDraft(draft), drafts: [structuredClone(draft)],
       usage: { engine: 'preview:fake', passes: 1, latencyMs: 0 } }; },
     figure: async (_image, signal) => { signal.throwIfAborted(); return structuredClone(draft); } };

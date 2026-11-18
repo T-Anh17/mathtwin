@@ -2,6 +2,8 @@ import type { Claim, ClaimBody, GradeResult, ProblemSpec, Task } from '@mathtwin
 import type { TextLine } from '@mathtwin/reader';
 
 export interface WorkLine extends TextLine {
+  /** An ink band without a transcription; cleared only by an explicit user answer. */
+  missing?: boolean;
   page: number; index: number; skipped?: boolean;
   /** Pixel cancellation evidence; user struck answers clear this score. */
   strikeScore?: number;
@@ -27,6 +29,7 @@ export interface ParsedWork {
   unchecked: number[]; issues: WorkIssue[];
 }
 export interface WorkQuestion {
+  reason?: 'missing';
   kind: 'reading' | 'unparsed' | 'struck'; lines: number[]; page: number;
   box?: [number, number, number, number]; shownText: string; options: string[];
 }

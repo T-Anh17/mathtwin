@@ -6,12 +6,12 @@ export function applyWorkAnswers(lines: WorkLine[], answers: WorkAnswer[]): Work
   return lines.map((line) => {
     const answer = byLine.get(line.index);
     if (!answer) return { ...line, alternatives: [...line.alternatives], ...(line.charConf ? { charConf: [...line.charConf] } : {}) };
-    if ('skip' in answer) return { ...line, skipped: true };
+    if ('skip' in answer) return { ...line, skipped: true, missing: false };
     if ('struck' in answer) {
       const { strikeScore: _strikeScore, ...rest } = line;
       return { ...rest, struck: answer.struck };
     }
     const { charConf: _charConf, skipped: _skipped, ...rest } = line;
-    return { ...rest, text: answer.text.normalize('NFC'), conf: 1, alternatives: [] };
+    return { ...rest, missing: false, text: answer.text.normalize('NFC'), conf: 1, alternatives: [] };
   });
 }

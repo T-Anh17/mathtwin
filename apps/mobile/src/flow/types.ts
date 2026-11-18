@@ -2,6 +2,7 @@ import type { ProblemSpec, Solution } from '@mathtwin/core';
 import type { ReadOutcome } from '@mathtwin/reader';
 import type { WorkAnswer, WorkGrade, WorkLine } from '@mathtwin/work';
 import type { ProblemPageRead } from './reading.js';
+import type { WorkPageRead } from './work-reading.js';
 
 export type Stage = 'problem_capture' | 'problem_reading' | 'problem_confirm' | 'solution'
   | 'work_capture' | 'work_reading' | 'work_review' | 'result';
@@ -19,8 +20,13 @@ export interface Session {
   readerId?: string;
   problemPages?: ProblemPageRead[];
   graphLayout?: GraphLayout;
+  workPages?: WorkPageRead[];
 }
 export type SessionEvent =
+  | { type: 'work_capture_photos'; photos: PhotoRef[] }
+  | { type: 'work_page'; reading: WorkPageRead }
+  | { type: 'work_restore'; line: number }
+  | { type: 'work_manual_page'; page: number; lines: string[] }
   | { type: 'problem_page'; reading: ProblemPageRead }
   | { type: 'problem_capture'; photos: PhotoRef[] }
   | { type: 'problem_photos'; photos: PhotoRef[] } | { type: 'problem_read'; outcome: ReadOutcome; ms: number }

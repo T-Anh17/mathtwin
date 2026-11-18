@@ -35,7 +35,11 @@ export function createProblemReaders(benchmark: Pick<Benchmark, 'run'>, lifecycl
   };
   const text: TextReader = { engine: engineFor('b'), readLines: async (images, signal) => {
     const result = await run(images, 'lines', signal);
-    return result.linePasses?.[0] ?? { lines: [], usage: result.usage };
+    const read = result.linePasses?.[0] ?? { lines: [], usage: result.usage };
+    const image = images[0]!;
+    return { ...read, lines: read.lines.map((line) => ({ ...line, ...(line.box ? {
+      box: line.box.map((n, axis) => n * 1000 / (axis % 2 ? image.height : image.width)) as [number, number, number, number],
+    } : {}) })) };
   } };
   return { text, problem: async (images, signal) => {
     const result = await run(images, 'graph', signal);

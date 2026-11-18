@@ -42,6 +42,8 @@ export interface TextLine {
   conf: number;
   alternatives: string[];
   region?: 'question' | 'figure' | 'solution' | 'table';
+  /** Measured token confidence in the region classification, independent of text. */
+  regionConf?: number;
 }
 export interface TextReader {
   readonly engine: string;

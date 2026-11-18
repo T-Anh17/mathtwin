@@ -253,3 +253,70 @@ nội dung ở hai phía của dòng gạch bị mất.
 Audit giữ nhóm nguyên nhân a/b/c/d, dòng claim mất, sai conf cao và region; dòng
 hình/đề lẫn được đếm riêng ở đầu vào và ở claim/unchecked. OCR chưa căn được
 không mặc nhiên là chữ hình. Căn dòng vẫn là ước lượng cần kiểm trên ảnh thật.
+
+## Lô 4.4: dựng B CPU Windows và đo layout, hoàn toàn cục bộ
+
+Chỉ dùng nguồn b12388 sẵn có `.build-cache/llama.cpp` (commit
+`1c2adc75f619d05efc5d49ce08eaaa96272ebfa2`), trọng số `.models/b`, MSVC và
+CMake/Ninja đã cài. Thiếu thành phần thì dừng, không tải/cài. Máy đo ngày
+2026-11-18 có MSVC 14.51 tại VS 18 Community và Android SDK CMake 4.0.2.
+Lưu nội dung sau thành `.build-cache/build-llama-win.cmd` rồi chạy từ gốc repo:
+
+```bat
+@echo off
+call "C:\Program Files\Microsoft Visual Studio\18\Community\VC\Auxiliary\Build\vcvars64.bat"
+if errorlevel 1 exit /b %errorlevel%
+set "PATH=%LOCALAPPDATA%\Android\Sdk\cmake\4.0.2\bin;%PATH%"
+cmake -S .build-cache/llama.cpp -B .build-cache/llama-win -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DGGML_NATIVE=OFF -DGGML_OPENMP=OFF -DLLAMA_OPENSSL=OFF -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_BUILD_APP=OFF -DLLAMA_BUILD_UI=OFF -DLLAMA_USE_PREBUILT_UI=OFF -DLLAMA_CONNECT=OFF -DFETCHCONTENT_FULLY_DISCONNECTED=ON
+if errorlevel 1 exit /b %errorlevel%
+cmake --build .build-cache/llama-win --target llama-server --parallel 4
+```
+
+Trong PowerShell, các lệnh dài phải có timeout và log (đường dẫn batch dùng `\`):
+
+```powershell
+node tools/eval/run-bounded.mjs 900 reports/.debug/4.4-r1-llama-build.log cmd.exe /d /c .build-cache\build-llama-win.cmd
+node tools/eval/run-bounded.mjs 180 reports/.debug/4.4-r1-build-ts.log cmd.exe /d /c npm run build
+node tools/eval/run-bounded.mjs 3660 reports/.debug/4.4-r1-work-layout.log node tools/eval/dist/work-layout.js .build-cache/llama-win/bin/llama-server.exe
+```
+
+`run-bounded.mjs` ghi stdout/stderr, thời gian và exit code; timeout trên Windows
+dừng cả cây tiến trình và trả mã 124. Binary đầu ra là
+`.build-cache/llama-win/bin/llama-server.exe`. Không dùng binary Android.
+Build này chỉ CPU, AVX2, không OpenMP, không UI tải sẵn hay HTTPS.
+
+`work-layout` chạy tuần tự 40 trang synthetic-hw, B ở 768 px, 4 luồng,
+1.536 token; mỗi request tối đa 180 s, mỗi lượt đọc tối đa 300 s, toàn bộ OCR
+tối đa 60 phút. Một trang lỗi vẫn được ghi và tiếp tục trang sau. CLI lưu
+`reports/.debug/mvp-batch-4.4-measurement.json` sau mỗi trang, kèm chữ/box quan sát,
+phân bố region/regionConf, số trang cần khoanh, leakage trước/sau và ms từng trang.
+Box dòng hợp lệ phải trong 0–1000, có chiều dương và diện tích dưới 80% trang;
+box bị loại không tính vào tử số. Leakage dùng truth sau inference để căn dòng;
+`before` đã loại dòng model gắn question/figure, `after` thêm lọc hình học.
+Truth không điền tọa độ hay chữ vào OCR. `missing.misses` chứa 20 chẩn đoán
+bỏ dòng oracle, gồm box dải, dòng đang che dải và nguyên nhân; không dùng để sửa parser.
+Không chạy suy luận trong `npm test`, không dùng adb.
+
+### Sửa review 4.4-r2: đo lại vùng và chạy lại riêng trang lỗi
+
+Sau `npm run build`, chạy từ gốc repo (không tải/cài thêm):
+
+```powershell
+node tools/eval/run-bounded.mjs 120 reports/.debug/4.4-r2-region-review-verified.log node tools/eval/dist/work-layout.js --review-saved
+node tools/eval/run-bounded.mjs 960 reports/.debug/4.4-r2-retries.log node tools/eval/retry-layout.mjs
+```
+
+`--review-saved` dùng lại đúng 37 trang thành công của phép đo r1, ghi
+`reports/.debug/4.4-r2-region-review.json`. Khung gợi ý chỉ lấy bao các box hợp lệ
+của dòng solution/table, cộng lề 24/1000 trang, chưa tự áp dụng khi chưa xác nhận.
+Tách hai phép đo thành phần: xác nhận nguyên khung gợi ý từ OCR, và vùng người
+dùng xác nhận mô phỏng bằng vùng lời giải tham chiếu synthetic-hw. Truth chỉ cấp
+vùng cho nhánh mô phỏng này và căn dòng chấm số đo; không sửa chữ/box OCR, không
+giả lập kết quả OCR crop. Đếm riêng 30 dòng cũ còn bị loại và tổng dòng bị loại
+sau lọc; không coi các số này là kết quả chấm cuối của app. Trang thiếu box vẫn
+phải đọc lại crop, rồi soát bắt buộc nếu crop còn thiếu box.
+
+`retry-layout.mjs` chỉ chọn các trang có `error` trong phép đo r1; cùng model B,
+768 px, 4 luồng, 1.536 token, request 180 s / lượt đọc 300 s. Ghi sau mỗi trang
+vào `reports/.debug/4.4-r2-retries.json`, giữ `reason` và `finish_reason`; không
+ghi đè phép đo 40 trang cũ và không tự retry thêm nếu lần chạy này vẫn lỗi.

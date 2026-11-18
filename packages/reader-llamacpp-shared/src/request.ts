@@ -19,12 +19,12 @@ Boxes use relative coordinates 0..1000. Omit box if not identifiable.
 For an unsupported task use its literal type and rawText. An unmappable option has check:null.`;
 }
 export const linesPrompt = `Transcribe each visible text line in reading order, verbatim, including the student's mistakes.
-Return JSON lines matching the response schema. region and box are optional.
-Boxes use Qwen3-VL relative coordinates 0..1000: [x1,y1,x2,y2]. Omit box if not identifiable.
-Do not invent alternative readings, missing text or coordinates. No solving or correcting.`;
+Return JSON lines matching the response schema. Classify every line's region: question (problem statement), figure (graph labels, edge names or weights), solution (student's written steps), table (student's working table). Never treat graph annotations as solution steps.
+Every line MUST include its own tight bounding box around the visible text. Boxes use Qwen3-VL relative coordinates 0..1000: [x1,y1,x2,y2], x1<x2 and y1<y2. Never use a whole-page box for a line.
+Do not invent alternative readings or missing text. No solving or correcting.`;
 export type ReadMode = 'edges' | 'neighbors' | 'lines' | 'ocr' | 'spotting' | 'glyph' | 'glyph-label' | 'glyph-weight' | 'glyph-name';
 const lineSchema = z.strictObject({ lines: z.array(z.strictObject({ text: z.string().min(1),
-  region: z.enum(['question', 'figure', 'solution', 'table']).optional(), box: z.tuple([z.number(), z.number(), z.number(), z.number()]).optional() })).min(1) });
+  region: z.enum(['question', 'figure', 'solution', 'table']), box: z.tuple([z.number().min(0).max(1000), z.number().min(0).max(1000), z.number().min(0).max(1000), z.number().min(0).max(1000)]) })).min(1) });
 /** llama.cpp b12388 accepts homogeneous arrays, not draft-2020 tuple keywords. */
 function serverSchema(value: unknown, root: unknown = value): unknown {
   if (Array.isArray(value)) return value.map((child) => serverSchema(child, root));
