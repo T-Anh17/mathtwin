@@ -30,6 +30,18 @@ describe('grade student Dijkstra simulation', () => {
     expect(result).toMatchObject({ verdict: 'SAI', firstErrorStep: 3, errorCode: 'SAI_PHEP_TINH', facts: { expected: 4, got: 2, viaDistance: 1, weight: 3 } });
     expect(result.notes.some((note) => note.startsWith('Bước '))).toBe(false);
   });
+  it('classifies a retained old label with absent/old via before arithmetic, preserving other cases', () => {
+    const changed = { ...spec, graph: weighted(['A', 'B', 'C', 'D'], [['A', 'B', 1], ['A', 'D', 4], ['B', 'D', 2], ['A', 'C', 8]]) };
+    const prefix: ClaimBody[] = [{ type: 'dijkstra_select', v: 'A' }, { type: 'dijkstra_select', v: 'B' }];
+    for (const via of [undefined, 'A']) expect(grade(changed, ordered([...prefix,
+      { type: 'dijkstra_label', v: 'D', value: 4, ...(via ? { via } : {}) },
+    ]))).toMatchObject({ verdict: 'SAI', firstErrorStep: 3, errorCode: 'BO_SOT', facts: { expected: 3, got: 4 } });
+    for (const value of [4, 2]) expect(grade(changed, ordered([...prefix,
+      { type: 'dijkstra_label', v: 'D', value, via: 'B' },
+    ]))).toMatchObject({ errorCode: 'SAI_PHEP_TINH' });
+    expect(grade(changed, ordered([...prefix, { type: 'dijkstra_label', v: 'D', value: 4, via: 'C' }]))).toMatchObject({ errorCode: 'CANH_KHONG_TON_TAI' });
+    expect(grade(changed, ordered([...prefix, { type: 'dijkstra_label', v: 'D', value: 3, via: 'B' }])).verdict).toBe('DUNG');
+  });
   it('reports missed updates in a partially written relaxation block', () => {
     const result = grade(spec, ordered([
       { type: 'dijkstra_select', v: 'A' }, { type: 'dijkstra_label', v: 'B', value: 1 },

@@ -1,0 +1,74 @@
+{
+  "claims": [
+    {
+      "type": "dijkstra_select",
+      "v": "A",
+      "step": 1,
+      "raw": "A | 0 | 1/A | 1/A | ∞"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "B",
+      "value": 1,
+      "via": "A",
+      "step": 2,
+      "raw": "A | 0 | 1/A | 1/A | ∞"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "C",
+      "value": 1,
+      "via": "A",
+      "step": 3,
+      "raw": "A | 0 | 1/A | 1/A | ∞"
+    },
+    {
+      "type": "dijkstra_select",
+      "v": "D",
+      "step": 4,
+      "raw": "D | - | 1/A | 1/A | 4/B"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "B",
+      "value": 1,
+      "via": "A",
+      "step": 5,
+      "raw": "D | - | 1/A | 1/A | 4/B"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "C",
+      "value": 1,
+      "via": "A",
+      "step": 6,
+      "raw": "D | - | 1/A | 1/A | 4/B"
+    }
+  ],
+  "lineOf": {
+    "1": [
+      1
+    ],
+    "2": [
+      1
+    ],
+    "3": [
+      1
+    ],
+    "4": [
+      2
+    ],
+    "5": [
+      2
+    ],
+    "6": [
+      2
+    ]
+  },
+  "prose": [],
+  "expected": {
+    "verdict": "SAI",
+    "firstErrorStep": 4,
+    "errorCode": "SAI_LUA_CHON"
+  }
+}

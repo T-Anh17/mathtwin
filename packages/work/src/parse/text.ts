@@ -18,9 +18,9 @@ export function editDistance(a: string, b: string): number {
   }
   return previous[b.length]!;
 }
-const keywords = ('do thi co so dinh canh khuyen cac la gom tap rong khong bac cua bang tong le thanh phan lien thong '
+const keywords = ('khac khoi tao doi qua tai thanh buoc duoc chon do thi co so dinh canh khuyen cac la gom tap rong khong bac cua bang tong le thanh phan lien thong '
   + 'chu trinh duong di euler hamilton ve duoc mot net theo thoa dieu kien dirac ore nen ly do bat buoc da tim thay '
-  + 'do dai ngan nhat tu den ket qua vay kl dap an chon phuong dung sai nhan khoanh tron gan cap nhat lap lai them '
+  + 'do dai quang ngan nhat tu den ket qua vay kl dap an chon phuong dung sai nhan khoanh tron gan cap nhat lap lai them '
   + 'nguoi du lich hanh trinh dua thu em dem duoc liet ke '
   + 'toi minh chung ta ban nhan xet rang thay quan sat tinh ghi viet xac dinh '
   + 'da dang se vua van tat ca nhung nay tren hinh thanh chia nhu sau lan luot '

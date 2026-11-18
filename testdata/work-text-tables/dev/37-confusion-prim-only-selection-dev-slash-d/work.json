@@ -1,0 +1,96 @@
+{
+  "claims": [
+    {
+      "type": "dijkstra_select",
+      "v": "A",
+      "step": 1,
+      "raw": "A | 0 | 1/A | 3/A | ∞ | 5/A | ∞"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "B",
+      "value": 1,
+      "via": "A",
+      "step": 2,
+      "raw": "A | 0 | 1/A | 3/A | ∞ | 5/A | ∞"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "C",
+      "value": 3,
+      "via": "A",
+      "step": 3,
+      "raw": "A | 0 | 1/A | 3/A | ∞ | 5/A | ∞"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "E",
+      "value": 5,
+      "via": "A",
+      "step": 4,
+      "raw": "A | 0 | 1/A | 3/A | ∞ | 5/A | ∞"
+    },
+    {
+      "type": "dijkstra_select",
+      "v": "C",
+      "step": 5,
+      "raw": "C | - | 1/A | 3/A | 4/B | 5/A | ∞"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "B",
+      "value": 1,
+      "via": "A",
+      "step": 6,
+      "raw": "C | - | 1/A | 3/A | 4/B | 5/A | ∞"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "D",
+      "value": 4,
+      "via": "B",
+      "step": 7,
+      "raw": "C | - | 1/A | 3/A | 4/B | 5/A | ∞"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "E",
+      "value": 5,
+      "via": "A",
+      "step": 8,
+      "raw": "C | - | 1/A | 3/A | 4/B | 5/A | ∞"
+    }
+  ],
+  "lineOf": {
+    "1": [
+      1
+    ],
+    "2": [
+      1
+    ],
+    "3": [
+      1
+    ],
+    "4": [
+      1
+    ],
+    "5": [
+      2
+    ],
+    "6": [
+      2
+    ],
+    "7": [
+      2
+    ],
+    "8": [
+      2
+    ]
+  },
+  "prose": [],
+  "expected": {
+    "verdict": "SAI",
+    "firstErrorStep": 5,
+    "errorCode": "SAI_LUA_CHON"
+  }
+}

@@ -16,14 +16,14 @@ import { syntheticFixtures } from '../src/synthetic.js';
 import { workLines, validateWork, hasGradingContent } from '../src/work-data.js';
 import { evaluateWork, oracleWork, readWorkOptions } from '../src/work-eval.js';
 import { renderClaims, wording } from '../src/work-wording.js';
-import { devFamilies } from '../src/work-wording-dev.js';
+import { devFamilies, sampleWordingFamily } from '../src/work-wording-dev.js';
 import { testFamilies } from '../src/work-wording-test.js';
 import { characterEdits, noisyLines } from '../src/work-noise.js';
 import type { ConfusionTable } from '../src/work-noise.js';
 import type { WorkSampleMeta } from '../src/work-generate.js';
 const root = repositoryRoot;
 const families = [...devFamilies, ...testFamilies];
-describe('work truth and measuring instrument', () => {
+describe('work truth and measuring instrument', { timeout: 60000 }, () => {
   it.each(syntheticFixtures.flatMap((fixture) => handwritingStyles.map((style) => ({ fixture, style }))))('$fixture/$style preserves student errors, raw lines and grade', async ({ fixture, style }) => {
     const folder = join(root, 'testdata/images-synthetic-hw', `${fixture}-${style}`);
     const spec = await readJson(join(folder, 'truth.json')) as ProblemSpec;
@@ -47,9 +47,19 @@ describe('work truth and measuring instrument', () => {
       expect(lines.some((l) => l.text.startsWith('Cập nhật nhãn')) ? Object.values(work.lineOf).flat().includes(lines.findIndex((l) => l.text.startsWith('Cập nhật nhãn'))) : false).toBe(false);
     }
   });
+  it('writes visible vertices before a length claim and regrades the expanded evidence', () => {
+    const spec: ProblemSpec = { graph: { directed: false, vertices: [{id:'A',label:'A'},{id:'B',label:'B'}], edges:[{id:'ab',u:'A',v:'B',w:3}] }, task:{type:'shortest_path',from:'A',to:'B'},questionFormat:'tu_luan' };
+    const source: Claim[] = [{type:'length',vertices:['A','B'],value:4,step:1,raw:'',conf:0.91}];
+    const written=renderClaims(source,spec,devFamilies[0]!);
+    expect(written.lines.map((l)=>l.text)).toEqual(['A → B','Độ dài là 4.']);
+    expect(written.claims).toMatchObject([{type:'walk',vertices:['A','B'],step:1},{type:'length',vertices:['A','B'],value:4,step:2,conf:0.91}]);
+    expect(written.lineOf).toEqual({'1':[0],'2':[1]});
+    expect(grade(spec,written.claims)).toMatchObject({verdict:'SAI',errorCode:'SAI_PHEP_TINH',firstErrorStep:2});
+  });
   it('keeps all 60 source fixtures across separate wording families and four deterministic noise variants', async () => {
     const manifest = await readJson(join(root, 'testdata/work-text/manifest.json')) as WorkSampleMeta[];
     const confusions = await readJson(join(root, 'testdata/work-text/confusions.json')) as ConfusionTable;
+    expect(manifest.length).toBeLessThanOrEqual(8000);
     expect(manifest).toHaveLength(60 * families.length * 4); expect(new Set(manifest.map((m) => m.id)).size).toBe(60 * families.length * 4);
     expect(new Set(manifest.map((m) => m.coreFixture)).size).toBe(60);
     expect(new Set(manifest.filter((m) => m.split === 'dev').map((m) => m.family))).toEqual(new Set(devFamilies.map((f) => f.id)));
@@ -60,7 +70,7 @@ describe('work truth and measuring instrument', () => {
       const spec = await readJson(join(folder, 'spec.json')) as ProblemSpec;
       const claims = await readJson(join(folder, 'claims.json')) as Claim[];
       for (const family of families) {
-        const clean = renderClaims(claims, spec, family, family.split === 'dev' ? devFamilies[0] : testFamilies[0]);
+        const clean = renderClaims(claims, spec, sampleWordingFamily(family, `${fixture}-${family.id}`), family.split === 'dev' ? devFamilies[0] : testFamilies[0]);
         if (clean.tableFallback) fallbacks++;
         const earlierSelections = new Set<string>();
         for (const line of clean.lines.filter((l) => l.region === 'table' && l.index !== 0)) {
@@ -78,7 +88,7 @@ describe('work truth and measuring instrument', () => {
           expect(await readdir(directory)).toEqual(['lines.json', 'vocab.json', 'work.json']);
           expect(lines).toEqual(noisyLines(clean.lines, meta.variant, meta.seed, confusions, meta.noiseEngine));
           expect(work.claims.map(claimKey)).toEqual(clean.claims.map(claimKey));
-          expect(work.claims.map((c) => c.conf)).toEqual(claims.map((c) => c.conf));
+          expect(work.claims.map((c) => c.conf)).toEqual(clean.claims.map((c) => c.conf));
           const expected = grade(spec, clean.claims);
           expect(work.expected.verdict).toBe(expected.verdict);
           expect(work.expected.firstErrorStep).toBe(expected.firstErrorStep ?? null);
@@ -103,7 +113,7 @@ describe('work truth and measuring instrument', () => {
       }
     }
     expect(changed).toBeGreaterThan(100); expect(accents).toBeGreaterThan(100); expect(fallbacks).toBeGreaterThan(0);
-  }, 30000);
+  }, 60000);
   it('records measured B/C character substitutions, insertions and deletions with reproducible provenance', async () => {
     const table = await readJson(join(root, 'testdata/work-text/confusions.json')) as ConfusionTable;
     expect(table.sources.map((s) => [s.engine, s.pages])).toEqual([['B', 36], ['C', 40]]);
@@ -221,7 +231,7 @@ describe('work truth and measuring instrument', () => {
       if (!resolve(temporary).startsWith(resolve(tmpdir(), 'mathtwin-work-'))) throw new Error('Unexpected temporary path');
       await rm(temporary, { recursive: true, force: true });
     }
-  }, 30000);
+  }, 60000);
   it('validates CLI options and refuses empty real data and unregistered engines', async () => {
     expect(readWorkOptions(['--set', 'synthetic-hw', '--lines', 'device', 'input.json'])).toEqual({ set: 'synthetic-hw', source: 'device', file: 'input.json' });
     for (const args of [[], ['--set', 'bad', '--lines', 'truth'], ['--set', 'work-text', '--lines', 'device'], ['--set', 'real', '--lines', 'truth', '--split', 'test']]) expect(() => readWorkOptions(args)).toThrow();

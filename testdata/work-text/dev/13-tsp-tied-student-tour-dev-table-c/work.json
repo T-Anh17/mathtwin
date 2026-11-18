@@ -3,28 +3,28 @@
     {
       "step": 1,
       "type": "nn_step",
-      "raw": "Kết quả: Từ A đi đến C (gần nhất).",
+      "raw": "Em ghi: Từ A đi đến C (gần nhất).",
       "from": "A",
       "to": "C"
     },
     {
       "step": 2,
       "type": "nn_step",
-      "raw": "Kết quả: Từ C đi đến B (gần nhất).",
+      "raw": "Em ghi: Từ C đi đến B (gần nhất).",
       "from": "C",
       "to": "B"
     },
     {
       "step": 3,
       "type": "nn_step",
-      "raw": "Kết quả: Từ B đi đến D (gần nhất).",
+      "raw": "Em ghi: Từ B đi đến D (gần nhất).",
       "from": "B",
       "to": "D"
     },
     {
       "step": 4,
       "type": "nn_step",
-      "raw": "Kết quả: Từ D đi đến A (gần nhất).",
+      "raw": "Em ghi: Từ D đi đến A (gần nhất).",
       "from": "D",
       "to": "A"
     },

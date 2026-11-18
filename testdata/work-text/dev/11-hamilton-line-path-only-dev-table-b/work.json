@@ -3,14 +3,14 @@
     {
       "step": 1,
       "type": "hamilton_exists",
-      "raw": "Kết quả: Có đường đi Hamilton.",
+      "raw": "Em ghi: Có đường đi Hamilton.",
       "kind": "path",
       "value": true
     },
     {
       "step": 2,
       "type": "hamilton_exists",
-      "raw": "Kết quả: Không có chu trình Hamilton (lý do: đỉnh bậc 1).",
+      "raw": "Em ghi: Không có chu trình Hamilton (lý do: đỉnh bậc 1).",
       "kind": "cycle",
       "value": false,
       "reason": "degree1"

@@ -3,7 +3,7 @@
     {
       "step": 1,
       "type": "shortest_length",
-      "raw": "Kết quả: d(A, C) = 2.",
+      "raw": "Em ghi: d(A, C) = 2.",
       "from": "A",
       "to": "C",
       "value": 2

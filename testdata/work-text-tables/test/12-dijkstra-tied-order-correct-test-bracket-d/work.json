@@ -1,0 +1,103 @@
+{
+  "claims": [
+    {
+      "type": "dijkstra_select",
+      "v": "A",
+      "step": 1,
+      "raw": "A | 0 | [1; A] | [1; A] | ∞"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "B",
+      "value": 1,
+      "via": "A",
+      "step": 2,
+      "raw": "A | 0 | [1; A] | [1; A] | ∞"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "C",
+      "value": 1,
+      "via": "A",
+      "step": 3,
+      "raw": "A | 0 | [1; A] | [1; A] | ∞"
+    },
+    {
+      "type": "dijkstra_select",
+      "v": "B",
+      "step": 4,
+      "raw": "B | - | [1; A] | [1; A] | [4; B]"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "C",
+      "value": 1,
+      "via": "A",
+      "step": 5,
+      "raw": "B | - | [1; A] | [1; A] | [4; B]"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "D",
+      "value": 4,
+      "via": "B",
+      "step": 6,
+      "raw": "B | - | [1; A] | [1; A] | [4; B]"
+    },
+    {
+      "type": "dijkstra_select",
+      "v": "C",
+      "step": 7,
+      "raw": "C | - | - | [1; A] | [4; B]"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "D",
+      "value": 4,
+      "via": "B",
+      "step": 8,
+      "raw": "C | - | - | [1; A] | [4; B]"
+    },
+    {
+      "type": "dijkstra_select",
+      "v": "D",
+      "step": 9,
+      "raw": "D | - | - | - | [4; B]"
+    }
+  ],
+  "lineOf": {
+    "1": [
+      1
+    ],
+    "2": [
+      1
+    ],
+    "3": [
+      1
+    ],
+    "4": [
+      2
+    ],
+    "5": [
+      2
+    ],
+    "6": [
+      2
+    ],
+    "7": [
+      3
+    ],
+    "8": [
+      3
+    ],
+    "9": [
+      4
+    ]
+  },
+  "prose": [],
+  "expected": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

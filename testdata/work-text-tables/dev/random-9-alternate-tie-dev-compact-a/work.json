@@ -1,0 +1,332 @@
+{
+  "claims": [
+    {
+      "type": "dijkstra_select",
+      "v": "v0",
+      "step": 1,
+      "raw": "0* | 2A | 2A | 9A | 10A | 11A | 13A | 5A"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "v1",
+      "value": 2,
+      "via": "v0",
+      "step": 2,
+      "raw": "0* | 2A | 2A | 9A | 10A | 11A | 13A | 5A"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "v2",
+      "value": 2,
+      "via": "v0",
+      "step": 3,
+      "raw": "0* | 2A | 2A | 9A | 10A | 11A | 13A | 5A"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "v3",
+      "value": 9,
+      "via": "v0",
+      "step": 4,
+      "raw": "0* | 2A | 2A | 9A | 10A | 11A | 13A | 5A"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "v4",
+      "value": 10,
+      "via": "v0",
+      "step": 5,
+      "raw": "0* | 2A | 2A | 9A | 10A | 11A | 13A | 5A"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "v5",
+      "value": 11,
+      "via": "v0",
+      "step": 6,
+      "raw": "0* | 2A | 2A | 9A | 10A | 11A | 13A | 5A"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "v6",
+      "value": 13,
+      "via": "v0",
+      "step": 7,
+      "raw": "0* | 2A | 2A | 9A | 10A | 11A | 13A | 5A"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "v7",
+      "value": 5,
+      "via": "v0",
+      "step": 8,
+      "raw": "0* | 2A | 2A | 9A | 10A | 11A | 13A | 5A"
+    },
+    {
+      "type": "dijkstra_select",
+      "v": "v2",
+      "step": 9,
+      "raw": "- | 2A | 2A✓ | 9A | 6C | 11A | 13A | 5A"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "v1",
+      "value": 2,
+      "via": "v0",
+      "step": 10,
+      "raw": "- | 2A | 2A✓ | 9A | 6C | 11A | 13A | 5A"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "v3",
+      "value": 9,
+      "via": "v0",
+      "step": 11,
+      "raw": "- | 2A | 2A✓ | 9A | 6C | 11A | 13A | 5A"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "v4",
+      "value": 6,
+      "via": "v2",
+      "step": 12,
+      "raw": "- | 2A | 2A✓ | 9A | 6C | 11A | 13A | 5A"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "v5",
+      "value": 11,
+      "via": "v0",
+      "step": 13,
+      "raw": "- | 2A | 2A✓ | 9A | 6C | 11A | 13A | 5A"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "v6",
+      "value": 13,
+      "via": "v0",
+      "step": 14,
+      "raw": "- | 2A | 2A✓ | 9A | 6C | 11A | 13A | 5A"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "v7",
+      "value": 5,
+      "via": "v0",
+      "step": 15,
+      "raw": "- | 2A | 2A✓ | 9A | 6C | 11A | 13A | 5A"
+    },
+    {
+      "type": "dijkstra_select",
+      "v": "v1",
+      "step": 16,
+      "raw": "- | 2A* | - | 3B | 6C | 7B | 13A | 5A"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "v3",
+      "value": 3,
+      "via": "v1",
+      "step": 17,
+      "raw": "- | 2A* | - | 3B | 6C | 7B | 13A | 5A"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "v4",
+      "value": 6,
+      "via": "v2",
+      "step": 18,
+      "raw": "- | 2A* | - | 3B | 6C | 7B | 13A | 5A"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "v5",
+      "value": 7,
+      "via": "v1",
+      "step": 19,
+      "raw": "- | 2A* | - | 3B | 6C | 7B | 13A | 5A"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "v6",
+      "value": 13,
+      "via": "v0",
+      "step": 20,
+      "raw": "- | 2A* | - | 3B | 6C | 7B | 13A | 5A"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "v7",
+      "value": 5,
+      "via": "v0",
+      "step": 21,
+      "raw": "- | 2A* | - | 3B | 6C | 7B | 13A | 5A"
+    },
+    {
+      "type": "dijkstra_select",
+      "v": "v3",
+      "step": 22,
+      "raw": "- | - | - | 3B✓ | 6C | 7B | 13A | 5A"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "v4",
+      "value": 6,
+      "via": "v2",
+      "step": 23,
+      "raw": "- | - | - | 3B✓ | 6C | 7B | 13A | 5A"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "v5",
+      "value": 7,
+      "via": "v1",
+      "step": 24,
+      "raw": "- | - | - | 3B✓ | 6C | 7B | 13A | 5A"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "v6",
+      "value": 13,
+      "via": "v0",
+      "step": 25,
+      "raw": "- | - | - | 3B✓ | 6C | 7B | 13A | 5A"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "v7",
+      "value": 5,
+      "via": "v0",
+      "step": 26,
+      "raw": "- | - | - | 3B✓ | 6C | 7B | 13A | 5A"
+    },
+    {
+      "type": "dijkstra_select",
+      "v": "v7",
+      "step": 27,
+      "raw": "- | - | - | - | 6C | 7B | 13A | 5A*"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "v4",
+      "value": 6,
+      "via": "v2",
+      "step": 28,
+      "raw": "- | - | - | - | 6C | 7B | 13A | 5A*"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "v5",
+      "value": 7,
+      "via": "v1",
+      "step": 29,
+      "raw": "- | - | - | - | 6C | 7B | 13A | 5A*"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "v6",
+      "value": 13,
+      "via": "v0",
+      "step": 30,
+      "raw": "- | - | - | - | 6C | 7B | 13A | 5A*"
+    }
+  ],
+  "lineOf": {
+    "1": [
+      1
+    ],
+    "2": [
+      1
+    ],
+    "3": [
+      1
+    ],
+    "4": [
+      1
+    ],
+    "5": [
+      1
+    ],
+    "6": [
+      1
+    ],
+    "7": [
+      1
+    ],
+    "8": [
+      1
+    ],
+    "9": [
+      2
+    ],
+    "10": [
+      2
+    ],
+    "11": [
+      2
+    ],
+    "12": [
+      2
+    ],
+    "13": [
+      2
+    ],
+    "14": [
+      2
+    ],
+    "15": [
+      2
+    ],
+    "16": [
+      3
+    ],
+    "17": [
+      3
+    ],
+    "18": [
+      3
+    ],
+    "19": [
+      3
+    ],
+    "20": [
+      3
+    ],
+    "21": [
+      3
+    ],
+    "22": [
+      4
+    ],
+    "23": [
+      4
+    ],
+    "24": [
+      4
+    ],
+    "25": [
+      4
+    ],
+    "26": [
+      4
+    ],
+    "27": [
+      5
+    ],
+    "28": [
+      5
+    ],
+    "29": [
+      5
+    ],
+    "30": [
+      5
+    ]
+  },
+  "prose": [],
+  "expected": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

@@ -4,6 +4,13 @@ import type { WorkVocabulary } from '../src/index.js';
 const vocab: WorkVocabulary = { vertexLabels: ['A', 'B', 'C', 'D', 'I'], edgeNames: [], task: 'path', questionFormat: 'tu_luan', statementIds: [], questionText: [] };
 const parse = (text: string) => parseWork([{ text, index: 0, page: 0, conf: 1, alternatives: [] }], vocab);
 describe('noun and value slots', () => {
+  it('uses the same preposition and vertex noun slots for degree topics', () => {
+    for (const preposition of ['', 'của ', 'tại ', 'ở ', 'cho ', 'đến ', 'tới '])
+      for (const noun of ['', 'đỉnh ', 'điểm ']) for (const v of vocab.vertexLabels) {
+        const text = `Nhận xét: Bậc ${preposition}${noun}${v} có giá trị 3`;
+        expect(parse(text), text).toMatchObject({steps:[{claim:{type:'degree',v,value:3}}],unchecked:[]});
+      }
+  });
   it.each([
     ['Em liệt kê tập đỉnh A, B, I', { type: 'vertex_list', vertices: ['A', 'B', 'I'] }],
     ['Em chia các đỉnh thành 2 nhóm liên thông', { type: 'component_count', value: 2 }],

@@ -10,14 +10,14 @@ import { loadCases, prepareImages, readJson } from './dataset.js';
 import { jsonText } from './work-generate.js';
 import type { WorkSampleMeta } from './work-generate.js';
 import { workLines } from './work-data.js';
-export interface WorkOptions { set: 'work-text' | 'synthetic-hw' | 'real'; source: 'truth' | 'device' | 'engine'; file?: string; engine?: string; split?: 'dev' | 'test'; parser?: 'oracle' | 'real'; variant?: 'a' | 'b' | 'c' | 'd' }
+export interface WorkOptions { set: 'work-text' | 'work-text-tables' | 'synthetic-hw' | 'real'; source: 'truth' | 'device' | 'engine'; file?: string; engine?: string; split?: 'dev' | 'test'; parser?: 'oracle' | 'real'; variant?: 'a' | 'b' | 'c' | 'd' }
 export function readWorkOptions(args: string[]): WorkOptions {
   let set: WorkOptions['set'] | undefined; let source: WorkOptions['source'] | undefined;
   let parser: WorkOptions['parser']; let variant: WorkOptions['variant'];
   let file: string | undefined; let engine: string | undefined; let split: WorkOptions['split'];
   for (let i = 0; i < args.length; i++) {
     const flag = args[i]; const value = args[++i];
-    if (flag === '--set' && ['work-text', 'synthetic-hw', 'real'].includes(value ?? '') && !set) set = value as WorkOptions['set'];
+    if (flag === '--set' && ['work-text', 'work-text-tables', 'synthetic-hw', 'real'].includes(value ?? '') && !set) set = value as WorkOptions['set'];
     else if (flag === '--split' && ['dev', 'test'].includes(value ?? '') && !split) split = value as 'dev' | 'test';
     else if (flag === '--parser' && ['oracle', 'real'].includes(value ?? '') && !parser) parser = value as 'oracle' | 'real';
     else if (flag === '--variant' && ['a', 'b', 'c', 'd'].includes(value ?? '') && !variant) variant = value as 'a' | 'b' | 'c' | 'd';
@@ -25,9 +25,9 @@ export function readWorkOptions(args: string[]): WorkOptions {
       source = value as WorkOptions['source'];
       if (source === 'device') file = args[++i];
       if (source === 'engine') engine = args[++i];
-    } else throw new Error('Dùng --set work-text|synthetic-hw|real --lines truth|device <file>|engine <tên> [--split dev|test] [--parser oracle|real] [--variant a|b|c|d].');
+    } else throw new Error('Dùng --set work-text|work-text-tables|synthetic-hw|real --lines truth|device <file>|engine <tên> [--split dev|test] [--parser oracle|real] [--variant a|b|c|d].');
   }
-  if (!set || !source || source === 'device' && (!file || file.startsWith('--')) || source === 'engine' && (!engine || engine.startsWith('--')) || (split || variant) && set !== 'work-text') throw new Error('Thiếu hoặc sai tham số eval:work.');
+  if (!set || !source || source === 'device' && (!file || file.startsWith('--')) || source === 'engine' && (!engine || engine.startsWith('--')) || (split || variant) && !['work-text', 'work-text-tables'].includes(set)) throw new Error('Thiếu hoặc sai tham số eval:work.');
   return { set, source, ...(file ? { file } : {}), ...(engine ? { engine } : {}), ...(split ? { split } : {}), ...(parser ? { parser } : {}), ...(variant ? { variant } : {}) };
 }
 /** Oracle checks the measuring instrument; it makes no claim about parsing observed text. */
@@ -57,8 +57,12 @@ export function realWork(spec: ProblemSpec, lines: WorkLine[]): { parsed: Parsed
   const claims = parsed.steps.map(({ claim }) => {
     const id = (v: string): string => ids.get(v) ?? v;
     switch (claim.type) {
+      case 'dijkstra_init': return { ...claim, source: id(claim.source) };
+      case 'dijkstra_select': return { ...claim, v: id(claim.v) };
+      case 'dijkstra_label': return { ...claim, v: id(claim.v), ...(claim.via ? { via: id(claim.via) } : {}) };
+      case 'nn_step': return { ...claim, from: id(claim.from), to: id(claim.to) };
       case 'degree': return { ...claim, v: id(claim.v) };
-      case 'vertex_list': case 'odd_vertices': case 'walk': case 'length': return { ...claim, vertices: claim.vertices.map(id) };
+      case 'postman_duplicate': case 'vertex_list': case 'odd_vertices': case 'walk': case 'length': return { ...claim, vertices: claim.vertices.map(id) };
       case 'edge_list': return { ...claim, edges: claim.edges.map((e) => ({ u: id(e.u), v: id(e.v) })) };
       case 'shortest_length': return { ...claim, from: id(claim.from), to: id(claim.to) };
       case 'final_answer': return { ...claim, value: answerIds(claim.value) };
@@ -90,9 +94,9 @@ export async function evaluateWork(args: string[], root: string, date: string, r
     if (!Array.isArray(data.results) || new Set(data.results.map((r) => r.id)).size !== data.results.length) throw new Error('File thiết bị không hợp lệ.');
     device = new Map(data.results.map((r) => [r.id, r.linePasses[0]?.lines ?? []]));
   }
-  if (options.set === 'work-text') {
+  if (options.set === 'work-text' || options.set === 'work-text-tables') {
     if (options.source !== 'truth') throw new Error('work-text chỉ có chữ; dùng --lines truth.');
-    const folder = join(root, 'testdata/work-text');
+    const folder = join(root, 'testdata', options.set);
     const manifest = await readJson(join(folder, 'manifest.json')) as WorkSampleMeta[];
     for (const meta of manifest.filter((m) => (!options.split || m.split === options.split) && (!options.variant || m.variant === options.variant))) {
       const directory = join(folder, meta.split, meta.id);
@@ -103,7 +107,7 @@ export async function evaluateWork(args: string[], root: string, date: string, r
       if (!clean) throw new Error('Thiếu biến thể chữ chuẩn a để đối chiếu.');
       const reference = meta.variant === 'a' ? lines
         : await readJson(join(folder, clean.split, clean.id, 'lines.json')) as WorkLine[];
-      samples.push({ id: meta.id, spec: await readJson(join(root, 'testdata/core', meta.coreFixture, 'spec.json')) as ProblemSpec,
+      samples.push({ id: meta.id, spec: await readJson(options.set === 'work-text-tables' ? join(directory, 'spec.json') : join(root, 'testdata/core', meta.coreFixture, 'spec.json')) as ProblemSpec,
         truth, lines: reference, observed: lines, observedCount: lines.length, group: meta.family, variant: meta.variant });
     }
   } else {
@@ -174,7 +178,7 @@ export async function evaluateWork(args: string[], root: string, date: string, r
       firstErrorLines: r.firstErrorLines, expectedErrorLines: r.expectedErrorLines, unchecked: r.unchecked }));
   const parser = options.parser ?? 'oracle';
   const report = { date, ...options, parser, fixtureOnly: true,
-    note: parser === 'real' ? 'Parser văn xuôi Lô 3.2; chưa hỗ trợ Dijkstra, nn_step, postman_duplicate, bảng. Chấm trực tiếp bằng core.grade để đo; chưa có gradeWork, readingCheck hay nâng unchecked thành hỏi lại (Lô 3.4). Các chỉ số chấm là chẩn đoán, không phải pipeline an toàn hoàn chỉnh. Chưa đủ căn cứ trên bài thật.' : 'Parser oracle trả claims truth, bỏ qua chữ quan sát khi tạo claim. 100% chỉ kiểm bộ đo. Không phải độ chính xác đọc/hiểu, không mô phỏng hỏi lại (Lô 3.4). Chưa đủ căn cứ trên bài thật.',
+    note: parser === 'real' ? 'Parser Lô 3.3: văn xuôi, Dijkstra, nn_step, postman_duplicate, bảng và nhiều trang. Chấm trực tiếp bằng core.grade để đo; chưa có gradeWork, readingCheck hay nâng unchecked thành hỏi lại (Lô 3.4). Các chỉ số chấm là chẩn đoán, không phải pipeline an toàn hoàn chỉnh. Chưa đủ căn cứ trên bài thật.' : 'Parser oracle trả claims truth, bỏ qua chữ quan sát khi tạo claim. 100% chỉ kiểm bộ đo. Không phải độ chính xác đọc/hiểu, không mô phỏng hỏi lại (Lô 3.4). Chưa đủ căn cứ trên bài thật.',
     summary, proseOnly: withRates(summarize(rows.filter((r) => !r.deferredTruth))), groups, variants, silentErrors, rows };
   const source = `${options.set}-${options.source}${options.split ? '-' + options.split : ''}${options.engine ? '-' + options.engine.replace(/[^a-zA-Z0-9-]/g, '-') : ''}${options.variant ? '-' + options.variant : ''}${parser === 'real' ? '-real' : ''}`;
   const output = join(reportRoot, 'reports', `work-eval-${source}-${date}`); await mkdir(join(reportRoot, 'reports'), { recursive: true });

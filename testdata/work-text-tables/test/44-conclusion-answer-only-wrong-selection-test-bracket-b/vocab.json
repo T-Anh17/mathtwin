@@ -1,0 +1,12 @@
+{
+  "vertexLabels": [
+    "A",
+    "B",
+    "C"
+  ],
+  "edgeNames": [],
+  "task": "shortest_path",
+  "questionFormat": "tra_loi_ngan",
+  "statementIds": [],
+  "questionText": []
+}

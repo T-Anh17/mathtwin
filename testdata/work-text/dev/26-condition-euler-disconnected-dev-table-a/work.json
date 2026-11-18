@@ -3,13 +3,13 @@
     {
       "step": 1,
       "type": "connected",
-      "raw": "Kết quả: Đồ thị không liên thông.",
+      "raw": "Em ghi: Đồ thị không liên thông.",
       "value": false
     },
     {
       "step": 2,
       "type": "euler_exists",
-      "raw": "Kết quả: Có chu trình Euler.",
+      "raw": "Em ghi: Có chu trình Euler.",
       "kind": "circuit",
       "value": true
     }

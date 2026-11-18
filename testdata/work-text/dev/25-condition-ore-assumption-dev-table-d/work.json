@@ -3,7 +3,7 @@
     {
       "step": 1,
       "type": "theorem",
-      "raw": "Kết quả: Thỏa điều kiện Ore.",
+      "raw": "Em ghi: Thỏa điều kiện Ore.",
       "name": "ore",
       "holds": true
     }

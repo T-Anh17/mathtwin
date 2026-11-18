@@ -2,6 +2,7 @@ import type { Claim, ClaimBody, ProblemSpec } from '@mathtwin/core';
 import type { WorkLine } from '@mathtwin/work';
 export interface WordingFamily {
   id: string; split: 'dev' | 'test'; table: boolean;
+  omitLabelVia?: boolean;
   count: (subject: string, value: number) => string;
   list: (subject: string, values: string) => string;
   degree: (vertex: string, value: number) => string;
@@ -79,19 +80,34 @@ export function renderClaims(claims: Claim[], spec: ProblemSpec, family: Wording
     const index = lines.length; lines.push({ text: text.normalize('NFC'), region, conf: 1, alternatives: [], page: 0, index }); return index;
   };
   let header = false;
+  const rendered: Claim[] = [];
+  let precedingWalk: string[] | undefined;
+  const emit = (claim: Claim, index: number): void => {
+    const step = rendered.length + 1;
+    rendered.push({ ...claim, step, raw: lines[index]!.text }); lineOf[String(step)] = [index];
+    if (claim.type === 'walk') precedingWalk = claim.vertices;
+  };
   for (let i = 0; i < claims.length; i++) {
     const claim = claims[i]!; const row = tableFallback ? undefined : rows.get(i);
     if (row) {
       if (!header) { add('Chọn ' + spec.graph.vertices.map((v) => v.label).join(' '), 'table'); header = true; }
       const index = add(row.text, 'table');
-      row.group.forEach((c) => { lineOf[String(c.step)] = [index]; });
+      row.group.forEach((c) => emit(c, index));
       i = row.end;
-    } else lineOf[String(claim.step)] = [add(wording(claim, spec, effective), 'solution')];
+    } else {
+      // A length's vertices must be visible, never supplied only by hidden truth.
+      if (claim.type === 'length' && JSON.stringify(precedingWalk) !== JSON.stringify(claim.vertices)) {
+        const walk: Claim = { type: 'walk', kind: 'path', vertices: [...claim.vertices], step: 0, raw: '' };
+        emit(walk, add(wording(walk, spec, { ...effective, list: (_s, v) => v }), 'solution'));
+      }
+      emit(claim, add(wording(claim, spec, effective), 'solution'));
+    }
   }
-  return { lines, lineOf, tableFallback, claims: claims.map((claim) => {
+  return { lines, lineOf, tableFallback, claims: rendered.map((claim) => {
     // This renderer writes only endpoints. Truth must describe that same evidence.
     const body = { ...claim };
     if (body.type === 'walk') delete body.edgeIds;
+    if (body.type === 'dijkstra_label' && effective.omitLabelVia) delete body.via;
     return { ...body, raw: lineOf[String(claim.step)]!.map((i) => lines[i]!.text).join('\n') };
   }) };
 }

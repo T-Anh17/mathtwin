@@ -1,0 +1,127 @@
+{
+  "claims": [
+    {
+      "type": "dijkstra_select",
+      "v": "A",
+      "step": 1,
+      "raw": "1 | 0* | (2, A) | (3, A) | ∞ | (2, A)"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "B",
+      "value": 2,
+      "via": "A",
+      "step": 2,
+      "raw": "1 | 0* | (2, A) | (3, A) | ∞ | (2, A)"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "C",
+      "value": 3,
+      "via": "A",
+      "step": 3,
+      "raw": "1 | 0* | (2, A) | (3, A) | ∞ | (2, A)"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "E",
+      "value": 2,
+      "via": "A",
+      "step": 4,
+      "raw": "1 | 0* | (2, A) | (3, A) | ∞ | (2, A)"
+    },
+    {
+      "type": "dijkstra_select",
+      "v": "B",
+      "step": 5,
+      "raw": "2 | - | (1, A)✓ | (3, A) | (4, B) | (2, A)"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "C",
+      "value": 3,
+      "via": "A",
+      "step": 6,
+      "raw": "2 | - | (1, A)✓ | (3, A) | (4, B) | (2, A)"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "D",
+      "value": 4,
+      "via": "B",
+      "step": 7,
+      "raw": "2 | - | (1, A)✓ | (3, A) | (4, B) | (2, A)"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "E",
+      "value": 2,
+      "via": "A",
+      "step": 8,
+      "raw": "2 | - | (1, A)✓ | (3, A) | (4, B) | (2, A)"
+    },
+    {
+      "type": "dijkstra_select",
+      "v": "E",
+      "step": 9,
+      "raw": "3 | - | - | (3, A) | (4, B) | (2, A)*"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "C",
+      "value": 3,
+      "via": "A",
+      "step": 10,
+      "raw": "3 | - | - | (3, A) | (4, B) | (2, A)*"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "D",
+      "value": 4,
+      "via": "B",
+      "step": 11,
+      "raw": "3 | - | - | (3, A) | (4, B) | (2, A)*"
+    }
+  ],
+  "lineOf": {
+    "1": [
+      1
+    ],
+    "2": [
+      1
+    ],
+    "3": [
+      1
+    ],
+    "4": [
+      1
+    ],
+    "5": [
+      2
+    ],
+    "6": [
+      2
+    ],
+    "7": [
+      2
+    ],
+    "8": [
+      2
+    ],
+    "9": [
+      3
+    ],
+    "10": [
+      3
+    ],
+    "11": [
+      3
+    ]
+  },
+  "prose": [],
+  "expected": {
+    "verdict": "SAI",
+    "firstErrorStep": 2,
+    "errorCode": "SAI_PHEP_TINH"
+  }
+}

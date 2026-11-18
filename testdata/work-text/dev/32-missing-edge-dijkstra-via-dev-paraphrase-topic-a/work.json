@@ -1,0 +1,32 @@
+{
+  "claims": [
+    {
+      "step": 1,
+      "type": "dijkstra_select",
+      "raw": "Khoanh tròn A.",
+      "v": "A"
+    },
+    {
+      "step": 2,
+      "type": "dijkstra_label",
+      "raw": "Ghi nhận Nhãn của đỉnh B bằng 1, đi qua C.",
+      "v": "B",
+      "value": 1,
+      "via": "C"
+    }
+  ],
+  "lineOf": {
+    "1": [
+      0
+    ],
+    "2": [
+      1
+    ]
+  },
+  "prose": [],
+  "expected": {
+    "verdict": "SAI",
+    "firstErrorStep": 2,
+    "errorCode": "CANH_KHONG_TON_TAI"
+  }
+}

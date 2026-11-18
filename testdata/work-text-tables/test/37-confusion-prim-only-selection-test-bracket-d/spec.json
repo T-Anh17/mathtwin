@@ -1,0 +1,87 @@
+{
+  "graph": {
+    "directed": false,
+    "vertices": [
+      {
+        "id": "A",
+        "label": "A"
+      },
+      {
+        "id": "B",
+        "label": "B"
+      },
+      {
+        "id": "C",
+        "label": "C"
+      },
+      {
+        "id": "D",
+        "label": "D"
+      },
+      {
+        "id": "E",
+        "label": "E"
+      },
+      {
+        "id": "F",
+        "label": "F"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1",
+        "u": "A",
+        "v": "B",
+        "w": 1
+      },
+      {
+        "id": "e2",
+        "u": "A",
+        "v": "C",
+        "w": 3
+      },
+      {
+        "id": "e3",
+        "u": "B",
+        "v": "D",
+        "w": 3
+      },
+      {
+        "id": "e4",
+        "u": "C",
+        "v": "D",
+        "w": 1
+      },
+      {
+        "id": "e5",
+        "u": "A",
+        "v": "E",
+        "w": 5
+      },
+      {
+        "id": "e6",
+        "u": "C",
+        "v": "E",
+        "w": 10
+      },
+      {
+        "id": "e7",
+        "u": "C",
+        "v": "F",
+        "w": 6
+      },
+      {
+        "id": "e8",
+        "u": "E",
+        "v": "F",
+        "w": 1
+      }
+    ]
+  },
+  "task": {
+    "type": "shortest_path",
+    "from": "A",
+    "to": "F"
+  },
+  "questionFormat": "tu_luan"
+}

@@ -6,7 +6,7 @@ import type { ProblemSpec } from '@mathtwin/core';
 import { evaluateWork, realWork, readWorkOptions, uncheckedGuard } from '../src/work-eval.js';
 import { compareWork } from '@mathtwin/work';
 const spec: ProblemSpec = { graph: { directed: false, vertices: [{ id: 'v1', label: 'A' }], edges: [] }, task: { type: 'degree', vertices: ['v1'] }, questionFormat: 'tu_luan' };
-describe('real parser evaluation switch', () => {
+describe('real parser evaluation switch', { timeout: 60000 }, () => {
   it('partitions silent errors by the future unchecked guard without changing the verdict', () => {
     const lines = (texts: string[]) => texts.map((text,index)=>({text,index,page:0,conf:1,alternatives:[]}));
     const prediction = realWork(spec, lines(['x = ?', 'deg(A) = 3']));

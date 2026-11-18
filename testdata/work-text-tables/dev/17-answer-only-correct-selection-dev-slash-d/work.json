@@ -1,0 +1,63 @@
+{
+  "claims": [
+    {
+      "type": "dijkstra_select",
+      "v": "A",
+      "step": 1,
+      "raw": "A | 0 | 2/A | 9/A"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "B",
+      "value": 2,
+      "via": "A",
+      "step": 2,
+      "raw": "A | 0 | 2/A | 9/A"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "C",
+      "value": 9,
+      "via": "A",
+      "step": 3,
+      "raw": "A | 0 | 2/A | 9/A"
+    },
+    {
+      "type": "dijkstra_select",
+      "v": "C",
+      "step": 4,
+      "raw": "C | - | 2/A | 5/B"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "B",
+      "value": 2,
+      "via": "A",
+      "step": 5,
+      "raw": "C | - | 2/A | 5/B"
+    }
+  ],
+  "lineOf": {
+    "1": [
+      1
+    ],
+    "2": [
+      1
+    ],
+    "3": [
+      1
+    ],
+    "4": [
+      2
+    ],
+    "5": [
+      2
+    ]
+  },
+  "prose": [],
+  "expected": {
+    "verdict": "SAI",
+    "firstErrorStep": 4,
+    "errorCode": "SAI_LUA_CHON"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "vertexLabels": [
+    "A",
+    "B",
+    "C"
+  ],
+  "edgeNames": [],
+  "task": "statements",
+  "questionFormat": "trac_nghiem",
+  "statementIds": [
+    "A",
+    "B",
+    "C",
+    "D"
+  ],
+  "questionText": []
+}

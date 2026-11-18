@@ -3,9 +3,10 @@ import type { WorkVocabulary } from '../types.js';
 import { labelList, oneLabel, LabelError } from './labels.js';
 import { fold, language } from './text.js';
 import { numericValue, slotClaim, unpad, writtenNumbers } from './slots.js';
+import { algorithmClause } from './algorithms.js';
 
 export type WalkKind = Extract<ClaimBody, { type: 'walk' }>['kind'];
-export interface ProseContext { walk?: string[]; kind?: WalkKind; reason?: Extract<ClaimBody, { type: 'hamilton_exists' }>['reason'] }
+export interface ProseContext { walk?: string[]; kind?: WalkKind; reason?: Extract<ClaimBody, { type: 'hamilton_exists' }>['reason']; lastGradingLine?: boolean }
 /** Split only outside notation; commas in lists and decimal numbers stay intact. */
 export function splitClauses(input: string, vocab: WorkVocabulary): string[] {
   const text = language(input, vocab.vertexLabels);
@@ -63,10 +64,13 @@ export function gradingContent(input: string, vocab: WorkVocabulary): boolean {
     withoutLabels = withoutLabels.split(/([^\p{L}\p{N}_])/u).map((t) => t === key ? '' : t).join('');
   }
   return /\d|=/u.test(withoutLabels) || /[\p{L}\p{N}]\s*(?:→|-)\s*[\p{L}\p{N}]/u.test(text)
-    || /\b(?:vay|kl|dap so|dap an)\b/u.test(text) || /\b(?:dung|sai)\b/u.test(judgments)
+    || /\b(?:vay|kl|ket luan|ket qua|dap so|dap an)\b/u.test(text) || /\b(?:dung|sai)\b/u.test(judgments)
     || /^[ds][.;]?$/u.test(text)
     || /(?:^|\s)[a-z][).:]\s*[ds](?:$|[\s.;,])/u.test(text)
-    || /\bchon\s+(?:phuong an\s+)?[a-d](?:$|[\s.;,)])/u.test(text);
+    || /\bchon\s+(?:phuong an\s+)?[a-d](?:$|[\s.;,)])/u.test(text)
+    || [...text.matchAll(/\b(?:chon|khoanh|danh dau|co dinh|(?:ghi|gan|doi) nhan|di den|lap lai|them canh)\b/gu)].some((action) =>
+      text.slice(action.index + action[0].length).split(/[^\p{L}\p{N}_]+/u)
+        .some((word) => vocab.vertexLabels.some((v) => language(v, vocab.vertexLabels) === word)));
 }
 function finalValue(text: string, vocab: WorkVocabulary): unknown {
   const clean = text.replace(/[.]$/u, '').trim();
@@ -99,17 +103,21 @@ function detachedDegree(text: string, vocab: WorkVocabulary): ClaimBody[] | unde
 export function proseClause(input: string, vocab: WorkVocabulary, context: ProseContext): ClaimBody[] | undefined {
   const labels = vocab.vertexLabels;
   let text = language(input, labels).replace(/[.;]$/u, '').trim();
-  text = text.replace(/^(?:em ghi|ket qua)\s*:\s*/u, '');
+  text = text.replace(/^em ghi\s*:\s*/u, '');
   if (/canh theo thu tu/u.test(text)) return undefined;
-  // Never turn the deferred algorithm claims into a different kind of claim.
-  const final = /\b(?:dap so|dap an|kl|vay|ket luan)\b/u.exec(text);
-  if (!final && (/\b(?:khoanh|nhan(?! (?:thay|xet|duoc|ra)\b)|gan nhan|lap lai|canh lap|them canh|gan nhat|nho nhat)\b/u.test(text) && !/duong di ngan nhat/u.test(text)
-    || /\b(?:n|l)\s*\(/u.test(text))) return undefined;
+  // Never turn an unsupported algorithm action into a different kind of claim.
+  const final = /\b(?:dap so|dap an|kl|vay|ket luan|ket qua(?: cuoi cung)?)\b/u.exec(text);
+  if (!final) {
+    const algorithm = algorithmClause(input, vocab);
+    if (algorithm) return algorithm;
+  }
   if (vocab.questionFormat === 'trac_nghiem') {
     const choice = text.match(/(?:chon|dap an)\s+(?:phuong an\s+)?([a-d])$/u);
     const bare = text.match(/^([a-d])$/u);
     if (bare || choice && unpad(text.slice(0, choice.index)) === '') return [{ type: 'choice', option: (bare ?? choice)![1]!.toUpperCase() }];
   }
+  if (!final && (/\b(?:chon|danh dau|khoanh|nhan(?! (?:thay|xet|duoc|ra|so|tong|do|bac|cac)\b)|gan nhan|lap lai|canh lap|them canh|gan nhat|nho nhat)\b/u.test(text) && !/duong di ngan nhat/u.test(text)
+    || /\b(?:n|l)\s*\(/u.test(text))) return undefined;
   const statements = [...text.matchAll(/(?:^|[\s;,])([\p{L}\p{N}_]+)[).:]\s*(dung|sai|d|s)(?=$|[\s;,])/gu)];
   if (statements.length && unpad(text.replace(/(?:^|[\s;,])([\p{L}\p{N}_]+)[).:]\s*(dung|sai|d|s)(?=$|[\s;,])/gu, '')) === '') {
     return statements.map((m) => {

@@ -14,6 +14,7 @@ export type AlgorithmClaim = Extract<ClaimBody, { type: 'dijkstra_init' | 'dijks
 export class AlgorithmChecker {
   private dijkstra: DijkstraState | undefined;
   private updates: DijkstraUpdate[] = [];
+  private oldVia: Record<string, string | undefined> = {};
   private writtenLabels = new Set<string>();
   private nn: { start: string; current: string; visited: Set<string>; closed: boolean; length: number } | undefined;
   private paired = new Set<string>();
@@ -43,6 +44,7 @@ export class AlgorithmChecker {
     if (this.dijkstra !== undefined && this.dijkstra.settled.length > 0) return fail('SAI_DIEU_KIEN', { source, settled: this.dijkstra.settled });
     this.dijkstra = createDijkstraState(this.spec.graph, source, this.spec.task.type === 'shortest_path' ? this.spec.task.to : undefined);
     this.updates = [];
+    this.oldVia = {};
     this.writtenLabels.clear();
     return compare(source, claim.source, 'HIEU_SAI_DE');
   }
@@ -54,6 +56,7 @@ export class AlgorithmChecker {
     const chosen = candidates.includes(claim.v) ? claim.v : candidates[0];
     const facts = { expected: candidates, got: claim.v, labels: { ...this.dijkstra.labels }, settled: [...this.dijkstra.settled] };
     if (chosen !== undefined) {
+      this.oldVia = Object.fromEntries(Object.entries(this.dijkstra.previous).map(([v, previous]) => [v, previous?.vertex]));
       const next = advanceDijkstra(this.spec.graph, this.dijkstra, chosen);
       this.dijkstra = next.state;
       this.updates = next.trace.updates;
@@ -70,6 +73,8 @@ export class AlgorithmChecker {
     const update = this.updates.find((u) => u.v === claim.v);
     if (update !== undefined) this.writtenLabels.add(claim.v);
     const facts = { vertex: claim.v, expected, got: claim.value, ...(update === undefined ? {} : { ...update, expected, got: claim.value }) };
+    if (update !== undefined && update.old !== update.new && claim.value === update.old
+      && (claim.via === undefined || claim.via === this.oldVia[claim.v])) return fail('BO_SOT', facts);
     // Distinguish the addition from the min operation before checking a predecessor.
     // An arithmetic error through the current pivot is not a traceback error.
     if (update !== undefined && (claim.via === undefined || claim.via === update.via) && claim.value !== expected) {

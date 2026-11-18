@@ -22,8 +22,8 @@ export function writtenNumbers(text: string, labels: string[] = []): number[] {
 export function numericValue(text: string, labels: string[] = [], allowWords = false): number | undefined {
   if (/[?]|\b(?:khong|chua|hoac|khoang|hon|kem)\b/u.test(text)) return undefined;
   const rhs = text.includes('=') ? text.slice(text.lastIndexOf('=') + 1).trim() : unpad(text);
-  if (allowWords && !text.includes('=')) {
-    const values = writtenNumbers(text, labels);
+  if (allowWords) {
+    const values = writtenNumbers(text.includes('=') ? rhs : text, labels);
     return values.length === 1 && Number.isFinite(values[0]) ? values[0] : undefined;
   }
   // A written final equality is authoritative, even if earlier arithmetic has words.
@@ -32,6 +32,8 @@ export function numericValue(text: string, labels: string[] = [], allowWords = f
   return Number.isFinite(value) ? value : undefined;
 }
 type SubjectKind = 'vertices' | 'edges' | 'odd' | 'degree_sum' | 'component_count' | 'loop_count' | 'degree' | 'length' | 'shortest_length';
+// Optional location/possession preposition and vertex noun, shared by labelled topics.
+export const vertexQualifier = '(?:(?:cua|tai|o|cho|den|toi)\\s+)?(?:(?:dinh|diem)\\s+)?';
 interface Subject { kind: SubjectKind; start: number; end: number; text: string }
 const subjects: [SubjectKind, RegExp][] = [
   ['degree_sum', /\b(?:tong(?: so)? bac(?: cua (?:cac )?dinh)?|tong cac bac)\b/gu],
@@ -40,7 +42,7 @@ const subjects: [SubjectKind, RegExp][] = [
   ['loop_count', /\b(?:(?:so(?: luong)?|cac) )?(?:canh )?khuyen\b/gu],
   ['vertices', /\b(?:(?:so(?: luong)?|cac|tap(?: hop)?) )?dinh\b|\|v\||\bv(?=\s*[:=])/gu],
   ['edges', /\b(?:(?:so(?: luong)?|cac|tap(?: hop)?) )?canh\b|\|e\||\be(?=\s*[:=])/gu],
-  ['degree', /\b(?:bac(?: cua)?\s+[\p{L}\p{N}_]+|[\p{L}\p{N}_]+\s+co bac)|\b(?:deg|d)\([^(),]+\)/gu],
+  ['degree', new RegExp(`\\b(?:bac\\s+${vertexQualifier}[\\p{L}\\p{N}_]+|[\\p{L}\\p{N}_]+\\s+co bac)|\\b(?:deg|d)\\([^(),]+\\)`, 'gu')],
   ['shortest_length', /\b(?:duong di ngan nhat|khoang cach ngan nhat)\s+tu\s+\S+\s+den\s+\S+|\bd\([^(),]+,\s*[^()]+\)/gu],
   ['length', /\b(?:duong di co do dai|do dai(?: duong di)?|tong quang duong|tong(?=\s*[:=]))\b/gu],
 ];
@@ -63,7 +65,9 @@ export function slotClaim(text: string, vocab: WorkVocabulary, context: ProseCon
   const before = text.slice(0, subject.start);
   const after = text.slice(subject.end);
   const rest = before + ' ' + after;
-  if (!text.includes('=') && writtenNumbers(text, vocab.vertexLabels).length > 1) return undefined;
+  const afterNumbers = writtenNumbers(after, vocab.vertexLabels);
+  if (!text.includes('=') && (afterNumbers.length > 1 || afterNumbers.length > 0 && numericValue(before) !== undefined
+    || !afterNumbers.length && writtenNumbers(rest, vocab.vertexLabels).length > 1)) return undefined;
   const value = numericValue(after, vocab.vertexLabels, true) ?? (!text.includes('=') ? numericValue(rest) : undefined);
   // A value after its subject needs no closed list of connecting words.
   // Reverse order still requires grammatical padding around the written value.
@@ -71,7 +75,7 @@ export function slotClaim(text: string, vocab: WorkVocabulary, context: ProseCon
   if (numeric) {
     if (/^[ve]$/u.test(subject.text)) return undefined;
     if (subject.kind === 'degree') {
-      const label = subject.text.replace(/^(?:deg|d)\(|\)$/gu, '').replace(/^bac(?: cua)?\s+|\s+co bac$/gu, '');
+      const label = subject.text.replace(/^(?:deg|d)\(|\)$/gu, '').replace(new RegExp(`^bac\\s+${vertexQualifier}|\\s+co bac$`, 'gu'), '');
       return [{ type: 'degree', v: oneLabel(label, vocab.vertexLabels), value }];
     }
     if (subject.kind === 'shortest_length') {
@@ -79,7 +83,8 @@ export function slotClaim(text: string, vocab: WorkVocabulary, context: ProseCon
       if (!pair) return undefined;
       return [{ type: 'shortest_length', from: oneLabel(pair[1]!, vocab.vertexLabels), to: oneLabel(pair[2]!, vocab.vertexLabels), value }];
     }
-    if (subject.kind === 'length') return context.walk ? [{ type: 'length', vertices: [...context.walk], value }] : undefined;
+    if (subject.kind === 'length') return context.walk ? [{ type: 'length', vertices: [...context.walk], value }]
+      : context.lastGradingLine && ['shortest_path', 'tsp', 'postman'].includes(vocab.task) ? [{ type: 'final_answer', value }] : undefined;
     const type = subject.kind === 'vertices' ? 'vertex_count' : subject.kind === 'edges' ? 'edge_count' : subject.kind === 'odd' ? 'odd_count' : subject.kind;
     return [{ type, value }];
   }

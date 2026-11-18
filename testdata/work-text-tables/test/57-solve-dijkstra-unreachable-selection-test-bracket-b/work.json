@@ -1,0 +1,52 @@
+{
+  "claims": [
+    {
+      "type": "dijkstra_select",
+      "v": "A",
+      "step": 1,
+      "raw": "A | 0 | [2; A] | ∞"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "B",
+      "value": 2,
+      "via": "A",
+      "step": 2,
+      "raw": "A | 0 | [2; A] | ∞"
+    },
+    {
+      "type": "dijkstra_select",
+      "v": "C",
+      "step": 3,
+      "raw": "C | - | [2; A] | ∞"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "B",
+      "value": 2,
+      "via": "A",
+      "step": 4,
+      "raw": "C | - | [2; A] | ∞"
+    }
+  ],
+  "lineOf": {
+    "1": [
+      1
+    ],
+    "2": [
+      1
+    ],
+    "3": [
+      2
+    ],
+    "4": [
+      2
+    ]
+  },
+  "prose": [],
+  "expected": {
+    "verdict": "SAI",
+    "firstErrorStep": 3,
+    "errorCode": "SAI_LUA_CHON"
+  }
+}

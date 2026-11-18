@@ -3,14 +3,14 @@
     {
       "step": 1,
       "type": "theorem",
-      "raw": "Kết quả: Không thỏa điều kiện Dirac.",
+      "raw": "Em ghi: Không thỏa điều kiện Dirac.",
       "name": "dirac",
       "holds": false
     },
     {
       "step": 2,
       "type": "hamilton_exists",
-      "raw": "Kết quả: Không có chu trình Hamilton (lý do: Dirac).",
+      "raw": "Em ghi: Không có chu trình Hamilton (lý do: Dirac).",
       "kind": "cycle",
       "value": false,
       "reason": "dirac"

@@ -1,0 +1,12 @@
+{
+  "vertexLabels": [
+    "A",
+    "B",
+    "C"
+  ],
+  "edgeNames": [],
+  "task": "tsp",
+  "questionFormat": "tu_luan",
+  "statementIds": [],
+  "questionText": []
+}

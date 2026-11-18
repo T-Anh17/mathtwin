@@ -8,7 +8,7 @@ export const devFamilies: WordingFamily[] = [
     conclusion: (s) => `Em ghi: ${s}.`, select: (v) => `Chọn ${v}.`, label: (v, n, via) => `L(${v}) = ${n}${via ? ` qua ${via}` : ''}.`, answer: (v) => `KL: ${v}.` },
   { id: 'dev-table', split: 'dev', table: true,
     count: (s, n) => `${s}: ${n}.`, list: (s, v) => `${s} gồm ${v || 'tập rỗng'}.`, degree: (v, n) => `${v} có bậc ${n}.`,
-    conclusion: (s) => `Kết quả: ${s}.`, select: (v) => `Đỉnh được chọn: ${v}.`, label: (v, n, via) => `Tại ${v}, nhãn bằng ${n}${via ? ` qua ${via}` : ''}.`, answer: (v) => `Vậy kết quả là ${v}.` },
+    conclusion: (s) => `Em ghi: ${s}.`, select: (v) => `Đỉnh được chọn: ${v}.`, label: (v, n, via) => `Tại ${v}, nhãn bằng ${n}${via ? ` qua ${via}` : ''}.`, answer: (v) => `Vậy kết quả là ${v}.` },
 ];
 
 // Full Cartesian product: prefix × noun synonym × connector × value order.
@@ -54,3 +54,49 @@ for (const [p, prefix] of ['', 'Em kiểm tra rồi '].entries())
       answer: (v) => `${prefix}đáp số em ${connector} ${v}.`,
     });
   }
+
+// Full products stay in memory for parser tests; only four rotating families go on disk.
+export const cartesianDevFamilies: WordingFamily[] = [];
+// Select slots: action × optional noun × every vertex in the core fixtures.
+for (const [a, action] of ['Chọn', 'Khoanh', 'Khoanh tròn', 'Đánh dấu', 'Cố định'].entries())
+  for (const [n, noun] of ['', 'đỉnh ', 'điểm '].entries()) cartesianDevFamilies.push({
+    ...devFamilies[0]!, id: `dev-paraphrase-select-${a}${n}`, select: (v) => `${action} ${noun}${v}.`,
+  });
+// Open prefixes and value connectors for each topic, including label predecessors.
+for (const [p, prefix] of ['Nhận xét:', 'Ghi lại:', 'Ghi nhận'].entries())
+  for (const [c, connector] of [':', 'là', 'bằng', 'có giá trị'].entries())
+    for (const [v, viaWord] of ['qua', 'đi qua', 'từ'].entries()) cartesianDevFamilies.push({
+      ...devFamilies[0]!, id: `dev-paraphrase-topic-${p}${c}${v}`,
+      count: (s, n) => `${prefix} ${s} ${connector} ${n}.`,
+      degree: (s, n) => `${prefix} Bậc của ${s} ${connector} ${n}.`,
+      label: (s, n, via) => `${prefix} Nhãn của đỉnh ${s} ${connector} ${n}${via ? `, ${viaWord} ${via}` : ''}.`,
+    });
+for (const [c, conclusion] of ['Vậy', 'KL:', 'Kết luận:', 'Kết quả:', 'Kết quả cuối cùng:', 'Đáp số:'].entries()) cartesianDevFamilies.push({
+  ...devFamilies[0]!, id: `dev-paraphrase-final-${c}`, answer: (v) => `${conclusion} ${v}.`,
+});
+
+// Location/possession slots × optional noun × connector × explicit predecessor.
+// These combinations are rendered exhaustively by work-paraphrase.test.ts.
+for (const [p, preposition] of ['', 'của ', 'tại ', 'ở ', 'cho ', 'đến ', 'tới '].entries())
+  for (const [n, noun] of ['', 'đỉnh ', 'điểm '].entries())
+    for (const [c, connector] of [':', 'là', 'bằng', '='].entries())
+      for (const withVia of [false, true]) cartesianDevFamilies.push({
+        ...devFamilies[0]!, id: `dev-paraphrase-label-${p}${n}${c}${Number(withVia)}`, omitLabelVia: !withVia,
+        label: (v, value, via) => `Nhãn ${preposition}${noun}${v} ${connector} ${value}${withVia && via ? `, qua ${via}` : ''}.`,
+      });
+
+export const rotatingDevGroups = ['select', 'topic', 'final', 'label'] as const;
+for (const group of rotatingDevGroups) devFamilies.push({
+  ...devFamilies[0]!, id: `dev-paraphrase-${group}`,
+});
+
+/** Numbered source fixture IDs provide a stable rotation, shared by noise variants a–d. */
+export function sampleWordingFamily(family: WordingFamily, sampleId: string): WordingFamily {
+  const group = rotatingDevGroups.find((name) => family.id === `dev-paraphrase-${name}`);
+  if (!group) return family;
+  const fixtureNumber = Number.parseInt(sampleId, 10);
+  if (!Number.isInteger(fixtureNumber) || fixtureNumber < 1) throw new Error('Expected a numbered source fixture ID.');
+  const choices = cartesianDevFamilies.filter((f) => f.id.startsWith(`${family.id}-`));
+  // 37 is coprime to each product size, spreading all slots across the 60 fixtures.
+  return { ...choices[((fixtureNumber - 1) * 37) % choices.length]!, id: family.id };
+}

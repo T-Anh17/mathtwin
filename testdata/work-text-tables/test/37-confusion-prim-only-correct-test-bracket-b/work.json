@@ -1,0 +1,198 @@
+{
+  "claims": [
+    {
+      "type": "dijkstra_select",
+      "v": "A",
+      "step": 1,
+      "raw": "A | 0 | [1; A] | [3; A] | ∞ | [5; A] | ∞"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "B",
+      "value": 1,
+      "via": "A",
+      "step": 2,
+      "raw": "A | 0 | [1; A] | [3; A] | ∞ | [5; A] | ∞"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "C",
+      "value": 3,
+      "via": "A",
+      "step": 3,
+      "raw": "A | 0 | [1; A] | [3; A] | ∞ | [5; A] | ∞"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "E",
+      "value": 5,
+      "via": "A",
+      "step": 4,
+      "raw": "A | 0 | [1; A] | [3; A] | ∞ | [5; A] | ∞"
+    },
+    {
+      "type": "dijkstra_select",
+      "v": "B",
+      "step": 5,
+      "raw": "B | - | [1; A] | [3; A] | [4; B] | [5; A] | ∞"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "C",
+      "value": 3,
+      "via": "A",
+      "step": 6,
+      "raw": "B | - | [1; A] | [3; A] | [4; B] | [5; A] | ∞"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "D",
+      "value": 4,
+      "via": "B",
+      "step": 7,
+      "raw": "B | - | [1; A] | [3; A] | [4; B] | [5; A] | ∞"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "E",
+      "value": 5,
+      "via": "A",
+      "step": 8,
+      "raw": "B | - | [1; A] | [3; A] | [4; B] | [5; A] | ∞"
+    },
+    {
+      "type": "dijkstra_select",
+      "v": "C",
+      "step": 9,
+      "raw": "C | - | - | [3; A] | [4; B] | [5; A] | [9; C]"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "D",
+      "value": 4,
+      "via": "B",
+      "step": 10,
+      "raw": "C | - | - | [3; A] | [4; B] | [5; A] | [9; C]"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "E",
+      "value": 5,
+      "via": "A",
+      "step": 11,
+      "raw": "C | - | - | [3; A] | [4; B] | [5; A] | [9; C]"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "F",
+      "value": 9,
+      "via": "C",
+      "step": 12,
+      "raw": "C | - | - | [3; A] | [4; B] | [5; A] | [9; C]"
+    },
+    {
+      "type": "dijkstra_select",
+      "v": "D",
+      "step": 13,
+      "raw": "D | - | - | - | [4; B] | [5; A] | [9; C]"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "E",
+      "value": 5,
+      "via": "A",
+      "step": 14,
+      "raw": "D | - | - | - | [4; B] | [5; A] | [9; C]"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "F",
+      "value": 9,
+      "via": "C",
+      "step": 15,
+      "raw": "D | - | - | - | [4; B] | [5; A] | [9; C]"
+    },
+    {
+      "type": "dijkstra_select",
+      "v": "E",
+      "step": 16,
+      "raw": "E | - | - | - | - | [5; A] | [6; E]"
+    },
+    {
+      "type": "dijkstra_label",
+      "v": "F",
+      "value": 6,
+      "via": "E",
+      "step": 17,
+      "raw": "E | - | - | - | - | [5; A] | [6; E]"
+    },
+    {
+      "type": "dijkstra_select",
+      "v": "F",
+      "step": 18,
+      "raw": "F | - | - | - | - | - | [6; E]"
+    }
+  ],
+  "lineOf": {
+    "1": [
+      1
+    ],
+    "2": [
+      1
+    ],
+    "3": [
+      1
+    ],
+    "4": [
+      1
+    ],
+    "5": [
+      2
+    ],
+    "6": [
+      2
+    ],
+    "7": [
+      2
+    ],
+    "8": [
+      2
+    ],
+    "9": [
+      3
+    ],
+    "10": [
+      3
+    ],
+    "11": [
+      3
+    ],
+    "12": [
+      3
+    ],
+    "13": [
+      4
+    ],
+    "14": [
+      4
+    ],
+    "15": [
+      4
+    ],
+    "16": [
+      5
+    ],
+    "17": [
+      5
+    ],
+    "18": [
+      6
+    ]
+  },
+  "prose": [],
+  "expected": {
+    "verdict": "DUNG",
+    "firstErrorStep": null,
+    "errorCode": null
+  }
+}

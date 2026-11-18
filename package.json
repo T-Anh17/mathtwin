@@ -25,7 +25,8 @@
     "mobile:dev": "npm run dev --workspace @mathtwin/mobile",
     "eval:effort": "npm run build && node tools/eval/dist/effort-cli.js",
     "eval:work": "npm run build && node tools/eval/dist/work-cli.js",
-    "eval:generate-work": "npm run build && node tools/eval/dist/work-generate-cli.js"
+    "eval:generate-work": "npm run build && node tools/eval/dist/work-generate-cli.js",
+    "eval:generate-work-tables": "npm run build && node tools/eval/dist/work-tables-cli.js"
   },
   "devDependencies": {
     "fast-check": "^4.10.2",

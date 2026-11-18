@@ -3,7 +3,7 @@
     {
       "step": 1,
       "type": "choice",
-      "raw": "Kết quả: Chọn phương án A.",
+      "raw": "Em ghi: Chọn phương án A.",
       "option": "A"
     }
   ],

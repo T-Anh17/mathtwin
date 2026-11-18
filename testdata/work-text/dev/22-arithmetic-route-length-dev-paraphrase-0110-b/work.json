@@ -7,7 +7,18 @@
       "value": 2
     },
     {
+      "type": "walk",
+      "kind": "path",
+      "vertices": [
+        "A",
+        "B",
+        "C"
+      ],
       "step": 2,
+      "raw": "A → B → C"
+    },
+    {
+      "step": 3,
       "type": "length",
       "raw": "Tổng quãng đường bằng 4.",
       "vertices": [
@@ -24,12 +35,15 @@
     ],
     "2": [
       1
+    ],
+    "3": [
+      2
     ]
   },
   "prose": [],
   "expected": {
     "verdict": "SAI",
-    "firstErrorStep": 2,
+    "firstErrorStep": 3,
     "errorCode": "SAI_PHEP_TINH"
   }
 }

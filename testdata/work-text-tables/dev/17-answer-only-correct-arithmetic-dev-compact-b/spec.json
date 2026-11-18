@@ -1,0 +1,45 @@
+{
+  "graph": {
+    "directed": false,
+    "vertices": [
+      {
+        "id": "A",
+        "label": "A"
+      },
+      {
+        "id": "B",
+        "label": "B"
+      },
+      {
+        "id": "C",
+        "label": "C"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1",
+        "u": "A",
+        "v": "B",
+        "w": 2
+      },
+      {
+        "id": "e2",
+        "u": "B",
+        "v": "C",
+        "w": 3
+      },
+      {
+        "id": "e3",
+        "u": "A",
+        "v": "C",
+        "w": 9
+      }
+    ]
+  },
+  "task": {
+    "type": "shortest_path",
+    "from": "A",
+    "to": "C"
+  },
+  "questionFormat": "tu_luan"
+}

@@ -56,7 +56,7 @@ describe('prose work parser, batch 3.2', () => {
     expect(bodies(['chu trình Hamilton:', 'ABDA'])).toEqual([{ type: 'walk', kind: 'hamilton_cycle', vertices: ['A', 'B', 'D', 'A'] }]);
     const source = lines(['A → B →', 'C → A']); source[0]!.box = [10, 20, 200, 40]; source[1]!.box = [20, 50, 250, 80]; source[1]!.conf = 0.8;
     expect(parseWork(source, vocab).steps[0]).toMatchObject({ lines: [0, 1], page: 0, box: [10, 20, 250, 80], claim: { step: 1, raw: 'A → B →\nC → A', conf: 0.8, box: [10, 20, 250, 80] } });
-    source[1]!.page = 1; expect(parseWork(source, vocab).unchecked).toContain(0); expect(parseWork(source, vocab).steps.every((s) => s.lines.length === 1)).toBe(true);
+    source[1]!.page = 1; expect(parseWork(source, vocab).steps[0]).toMatchObject({ lines: [0, 1], page: 0, claim: { vertices: ['A', 'B', 'C', 'A'] } }); expect(parseWork(source, vocab).steps[0]!.box).toEqual([10, 20, 200, 40]);
   });
   it('preserves wrong arithmetic and binds length to the preceding walk', () => {
     const parsed = parseWork(lines(['A → B → C → D → A', 'Độ dài = 1 + 2 + 4 + 9 = 17']), { ...vocab, task: 'tsp' });
@@ -80,10 +80,10 @@ describe('prose work parser, batch 3.2', () => {
     expect(parseWork(source, vocab)).toMatchObject({ steps: [], unchecked: [3, 4, 5], ignored: [{ line: 0, reason: 'prose' }, { line: 1, reason: 'prose' }, { line: 2, reason: 'prose' }] });
     expect(parseWork(lines(['Cập nhật nhãn v1 qua cạnh AB.']), { ...vocab, vertexLabels: ['A', 'B', 'v1'] }).unchecked).toEqual([]);
   });
-  it('does not repair labels, choose alternatives or implement deferred algorithms', () => {
+  it('does not repair labels, choose alternatives or interpret actions for unrelated tasks', () => {
     const source = lines(['A → E → D']); source[0]!.alternatives = ['A → B → D'];
     expect(parseWork(source, vocab)).toMatchObject({ steps: [], unchecked: [0], issues: expect.arrayContaining([expect.objectContaining({ code: 'unknown_label' })]) });
-    for (const text of ['Gán nhãn A = 0, các đỉnh khác ∞', 'Khoanh tròn C', 'n(B) = n(C) + w(CB) = 1 + 3 = 2', 'Từ A đi đến B (gần nhất)', 'A → B vì AB = 1 nhỏ nhất', 'Lặp lại đường B → C → D']) expect(bodies([text], { ...vocab, task: 'tsp' })).toEqual([]);
+    for (const text of ['Gán nhãn A = 0, các đỉnh khác ∞', 'Khoanh tròn C', 'n(B) = n(C) + w(CB) = 1 + 3 = 2', 'Từ A đi đến B (gần nhất)', 'A → B vì AB = 1 nhỏ nhất', 'Lặp lại đường B → C → D']) expect(bodies([text], { ...vocab, task: 'path' })).toEqual([]);
     const table = lines(['Chọn A B C D', 'A 0 1 3 4']); table.forEach((l) => { l.region = 'table'; });
     expect(parseWork(table, vocab)).toMatchObject({ steps: [], unchecked: [0, 1] });
   });
