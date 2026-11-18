@@ -44,11 +44,12 @@ export function WorkQuestionScreen({ question, lines, pages, onAnswer, onBack, b
     </div></Actions></div>;
 }
 
-export function WorkScreen({ spec, initialLines, pages, onBack, grade, onAnswers, onAcknowledge, uncheckedPages = [], ignoredLines = [], onRestore, busy = false }: {
+export function WorkScreen({ spec, initialLines, pages, onBack, grade, onAnswers, onAcknowledge, onResult, initialQuestion, uncheckedPages = [], ignoredLines = [], onRestore, busy = false }: {
   spec: ProblemSpec; initialLines: WorkLine[]; pages: WorkPage[]; onBack: () => void;
   grade?: WorkGrade; onAnswers?: (answers: WorkAnswer[]) => void; onAcknowledge?: () => void; busy?: boolean;
   uncheckedPages?: { page: number; region?: [number, number, number, number] }[];
   ignoredLines?: WorkLine[]; onRestore?: (line: number) => void;
+  onResult?: () => void; initialQuestion?: WorkQuestion;
 }) {
   const [localReview, setReview] = useState<WorkReview>(() => reviewWork(spec, initialLines));
   const base = onAnswers ? reviewWork(spec, initialLines) : localReview;
@@ -61,7 +62,7 @@ export function WorkScreen({ spec, initialLines, pages, onBack, grade, onAnswers
   const [asking, setAsking] = useState(false);
   const [selected, setSelected] = useState<number[]>([]);
   const [view, setView] = useState<'lines' | 'result'>('lines');
-  const [question, setQuestion] = useState<WorkQuestion | null>(null);
+  const [question, setQuestion] = useState<WorkQuestion | null>(initialQuestion ?? null);
   const needsReview = !!onAcknowledge && review.grade.result.verdict === 'CAN_XAC_NHAN' && !review.grade.questions.length;
   const answer = (answers: WorkAnswer[]) => { if (onAnswers) onAnswers(answers); else setReview((old) => reviewWork(spec, old.lines, answers)); };
   const activeQuestion = asking ? review.grade.questions[0] : question;
@@ -103,7 +104,7 @@ export function WorkScreen({ spec, initialLines, pages, onBack, grade, onAnswers
     {review.parsed.issues.filter((issue) => !issue.lines?.length).map((issue, index) => <p className="text-sm muted" key={index}>{labels.text(issue.message)}</p>)}
   </div><Actions>{review.grade.questions.length ? <button className="btn btn-primary btn-block" disabled={busy} onClick={() => setAsking(true)}>{workVi.ask}</button>
     : onAcknowledge && review.grade.result.verdict === 'CAN_XAC_NHAN' ? <button className="btn btn-primary btn-block" disabled={busy} onClick={onAcknowledge}>{workVi.ack}</button>
-    : <button className="btn btn-primary btn-block" onClick={() => setView('result')}>{m.work.result}</button>}</Actions></div>;
+    : <button className="btn btn-primary btn-block" onClick={() => onResult ? onResult() : setView('result')}>{m.work.result}</button>}</Actions></div>;
 }
 
 function LineEditor({ line, onAnswer, busy }: { line: WorkLine; onAnswer: (answers: WorkAnswer[]) => void; busy: boolean }) {

@@ -190,7 +190,7 @@ it('asks sequentially through reading, unknown, strike and missing; regrades imm
   const manual = reduce(fresh(), { type: 'manual_work', lines: ['Đồ thị có 2 đỉnh.', 'Đồ thị có 1 cạnh.'] });
   expect(manual.workGrade?.result.verdict).toBe('DUNG'); expect(manual.workSource).toBe('manual');
   const html = renderToStaticMarkup(createElement(WorkFlowScreen, { session: manual, busy: false, onEvent: noop, onBack: noop }));
-  expect(html).toContain('Đồ thị có 1 cạnh.'); expect(html).not.toContain('dữ liệu mẫu');
+  expect(html).toContain('>ĐÚNG<'); expect(html).toContain('Xem lời giải chuẩn'); expect(html).not.toContain('dữ liệu mẫu');
 });
 
 it('cancellation refuses late results without publishing an OCR checkpoint', async () => {

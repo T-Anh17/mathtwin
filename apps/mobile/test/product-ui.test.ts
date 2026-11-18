@@ -41,21 +41,19 @@ describe('UI-1 · 3 màn × 4 trạng thái wireframe', () => {
     });
     it(`Kết quả A · ${state}`, () => {
       const html = result(state);
-      expect(html).toContain(state === 'dang-tai' ? m.loading.title : state === 'rong' ? m.correctPrefix : state === 'loi' ? m.insufficient : m.wrongStep(4));
+      expect(html).toContain(state === 'dang-tai' ? m.loading.title : state === 'rong' ? m.correctPrefix : state === 'loi' ? 'KHÔNG ĐỦ CĂN CỨ' : m.wrongStep(4));
     });
   }
 });
 
 describe('Nội dung và các điểm nối', () => {
-  it('SAI giữ bước đầu tiên, số học sinh gạch và số đúng do dữ liệu truyền vào', () => {
+  it('SAI giữ bước đầu tiên và cách sửa do dữ liệu truyền vào', () => {
     const html = result('du-lieu');
     expect(html).toContain('Sai ở bước 4');
-    expect(html).toContain('<span class="strike-num">9</span>');
-    expect(html).toContain('<span class="fix-num">→ 8</span>');
-    const other = renderResult({ state: 'du-lieu', data: { ...sampleWrong, firstErrorStep: 6, studentValue: 12, correctValue: 11 }, actions, onBack: noop });
+    expect(html).toContain(sampleWrong.correction!);
+    const other = renderResult({ state: 'du-lieu', data: { ...sampleWrong, firstErrorStep: 6, correction: 'Kết quả đúng là 11.' }, actions, onBack: noop });
     expect(other).toContain('Sai ở bước 6');
-    expect(other).toContain('<span class="strike-num">12</span>');
-    expect(other).toContain('<span class="fix-num">→ 11</span>');
+    expect(other).toContain('Kết quả đúng là 11.');
   });
   it('Xác nhận có tiến độ và hai lựa chọn đúng wireframe', () => {
     const html = confirm('du-lieu');
@@ -70,10 +68,7 @@ describe('Nội dung và các điểm nối', () => {
     expect(html).toContain(m.missingReader);
   });
   it('đúng tọa độ cắt và khoanh trên ảnh mẫu', () => {
-    const wrong = result('du-lieu'), question = confirm('du-lieu');
-    expect(wrong).toContain('height:150px;background-image:');
-    expect(wrong).toContain('background-size:250% auto;background-position:6% 74%');
-    expect(wrong).toContain('left:9%;top:34%;width:66%;height:30%');
+    const question = confirm('du-lieu');
     expect(question).toContain('background-size:330% auto;background-position:72% 41%');
     expect(question).toContain('left:40%;top:30%;width:22%;height:40%');
   });
@@ -87,7 +82,7 @@ describe('Nội dung và các điểm nối', () => {
   });
   it('kết quả chưa chắc dùng đúng màn hỏi xác nhận, không kết luận sai', () => {
     const html = renderResult({ state: 'du-lieu', data: samplePending, actions, onBack: noop });
-    expect(html).toContain(m.uncertainProgress(1, 2)); expect(html).not.toContain(m.wrongStep(4));
+    expect(html).toContain('CẦN XÁC NHẬN'); expect(html).toContain('Xem bài máy đọc'); expect(html).not.toContain(m.wrongStep(4));
   });
   it('mở app vào Trang chủ, chưa mount màn Đo', () => {
     const html = renderToStaticMarkup(createElement(App));

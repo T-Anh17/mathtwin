@@ -24,14 +24,14 @@ export const sampleConfirmation: ConfirmationData = {
   crop: { x: 72, y: 41, zoom: 330, height: 150, region: { left: 40, top: 30, width: 22, height: 40 } },
 };
 export const sampleWrong: WrongResult = {
-  verdict: 'sai', title: m.resultTitle, image, firstErrorStep: 4, studentValue: 9, correctValue: 8,
-  summary: m.wrongSummary, calculation: m.calculation, errorType: m.arithmeticError,
-  reason: m.errorReason, previousSteps: m.previousSteps,
-  crop: { x: 6, y: 74, zoom: 250, height: 150, region: { left: 9, top: 34, width: 66, height: 30 } },
+  verdict: 'sai', title: m.resultTitle, message: m.wrongSummary, notes: [], firstErrorStep: 4,
+  errorCode: 'SAI_PHEP_TINH', errorType: m.arithmeticError, reason: m.errorReason,
+  correction: m.errorReason, nextStep: m.previousSteps, previousSteps: m.previousSteps,
+  errorMarks: [{ page: 0, box: [90, 340, 750, 640] }], graphHighlight: {},
 };
-export const sampleCorrect: CorrectResult = { verdict: 'dung', title: m.resultTitle, image, length: 8, note: m.correctNote };
-export const sampleInsufficient: InsufficientResult = { verdict: 'khong_du_can_cu', title: m.resultTitle, image, reason: m.insufficientReason };
-export const samplePending: PendingResult = { verdict: 'can_xac_nhan', title: m.resultTitle, image, confirmation: sampleConfirmation };
+export const sampleCorrect: CorrectResult = { verdict: 'dung', title: m.resultTitle, message: m.correctPrefix, notes: [m.correctNote], graphHighlight: {} };
+export const sampleInsufficient: InsufficientResult = { verdict: 'khong_du_can_cu', title: m.resultTitle, message: m.insufficientReason, issues: [m.insufficientReason], notes: [] };
+export const samplePending: PendingResult = { verdict: 'can_xac_nhan', title: m.resultTitle, message: m.question, requiresReview: false, notes: [] };
 export const emptyProductActions: ProductActions = {
   onCapture() {}, onDownloadReader() {}, onManualInput() {}, onChooseOption(_value) {}, onOtherNumber() {},
   onSkip() {}, onConfirm() {}, onEdit() {}, onRetake() {}, onAddPage() {}, onRegrade() {},

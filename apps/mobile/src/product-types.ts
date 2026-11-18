@@ -1,3 +1,6 @@
+import type { ErrorCode, Highlight } from '@mathtwin/core';
+import type { WorkQuestion } from '@mathtwin/work';
+
 export type ScreenState = 'du-lieu' | 'dang-tai' | 'rong' | 'loi';
 export type Verdict = 'dung' | 'sai' | 'can_xac_nhan' | 'khong_du_can_cu';
 export type Tab = 'home' | 'history' | 'settings';
@@ -14,15 +17,17 @@ export interface ConfirmationData {
   current: number; total: number; question: string; explanation: string;
   options: readonly number[]; selected: number; image: string; crop: CropData; graph: GraphDrawing;
 }
-interface ResultBase { title: string; image: string }
+export type GraphHighlight = Highlight;
+export interface ErrorMark { page: number; box: [number, number, number, number] }
+interface ResultBase { title: string; message: string; notes: string[]; workSource?: 'photo' | 'manual' }
 export interface WrongResult extends ResultBase {
-  verdict: 'sai'; firstErrorStep: number; studentValue: number; correctValue: number;
-  summary: string; calculation: string; errorType: string; reason: string;
-  previousSteps: string; crop: CropData;
+  verdict: 'sai'; firstErrorStep: number; errorCode: ErrorCode; errorType: string;
+  reason: string; correction?: string; nextStep: string; previousSteps: string;
+  errorMarks: ErrorMark[]; graphHighlight: GraphHighlight; readingCheck?: WorkQuestion;
 }
-export interface CorrectResult extends ResultBase { verdict: 'dung'; length: number; note: string }
-export interface InsufficientResult extends ResultBase { verdict: 'khong_du_can_cu'; reason: string }
-export interface PendingResult extends ResultBase { verdict: 'can_xac_nhan'; confirmation: ConfirmationData }
+export interface CorrectResult extends ResultBase { verdict: 'dung'; graphHighlight: GraphHighlight }
+export interface InsufficientResult extends ResultBase { verdict: 'khong_du_can_cu'; issues: string[] }
+export interface PendingResult extends ResultBase { verdict: 'can_xac_nhan'; question?: WorkQuestion; requiresReview: boolean }
 export type ResultData = WrongResult | CorrectResult | InsufficientResult | PendingResult;
 
 // Product actions are integration points only. UI-1 supplies no-op handlers.

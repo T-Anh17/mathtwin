@@ -6,6 +6,12 @@ import { captureImage, fileDataUrl } from './capture.js';
 import { decodeImage } from './images.js';
 import { Topbar } from './product-ui.js';
 import { WorkScreen } from './WorkScreen.js';
+import { ResultScreen } from './ResultScreen.js';
+import { SolutionScreen } from './SolutionScreen.js';
+import { resultView } from './flow/view.js';
+import { sessionGraphLayout, solutionGraph } from './flow/graph.js';
+import type { WorkQuestion } from '@mathtwin/work';
+import type { ProductActions } from './product-types.js';
 import type { WorkPage } from './work-session.js';
 import { workVi as m } from './work.vi.js';
 import { problemVi } from './problem.vi.js';
@@ -33,6 +39,8 @@ export function WorkFlowScreen({ session: s, busy, photoStore, readers, readerRe
   const [working, setWorking] = useState(false), [error, setError] = useState('');
   const [page, setPage] = useState(0), [attempt, setAttempt] = useState(0);
   const [manualPage, setManualPage] = useState<number | null>(null);
+  const [reviewing, setReviewing] = useState(false), [showSolution, setShowSolution] = useState(false);
+  const [resultQuestion, setResultQuestion] = useState<WorkQuestion | undefined>();
   const controller = useRef<AbortController | null>(null), input = useRef<HTMLInputElement | null>(null);
   const current = useRef(s); current.current = s;
   const photoKey = s.workPhotos.map((p) => p.id).join(',');
@@ -85,16 +93,39 @@ export function WorkFlowScreen({ session: s, busy, photoStore, readers, readerRe
   });
   const banner = <><p className="text-xs muted">{sessionVi.stages[s.stage]}</p>{preview && <p className="banner" role="status">{problemVi.preview}</p>}</>;
   const alert = error && <p className="banner banner-error" role="alert">{error}</p>;
+  if (showSolution) return <SolutionScreen session={s} busy={busy || working} onBack={() => setShowSolution(false)} onWork={(source) => {
+    setShowSolution(false);
+    if (source === 'manual') switchManual();
+    else void action(async () => { await onEvent({ type: 'work_capture_photos', photos: s.workPhotos }); });
+  }}/>;
   if (manual || manualPage !== null) return <div className="screen" data-stage={s.stage}><Topbar title={solutionVi.manualDestination} onBack={back}/><div className="content">{banner}
     {manualPage !== null && <p>{m.page(manualPage)}</p>}
     <label className="work-field">{m.manualHint}<textarea rows={12} value={text} onChange={(e) => setText(e.target.value)}/></label>
     <button className="btn btn-primary btn-block" disabled={busy || !text.trim()} onClick={() => void action(async () => {
       const lines = text.split(/\r?\n/).filter((l) => l.trim());
       if (manualPage !== null) { await onEvent({ type: 'work_manual_page', page: manualPage, lines }); setManualPage(null); }
-      else { await onEvent({ type: 'manual_work', lines }); setManual(false); }
+      else { await onEvent({ type: 'manual_work', lines }); setManual(false); setReviewing(false); }
     })}>{m.submit}</button>{alert}</div></div>;
+  if (s.stage === 'result' && s.spec && s.solution && !reviewing) {
+    const data = resultView(s);
+    const edit = () => { setResultQuestion(data.verdict === 'sai' ? data.readingCheck : data.verdict === 'can_xac_nhan' ? data.question : undefined); setReviewing(true); };
+    const addPage = () => void action(async () => { await onEvent({ type: 'work_capture_photos', photos: s.workPhotos }); });
+    const actions: ProductActions = { onEdit: edit, onSolution: () => setShowSolution(true), onManualInput: switchManual,
+      onRetake: () => void action(async () => { await onEvent({ type: 'retake', target: 'work' }); }), onAddPage: addPage,
+      onCapture: addPage, onRegrade: edit, onDownloadReader: () => onSettings?.(), onChooseOption: () => {}, onOtherNumber: edit,
+      onSkip: edit, onConfirm: edit, onHint: () => {}, onViewPage: edit, onCancel: back };
+    const layout = sessionGraphLayout(s);
+    const common = { actions, onBack: back, pages: photos, busy: busy || working, graph: solutionGraph(s.spec, s.solution),
+      ...(layout ? { layout } : {}) };
+    return <div data-stage={s.stage}>{banner}{alert}{data.verdict === 'dung' ? <ResultScreen {...common} state="rong" data={data}/>
+      : data.verdict === 'khong_du_can_cu' ? <ResultScreen {...common} state="loi" data={data}/>
+        : <ResultScreen {...common} state="du-lieu" data={data}/>}</div>;
+  }
   if (s.spec && s.workGrade && ['work_review', 'result'].includes(s.stage)) return <div data-stage={s.stage}>{banner}{alert}
-    <WorkScreen spec={s.spec} initialLines={s.workLines} grade={s.workGrade} pages={photos} busy={busy || working} onBack={back}
+    <WorkScreen spec={s.spec} initialLines={s.workLines} grade={s.workGrade} pages={photos} busy={busy || working}
+      onBack={reviewing && s.stage === 'result' ? () => setReviewing(false) : back}
+      {...(resultQuestion ? { initialQuestion: resultQuestion } : {})}
+      onResult={() => { setResultQuestion(undefined); setReviewing(false); }}
       uncheckedPages={s.workPages?.filter((p) => p.missingLineCheckUnavailable) ?? []}
       ignoredLines={ignoredWorkLines(s.workLines, s.workPages ?? [])}
       onRestore={(line) => void action(async () => { await onEvent({ type: 'work_restore', line }); })}

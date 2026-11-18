@@ -19,4 +19,7 @@
 .work-bounds input { width: 100%; min-height: 44px; }
 .work-tools { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 20px 90px; }
 .work-buttons .btn { min-height: 44px; }
+.result-screen .kv { grid-template-columns: minmax(0, 1fr); }
+.result-screen .kv dd { margin-bottom: 12px; }
+.result-screen .question-card > .btn { min-height: 44px; height: auto; white-space: normal; }
 .work-screen summary { min-height: 44px; padding: 12px 0; cursor: pointer; }
