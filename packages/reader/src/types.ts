@@ -45,9 +45,10 @@ export interface TextLine {
   /** Measured token confidence in the region classification, independent of text. */
   regionConf?: number;
 }
+export interface TextReadOptions { continuation?: boolean }
 export interface TextReader {
   readonly engine: string;
-  readLines(images: PreparedImage[], signal?: AbortSignal): Promise<{ lines: TextLine[]; usage: ReadUsage }>;
+  readLines(images: PreparedImage[], signal?: AbortSignal, options?: TextReadOptions): Promise<{ lines: TextLine[]; usage: ReadUsage }>;
 }
 export type NormalizedRead = Pick<ReadOutcome, 'spec' | 'graph' | 'graphUncertain' | 'issues'>;
 

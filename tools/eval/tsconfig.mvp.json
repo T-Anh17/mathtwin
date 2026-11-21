@@ -1,0 +1,6 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "rootDir": "../..", "outDir": "dist/mvp" },
+  "include": ["src/mvp*.ts"],
+  "exclude": []
+}

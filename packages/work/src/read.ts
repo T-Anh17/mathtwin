@@ -3,14 +3,14 @@ import type { WorkLine, WorkVocabulary, ParsedWork } from './types.js';
 import { detectStrikes } from './strikes.js';
 import { parseWork } from './parse/index.js';
 
-export async function readWork(pages: PreparedImage[], deps: { reader: TextReader; vocab: WorkVocabulary; signal?: AbortSignal }):
+export async function readWork(pages: PreparedImage[], deps: { reader: TextReader; vocab: WorkVocabulary; signal?: AbortSignal; continuation?: boolean }):
 Promise<{ lines: WorkLine[]; parsed: ParsedWork; usage: ReadUsage }> {
   const lines: WorkLine[] = [];
   const usage: ReadUsage = { passes: 0, latencyMs: 0, engine: deps.reader.engine, lineCount: 0 };
   // TextReader has no page field: one call per page preserves source coordinates.
   for (const [page, image] of pages.entries()) {
     deps.signal?.throwIfAborted();
-    const read = await deps.reader.readLines([image], deps.signal);
+    const read = await deps.reader.readLines([image], deps.signal, { continuation: deps.continuation === true || page > 0 });
     deps.signal?.throwIfAborted();
     const pageLines = read.lines.map((line, i): WorkLine => ({ ...line, page, index: lines.length + i }));
     const strikes = detectStrikes(image, pageLines);

@@ -4,7 +4,7 @@ import { availableParallelism } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { setTimeout as delay } from 'node:timers/promises';
 import { resizeImage } from '@mathtwin/reader';
-import type { PreparedImage, ReadDraft, ReadUsage, ServerTimings, TextLine, TextReader, VisionReader } from '@mathtwin/reader';
+import type { PreparedImage, ReadDraft, ReadUsage, ServerTimings, TextLine, TextReadOptions, TextReader, VisionReader } from '@mathtwin/reader';
 import { completionRequest, defaultDry, defaultMaxImageSide, defaultReadTimeout, defaultMaxTokens, imageTimeout, validateDry, graphResult, glyphResult, lineResult, parseCompletion, plainLines, spottingLines, LlamaCppReadError } from '@mathtwin/reader-llamacpp-shared';
 import type { Completion, DryConfig, ReadMode } from '@mathtwin/reader-llamacpp-shared';
 import { imageDataUrl } from './image.js';
@@ -95,11 +95,11 @@ export class LlamaCppReader implements VisionReader, TextReader {
     const result = await this.run([image], signal, async complete => ({ candidates: glyphResult(await complete([image], role ? `glyph-${role}` : 'glyph')) }));
     return result.candidates;
   }
-  async readLines(images: PreparedImage[], signal?: AbortSignal): Promise<{ lines: TextLine[]; usage: ReadUsage }> {
+  async readLines(images: PreparedImage[], signal?: AbortSignal, options?: TextReadOptions): Promise<{ lines: TextLine[]; usage: ReadUsage }> {
     return this.run(images, signal, async (complete) => {
       const lines: TextLine[] = [];
       for (const image of images) {
-        const mode = this.options.model === 'a' ? this.options.paddleTextMode : 'lines';
+        const mode = this.options.model === 'a' ? this.options.paddleTextMode : options?.continuation ? 'continuation-lines' : 'lines';
         const c = await complete([image], mode), t = this.options.alternativesThreshold;
         lines.push(...(mode === 'ocr' ? plainLines(c, t) : mode === 'spotting'
           ? spottingLines(c, image.width, image.height, t) : lineResult(c, image.width, image.height, t)));

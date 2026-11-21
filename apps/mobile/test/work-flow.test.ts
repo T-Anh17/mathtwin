@@ -91,6 +91,20 @@ it('keeps a previously located error inside the confirmed region when crop OCR o
   expect(reading.missingLineCheckUnavailable).toBe(true);
 });
 
+it('passes continuation context for subsequent work pages and their crops', async () => {
+  const contexts: (boolean | undefined)[] = [];
+  const reader: TextReader = { engine: 'fake', readLines: async (_images, _signal, options) => {
+    contexts.push(options?.continuation);
+    return { lines: [line()], usage: { engine: 'fake', passes: 1, latencyMs: 1 } };
+  } };
+  const signal = new AbortController().signal, vocab = vocabularyOf(spec);
+  await readWorkPages({ count: 2, reader, signal, vocab, load: async () => img, progress: () => {}, checkpoint: async () => {} });
+  const { box: _box, ...withoutBox } = line();
+  await readWorkRegion(img, { page: 1, raw: [withoutBox], lines: [], ms: 1, needsRegion: true },
+    [0, 400, 1000, 1000], reader, vocab, signal);
+  expect(contexts).toEqual([false, true, true]);
+});
+
 it.each(['partial', 'none', 'invalid'] as const)('keeps %s crop geometry usable, persists warning, and gates both verdicts', async (mode) => {
   for (const [text, verdict] of [['Đồ thị có 2 đỉnh.', 'DUNG'], ['Đồ thị có 3 đỉnh.', 'SAI']] as const) {
     const withBox = line(text), { box: _box, ...withoutBox } = line('Đồ thị có 1 cạnh.');

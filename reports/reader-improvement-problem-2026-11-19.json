@@ -1,0 +1,2856 @@
+{
+  "config": {
+    "model": "b",
+    "maxImageSide": 768,
+    "threads": 4,
+    "gpuLayers": 0,
+    "passes": 1,
+    "timeoutMs": 420000,
+    "readTimeout": 300000
+  },
+  "identities": [
+    {
+      "path": "D:\\work_place\\mathtwin\\.build-cache\\llama-win\\bin\\llama-server.exe",
+      "size": 10917888,
+      "modifiedMs": 1795005491264.7402
+    },
+    {
+      "path": "D:\\work_place\\mathtwin\\.models\\b\\Qwen3VL-2B-Instruct-Q4_K_M.gguf",
+      "size": 1107409952,
+      "modifiedMs": 1794791466401.8687
+    },
+    {
+      "path": "D:\\work_place\\mathtwin\\.models\\b\\mmproj-Qwen3VL-2B-Instruct-F16.gguf",
+      "size": 819394848,
+      "modifiedMs": 1794791527362.9805
+    }
+  ],
+  "fingerprint": "6cd9e4f73efaff1b7737b72a788a312db09c2f2a4424a137fd1c6f8c63770c58",
+  "machine": "win32 x64; Intel(R) Core(TM) i7-8700 CPU @ 3.20GHz; 31.9 GiB RAM; Node v22.23.4",
+  "planned": 40,
+  "attempted": 12,
+  "rows": [
+    {
+      "id": "01-elements-multigraph-dancing-perspective",
+      "elapsedMs": 54733.8183,
+      "before": {
+        "comparison": {
+          "graphMetrics": {
+            "vertices": {
+              "matched": 3,
+              "predicted": 3,
+              "reference": 3,
+              "precision": 1,
+              "recall": 1,
+              "f1": 1
+            },
+            "edges": {
+              "matched": 1,
+              "predicted": 3,
+              "reference": 3,
+              "precision": 0.3333333333333333,
+              "recall": 0.3333333333333333,
+              "f1": 0.3333333333333333
+            },
+            "weights": {
+              "correct": 0,
+              "total": 1,
+              "accuracy": 0
+            },
+            "loops": {
+              "applicable": true,
+              "correct": false
+            },
+            "parallelEdges": {
+              "applicable": true,
+              "correct": false
+            }
+          },
+          "completeCorrect": false,
+          "graphCorrect": false,
+          "fullyFlagged": true,
+          "silentError": false,
+          "graphSilentError": false,
+          "coverage": {
+            "precise": 1,
+            "coarse": 5,
+            "none": 0
+          },
+          "extraFlags": 4,
+          "differences": [
+            {
+              "item": "e1.w",
+              "type": "weight",
+              "predicted": 1,
+              "expected": null,
+              "tags": []
+            },
+            {
+              "item": "e2.v",
+              "type": "vertex_label",
+              "predicted": "i",
+              "expected": "b",
+              "tags": [
+                "parallel_edge"
+              ]
+            },
+            {
+              "item": "e2.w",
+              "type": "weight",
+              "predicted": 1,
+              "expected": null,
+              "tags": [
+                "parallel_edge"
+              ]
+            },
+            {
+              "item": "e3",
+              "type": "extra_edge",
+              "predicted": true,
+              "expected": false,
+              "tags": [
+                "parallel_edge"
+              ]
+            },
+            {
+              "item": "graph",
+              "type": "missing_edge",
+              "predicted": null,
+              "expected": {
+                "id": "l",
+                "u": "a",
+                "v": "a",
+                "name": "khuyên m"
+              },
+              "tags": [
+                "loop"
+              ]
+            },
+            {
+              "item": "spec",
+              "type": "task",
+              "predicted": null,
+              "expected": {
+                "type": "elements"
+              }
+            }
+          ],
+          "errorCounts": {
+            "weight": 2,
+            "vertex_label": 1,
+            "parallel_edge": 3,
+            "extra_edge": 1,
+            "missing_edge": 1,
+            "loop": 1,
+            "task": 1
+          }
+        },
+        "hasSpec": false,
+        "hasQuestion": true,
+        "questionMappingCorrect": false,
+        "questionMappingIssues": [
+          "unsupported_task",
+          "missing_weight",
+          "missing_weight",
+          "missing_weight"
+        ],
+        "questionMappingDifferences": [
+          {
+            "item": "spec",
+            "type": "task",
+            "predicted": null,
+            "expected": {
+              "type": "elements"
+            }
+          }
+        ]
+      },
+      "after": {
+        "comparison": {
+          "graphMetrics": {
+            "vertices": {
+              "matched": 3,
+              "predicted": 3,
+              "reference": 3,
+              "precision": 1,
+              "recall": 1,
+              "f1": 1
+            },
+            "edges": {
+              "matched": 1,
+              "predicted": 3,
+              "reference": 3,
+              "precision": 0.3333333333333333,
+              "recall": 0.3333333333333333,
+              "f1": 0.3333333333333333
+            },
+            "weights": {
+              "correct": 0,
+              "total": 1,
+              "accuracy": 0
+            },
+            "loops": {
+              "applicable": true,
+              "correct": false
+            },
+            "parallelEdges": {
+              "applicable": true,
+              "correct": false
+            }
+          },
+          "completeCorrect": false,
+          "graphCorrect": false,
+          "fullyFlagged": true,
+          "silentError": false,
+          "graphSilentError": false,
+          "coverage": {
+            "precise": 1,
+            "coarse": 5,
+            "none": 0
+          },
+          "extraFlags": 2,
+          "differences": [
+            {
+              "item": "e1.w",
+              "type": "weight",
+              "predicted": 1,
+              "expected": null,
+              "tags": []
+            },
+            {
+              "item": "e2.v",
+              "type": "vertex_label",
+              "predicted": "i",
+              "expected": "b",
+              "tags": []
+            },
+            {
+              "item": "e2.w",
+              "type": "weight",
+              "predicted": 1,
+              "expected": null,
+              "tags": []
+            },
+            {
+              "item": "e3",
+              "type": "extra_edge",
+              "predicted": true,
+              "expected": false,
+              "tags": []
+            },
+            {
+              "item": "graph",
+              "type": "missing_edge",
+              "predicted": null,
+              "expected": {
+                "id": "l",
+                "u": "a",
+                "v": "a",
+                "name": "khuyên m"
+              },
+              "tags": [
+                "loop"
+              ]
+            },
+            {
+              "item": "spec",
+              "type": "task",
+              "predicted": null,
+              "expected": {
+                "type": "elements"
+              }
+            }
+          ],
+          "errorCounts": {
+            "weight": 2,
+            "vertex_label": 1,
+            "extra_edge": 1,
+            "missing_edge": 1,
+            "loop": 1,
+            "task": 1
+          }
+        },
+        "hasSpec": false,
+        "hasQuestion": false,
+        "questionMappingCorrect": false,
+        "questionMappingIssues": [
+          "missing_question",
+          "missing_weight",
+          "missing_weight",
+          "missing_weight"
+        ],
+        "questionMappingDifferences": [
+          {
+            "item": "spec",
+            "type": "task",
+            "predicted": null,
+            "expected": {
+              "type": "elements"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "01-elements-multigraph-dancing-straight",
+      "elapsedMs": 63398.280199999994,
+      "before": {
+        "comparison": {
+          "graphMetrics": {
+            "vertices": {
+              "matched": 3,
+              "predicted": 3,
+              "reference": 3,
+              "precision": 1,
+              "recall": 1,
+              "f1": 1
+            },
+            "edges": {
+              "matched": 1,
+              "predicted": 4,
+              "reference": 3,
+              "precision": 0.25,
+              "recall": 0.3333333333333333,
+              "f1": 0.2857142857142857
+            },
+            "weights": {
+              "correct": 0,
+              "total": 1,
+              "accuracy": 0
+            },
+            "loops": {
+              "applicable": true,
+              "correct": false
+            },
+            "parallelEdges": {
+              "applicable": true,
+              "correct": false
+            }
+          },
+          "completeCorrect": false,
+          "graphCorrect": false,
+          "fullyFlagged": true,
+          "silentError": false,
+          "graphSilentError": false,
+          "coverage": {
+            "precise": 2,
+            "coarse": 5,
+            "none": 0
+          },
+          "extraFlags": 6,
+          "differences": [
+            {
+              "item": "e1.w",
+              "type": "weight",
+              "predicted": 1,
+              "expected": null,
+              "tags": []
+            },
+            {
+              "item": "e2.v",
+              "type": "vertex_label",
+              "predicted": "i",
+              "expected": "b",
+              "tags": [
+                "parallel_edge"
+              ]
+            },
+            {
+              "item": "e2.w",
+              "type": "weight",
+              "predicted": 1,
+              "expected": null,
+              "tags": [
+                "parallel_edge"
+              ]
+            },
+            {
+              "item": "e3",
+              "type": "extra_edge",
+              "predicted": true,
+              "expected": false,
+              "tags": [
+                "parallel_edge"
+              ]
+            },
+            {
+              "item": "e4",
+              "type": "extra_edge",
+              "predicted": true,
+              "expected": false,
+              "tags": []
+            },
+            {
+              "item": "graph",
+              "type": "missing_edge",
+              "predicted": null,
+              "expected": {
+                "id": "l",
+                "u": "a",
+                "v": "a",
+                "name": "khuyên m"
+              },
+              "tags": [
+                "loop"
+              ]
+            },
+            {
+              "item": "spec",
+              "type": "task",
+              "predicted": null,
+              "expected": {
+                "type": "elements"
+              }
+            }
+          ],
+          "errorCounts": {
+            "weight": 2,
+            "vertex_label": 1,
+            "parallel_edge": 3,
+            "extra_edge": 2,
+            "missing_edge": 1,
+            "loop": 1,
+            "task": 1
+          }
+        },
+        "hasSpec": false,
+        "hasQuestion": true,
+        "questionMappingCorrect": false,
+        "questionMappingIssues": [
+          "unsupported_task",
+          "missing_weight",
+          "missing_weight",
+          "missing_weight"
+        ],
+        "questionMappingDifferences": [
+          {
+            "item": "spec",
+            "type": "task",
+            "predicted": null,
+            "expected": {
+              "type": "elements"
+            }
+          }
+        ]
+      },
+      "after": {
+        "comparison": {
+          "graphMetrics": {
+            "vertices": {
+              "matched": 3,
+              "predicted": 3,
+              "reference": 3,
+              "precision": 1,
+              "recall": 1,
+              "f1": 1
+            },
+            "edges": {
+              "matched": 1,
+              "predicted": 4,
+              "reference": 3,
+              "precision": 0.25,
+              "recall": 0.3333333333333333,
+              "f1": 0.2857142857142857
+            },
+            "weights": {
+              "correct": 0,
+              "total": 1,
+              "accuracy": 0
+            },
+            "loops": {
+              "applicable": true,
+              "correct": false
+            },
+            "parallelEdges": {
+              "applicable": true,
+              "correct": false
+            }
+          },
+          "completeCorrect": false,
+          "graphCorrect": false,
+          "fullyFlagged": true,
+          "silentError": false,
+          "graphSilentError": false,
+          "coverage": {
+            "precise": 2,
+            "coarse": 5,
+            "none": 0
+          },
+          "extraFlags": 5,
+          "differences": [
+            {
+              "item": "e1.w",
+              "type": "weight",
+              "predicted": 1,
+              "expected": null,
+              "tags": []
+            },
+            {
+              "item": "e2.v",
+              "type": "vertex_label",
+              "predicted": "i",
+              "expected": "b",
+              "tags": [
+                "parallel_edge"
+              ]
+            },
+            {
+              "item": "e2.w",
+              "type": "weight",
+              "predicted": 1,
+              "expected": null,
+              "tags": [
+                "parallel_edge"
+              ]
+            },
+            {
+              "item": "e3",
+              "type": "extra_edge",
+              "predicted": true,
+              "expected": false,
+              "tags": [
+                "parallel_edge"
+              ]
+            },
+            {
+              "item": "e4",
+              "type": "extra_edge",
+              "predicted": true,
+              "expected": false,
+              "tags": []
+            },
+            {
+              "item": "graph",
+              "type": "missing_edge",
+              "predicted": null,
+              "expected": {
+                "id": "l",
+                "u": "a",
+                "v": "a",
+                "name": "khuyên m"
+              },
+              "tags": [
+                "loop"
+              ]
+            },
+            {
+              "item": "spec",
+              "type": "task",
+              "predicted": null,
+              "expected": {
+                "type": "elements"
+              }
+            }
+          ],
+          "errorCounts": {
+            "weight": 2,
+            "vertex_label": 1,
+            "parallel_edge": 3,
+            "extra_edge": 2,
+            "missing_edge": 1,
+            "loop": 1,
+            "task": 1
+          }
+        },
+        "hasSpec": false,
+        "hasQuestion": false,
+        "questionMappingCorrect": false,
+        "questionMappingIssues": [
+          "missing_question",
+          "missing_weight",
+          "missing_weight",
+          "missing_weight"
+        ],
+        "questionMappingDifferences": [
+          {
+            "item": "spec",
+            "type": "task",
+            "predicted": null,
+            "expected": {
+              "type": "elements"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "01-elements-multigraph-patrick-perspective",
+      "elapsedMs": 55696.893899999995,
+      "before": {
+        "comparison": {
+          "graphMetrics": {
+            "vertices": {
+              "matched": 2,
+              "predicted": 3,
+              "reference": 3,
+              "precision": 0.6666666666666666,
+              "recall": 0.6666666666666666,
+              "f1": 0.6666666666666666
+            },
+            "edges": {
+              "matched": 2,
+              "predicted": 2,
+              "reference": 3,
+              "precision": 1,
+              "recall": 0.6666666666666666,
+              "f1": 0.8
+            },
+            "weights": {
+              "correct": 0,
+              "total": 2,
+              "accuracy": 0
+            },
+            "loops": {
+              "applicable": true,
+              "correct": false
+            },
+            "parallelEdges": {
+              "applicable": true,
+              "correct": false
+            }
+          },
+          "completeCorrect": false,
+          "graphCorrect": false,
+          "fullyFlagged": true,
+          "silentError": false,
+          "graphSilentError": false,
+          "coverage": {
+            "precise": 0,
+            "coarse": 6,
+            "none": 0
+          },
+          "extraFlags": 2,
+          "differences": [
+            {
+              "item": "khuyến m",
+              "type": "vertex_label",
+              "predicted": "khuyếnm",
+              "expected": "i",
+              "tags": []
+            },
+            {
+              "item": "e1.w",
+              "type": "weight",
+              "predicted": 1,
+              "expected": null,
+              "tags": []
+            },
+            {
+              "item": "e2.w",
+              "type": "weight",
+              "predicted": 1,
+              "expected": null,
+              "tags": [
+                "loop"
+              ]
+            },
+            {
+              "item": "e2.name",
+              "type": "edge_name",
+              "predicted": "b",
+              "expected": "khuyên m",
+              "tags": [
+                "loop"
+              ]
+            },
+            {
+              "item": "graph",
+              "type": "missing_edge",
+              "predicted": null,
+              "expected": {
+                "id": "b",
+                "u": "a",
+                "v": "b",
+                "name": "b"
+              },
+              "tags": [
+                "parallel_edge"
+              ]
+            },
+            {
+              "item": "spec",
+              "type": "task",
+              "predicted": null,
+              "expected": {
+                "type": "elements"
+              }
+            }
+          ],
+          "errorCounts": {
+            "vertex_label": 1,
+            "weight": 2,
+            "loop": 2,
+            "edge_name": 1,
+            "missing_edge": 1,
+            "parallel_edge": 1,
+            "task": 1
+          }
+        },
+        "hasSpec": false,
+        "hasQuestion": true,
+        "questionMappingCorrect": false,
+        "questionMappingIssues": [
+          "unsupported_task",
+          "missing_weight",
+          "missing_weight",
+          "missing_weight"
+        ],
+        "questionMappingDifferences": [
+          {
+            "item": "spec",
+            "type": "task",
+            "predicted": null,
+            "expected": {
+              "type": "elements"
+            }
+          }
+        ]
+      },
+      "after": {
+        "comparison": {
+          "graphMetrics": {
+            "vertices": {
+              "matched": 2,
+              "predicted": 3,
+              "reference": 3,
+              "precision": 0.6666666666666666,
+              "recall": 0.6666666666666666,
+              "f1": 0.6666666666666666
+            },
+            "edges": {
+              "matched": 1,
+              "predicted": 2,
+              "reference": 3,
+              "precision": 0.5,
+              "recall": 0.3333333333333333,
+              "f1": 0.4
+            },
+            "weights": {
+              "correct": 0,
+              "total": 1,
+              "accuracy": 0
+            },
+            "loops": {
+              "applicable": true,
+              "correct": false
+            },
+            "parallelEdges": {
+              "applicable": true,
+              "correct": false
+            }
+          },
+          "completeCorrect": false,
+          "graphCorrect": false,
+          "fullyFlagged": true,
+          "silentError": false,
+          "graphSilentError": false,
+          "coverage": {
+            "precise": 0,
+            "coarse": 6,
+            "none": 0
+          },
+          "extraFlags": 1,
+          "differences": [
+            {
+              "item": "khuyến m",
+              "type": "vertex_label",
+              "predicted": "khuyếnm",
+              "expected": "i",
+              "tags": []
+            },
+            {
+              "item": "e1.w",
+              "type": "weight",
+              "predicted": 1,
+              "expected": null,
+              "tags": []
+            },
+            {
+              "item": "e2.v",
+              "type": "vertex_label",
+              "predicted": "khuyếnm",
+              "expected": "b",
+              "tags": []
+            },
+            {
+              "item": "e2.w",
+              "type": "weight",
+              "predicted": 1,
+              "expected": null,
+              "tags": []
+            },
+            {
+              "item": "graph",
+              "type": "missing_edge",
+              "predicted": null,
+              "expected": {
+                "id": "l",
+                "u": "a",
+                "v": "a",
+                "name": "khuyên m"
+              },
+              "tags": [
+                "loop"
+              ]
+            },
+            {
+              "item": "spec",
+              "type": "task",
+              "predicted": null,
+              "expected": {
+                "type": "elements"
+              }
+            }
+          ],
+          "errorCounts": {
+            "vertex_label": 2,
+            "weight": 2,
+            "missing_edge": 1,
+            "loop": 1,
+            "task": 1
+          }
+        },
+        "hasSpec": false,
+        "hasQuestion": false,
+        "questionMappingCorrect": false,
+        "questionMappingIssues": [
+          "missing_question",
+          "missing_weight",
+          "missing_weight",
+          "missing_weight"
+        ],
+        "questionMappingDifferences": [
+          {
+            "item": "spec",
+            "type": "task",
+            "predicted": null,
+            "expected": {
+              "type": "elements"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "01-elements-multigraph-patrick-straight",
+      "elapsedMs": 77734.989,
+      "before": {
+        "comparison": {
+          "graphMetrics": {
+            "vertices": {
+              "matched": 3,
+              "predicted": 3,
+              "reference": 3,
+              "precision": 1,
+              "recall": 1,
+              "f1": 1
+            },
+            "edges": {
+              "matched": 1,
+              "predicted": 3,
+              "reference": 3,
+              "precision": 0.3333333333333333,
+              "recall": 0.3333333333333333,
+              "f1": 0.3333333333333333
+            },
+            "weights": {
+              "correct": 0,
+              "total": 1,
+              "accuracy": 0
+            },
+            "loops": {
+              "applicable": true,
+              "correct": false
+            },
+            "parallelEdges": {
+              "applicable": true,
+              "correct": false
+            }
+          },
+          "completeCorrect": false,
+          "graphCorrect": false,
+          "fullyFlagged": true,
+          "silentError": false,
+          "graphSilentError": false,
+          "coverage": {
+            "precise": 2,
+            "coarse": 4,
+            "none": 0
+          },
+          "extraFlags": 5,
+          "differences": [
+            {
+              "item": "e1.w",
+              "type": "weight",
+              "predicted": 1,
+              "expected": null,
+              "tags": []
+            },
+            {
+              "item": "e2.v",
+              "type": "vertex_label",
+              "predicted": "i",
+              "expected": "b",
+              "tags": [
+                "parallel_edge"
+              ]
+            },
+            {
+              "item": "e2.w",
+              "type": "weight",
+              "predicted": 1,
+              "expected": null,
+              "tags": [
+                "parallel_edge"
+              ]
+            },
+            {
+              "item": "e3",
+              "type": "extra_edge",
+              "predicted": true,
+              "expected": false,
+              "tags": [
+                "parallel_edge"
+              ]
+            },
+            {
+              "item": "graph",
+              "type": "missing_edge",
+              "predicted": null,
+              "expected": {
+                "id": "l",
+                "u": "a",
+                "v": "a",
+                "name": "khuyên m"
+              },
+              "tags": [
+                "loop"
+              ]
+            },
+            {
+              "item": "spec",
+              "type": "task",
+              "predicted": null,
+              "expected": {
+                "type": "elements"
+              }
+            }
+          ],
+          "errorCounts": {
+            "weight": 2,
+            "vertex_label": 1,
+            "parallel_edge": 3,
+            "extra_edge": 1,
+            "missing_edge": 1,
+            "loop": 1,
+            "task": 1
+          }
+        },
+        "hasSpec": false,
+        "hasQuestion": true,
+        "questionMappingCorrect": false,
+        "questionMappingIssues": [
+          "unsupported_task",
+          "missing_weight",
+          "missing_weight",
+          "missing_weight"
+        ],
+        "questionMappingDifferences": [
+          {
+            "item": "spec",
+            "type": "task",
+            "predicted": null,
+            "expected": {
+              "type": "elements"
+            }
+          }
+        ]
+      },
+      "after": {
+        "comparison": {
+          "graphMetrics": {
+            "vertices": {
+              "matched": 3,
+              "predicted": 4,
+              "reference": 3,
+              "precision": 0.75,
+              "recall": 1,
+              "f1": 0.8571428571428571
+            },
+            "edges": {
+              "matched": 1,
+              "predicted": 3,
+              "reference": 3,
+              "precision": 0.3333333333333333,
+              "recall": 0.3333333333333333,
+              "f1": 0.3333333333333333
+            },
+            "weights": {
+              "correct": 0,
+              "total": 1,
+              "accuracy": 0
+            },
+            "loops": {
+              "applicable": true,
+              "correct": false
+            },
+            "parallelEdges": {
+              "applicable": true,
+              "correct": false
+            }
+          },
+          "completeCorrect": false,
+          "graphCorrect": false,
+          "fullyFlagged": true,
+          "silentError": false,
+          "graphSilentError": false,
+          "coverage": {
+            "precise": 1,
+            "coarse": 6,
+            "none": 0
+          },
+          "extraFlags": 3,
+          "differences": [
+            {
+              "item": "m",
+              "type": "vertex_label",
+              "predicted": "m",
+              "expected": false,
+              "tags": []
+            },
+            {
+              "item": "e1.w",
+              "type": "weight",
+              "predicted": 1,
+              "expected": null,
+              "tags": []
+            },
+            {
+              "item": "e2.v",
+              "type": "vertex_label",
+              "predicted": "i",
+              "expected": "b",
+              "tags": []
+            },
+            {
+              "item": "e2.w",
+              "type": "weight",
+              "predicted": 1,
+              "expected": null,
+              "tags": []
+            },
+            {
+              "item": "e3",
+              "type": "extra_edge",
+              "predicted": true,
+              "expected": false,
+              "tags": []
+            },
+            {
+              "item": "graph",
+              "type": "missing_edge",
+              "predicted": null,
+              "expected": {
+                "id": "l",
+                "u": "a",
+                "v": "a",
+                "name": "khuyên m"
+              },
+              "tags": [
+                "loop"
+              ]
+            },
+            {
+              "item": "spec",
+              "type": "task",
+              "predicted": null,
+              "expected": {
+                "type": "elements"
+              }
+            }
+          ],
+          "errorCounts": {
+            "vertex_label": 2,
+            "weight": 2,
+            "extra_edge": 1,
+            "missing_edge": 1,
+            "loop": 1,
+            "task": 1
+          }
+        },
+        "hasSpec": false,
+        "hasQuestion": false,
+        "questionMappingCorrect": false,
+        "questionMappingIssues": [
+          "missing_question",
+          "missing_weight",
+          "missing_weight",
+          "missing_weight"
+        ],
+        "questionMappingDifferences": [
+          {
+            "item": "spec",
+            "type": "task",
+            "predicted": null,
+            "expected": {
+              "type": "elements"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "07-connectivity-components-dancing-perspective",
+      "elapsedMs": 66779.35749999998,
+      "before": {
+        "comparison": {
+          "graphMetrics": {
+            "vertices": {
+              "matched": 4,
+              "predicted": 4,
+              "reference": 4,
+              "precision": 1,
+              "recall": 1,
+              "f1": 1
+            },
+            "edges": {
+              "matched": 2,
+              "predicted": 2,
+              "reference": 2,
+              "precision": 1,
+              "recall": 1,
+              "f1": 1
+            },
+            "weights": {
+              "correct": 2,
+              "total": 2,
+              "accuracy": 1
+            },
+            "loops": {
+              "applicable": false,
+              "correct": true
+            },
+            "parallelEdges": {
+              "applicable": false,
+              "correct": true
+            }
+          },
+          "completeCorrect": false,
+          "graphCorrect": false,
+          "fullyFlagged": true,
+          "silentError": false,
+          "graphSilentError": false,
+          "coverage": {
+            "precise": 0,
+            "coarse": 3,
+            "none": 0
+          },
+          "extraFlags": 5,
+          "differences": [
+            {
+              "item": "e1.name",
+              "type": "edge_name",
+              "predicted": "A-B",
+              "expected": null,
+              "tags": []
+            },
+            {
+              "item": "e2.name",
+              "type": "edge_name",
+              "predicted": "D-C",
+              "expected": null,
+              "tags": []
+            },
+            {
+              "item": "spec",
+              "type": "task",
+              "predicted": null,
+              "expected": {
+                "type": "connectivity"
+              }
+            }
+          ],
+          "errorCounts": {
+            "edge_name": 2,
+            "task": 1
+          }
+        },
+        "hasSpec": false,
+        "hasQuestion": true,
+        "questionMappingCorrect": false,
+        "questionMappingIssues": [
+          "unsupported_task",
+          "missing_weight",
+          "missing_weight"
+        ],
+        "questionMappingDifferences": [
+          {
+            "item": "spec",
+            "type": "task",
+            "predicted": null,
+            "expected": {
+              "type": "connectivity"
+            }
+          }
+        ]
+      },
+      "after": {
+        "comparison": {
+          "graphMetrics": {
+            "vertices": {
+              "matched": 4,
+              "predicted": 4,
+              "reference": 4,
+              "precision": 1,
+              "recall": 1,
+              "f1": 1
+            },
+            "edges": {
+              "matched": 2,
+              "predicted": 2,
+              "reference": 2,
+              "precision": 1,
+              "recall": 1,
+              "f1": 1
+            },
+            "weights": {
+              "correct": 2,
+              "total": 2,
+              "accuracy": 1
+            },
+            "loops": {
+              "applicable": false,
+              "correct": true
+            },
+            "parallelEdges": {
+              "applicable": false,
+              "correct": true
+            }
+          },
+          "completeCorrect": false,
+          "graphCorrect": false,
+          "fullyFlagged": true,
+          "silentError": false,
+          "graphSilentError": false,
+          "coverage": {
+            "precise": 0,
+            "coarse": 3,
+            "none": 0
+          },
+          "extraFlags": 5,
+          "differences": [
+            {
+              "item": "e1.name",
+              "type": "edge_name",
+              "predicted": "A-B",
+              "expected": null,
+              "tags": []
+            },
+            {
+              "item": "e2.name",
+              "type": "edge_name",
+              "predicted": "D-C",
+              "expected": null,
+              "tags": []
+            },
+            {
+              "item": "spec",
+              "type": "task",
+              "predicted": null,
+              "expected": {
+                "type": "connectivity"
+              }
+            }
+          ],
+          "errorCounts": {
+            "edge_name": 2,
+            "task": 1
+          }
+        },
+        "hasSpec": false,
+        "hasQuestion": false,
+        "questionMappingCorrect": false,
+        "questionMappingIssues": [
+          "missing_question",
+          "missing_weight",
+          "missing_weight"
+        ],
+        "questionMappingDifferences": [
+          {
+            "item": "spec",
+            "type": "task",
+            "predicted": null,
+            "expected": {
+              "type": "connectivity"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "07-connectivity-components-dancing-straight",
+      "elapsedMs": 79359.51199999999,
+      "before": {
+        "comparison": {
+          "graphMetrics": {
+            "vertices": {
+              "matched": 4,
+              "predicted": 4,
+              "reference": 4,
+              "precision": 1,
+              "recall": 1,
+              "f1": 1
+            },
+            "edges": {
+              "matched": 2,
+              "predicted": 2,
+              "reference": 2,
+              "precision": 1,
+              "recall": 1,
+              "f1": 1
+            },
+            "weights": {
+              "correct": 2,
+              "total": 2,
+              "accuracy": 1
+            },
+            "loops": {
+              "applicable": false,
+              "correct": true
+            },
+            "parallelEdges": {
+              "applicable": false,
+              "correct": true
+            }
+          },
+          "completeCorrect": false,
+          "graphCorrect": false,
+          "fullyFlagged": true,
+          "silentError": false,
+          "graphSilentError": false,
+          "coverage": {
+            "precise": 0,
+            "coarse": 3,
+            "none": 0
+          },
+          "extraFlags": 3,
+          "differences": [
+            {
+              "item": "e1.name",
+              "type": "edge_name",
+              "predicted": "A-B",
+              "expected": null,
+              "tags": []
+            },
+            {
+              "item": "e2.name",
+              "type": "edge_name",
+              "predicted": "D-C",
+              "expected": null,
+              "tags": []
+            },
+            {
+              "item": "spec",
+              "type": "task",
+              "predicted": null,
+              "expected": {
+                "type": "connectivity"
+              }
+            }
+          ],
+          "errorCounts": {
+            "edge_name": 2,
+            "task": 1
+          }
+        },
+        "hasSpec": false,
+        "hasQuestion": true,
+        "questionMappingCorrect": false,
+        "questionMappingIssues": [
+          "unsupported_task",
+          "missing_weight",
+          "missing_weight"
+        ],
+        "questionMappingDifferences": [
+          {
+            "item": "spec",
+            "type": "task",
+            "predicted": null,
+            "expected": {
+              "type": "connectivity"
+            }
+          }
+        ]
+      },
+      "after": {
+        "comparison": {
+          "graphMetrics": {
+            "vertices": {
+              "matched": 4,
+              "predicted": 4,
+              "reference": 4,
+              "precision": 1,
+              "recall": 1,
+              "f1": 1
+            },
+            "edges": {
+              "matched": 2,
+              "predicted": 2,
+              "reference": 2,
+              "precision": 1,
+              "recall": 1,
+              "f1": 1
+            },
+            "weights": {
+              "correct": 2,
+              "total": 2,
+              "accuracy": 1
+            },
+            "loops": {
+              "applicable": false,
+              "correct": true
+            },
+            "parallelEdges": {
+              "applicable": false,
+              "correct": true
+            }
+          },
+          "completeCorrect": false,
+          "graphCorrect": false,
+          "fullyFlagged": true,
+          "silentError": false,
+          "graphSilentError": false,
+          "coverage": {
+            "precise": 0,
+            "coarse": 3,
+            "none": 0
+          },
+          "extraFlags": 3,
+          "differences": [
+            {
+              "item": "e1.name",
+              "type": "edge_name",
+              "predicted": "A-B",
+              "expected": null,
+              "tags": []
+            },
+            {
+              "item": "e2.name",
+              "type": "edge_name",
+              "predicted": "D-C",
+              "expected": null,
+              "tags": []
+            },
+            {
+              "item": "spec",
+              "type": "task",
+              "predicted": null,
+              "expected": {
+                "type": "connectivity"
+              }
+            }
+          ],
+          "errorCounts": {
+            "edge_name": 2,
+            "task": 1
+          }
+        },
+        "hasSpec": false,
+        "hasQuestion": false,
+        "questionMappingCorrect": false,
+        "questionMappingIssues": [
+          "missing_question",
+          "missing_weight",
+          "missing_weight"
+        ],
+        "questionMappingDifferences": [
+          {
+            "item": "spec",
+            "type": "task",
+            "predicted": null,
+            "expected": {
+              "type": "connectivity"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "07-connectivity-components-patrick-perspective",
+      "elapsedMs": 54340.6446,
+      "before": {
+        "comparison": {
+          "graphMetrics": {
+            "vertices": {
+              "matched": 4,
+              "predicted": 4,
+              "reference": 4,
+              "precision": 1,
+              "recall": 1,
+              "f1": 1
+            },
+            "edges": {
+              "matched": 2,
+              "predicted": 2,
+              "reference": 2,
+              "precision": 1,
+              "recall": 1,
+              "f1": 1
+            },
+            "weights": {
+              "correct": 0,
+              "total": 2,
+              "accuracy": 0
+            },
+            "loops": {
+              "applicable": false,
+              "correct": true
+            },
+            "parallelEdges": {
+              "applicable": false,
+              "correct": true
+            }
+          },
+          "completeCorrect": false,
+          "graphCorrect": false,
+          "fullyFlagged": true,
+          "silentError": false,
+          "graphSilentError": false,
+          "coverage": {
+            "precise": 0,
+            "coarse": 5,
+            "none": 0
+          },
+          "extraFlags": 3,
+          "differences": [
+            {
+              "item": "e1.w",
+              "type": "weight",
+              "predicted": 0,
+              "expected": null,
+              "tags": []
+            },
+            {
+              "item": "e1.name",
+              "type": "edge_name",
+              "predicted": "A-B",
+              "expected": null,
+              "tags": []
+            },
+            {
+              "item": "e2.w",
+              "type": "weight",
+              "predicted": 0,
+              "expected": null,
+              "tags": []
+            },
+            {
+              "item": "e2.name",
+              "type": "edge_name",
+              "predicted": "D-C",
+              "expected": null,
+              "tags": []
+            },
+            {
+              "item": "spec",
+              "type": "task",
+              "predicted": null,
+              "expected": {
+                "type": "connectivity"
+              }
+            }
+          ],
+          "errorCounts": {
+            "weight": 2,
+            "edge_name": 2,
+            "task": 1
+          }
+        },
+        "hasSpec": false,
+        "hasQuestion": true,
+        "questionMappingCorrect": false,
+        "questionMappingIssues": [
+          "unsupported_task",
+          "missing_weight",
+          "missing_weight"
+        ],
+        "questionMappingDifferences": [
+          {
+            "item": "spec",
+            "type": "task",
+            "predicted": null,
+            "expected": {
+              "type": "connectivity"
+            }
+          }
+        ]
+      },
+      "after": {
+        "comparison": {
+          "graphMetrics": {
+            "vertices": {
+              "matched": 4,
+              "predicted": 4,
+              "reference": 4,
+              "precision": 1,
+              "recall": 1,
+              "f1": 1
+            },
+            "edges": {
+              "matched": 2,
+              "predicted": 2,
+              "reference": 2,
+              "precision": 1,
+              "recall": 1,
+              "f1": 1
+            },
+            "weights": {
+              "correct": 2,
+              "total": 2,
+              "accuracy": 1
+            },
+            "loops": {
+              "applicable": false,
+              "correct": true
+            },
+            "parallelEdges": {
+              "applicable": false,
+              "correct": true
+            }
+          },
+          "completeCorrect": false,
+          "graphCorrect": false,
+          "fullyFlagged": true,
+          "silentError": false,
+          "graphSilentError": false,
+          "coverage": {
+            "precise": 0,
+            "coarse": 3,
+            "none": 0
+          },
+          "extraFlags": 5,
+          "differences": [
+            {
+              "item": "e1.name",
+              "type": "edge_name",
+              "predicted": "A-B",
+              "expected": null,
+              "tags": []
+            },
+            {
+              "item": "e2.name",
+              "type": "edge_name",
+              "predicted": "D-C",
+              "expected": null,
+              "tags": []
+            },
+            {
+              "item": "spec",
+              "type": "task",
+              "predicted": null,
+              "expected": {
+                "type": "connectivity"
+              }
+            }
+          ],
+          "errorCounts": {
+            "edge_name": 2,
+            "task": 1
+          }
+        },
+        "hasSpec": false,
+        "hasQuestion": false,
+        "questionMappingCorrect": false,
+        "questionMappingIssues": [
+          "missing_question",
+          "missing_weight",
+          "missing_weight"
+        ],
+        "questionMappingDifferences": [
+          {
+            "item": "spec",
+            "type": "task",
+            "predicted": null,
+            "expected": {
+              "type": "connectivity"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "07-connectivity-components-patrick-straight",
+      "elapsedMs": 78907.34230000008,
+      "before": {
+        "comparison": {
+          "graphMetrics": {
+            "vertices": {
+              "matched": 4,
+              "predicted": 4,
+              "reference": 4,
+              "precision": 1,
+              "recall": 1,
+              "f1": 1
+            },
+            "edges": {
+              "matched": 2,
+              "predicted": 2,
+              "reference": 2,
+              "precision": 1,
+              "recall": 1,
+              "f1": 1
+            },
+            "weights": {
+              "correct": 0,
+              "total": 2,
+              "accuracy": 0
+            },
+            "loops": {
+              "applicable": false,
+              "correct": true
+            },
+            "parallelEdges": {
+              "applicable": false,
+              "correct": true
+            }
+          },
+          "completeCorrect": false,
+          "graphCorrect": false,
+          "fullyFlagged": true,
+          "silentError": false,
+          "graphSilentError": false,
+          "coverage": {
+            "precise": 0,
+            "coarse": 5,
+            "none": 0
+          },
+          "extraFlags": 1,
+          "differences": [
+            {
+              "item": "e1.w",
+              "type": "weight",
+              "predicted": 0,
+              "expected": null,
+              "tags": []
+            },
+            {
+              "item": "e1.name",
+              "type": "edge_name",
+              "predicted": "A-B",
+              "expected": null,
+              "tags": []
+            },
+            {
+              "item": "e2.w",
+              "type": "weight",
+              "predicted": 0,
+              "expected": null,
+              "tags": []
+            },
+            {
+              "item": "e2.name",
+              "type": "edge_name",
+              "predicted": "D-C",
+              "expected": null,
+              "tags": []
+            },
+            {
+              "item": "spec",
+              "type": "task",
+              "predicted": null,
+              "expected": {
+                "type": "connectivity"
+              }
+            }
+          ],
+          "errorCounts": {
+            "weight": 2,
+            "edge_name": 2,
+            "task": 1
+          }
+        },
+        "hasSpec": false,
+        "hasQuestion": true,
+        "questionMappingCorrect": false,
+        "questionMappingIssues": [
+          "unsupported_task",
+          "missing_weight",
+          "missing_weight"
+        ],
+        "questionMappingDifferences": [
+          {
+            "item": "spec",
+            "type": "task",
+            "predicted": null,
+            "expected": {
+              "type": "connectivity"
+            }
+          }
+        ]
+      },
+      "after": {
+        "comparison": {
+          "graphMetrics": {
+            "vertices": {
+              "matched": 4,
+              "predicted": 4,
+              "reference": 4,
+              "precision": 1,
+              "recall": 1,
+              "f1": 1
+            },
+            "edges": {
+              "matched": 2,
+              "predicted": 2,
+              "reference": 2,
+              "precision": 1,
+              "recall": 1,
+              "f1": 1
+            },
+            "weights": {
+              "correct": 2,
+              "total": 2,
+              "accuracy": 1
+            },
+            "loops": {
+              "applicable": false,
+              "correct": true
+            },
+            "parallelEdges": {
+              "applicable": false,
+              "correct": true
+            }
+          },
+          "completeCorrect": false,
+          "graphCorrect": false,
+          "fullyFlagged": true,
+          "silentError": false,
+          "graphSilentError": false,
+          "coverage": {
+            "precise": 0,
+            "coarse": 3,
+            "none": 0
+          },
+          "extraFlags": 3,
+          "differences": [
+            {
+              "item": "e1.name",
+              "type": "edge_name",
+              "predicted": "A-B",
+              "expected": null,
+              "tags": []
+            },
+            {
+              "item": "e2.name",
+              "type": "edge_name",
+              "predicted": "D-C",
+              "expected": null,
+              "tags": []
+            },
+            {
+              "item": "spec",
+              "type": "task",
+              "predicted": null,
+              "expected": {
+                "type": "connectivity"
+              }
+            }
+          ],
+          "errorCounts": {
+            "edge_name": 2,
+            "task": 1
+          }
+        },
+        "hasSpec": false,
+        "hasQuestion": false,
+        "questionMappingCorrect": false,
+        "questionMappingIssues": [
+          "missing_question",
+          "missing_weight",
+          "missing_weight"
+        ],
+        "questionMappingDifferences": [
+          {
+            "item": "spec",
+            "type": "task",
+            "predicted": null,
+            "expected": {
+              "type": "connectivity"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "09-euler-loop-parallel-dancing-perspective",
+      "elapsedMs": 121076.03139999998,
+      "before": {
+        "comparison": {
+          "graphMetrics": {
+            "vertices": {
+              "matched": 2,
+              "predicted": 2,
+              "reference": 3,
+              "precision": 1,
+              "recall": 0.6666666666666666,
+              "f1": 0.8
+            },
+            "edges": {
+              "matched": 2,
+              "predicted": 2,
+              "reference": 3,
+              "precision": 1,
+              "recall": 0.6666666666666666,
+              "f1": 0.8
+            },
+            "weights": {
+              "correct": 2,
+              "total": 2,
+              "accuracy": 1
+            },
+            "loops": {
+              "applicable": true,
+              "correct": false
+            },
+            "parallelEdges": {
+              "applicable": true,
+              "correct": false
+            }
+          },
+          "completeCorrect": false,
+          "graphCorrect": false,
+          "fullyFlagged": true,
+          "silentError": false,
+          "graphSilentError": false,
+          "coverage": {
+            "precise": 0,
+            "coarse": 5,
+            "none": 0
+          },
+          "extraFlags": 4,
+          "differences": [
+            {
+              "item": "graph",
+              "type": "vertex_label",
+              "predicted": null,
+              "expected": "i",
+              "tags": []
+            },
+            {
+              "item": "e1.name",
+              "type": "edge_name",
+              "predicted": "A → B",
+              "expected": "a",
+              "tags": [
+                "parallel_edge"
+              ]
+            },
+            {
+              "item": "e2.name",
+              "type": "edge_name",
+              "predicted": "B → A",
+              "expected": "b",
+              "tags": [
+                "parallel_edge"
+              ]
+            },
+            {
+              "item": "graph",
+              "type": "missing_edge",
+              "predicted": null,
+              "expected": {
+                "id": "l",
+                "u": "a",
+                "v": "a",
+                "name": "khuyên m"
+              },
+              "tags": [
+                "loop"
+              ]
+            },
+            {
+              "item": "spec",
+              "type": "task",
+              "predicted": null,
+              "expected": {
+                "type": "euler",
+                "want": "circuit"
+              }
+            }
+          ],
+          "errorCounts": {
+            "vertex_label": 1,
+            "edge_name": 2,
+            "parallel_edge": 2,
+            "missing_edge": 1,
+            "loop": 1,
+            "task": 1
+          }
+        },
+        "hasSpec": false,
+        "hasQuestion": true,
+        "questionMappingCorrect": false,
+        "questionMappingIssues": [
+          "unsupported_task",
+          "missing_weight",
+          "missing_weight",
+          "missing_weight"
+        ],
+        "questionMappingDifferences": [
+          {
+            "item": "spec",
+            "type": "task",
+            "predicted": null,
+            "expected": {
+              "type": "euler",
+              "want": "circuit"
+            }
+          }
+        ]
+      },
+      "after": {
+        "comparison": {
+          "graphMetrics": {
+            "vertices": {
+              "matched": 3,
+              "predicted": 3,
+              "reference": 3,
+              "precision": 1,
+              "recall": 1,
+              "f1": 1
+            },
+            "edges": {
+              "matched": 1,
+              "predicted": 3,
+              "reference": 3,
+              "precision": 0.3333333333333333,
+              "recall": 0.3333333333333333,
+              "f1": 0.3333333333333333
+            },
+            "weights": {
+              "correct": 1,
+              "total": 1,
+              "accuracy": 1
+            },
+            "loops": {
+              "applicable": true,
+              "correct": false
+            },
+            "parallelEdges": {
+              "applicable": true,
+              "correct": false
+            }
+          },
+          "completeCorrect": false,
+          "graphCorrect": false,
+          "fullyFlagged": true,
+          "silentError": false,
+          "graphSilentError": false,
+          "coverage": {
+            "precise": 1,
+            "coarse": 3,
+            "none": 0
+          },
+          "extraFlags": 4,
+          "differences": [
+            {
+              "item": "e2.v",
+              "type": "vertex_label",
+              "predicted": "i",
+              "expected": "b",
+              "tags": []
+            },
+            {
+              "item": "e3",
+              "type": "extra_edge",
+              "predicted": true,
+              "expected": false,
+              "tags": []
+            },
+            {
+              "item": "graph",
+              "type": "missing_edge",
+              "predicted": null,
+              "expected": {
+                "id": "l",
+                "u": "a",
+                "v": "a",
+                "name": "khuyên m"
+              },
+              "tags": [
+                "loop"
+              ]
+            },
+            {
+              "item": "spec",
+              "type": "task",
+              "predicted": null,
+              "expected": {
+                "type": "euler",
+                "want": "circuit"
+              }
+            }
+          ],
+          "errorCounts": {
+            "vertex_label": 1,
+            "extra_edge": 1,
+            "missing_edge": 1,
+            "loop": 1,
+            "task": 1
+          }
+        },
+        "hasSpec": false,
+        "hasQuestion": false,
+        "questionMappingCorrect": false,
+        "questionMappingIssues": [
+          "missing_question",
+          "missing_weight",
+          "missing_weight",
+          "missing_weight"
+        ],
+        "questionMappingDifferences": [
+          {
+            "item": "spec",
+            "type": "task",
+            "predicted": null,
+            "expected": {
+              "type": "euler",
+              "want": "circuit"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "09-euler-loop-parallel-dancing-straight",
+      "elapsedMs": 84874.9145999999,
+      "before": {
+        "comparison": {
+          "graphMetrics": {
+            "vertices": {
+              "matched": 3,
+              "predicted": 3,
+              "reference": 3,
+              "precision": 1,
+              "recall": 1,
+              "f1": 1
+            },
+            "edges": {
+              "matched": 2,
+              "predicted": 3,
+              "reference": 3,
+              "precision": 0.6666666666666666,
+              "recall": 0.6666666666666666,
+              "f1": 0.6666666666666666
+            },
+            "weights": {
+              "correct": 2,
+              "total": 2,
+              "accuracy": 1
+            },
+            "loops": {
+              "applicable": true,
+              "correct": false
+            },
+            "parallelEdges": {
+              "applicable": true,
+              "correct": false
+            }
+          },
+          "completeCorrect": false,
+          "graphCorrect": false,
+          "fullyFlagged": true,
+          "silentError": false,
+          "graphSilentError": false,
+          "coverage": {
+            "precise": 1,
+            "coarse": 3,
+            "none": 0
+          },
+          "extraFlags": 8,
+          "differences": [
+            {
+              "item": "e2.name",
+              "type": "edge_name",
+              "predicted": "b",
+              "expected": "khuyên m",
+              "tags": [
+                "loop"
+              ]
+            },
+            {
+              "item": "e3.v",
+              "type": "vertex_label",
+              "predicted": "i",
+              "expected": "b",
+              "tags": []
+            },
+            {
+              "item": "e3.name",
+              "type": "edge_name",
+              "predicted": "khuyen m",
+              "expected": "b",
+              "tags": []
+            },
+            {
+              "item": "spec",
+              "type": "task",
+              "predicted": null,
+              "expected": {
+                "type": "euler",
+                "want": "circuit"
+              }
+            }
+          ],
+          "errorCounts": {
+            "edge_name": 2,
+            "loop": 1,
+            "vertex_label": 1,
+            "task": 1
+          }
+        },
+        "hasSpec": false,
+        "hasQuestion": true,
+        "questionMappingCorrect": false,
+        "questionMappingIssues": [
+          "unsupported_task",
+          "missing_weight",
+          "missing_weight",
+          "missing_weight"
+        ],
+        "questionMappingDifferences": [
+          {
+            "item": "spec",
+            "type": "task",
+            "predicted": null,
+            "expected": {
+              "type": "euler",
+              "want": "circuit"
+            }
+          }
+        ]
+      },
+      "after": {
+        "comparison": {
+          "graphMetrics": {
+            "vertices": {
+              "matched": 3,
+              "predicted": 3,
+              "reference": 3,
+              "precision": 1,
+              "recall": 1,
+              "f1": 1
+            },
+            "edges": {
+              "matched": 2,
+              "predicted": 3,
+              "reference": 3,
+              "precision": 0.6666666666666666,
+              "recall": 0.6666666666666666,
+              "f1": 0.6666666666666666
+            },
+            "weights": {
+              "correct": 0,
+              "total": 2,
+              "accuracy": 0
+            },
+            "loops": {
+              "applicable": true,
+              "correct": false
+            },
+            "parallelEdges": {
+              "applicable": true,
+              "correct": false
+            }
+          },
+          "completeCorrect": false,
+          "graphCorrect": false,
+          "fullyFlagged": true,
+          "silentError": false,
+          "graphSilentError": false,
+          "coverage": {
+            "precise": 0,
+            "coarse": 6,
+            "none": 0
+          },
+          "extraFlags": 4,
+          "differences": [
+            {
+              "item": "e1.w",
+              "type": "weight",
+              "predicted": 1,
+              "expected": null,
+              "tags": []
+            },
+            {
+              "item": "e2.v",
+              "type": "vertex_label",
+              "predicted": "i",
+              "expected": "b",
+              "tags": []
+            },
+            {
+              "item": "e2.w",
+              "type": "weight",
+              "predicted": 1,
+              "expected": null,
+              "tags": []
+            },
+            {
+              "item": "e3.w",
+              "type": "weight",
+              "predicted": 1,
+              "expected": null,
+              "tags": [
+                "loop"
+              ]
+            },
+            {
+              "item": "e3.name",
+              "type": "edge_name",
+              "predicted": "khuynh m",
+              "expected": "khuyên m",
+              "tags": [
+                "loop"
+              ]
+            },
+            {
+              "item": "spec",
+              "type": "task",
+              "predicted": null,
+              "expected": {
+                "type": "euler",
+                "want": "circuit"
+              }
+            }
+          ],
+          "errorCounts": {
+            "weight": 3,
+            "vertex_label": 1,
+            "loop": 2,
+            "edge_name": 1,
+            "task": 1
+          }
+        },
+        "hasSpec": false,
+        "hasQuestion": false,
+        "questionMappingCorrect": false,
+        "questionMappingIssues": [
+          "missing_question",
+          "missing_weight",
+          "missing_weight",
+          "missing_weight"
+        ],
+        "questionMappingDifferences": [
+          {
+            "item": "spec",
+            "type": "task",
+            "predicted": null,
+            "expected": {
+              "type": "euler",
+              "want": "circuit"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "09-euler-loop-parallel-patrick-perspective",
+      "elapsedMs": 231011.21010000003,
+      "before": {
+        "comparison": {
+          "graphMetrics": {
+            "vertices": {
+              "matched": 2,
+              "predicted": 2,
+              "reference": 3,
+              "precision": 1,
+              "recall": 0.6666666666666666,
+              "f1": 0.8
+            },
+            "edges": {
+              "matched": 2,
+              "predicted": 3,
+              "reference": 3,
+              "precision": 0.6666666666666666,
+              "recall": 0.6666666666666666,
+              "f1": 0.6666666666666666
+            },
+            "weights": {
+              "correct": 2,
+              "total": 2,
+              "accuracy": 1
+            },
+            "loops": {
+              "applicable": true,
+              "correct": false
+            },
+            "parallelEdges": {
+              "applicable": true,
+              "correct": false
+            }
+          },
+          "completeCorrect": false,
+          "graphCorrect": false,
+          "fullyFlagged": true,
+          "silentError": false,
+          "graphSilentError": false,
+          "coverage": {
+            "precise": 0,
+            "coarse": 4,
+            "none": 0
+          },
+          "extraFlags": 10,
+          "differences": [
+            {
+              "item": "graph",
+              "type": "vertex_label",
+              "predicted": null,
+              "expected": "i",
+              "tags": []
+            },
+            {
+              "item": "e2.v",
+              "type": "vertex_label",
+              "predicted": "a",
+              "expected": "b",
+              "tags": [
+                "loop",
+                "parallel_edge"
+              ]
+            },
+            {
+              "item": "e3.name",
+              "type": "edge_name",
+              "predicted": "m",
+              "expected": "khuyên m",
+              "tags": [
+                "loop",
+                "parallel_edge"
+              ]
+            },
+            {
+              "item": "spec",
+              "type": "task",
+              "predicted": null,
+              "expected": {
+                "type": "euler",
+                "want": "circuit"
+              }
+            }
+          ],
+          "errorCounts": {
+            "vertex_label": 2,
+            "loop": 2,
+            "parallel_edge": 2,
+            "edge_name": 1,
+            "task": 1
+          }
+        },
+        "hasSpec": false,
+        "hasQuestion": true,
+        "questionMappingCorrect": false,
+        "questionMappingIssues": [
+          "unsupported_task",
+          "missing_weight",
+          "missing_weight",
+          "missing_weight"
+        ],
+        "questionMappingDifferences": [
+          {
+            "item": "spec",
+            "type": "task",
+            "predicted": null,
+            "expected": {
+              "type": "euler",
+              "want": "circuit"
+            }
+          }
+        ]
+      },
+      "after": {
+        "comparison": {
+          "graphMetrics": {
+            "vertices": {
+              "matched": 0,
+              "predicted": 0,
+              "reference": 3,
+              "precision": null,
+              "recall": 0,
+              "f1": 0
+            },
+            "edges": {
+              "matched": 0,
+              "predicted": 0,
+              "reference": 3,
+              "precision": null,
+              "recall": 0,
+              "f1": 0
+            },
+            "weights": {
+              "correct": 0,
+              "total": 0,
+              "accuracy": null
+            },
+            "loops": {
+              "applicable": true,
+              "correct": false
+            },
+            "parallelEdges": {
+              "applicable": true,
+              "correct": false
+            }
+          },
+          "completeCorrect": false,
+          "graphCorrect": false,
+          "fullyFlagged": false,
+          "silentError": true,
+          "graphSilentError": true,
+          "coverage": {
+            "precise": 0,
+            "coarse": 0,
+            "none": 2
+          },
+          "extraFlags": 0,
+          "differences": [
+            {
+              "item": "graph",
+              "type": "graph",
+              "predicted": null,
+              "expected": {
+                "directed": false,
+                "vertices": [
+                  {
+                    "id": "A",
+                    "label": "A"
+                  },
+                  {
+                    "id": "B",
+                    "label": "B"
+                  },
+                  {
+                    "id": "I",
+                    "label": "I"
+                  }
+                ],
+                "edges": [
+                  {
+                    "id": "l",
+                    "u": "A",
+                    "v": "A",
+                    "name": "khuyên m"
+                  },
+                  {
+                    "id": "a",
+                    "u": "A",
+                    "v": "B",
+                    "name": "a"
+                  },
+                  {
+                    "id": "b",
+                    "u": "A",
+                    "v": "B",
+                    "name": "b"
+                  }
+                ]
+              }
+            },
+            {
+              "item": "spec",
+              "type": "task",
+              "predicted": null,
+              "expected": {
+                "type": "euler",
+                "want": "circuit"
+              }
+            }
+          ],
+          "errorCounts": {
+            "graph": 1,
+            "task": 1
+          }
+        },
+        "hasSpec": false,
+        "hasQuestion": false,
+        "questionMappingCorrect": false,
+        "questionMappingIssues": [
+          "missing_question",
+          "missing_weight",
+          "missing_weight",
+          "missing_weight"
+        ],
+        "questionMappingDifferences": [
+          {
+            "item": "spec",
+            "type": "task",
+            "predicted": null,
+            "expected": {
+              "type": "euler",
+              "want": "circuit"
+            }
+          }
+        ]
+      },
+      "failure": {
+        "code": "repetition_loop",
+        "reason": "repetition_loop",
+        "finish": "length"
+      }
+    },
+    {
+      "id": "09-euler-loop-parallel-patrick-straight",
+      "elapsedMs": 185850.4022,
+      "before": {
+        "comparison": {
+          "graphMetrics": {
+            "vertices": {
+              "matched": 0,
+              "predicted": 0,
+              "reference": 3,
+              "precision": null,
+              "recall": 0,
+              "f1": 0
+            },
+            "edges": {
+              "matched": 0,
+              "predicted": 0,
+              "reference": 3,
+              "precision": null,
+              "recall": 0,
+              "f1": 0
+            },
+            "weights": {
+              "correct": 0,
+              "total": 0,
+              "accuracy": null
+            },
+            "loops": {
+              "applicable": true,
+              "correct": false
+            },
+            "parallelEdges": {
+              "applicable": true,
+              "correct": false
+            }
+          },
+          "completeCorrect": false,
+          "graphCorrect": false,
+          "fullyFlagged": false,
+          "silentError": true,
+          "graphSilentError": true,
+          "coverage": {
+            "precise": 0,
+            "coarse": 0,
+            "none": 2
+          },
+          "extraFlags": 0,
+          "differences": [
+            {
+              "item": "graph",
+              "type": "graph",
+              "predicted": null,
+              "expected": {
+                "directed": false,
+                "vertices": [
+                  {
+                    "id": "A",
+                    "label": "A"
+                  },
+                  {
+                    "id": "B",
+                    "label": "B"
+                  },
+                  {
+                    "id": "I",
+                    "label": "I"
+                  }
+                ],
+                "edges": [
+                  {
+                    "id": "l",
+                    "u": "A",
+                    "v": "A",
+                    "name": "khuyên m"
+                  },
+                  {
+                    "id": "a",
+                    "u": "A",
+                    "v": "B",
+                    "name": "a"
+                  },
+                  {
+                    "id": "b",
+                    "u": "A",
+                    "v": "B",
+                    "name": "b"
+                  }
+                ]
+              }
+            },
+            {
+              "item": "spec",
+              "type": "task",
+              "predicted": null,
+              "expected": {
+                "type": "euler",
+                "want": "circuit"
+              }
+            }
+          ],
+          "errorCounts": {
+            "graph": 1,
+            "task": 1
+          }
+        },
+        "hasSpec": false,
+        "hasQuestion": false,
+        "questionMappingCorrect": false,
+        "questionMappingIssues": [
+          "missing_question",
+          "missing_weight",
+          "missing_weight",
+          "missing_weight"
+        ],
+        "questionMappingDifferences": [
+          {
+            "item": "spec",
+            "type": "task",
+            "predicted": null,
+            "expected": {
+              "type": "euler",
+              "want": "circuit"
+            }
+          }
+        ]
+      },
+      "after": {
+        "comparison": {
+          "graphMetrics": {
+            "vertices": {
+              "matched": 0,
+              "predicted": 0,
+              "reference": 3,
+              "precision": null,
+              "recall": 0,
+              "f1": 0
+            },
+            "edges": {
+              "matched": 0,
+              "predicted": 0,
+              "reference": 3,
+              "precision": null,
+              "recall": 0,
+              "f1": 0
+            },
+            "weights": {
+              "correct": 0,
+              "total": 0,
+              "accuracy": null
+            },
+            "loops": {
+              "applicable": true,
+              "correct": false
+            },
+            "parallelEdges": {
+              "applicable": true,
+              "correct": false
+            }
+          },
+          "completeCorrect": false,
+          "graphCorrect": false,
+          "fullyFlagged": false,
+          "silentError": true,
+          "graphSilentError": true,
+          "coverage": {
+            "precise": 0,
+            "coarse": 0,
+            "none": 2
+          },
+          "extraFlags": 0,
+          "differences": [
+            {
+              "item": "graph",
+              "type": "graph",
+              "predicted": null,
+              "expected": {
+                "directed": false,
+                "vertices": [
+                  {
+                    "id": "A",
+                    "label": "A"
+                  },
+                  {
+                    "id": "B",
+                    "label": "B"
+                  },
+                  {
+                    "id": "I",
+                    "label": "I"
+                  }
+                ],
+                "edges": [
+                  {
+                    "id": "l",
+                    "u": "A",
+                    "v": "A",
+                    "name": "khuyên m"
+                  },
+                  {
+                    "id": "a",
+                    "u": "A",
+                    "v": "B",
+                    "name": "a"
+                  },
+                  {
+                    "id": "b",
+                    "u": "A",
+                    "v": "B",
+                    "name": "b"
+                  }
+                ]
+              }
+            },
+            {
+              "item": "spec",
+              "type": "task",
+              "predicted": null,
+              "expected": {
+                "type": "euler",
+                "want": "circuit"
+              }
+            }
+          ],
+          "errorCounts": {
+            "graph": 1,
+            "task": 1
+          }
+        },
+        "hasSpec": false,
+        "hasQuestion": false,
+        "questionMappingCorrect": false,
+        "questionMappingIssues": [
+          "missing_question",
+          "missing_weight",
+          "missing_weight",
+          "missing_weight"
+        ],
+        "questionMappingDifferences": [
+          {
+            "item": "spec",
+            "type": "task",
+            "predicted": null,
+            "expected": {
+              "type": "euler",
+              "want": "circuit"
+            }
+          }
+        ]
+      },
+      "failure": {
+        "code": "repetition_loop",
+        "reason": "repetition_loop",
+        "finish": "length"
+      }
+    }
+  ]
+}

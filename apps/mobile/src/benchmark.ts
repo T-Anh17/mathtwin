@@ -1,5 +1,5 @@
 import { readProblem } from '@mathtwin/reader';
-import type { ReadUsage, TextLine, VisionReader } from '@mathtwin/reader';
+import type { ReadUsage, TextLine, TextReadOptions, VisionReader } from '@mathtwin/reader';
 import { completionRequest, completionFinishReason, defaultMaxImageSide, defaultReadTimeout, defaultMaxTokens, defaultDry, validateDry, imageTimeout, graphResult, lineResult, parseCompletion, spottingLines } from '@mathtwin/reader-llamacpp-shared';
 import type { ReadMode } from '@mathtwin/reader-llamacpp-shared';
 import { FigureReader, NoGlyphReader } from '@mathtwin/reader-figure';
@@ -38,7 +38,7 @@ export class Benchmark {
     private readonly decode: (dataUrl: string, maxImageSide: number) => Promise<DecodedImage>, private readonly now = () => performance.now(),
     private readonly ocr?: OcrRunner) {}
 
-  async run(image: BenchImage, config: BenchmarkConfig, signal: AbortSignal): Promise<ImageResult> {
+  async run(image: BenchImage, config: BenchmarkConfig, signal: AbortSignal, textOptions?: TextReadOptions): Promise<ImageResult> {
     if (this.active) throw { code: 'busy' };
     if (config.mode === 'work') {
       const spec = config.workSpecs?.[image.id];
@@ -164,7 +164,7 @@ export class Benchmark {
       } else {
         result.linePasses = [];
         for (let pass = 0; pass < config.passes; pass++) {
-          const { completion, usage } = await complete(config.model === 'a' ? 'spotting' : 'lines');
+          const { completion, usage } = await complete(config.model === 'a' ? 'spotting' : textOptions?.continuation ? 'continuation-lines' : 'lines');
           const lines: TextLine[] = config.model === 'a' ? spottingLines(completion, decoded.original.width, decoded.original.height)
             : lineResult(completion, decoded.original.width, decoded.original.height);
           result.linePasses.push({ lines, usage });

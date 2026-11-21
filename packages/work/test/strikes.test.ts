@@ -96,7 +96,7 @@ describe('strike confirmation and reading', () => {
     expect(output.parsed.ignored).toContainEqual({ line: 0, reason: 'struck' });
     expect(output.parsed.steps.every((s) => !s.lines.includes(0))).toBe(true);
     expect(output.usage).toMatchObject({ passes: 2, latencyMs: 4, lineCount: 2, peakMemoryMb: 3, lineMs: [1, 1], finish_reason: ['stop', 'stop'] });
-    expect(reader.readLines).toHaveBeenNthCalledWith(2, [clean.image], signal);
+    expect(reader.readLines).toHaveBeenNthCalledWith(2, [clean.image], signal, { continuation: true });
   });
   it('propagates abort and reader failures and accepts no pages', async () => {
     const readLines = vi.fn(async () => { throw new Error('read failed'); });

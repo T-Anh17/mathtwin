@@ -15,6 +15,7 @@
     "build": "npm run build --workspace @mathtwin/core --workspace @mathtwin/reader --workspace @mathtwin/reader-llamacpp-shared --workspace @mathtwin/reader-llamacpp --workspace @mathtwin/reader-ocr-shared --workspace @mathtwin/reader-ocr --workspace @mathtwin/reader-figure --workspace @mathtwin/work --workspace @mathtwin/eval --workspace @mathtwin/models",
     "typecheck": "tsc --noEmit -p tsconfig.json && npm run typecheck --workspace @mathtwin/mobile",
     "test": "npm run typecheck && vitest run",
+    "eval:mvp": "npm run build && npm run build:mvp --workspace @mathtwin/eval && node tools/eval/dist/mvp/tools/eval/src/mvp-cli.js",
     "eval:read": "npm run build && node tools/eval/dist/cli.js",
     "eval:generate": "npm run build && node tools/eval/dist/generate-cli.js",
     "eval:pack": "npm run build && node tools/eval/dist/pack.js",

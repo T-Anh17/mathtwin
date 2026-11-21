@@ -3,6 +3,7 @@ import type { WorkLine } from '../src/index.js';
 import { applyWorkAnswers, detectMissingLines, filterWorkRegions, gradeWork, parseWork, vocabularyOf, suggestWorkRegion } from '../src/index.js';
 import type { PreparedImage } from '@mathtwin/reader';
 import type { ProblemSpec } from '@mathtwin/core';
+import { readFileSync } from 'node:fs';
 
 const spec: ProblemSpec = { graph: { directed: false, vertices: [{ id: 'v3', label: 'A' }], edges: [] }, task: { type: 'elements' }, questionFormat: 'tu_luan' };
 const line = (text: string, index: number, x: number, y: number): WorkLine => ({ text, index, page: 0, conf: 1, alternatives: [], box: [x, y, x + 20, y + 20] });
@@ -38,6 +39,50 @@ it('proposes only the padded envelope of valid solution/table boxes, leaving con
   expect(suggestWorkRegion([{ ...lines[0]!, box: [0, 0, 1000, 1000] }, lines[2]!])).toBeUndefined();
   expect(filterWorkRegions(lines).needsRegion).toBe(true);
 });
+it('asks for the region before excluding question-labelled working on a continuation page', () => {
+  const lines: WorkLine[] = [
+    { ...line('(Tiếp Bài 9)', 0, 100, 100), page: 1, region: 'question', regionConf: 1 },
+    { ...line('Đổi nhãn B thành 7', 1, 100, 300), page: 1, region: 'question', regionConf: 1 },
+    { ...line('Kết luận', 2, 100, 700), page: 1, region: 'solution', regionConf: 1 },
+  ];
+  expect(filterWorkRegions(lines).needsRegion).toBe(true);
+  expect(suggestWorkRegion(lines)).toBeUndefined();
+  expect(filterWorkRegions([lines[0]!, lines[2]!]).needsRegion).toBe(false);
+  expect(filterWorkRegions(lines.map((row) => ({ ...row, page: 0 }))).needsRegion).toBe(false);
+  const confirmed = filterWorkRegions(lines, { solution: [0, 250, 900, 850] });
+  expect(confirmed.needsRegion).toBe(false);
+  expect(confirmed.lines.map((row) => row.region)).toEqual(['question', 'solution', 'solution']);
+});
+
+it('Bài 26 page 2: blocks a truncated region proposal for the saved 11/15 misclassified working lines', () => {
+  const fixture = JSON.parse(readFileSync(new URL('./fixtures/bai-26-page-2-ocr.json', import.meta.url), 'utf8')) as { lines: WorkLine[] };
+  const lines = fixture.lines;
+  expect(lines).toHaveLength(16);
+  expect(lines.slice(1).filter((l) => l.region === 'question')).toHaveLength(11);
+  // Isolate region safety from the separate missing-box/low-confidence guards.
+  const boxed = lines.map((l, i) => ({ ...l, regionConf: 1, box: [40, 20 + i * 50, 900, 50 + i * 50] as [number, number, number, number] }));
+  const before = structuredClone(boxed);
+  expect(filterWorkRegions(boxed).needsRegion).toBe(true);
+  expect(suggestWorkRegion(boxed)).toBeUndefined();
+  const confirmed = filterWorkRegions(boxed, { solution: [0, 60, 1000, 1000] });
+  expect(confirmed.needsRegion).toBe(false);
+  expect(confirmed.lines[0]?.region).toBe('question');
+  expect(confirmed.lines.slice(1).every((l) => l.region === 'solution')).toBe(true);
+  expect(boxed).toEqual(before);
+  // The actual saved OCR lacks boxes: a region alone cannot restore it.
+  expect(filterWorkRegions(lines, { solution: [0, 85, 1000, 1000] }).needsRegion).toBe(true);
+});
+
+it('leaves the region unselected when continued working lacks boxes even with correct region labels', () => {
+  const lines: WorkLine[] = [
+    { ...line('Đổi nhãn B thành 7', 0, 100, 300), page: 1, region: 'solution' },
+    { text: 'Khoanh đỉnh B', index: 1, page: 1, conf: 1, alternatives: [], region: 'solution' },
+  ];
+  expect(filterWorkRegions(lines).needsRegion).toBe(true);
+  expect(suggestWorkRegion(lines)).toBeUndefined();
+  expect(suggestWorkRegion([lines[0]!])).toEqual([76, 276, 144, 344]);
+});
+
 function image(): PreparedImage {
   const width = 200, height = 200, pixels = new Uint8ClampedArray(width * height * 4).fill(255);
   for (const y0 of [40, 90]) for (let y = y0; y < y0 + 12; y++) for (let x = 20; x < 160; x += 10) for (let dx = 0; dx < 5; dx++)

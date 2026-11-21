@@ -40,7 +40,7 @@ export async function readWorkRegion(image: PreparedImage, reading: WorkPageRead
   const width = right - left, height = bottom - top, pixels = new Uint8ClampedArray(width * height * 4);
   for (let y = 0; y < height; y++) pixels.set(image.pixels.subarray(((top + y) * image.width + left) * 4, ((top + y) * image.width + right) * 4), y * width * 4);
   const started = performance.now();
-  const read = await readingTask((signal) => readWork([{ pixels, width, height }], { reader, vocab, signal }), signal);
+  const read = await readingTask((signal) => readWork([{ pixels, width, height }], { reader, vocab, signal, continuation: reading.page > 0 }), signal);
   const cropLines = read.lines.map(({ box, ...l }): WorkLine => ({ ...l, page: reading.page, ...(box && validWorkLineBox(box) ? {
     box: [(left + box[0] * width / 1000) / image.width * 1000, (top + box[1] * height / 1000) / image.height * 1000,
       (left + box[2] * width / 1000) / image.width * 1000, (top + box[3] * height / 1000) / image.height * 1000],
@@ -77,7 +77,7 @@ export async function readWorkPages(options: {
     }
     if (saved && !saved.failed) { await options.checkpoint(processWorkPage(image, saved, saved.region)); continue; }
     let result: Awaited<ReturnType<typeof readWork>>;
-    try { result = await readingTask((signal) => readWork([image], { reader: options.reader, vocab: options.vocab, signal }), signal, options.timeoutMs); }
+    try { result = await readingTask((signal) => readWork([image], { reader: options.reader, vocab: options.vocab, signal, continuation: page > 0 }), signal, options.timeoutMs); }
     catch (error) {
       signal.throwIfAborted();
       await options.checkpoint({ ...saved, page, raw: saved?.raw ?? [], lines: saved?.lines ?? [], ms: now() - started, needsRegion: true, inspected: false, failed: true });

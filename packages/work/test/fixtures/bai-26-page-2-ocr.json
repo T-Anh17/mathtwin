@@ -1,0 +1,188 @@
+{
+  "source": "read-eval-generated-handwriting-2026-11-19",
+  "image": "bai_26_p2.png",
+  "width": 1448,
+  "height": 1448,
+  "lines": [
+    {
+      "text": "(tiếp Bài 26)",
+      "conf": 0.3540682084721973,
+      "region": "question",
+      "regionConf": 0.9967222809570025,
+      "box": [
+        52.128,
+        55.024,
+        434.4,
+        121.632
+      ],
+      "alternatives": [],
+      "index": 0,
+      "page": 1
+    },
+    {
+      "text": "Trong các định chưa khoanh tròn, tính kê",
+      "conf": 0.46804033008311324,
+      "region": "question",
+      "regionConf": 0.9260687817238284,
+      "box": [
+        52.128,
+        121.632,
+        434.4,
+        185.344
+      ],
+      "alternatives": [],
+      "index": 1,
+      "page": 1
+    },
+    {
+      "text": "với C gồm D và E. Tại D, đối nhân 20",
+      "conf": 0.37480613171376503,
+      "region": "question",
+      "regionConf": 0.9999792575841043,
+      "box": [
+        52.128,
+        185.344,
+        434.4,
+        289.6
+      ],
+      "alternatives": [],
+      "index": 2,
+      "page": 1
+    },
+    {
+      "text": "thành 18 (bằng nC + WED). Tại E, đối",
+      "conf": 0.7692661172319035,
+      "region": "question",
+      "regionConf": 0.9999998807907033,
+      "box": [
+        52.128,
+        289.6,
+        434.4,
+        434.4
+      ],
+      "alternatives": [],
+      "index": 3,
+      "page": 1
+    },
+    {
+      "text": "nhân 13 thành 10 (bằng nC + WCE). Lúc này",
+      "conf": 0.8795571974060393,
+      "region": "question",
+      "regionConf": 1,
+      "box": [
+        52.128,
+        434.4,
+        434.4,
+        593.68
+      ],
+      "alternatives": [],
+      "index": 4,
+      "page": 1
+    },
+    {
+      "text": "trong các định chưa khoanh tròn, định có",
+      "conf": 0.7791603784742301,
+      "region": "question",
+      "regionConf": 0.9999954700467981,
+      "box": [
+        52.128,
+        593.68,
+        434.4,
+        738.48
+      ],
+      "alternatives": [],
+      "index": 5,
+      "page": 1
+    },
+    {
+      "text": "nhân nhớ nhất là E. Khoanh tròn định E.",
+      "conf": 0.252477080922796,
+      "region": "question",
+      "regionConf": 1,
+      "alternatives": [],
+      "index": 6,
+      "page": 1
+    },
+    {
+      "text": "Trong các định chưa khoanh tròn, tính kê",
+      "conf": 0.8903472415858282,
+      "region": "question",
+      "regionConf": 0.9999523162823969,
+      "alternatives": [],
+      "index": 7,
+      "page": 1
+    },
+    {
+      "text": "với E chỉ có D. Tại D, đối nhân 18 thành",
+      "conf": 0.5667307393590223,
+      "region": "question",
+      "regionConf": 0.9999941587445919,
+      "alternatives": [],
+      "index": 8,
+      "page": 1
+    },
+    {
+      "text": "17 (bằng NE + WED). Lúc này, trong các",
+      "conf": 0.7506427657592328,
+      "region": "question",
+      "regionConf": 0.9999992847442343,
+      "alternatives": [],
+      "index": 9,
+      "page": 1
+    },
+    {
+      "text": "định chưa khoanh tròn, định có nhân nhớ nhất",
+      "conf": 0.8025356485689754,
+      "region": "question",
+      "regionConf": 0.9999990463256836,
+      "alternatives": [],
+      "index": 10,
+      "page": 1
+    },
+    {
+      "text": "là D. Khoanh tròn định D.",
+      "conf": 0.9942240117848833,
+      "region": "question",
+      "regionConf": 0.9999995231628418,
+      "alternatives": [],
+      "index": 11,
+      "page": 1
+    },
+    {
+      "text": "Đô lại các bước, ta có nD = WAF + WFC + WCE + WED",
+      "conf": 0.5700389195438375,
+      "region": "solution",
+      "regionConf": 0.7252350939386467,
+      "alternatives": [],
+      "index": 12,
+      "page": 1
+    },
+    {
+      "text": " = 3 + 5 + 2 + 7 = 17.",
+      "conf": 0.9820427299867129,
+      "region": "solution",
+      "regionConf": 1,
+      "alternatives": [],
+      "index": 13,
+      "page": 1
+    },
+    {
+      "text": "Vậy đường đi ngắn nhất từ A đến D là",
+      "conf": 0.9770018452212927,
+      "region": "solution",
+      "regionConf": 0.9999827146532513,
+      "alternatives": [],
+      "index": 14,
+      "page": 1
+    },
+    {
+      "text": "AFCED, với độ dài bằng 17.",
+      "conf": 0.6603412111606219,
+      "region": "solution",
+      "regionConf": 0.9999996423721385,
+      "alternatives": [],
+      "index": 15,
+      "page": 1
+    }
+  ]
+}

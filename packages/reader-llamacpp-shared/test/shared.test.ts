@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { compareRead, normalizeDraft, readProblem, resizeImage } from '@mathtwin/reader';
+import { compareRead, normalizeDraft, readProblem, resizeImage, ReadDraftSchema } from '@mathtwin/reader';
 import { completionRequest, graphResult, lineResult, parseCompletion, plainLines, spottingLines } from '../src/index.js';
 import { draft, FakeVisionReader, image } from '../../reader/test/fixtures.js';
 
@@ -11,6 +11,7 @@ it('uses the shared 1536 token default for completion requests', () => {
   expect(completionRequest('b', 'lines', ['data:image/png;base64,AA=='])).toMatchObject({ max_tokens: 1536, stream: false });
 });
 interface Change { probability?: number; alternatives?: { text: string; probability: number }[] }
+
 function response(text: string, changes = new Map<number, Change>()): unknown {
   let offset = 0;
   return { choices: [{ finish_reason: 'stop', message: { content: text }, logprobs: { content: [...text].map((char) => {
@@ -41,6 +42,15 @@ it('requires boxes for work lines while problem reading keeps optional boxes', (
   expect(prompt).toContain('Every line MUST include'); expect(prompt).not.toContain('box is optional');
   const problem = JSON.stringify(completionRequest('b', 'edges', ['data:image/png;base64,AA==']));
   expect(problem).toContain('Omit box if not identifiable');
+});
+
+it('uses the continuation instructions only in that line mode, with the same schema', () => {
+  const images = ['data:image/png;base64,AA=='];
+  const first = completionRequest('b', 'lines', images);
+  const later = completionRequest('b', 'continuation-lines', images);
+  expect(JSON.stringify(first.messages)).not.toContain('A continuation heading');
+  expect(JSON.stringify(later.messages)).toContain('A continuation heading');
+  expect(later.response_format).toEqual(first.response_format);
 });
 
 it.each(['lines', 'edges', 'neighbors'] as const)('emits only llama.cpp-compatible array items throughout %s schema', (mode) => {

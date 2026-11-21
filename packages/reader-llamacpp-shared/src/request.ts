@@ -18,11 +18,15 @@ conf fields are ignored and replaced with measured token probabilities; put 0 in
 Boxes use relative coordinates 0..1000. Omit box if not identifiable.
 For an unsupported task use its literal type and rawText. An unmappable option has check:null.`;
 }
-export const linesPrompt = `Transcribe each visible text line in reading order, verbatim, including the student's mistakes.
+const lineIntro = `Transcribe each visible text line in reading order, verbatim, including the student's mistakes.
 Return JSON lines matching the response schema. Classify every line's region: question (problem statement), figure (graph labels, edge names or weights), solution (student's written steps), table (student's working table). Never treat graph annotations as solution steps.
-Every line MUST include its own tight bounding box around the visible text. Boxes use Qwen3-VL relative coordinates 0..1000: [x1,y1,x2,y2], x1<x2 and y1<y2. Never use a whole-page box for a line.
+`;
+const lineGeometry = `Every line MUST include its own tight bounding box around the visible text. Boxes use Qwen3-VL relative coordinates 0..1000: [x1,y1,x2,y2], x1<x2 and y1<y2. Never use a whole-page box for a line.
 Do not invent alternative readings or missing text. No solving or correcting.`;
-export type ReadMode = 'edges' | 'neighbors' | 'lines' | 'ocr' | 'spotting' | 'glyph' | 'glyph-label' | 'glyph-weight' | 'glyph-name';
+export const linesPrompt = lineIntro + lineGeometry;
+const continuationPrompt = lineIntro + `A continuation heading such as "tiếp Bài ..." is question only for that heading. Following calculations, row updates and written reasoning are solution or table even at the top of a page. Mark a new question only where the text actually states a new problem.
+` + lineGeometry;
+export type ReadMode = 'edges' | 'neighbors' | 'lines' | 'continuation-lines' | 'ocr' | 'spotting' | 'glyph' | 'glyph-label' | 'glyph-weight' | 'glyph-name';
 const lineSchema = z.strictObject({ lines: z.array(z.strictObject({ text: z.string().min(1),
   region: z.enum(['question', 'figure', 'solution', 'table']), box: z.tuple([z.number().min(0).max(1000), z.number().min(0).max(1000), z.number().min(0).max(1000), z.number().min(0).max(1000)]) })).min(1) });
 /** llama.cpp b12388 accepts homogeneous arrays, not draft-2020 tuple keywords. */
@@ -51,13 +55,14 @@ function serverSchema(value: unknown, root: unknown = value): unknown {
   }
   return result;
 }
-export function completionRequest(model: 'a' | 'b', mode: ReadMode, imageUrls: string[], maxTokens = defaultMaxTokens, dry: DryConfig = defaultDry): Record<string, unknown> {
+export function completionRequest(model: 'a' | 'b', mode: ReadMode, imageUrls: string[], maxTokens = defaultMaxTokens,
+  dry: DryConfig = defaultDry): Record<string, unknown> {
   validateDry(dry);
   if (!imageUrls.length || imageUrls.some((url) => !/^data:image\/(?:png|jpeg);base64,[A-Za-z0-9+/]+={0,2}$/.test(url))) throw new Error('Images must be in-memory data URLs.');
   if (!Number.isSafeInteger(maxTokens) || maxTokens < 1) throw new Error('Invalid token limit.');
   if ((model === 'a') !== (mode === 'ocr' || mode === 'spotting')) throw new Error('Unsupported model/mode.');
-  const prompt = mode === 'edges' || mode === 'neighbors' ? graphPrompt(mode) : mode === 'ocr' ? 'OCR:' : mode === 'spotting' ? 'Spotting:' : mode.startsWith('glyph') ? `Transcribe only ${mode === 'glyph-label' ? 'one vertex label: a letter or v followed by digits (including subscripts)' : mode === 'glyph-weight' ? 'one positive integer edge weight' : mode === 'glyph-name' ? 'one edge name: a, b or m' : 'the single label, positive integer weight or edge name'} in this crop. Return one JSON string; empty string when unreadable. No explanation.` : linesPrompt;
-  const schema = serverSchema(z.toJSONSchema(mode.startsWith('glyph') ? z.string() : mode === 'lines' ? lineSchema : ReadDraftSchema, { unrepresentable: 'any', reused: 'ref' }));
+  const prompt = mode === 'edges' || mode === 'neighbors' ? graphPrompt(mode) : mode === 'ocr' ? 'OCR:' : mode === 'spotting' ? 'Spotting:' : mode.startsWith('glyph') ? `Transcribe only ${mode === 'glyph-label' ? 'one vertex label: a letter or v followed by digits (including subscripts)' : mode === 'glyph-weight' ? 'one positive integer edge weight' : mode === 'glyph-name' ? 'one edge name: a, b or m' : 'the single label, positive integer weight or edge name'} in this crop. Return one JSON string; empty string when unreadable. No explanation.` : mode === 'continuation-lines' ? continuationPrompt : linesPrompt;
+  const schema = serverSchema(z.toJSONSchema(mode.startsWith('glyph') ? z.string() : mode === 'lines' || mode === 'continuation-lines' ? lineSchema : ReadDraftSchema, { unrepresentable: 'any', reused: 'ref' }));
   return {
     messages: [...(model === 'a' ? [] : [{ role: 'system', content: readerInstruction }]), { role: 'user', content: [
       ...imageUrls.map((url) => ({ type: 'image_url', image_url: { url } })), { type: 'text', text: prompt },

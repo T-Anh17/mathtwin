@@ -4,9 +4,17 @@ export type WorkBox = [number, number, number, number];
 export const validWorkBox = (b: WorkBox): boolean => b.every((n) => Number.isFinite(n) && n >= 0 && n <= 1000) && b[2] > b[0] && b[3] > b[1];
 export const validWorkLineBox = (b: WorkBox): boolean => validWorkBox(b) && (b[2] - b[0]) * (b[3] - b[1]) < 800_000;
 const inside = (a: WorkBox, b: WorkBox): boolean => a[0] >= b[0] && a[1] >= b[1] && a[2] <= b[2] && a[3] <= b[3];
+const continuationHeading = /^\s*\(?\s*tiếp(?:\s+theo)?\s+bài\s+\d+\s*\)?\s*[:.]?\s*$/iu;
+const hasContinuationQuestion = (lines: WorkLine[]): boolean => lines.some((line) =>
+  line.page > 0 && line.region === 'question' && !continuationHeading.test(line.text.normalize('NFC')));
 
 /** A proposal only: the caller must obtain user confirmation before applying it. */
 export function suggestWorkRegion(lines: WorkLine[]): WorkBox | undefined {
+  if (hasContinuationQuestion(lines)) return;
+  // A tight envelope of the located rows can cut off later working when OCR
+  // supplied boxes for only part of a continuation. Let the user draw it.
+  if (lines.some((line) => line.page > 0 && (line.region === 'solution' || line.region === 'table')
+    && (!line.box || !validWorkLineBox(line.box)))) return;
   const boxes = lines.filter((l) => (l.region === 'solution' || l.region === 'table') && l.box && validWorkLineBox(l.box)).map((l) => l.box!);
   if (!boxes.length) return;
   return [Math.max(0, Math.min(...boxes.map((b) => b[0])) - 24), Math.max(0, Math.min(...boxes.map((b) => b[1])) - 24),
@@ -43,6 +51,8 @@ export function filterWorkRegions(lines: WorkLine[], options: { figures?: WorkBo
       return { ...line, region: 'figure', regionConf: 1 };
     return { ...line };
   });
+  // A continuation can contain either a new prompt or mislabelled working.
+  // Ask for the solution region before discarding these lines.
   return { lines: filtered, needsRegion: filtered.some((l) => !l.region || (l.regionConf ?? 1) < .85 || !l.box && !options.cropped)
-    || !options.solution && !filtered.some((l) => l.region === 'solution' || l.region === 'table') };
+    || !options.solution && (hasContinuationQuestion(filtered) || !filtered.some((l) => l.region === 'solution' || l.region === 'table')) };
 }

@@ -1,4 +1,4 @@
-import type { PreparedImage, TextReader } from '@mathtwin/reader';
+import type { PreparedImage, TextReadOptions, TextReader } from '@mathtwin/reader';
 import type { Readers } from './flow/reading.js';
 import type { FigureDraftRunner } from './flow/reading.js';
 import type { MobilePlugin } from './contracts.js';
@@ -31,19 +31,19 @@ export function createProblemReaders(benchmark: Pick<Benchmark, 'run'>, lifecycl
       }
     } else if (leases > 0 && --leases === 0) await lifecycle.setBenchmarkState({ running: false, backgroundIdleMinutes: 5 });
   };
-  const run = async (images: PreparedImage[], mode: 'graph' | 'lines', signal = new AbortController().signal) => {
+  const run = async (images: PreparedImage[], mode: 'graph' | 'lines', signal = new AbortController().signal, textOptions?: TextReadOptions) => {
     if (images.length !== 1) throw { code: 'image_invalid' };
     signal.throwIfAborted();
     await activity(true);
     try {
       const result = await benchmark.run({ id: 'problem', dataUrl: encodeImage(images[0]!), imageSource: 'gallery' },
-        { model: 'b', passes: 1, mode, threads: 4, minRamGb: 6, allowLowRam: false, backgroundIdleMinutes: 5 }, signal);
+        { model: 'b', passes: 1, mode, threads: 4, minRamGb: 6, allowLowRam: false, backgroundIdleMinutes: 5 }, signal, textOptions);
       if (result.errorCode) throw { code: result.errorCode };
       return result;
     } finally { await activity(false); }
   };
-  const text: TextReader = { engine: engineFor('b'), readLines: async (images, signal) => {
-    const result = await run(images, 'lines', signal);
+  const text: TextReader = { engine: engineFor('b'), readLines: async (images, signal, options) => {
+    const result = await run(images, 'lines', signal, options);
     const read = result.linePasses?.[0] ?? { lines: [], usage: result.usage };
     const image = images[0]!;
     return { ...read, lines: read.lines.map((line) => ({ ...line, ...(line.box ? {

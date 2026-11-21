@@ -320,3 +320,63 @@ phải đọc lại crop, rồi soát bắt buộc nếu crop còn thiếu box.
 768 px, 4 luồng, 1.536 token, request 180 s / lượt đọc 300 s. Ghi sau mỗi trang
 vào `reports/.debug/4.4-r2-retries.json`, giữ `reason` và `finish_reason`; không
 ghi đè phép đo 40 trang cũ và không tự retry thêm nếu lần chạy này vẫn lỗi.
+
+## Lô 4.7 — MVP đầu–cuối trên Node
+
+Từ gốc repo: `npm run eval:mvp -- --date 2026-11-18` (mặc định đủ 40
+trang synthetic-hw; `--limit 1..40` chỉ dùng kiểm bộ đo). B dùng đúng
+`.build-cache/llama-win/bin/llama-server.exe` và hai GGUF có sẵn trong
+`.models/b`; không có nhánh tải model. D không có glyph model, như app.
+Ảnh cùng trang được dùng làm đề và bài làm; báo cáo công bố giới hạn này.
+
+Ví dụ PowerShell chạy có hạn 3 giờ, log nối tiếp (có thể chạy bằng
+`Start-Process -WindowStyle Hidden` với các đối số tương tự):
+
+```powershell
+node tools/eval/run-bounded.mjs 10800 reports/.debug/mvp-run.log node.exe 'C:/Program Files/nodejs/node_modules/npm/bin/npm-cli.js' run eval:mvp -- --date 2026-11-18
+```
+
+Checkpoint JSON ghi nguyên tử sau mỗi trang/lượt OCR và khi xong mỗi bài trong
+`reports/.debug/mvp-<ngày>/`. Chạy lại cùng lệnh tiếp tục từ checkpoint; cấu
+hình, mã bộ đo hoặc ảnh/truth khác sẽ bị chặn, không trộn số đo cũ. Báo cáo
+MD và JSON tổng hợp được cập nhật sau mỗi bài tại `reports/mvp-eval-<ngày>`.
+Một lỗi trang được ghi lại và tiếp tục trang khác; lệnh trả mã khác 0 nếu
+còn lỗi/thiếu trang. Kết quả thiếu trang không được xem là phép đo hoàn tất.
+
+`--rescore` chạy lại xác nhận/soát/chấm bằng OCR gốc và nháp D đã lưu khi sửa
+bộ đo, với cấu hình đọc và tệp model/server giữ nguyên. Adapter suy luận bị
+chặn trong nhánh này; chữ đã sửa của lần mô phỏng cũ không được dùng làm OCR.
+Báo cáo ghi provenance và tách thời gian suy luận cũ khỏi xử lý/chấm mới;
+bản báo cáo trước chấm lại được giữ trong thư mục checkpoint. Đây không phải
+một lần đo suy luận mới. Không dùng tùy chọn này để đổi cấu hình B/D.
+Trang đã lỗi đọc vẫn giữ nguyên lỗi và mã thoát khác 0; chấm lại chỉ lấy
+thêm chỉ số khâu đề/giải có trong checkpoint, không lén retry hoặc cấp chữ
+truth cho cả bài chưa đọc. Mẫu số kết luận/bước sai vẫn tính trang lỗi.
+
+Đây là đo `apps/mobile/src/flow/` thật, với adapter Node tại biên đọc ảnh;
+truth chỉ trả lời xác nhận/hỏi lại/soát mô phỏng và tính chỉ số. Bộ đối chiếu
+đáp án độc lập nằm ở `mvp-oracle.ts`, giới hạn đồ thị nhỏ của synthetic-hw.
+`npm test` chỉ chạy adapter giả lập trong `test/mvp.test.ts`, không khởi động
+llama-server, không mạng, không tải trọng số. Chưa có ảnh thật thì kết luận
+nghiệm thu luôn là **chưa đủ căn cứ**, kể cả khi các cổng chức năng xanh.
+
+### Đo OCR bổ sung trên ảnh mô phỏng từ bên ngoài
+
+Dùng thư mục PNG đã soát và `labels.json` của bộ ảnh. Bộ đo kiểm tra tên tệp,
+thứ tự và tổng số trang của từng bài trước khi chạy. Cấu hình B giống lượt
+đo MVP cục bộ. Chữ tham chiếu lấy từ văn bản dùng để sinh ảnh, nên khi nhãn
+chưa được đối chiếu, CER/WER có thể bao gồm sai lệch do khâu sinh ảnh.
+
+```powershell
+npm run build
+npm run build:mvp --workspace @mathtwin/eval
+node tools/eval/dist/mvp/tools/eval/src/mvp-handwriting-cli.js --images '<thư mục PNG>' --labels '<đường dẫn labels.json>' --date 2026-11-19
+```
+
+Báo cáo Markdown và JSON ở `reports/read-eval-generated-handwriting-<ngày>`.
+Điểm tổng cộng gồm cả trang lỗi với đầu ra rỗng. Lệnh trả mã khác 0 nếu có
+trang lỗi. Chạy lại cùng đầu vào dùng các checkpoint theo cấu hình, ảnh và
+nhãn trong `reports/.debug/`. Thêm `--retry-errors` khi đã xử lý nguyên nhân
+lỗi và cần đọc lại những trang đó. Chỉ số ở đây đo chữ, còn chỉ số đồ thị
+và chấm bài cần nhãn đã xác nhận cho từng ảnh và bài làm.
+
