@@ -7,10 +7,17 @@ import { loadCases, readJson, setFolders } from './dataset.js';
 import type { DatasetSet } from './dataset.js';
 import { graphKey, graphSplit } from './figures.js';
 import sharp from 'sharp';
+import { loadPairs } from './pair-data.js';
 
 try {
-  const folder = process.argv[2];
-  if (!folder || !Object.hasOwn(setFolders, folder)) throw new Error('Chọn synthetic, synthetic-hw, synthetic-fig hoặc real.');
+  const [folder, ...args] = process.argv.slice(2);
+  if (folder === 'real-pairs') {
+    if (args.length !== 2 || args[0] !== '--dir') throw new Error('Dùng eval:validate -- real-pairs --dir <thư mục>.');
+    const pairs = await loadPairs(args[1]!, undefined);
+    console.log(`Nhãn cặp hợp lệ: ${pairs.length} cặp.`);
+    process.exit(0);
+  }
+  if (!folder || !Object.hasOwn(setFolders, folder) || args.length) throw new Error('Chọn synthetic, synthetic-hw, synthetic-fig, real hoặc real-pairs --dir <thư mục>.');
   const cases = await loadCases(join(repositoryRoot, 'testdata', setFolders[folder as DatasetSet]));
   for (const sample of cases) {
     if ((await readdir(sample.directory)).includes('work.json')) {

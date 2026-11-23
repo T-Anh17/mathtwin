@@ -10,6 +10,7 @@ import { readProblemPages } from '../../../apps/mobile/src/flow/reading.js';
 import type { Readers } from '../../../apps/mobile/src/flow/reading.js';
 import { confirmationQuestions, initialProblem, replaceGraph, confirmProblem } from '../../../apps/mobile/src/flow/confirmation.js';
 import { readWorkPages, readWorkRegion, combinedWorkLines, processWorkPage } from '../../../apps/mobile/src/flow/work-reading.js';
+import type { WorkPageRead } from '../../../apps/mobile/src/flow/work-reading.js';
 import { resultView, solutionView } from '../../../apps/mobile/src/flow/view.js';
 import { alignWorkLines, compareAlignedWork, joinedText, readingText } from './work-alignment.js';
 import type { WorkAlignment } from './work-alignment.js';
@@ -72,6 +73,31 @@ export function alignMvpWork(observed: WorkLine[], truth: WorkLine[]): WorkAlign
 }
 
 const solutionRow = (l: WorkLine) => l.region === 'solution' || l.region === 'table';
+
+/** Simulate an accurate hand crop without another B read.  Alignment may only
+ * change the displayed region of matched OCR rows; raw B output stays intact. */
+export function simulateManualWorkRegion(image: PreparedImage, reading: WorkPageRead, reference: WorkLine[]): WorkPageRead {
+  const truth = reference.filter((line) => line.page === reading.page);
+  const matchesByObserved = new Map<number, WorkLine[]>();
+  for (const group of alignWorkLines(reading.raw, truth).groups) {
+    const matches = truth.filter((line) => group.truth.includes(line.index));
+    for (const index of group.observed) matchesByObserved.set(index, matches);
+  }
+  const relabelled = reading.raw.map((line) => {
+    const matches = matchesByObserved.get(line.index) ?? [];
+    if (!matches.length) return line;
+    const regions = matches.map((match) => match.region);
+    if (regions.every((region) => region === 'solution' || region === 'table'))
+      return { ...line, region: regions.every((region) => region === 'table') ? 'table' as const : 'solution' as const, regionConf: 1 };
+    if (regions.every((region) => region === 'question' || region === 'figure'))
+      return { ...line, region: regions.every((region) => region === 'figure') ? 'figure' as const : 'question' as const, regionConf: 1 };
+    // One OCR group spanning distinct truth regions is ambiguous: retain B's label.
+    return line;
+  });
+  const processed = processWorkPage(image, { ...reading, raw: relabelled, lines: relabelled });
+  // An unmatched row retains B's region and cannot cause another crop inference.
+  return { ...processed, raw: reading.raw, needsRegion: false, inspected: true, missingLineCheckUnavailable: true };
+}
 
 /** Evaluator-only: an automatic strike counts as "on a mark" when the vertical centre of a
  * truth-struck row lies inside the observed row and the two overlap horizontally. */
@@ -183,9 +209,16 @@ export function replayMvpWork(start: Session, truth: WorkLine[], ops?: Parameter
 export interface MvpInput {
   id: string; date: string; image: PreparedImage; truth: ProblemSpec; workTruth: WorkTruth; reference: WorkLine[];
   region: WorkBox; figure: FigureAnnotation; readers: Readers; signal: AbortSignal;
+  /** Pair datasets may contain distinct, multi-page problem and work photos.  The
+   * legacy synthetic evaluator continues to supply the single `image` field. */
+  problemImages?: PreparedImage[];
+  workImages?: PreparedImage[];
+  /** A label-derived solution area.  `undefined` means a person would have to
+   * draw the crop; the evaluator records that work but does not reread B. */
+  regionByPage?: (page: number) => WorkBox | undefined;
   saved?: Session; checkpoint: (session: Session) => Promise<void>;
   /** Explicit evaluator-only replay: raw OCR is retained, no corrected text is recycled. */
-  prior?: { session: Session; regionQuestions: number; timings: { workRead: number; decode: number; region: number } };
+  prior?: { session: Session; regionQuestions: number; manualRegionPages: number[]; timings: { workRead: number; decode: number; region: number } };
 }
 /** Also usable for a page whose work OCR failed after the problem/solve stages. */
 export function mvpReadComparisons(session: Session, truth: ProblemSpec) {
@@ -200,6 +233,8 @@ export function mvpReadComparisons(session: Session, truth: ProblemSpec) {
 }
 export async function runMvpSample(input: MvpInput) {
   const { image, truth, reference, readers, signal } = input;
+  const problemImages = input.problemImages ?? [image];
+  const workImages = input.workImages ?? [image];
   let session = input.prior ? { ...createSession(input.id, input.date), stage: 'problem_reading' as const,
     problemPhotos: structuredClone(input.prior.session.problemPhotos), problemPages: structuredClone(input.prior.session.problemPages ?? []),
     timings: { ...input.prior.session.timings, figureDraft: (input.prior.session.problemPages ?? []).reduce((n, p) => n + p.figureMs, 0) } }
@@ -208,10 +243,11 @@ export async function runMvpSample(input: MvpInput) {
   const ops = { solve: ((...args: Parameters<typeof solve>) => { const t = performance.now(); const result = solve(...args); timings.solve += performance.now() - t; return result; }),
     gradeWork: ((...args: Parameters<typeof gradeWork>) => { const t = performance.now(); const result = gradeWork(...args); timings.grade += performance.now() - t; return result; }) };
   const send = (event: SessionEvent) => { session = sessionReducer(session, event, ops); };
-  const photo = { id: input.id, width: image.width, height: image.height, page: 0 };
-  if (session.stage === 'problem_capture') send({ type: 'problem_photos', photos: [photo] });
+  const problemPhotos = problemImages.map((page, index) => ({ id: `${input.id}-de-${index + 1}`, width: page.width, height: page.height, page: index }));
+  const workPhotos = workImages.map((page, index) => ({ id: `${input.id}-bai-${index + 1}`, width: page.width, height: page.height, page: index }));
+  if (session.stage === 'problem_capture') send({ type: 'problem_photos', photos: problemPhotos });
   if (session.stage === 'problem_reading') {
-    const outcome = await readProblemPages({ count: 1, readers, signal, load: async () => image, saved: session.problemPages ?? [], progress: () => {},
+    const outcome = await readProblemPages({ count: problemImages.length, readers, signal, load: async (page) => problemImages[page]!, saved: session.problemPages ?? [], progress: () => {},
       timeoutMs: 420_000, checkpoint: async (reading) => { send({ type: 'problem_page', reading }); await input.checkpoint(session); } });
     send({ type: 'problem_read', outcome, ms: outcome.usage.latencyMs }); await input.checkpoint(session);
   }
@@ -226,26 +262,45 @@ export async function runMvpSample(input: MvpInput) {
   if (!session.spec || !session.solution || !validateSpec(session.spec).ok) throw new Error('Đề xác nhận chưa hợp lệ.');
   const confirmedCorrect = compareRead({ ...outcome, spec: session.spec }, truth).completeCorrect;
   const solutionCheck = confirmedCorrect ? checkMvpSolution(truth, session.solution) : { correct: false, reason: 'Đề xác nhận khác truth' };
-  if (session.stage === 'solution') { send({ type: 'work_capture', source: 'photo' }); send({ type: 'work_photos', photos: [photo] }); }
+  if (session.stage === 'solution') { send({ type: 'work_capture', source: 'photo' }); send({ type: 'work_photos', photos: workPhotos }); }
   if (input.prior) {
     const started = performance.now();
     const pages = input.prior.session.workPages;
     if (!pages?.length || pages.some((p) => p.failed || !p.inspected)) throw new Error('Không có đủ OCR gốc để chấm lại.');
-    for (const page of pages) send({ type: 'work_page', reading: processWorkPage(image, { ...structuredClone(page), lines: structuredClone(page.raw) },
-      input.prior.regionQuestions ? page.region : undefined) });
+    for (const page of pages) {
+      const labelledRegion = input.regionByPage?.(page.page);
+      const reread = { ...structuredClone(page), lines: structuredClone(page.raw) };
+      send({ type: 'work_page', reading: input.regionByPage && !labelledRegion
+        ? simulateManualWorkRegion(workImages[page.page]!, reread, reference)
+        : processWorkPage(workImages[page.page]!, reread, input.prior.regionQuestions ? page.region : undefined) });
+    }
     timings.inspection = performance.now() - started;
     await input.checkpoint(session);
   }
   if (session.stage === 'work_reading') {
-    await readWorkPages({ count: 1, reader: readers.text, vocab: vocabularyOf(session.spec), signal, load: async () => image,
+    await readWorkPages({ count: workImages.length, reader: readers.text, vocab: vocabularyOf(session.spec), signal, load: async (page) => workImages[page]!,
       saved: session.workPages ?? [], timeoutMs: 420_000, progress: () => {},
       checkpoint: async (reading) => { send({ type: 'work_page', reading }); await input.checkpoint(session); } });
   }
   let regionQuestions = input.prior?.regionQuestions ?? 0;
+  const manualRegionPages = [...(input.prior?.manualRegionPages ?? [])];
   for (const reading of session.workPages ?? []) if (reading.needsRegion) {
     regionQuestions++;
+    const labelledRegion = input.regionByPage?.(reading.page);
+    if (input.regionByPage) {
+      // Pair labels may not include geometry.  Model B has already completed its
+      // one permitted read of this page, so record a hand crop instead of doing a
+      // second OCR call merely to manufacture boxes.
+      if (!labelledRegion) manualRegionPages.push(reading.page);
+      const completed = labelledRegion
+        ? processWorkPage(workImages[reading.page]!, reading, labelledRegion)
+        : simulateManualWorkRegion(workImages[reading.page]!, reading, reference);
+      send({ type: 'work_page', reading: completed });
+      await input.checkpoint(session);
+      continue;
+    }
     const began = performance.now();
-    const result = await readWorkRegion(image, reading, input.region, readers.text, vocabularyOf(session.spec), signal);
+    const result = await readWorkRegion(workImages[reading.page]!, reading, input.region, readers.text, vocabularyOf(session.spec), signal);
     timings.region += performance.now() - began;
     send({ type: 'work_page', reading: result }); await input.checkpoint(session);
   }
@@ -270,7 +325,7 @@ export async function runMvpSample(input: MvpInput) {
   return { id: input.id, task: truth.task.type, source: 'synthetic-hw' as const, expected: input.workTruth.expected,
     readComparison, bComparison, confirmedCorrect, solutionCheck, effort, problemQuestions: confirmation.questions,
     problemFormEdits: confirmation.formEdits, workQuestions: replay.questions, regionQuestions,
-    reviews: replay.reviews, reviewEdits: replay.reviewEdits, comparison, rawComparison, audit, beforeAudit,
+    reviews: replay.reviews, reviewEdits: replay.reviewEdits, comparison, rawComparison, audit, beforeAudit, manualRegionPages,
     finalVerdict: session.workGrade!.result.verdict, result, solution, timings,
     strikes: strikeAudit(session.workLines, reference),
     deviation: session.workGrade!.result.verdict === input.workTruth.expected.verdict ? null : deviationCause(session, reference, input.workTruth),

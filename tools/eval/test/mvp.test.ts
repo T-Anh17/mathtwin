@@ -5,10 +5,10 @@ import type { PreparedImage, ReadDraft, ReadOutcome } from '@mathtwin/reader';
 import type { WorkLine, WorkTruth } from '@mathtwin/work';
 import { createSession, sessionReducer } from '../../../apps/mobile/src/flow/sessionReducer.js';
 import type { Session } from '../../../apps/mobile/src/flow/types.js';
-import { alignMvpWork, deviationCause, replayMvpWork, strikeAudit, runMvpSample, simulateProblemConfirmation, truthWorkAnswers } from '../src/mvp.js';
+import { alignMvpWork, deviationCause, replayMvpWork, strikeAudit, runMvpSample, simulateManualWorkRegion, simulateProblemConfirmation, truthWorkAnswers } from '../src/mvp.js';
 import type { MvpInput } from '../src/mvp.js';
 import { checkMvpSolution } from '../src/mvp-oracle.js';
-import { mvpReport } from '../src/mvp-report.js';
+import { deviationReason, mvpReport } from '../src/mvp-report.js';
 import { compareAlignedWork } from '../src/work-alignment.js';
 import { parseWork, vocabularyOf } from '@mathtwin/work';
 import { loadCases } from '../src/dataset.js';
@@ -73,6 +73,30 @@ describe('MVP evaluator, fake adapters only', () => {
     wrong.uncertain = [{ item: 'task.type', candidates: ['degree', 'elements'] }];
     const result = simulateProblemConfirmation(outcome(wrong), spec);
     expect(result.spec.task.type).toBe('elements'); expect(result.questions).toBe(1);
+  });
+  it('simulates a hand crop from aligned labels without admitting prompt or vertex rows', () => {
+    const image: PreparedImage = { width: 20, height: 20, pixels: new Uint8ClampedArray(1600).fill(255) };
+    const reference = [
+      line('Bài 1. Hãy liệt kê.', 0, { region: 'question', box: [0, 40, 900, 80] }),
+      line('A', 1, { region: 'figure', box: [40, 120, 80, 160] }),
+      line('Có 2 đỉnh.', 2, { region: 'solution', box: [0, 700, 900, 740] }),
+    ];
+    const raw = [
+      line('Bài 1. Hãy liệt kê.', 0, { region: 'question', box: [0, 40, 900, 80] }),
+      line('A', 1, { region: 'question', box: [40, 120, 80, 160] }),
+      // B gave this solution row a displaced box and the wrong region.
+      line('Có 2 đỉnh.', 2, { region: 'question', box: [0, 100, 900, 140] }),
+    ];
+    const page = simulateManualWorkRegion(image, { page: 0, raw, lines: raw, ms: 1, needsRegion: true }, reference);
+    expect(page.needsRegion).toBe(false);
+    expect(page.lines.find((row) => row.text === 'Bài 1. Hãy liệt kê.')?.region).toBe('question');
+    expect(page.lines.find((row) => row.text === 'A')?.region).toBe('figure');
+    expect(page.lines.find((row) => row.text === 'Có 2 đỉnh.')?.region).toBe('solution');
+    expect(page.raw.map((row) => row.region)).toEqual(['question', 'question', 'question']);
+  });
+  it('shares deviation wording with pair reports', () => {
+    expect(deviationReason({ cause: 'strike_off_mark', lines: [2] }))
+      .toEqual(['Tự đánh gạch dòng lời giải không có nét gạch (dòng 2)', 'sản phẩm (gạch xóa)']);
   });
   it('restores an OCR split once and retains the student mathematical error verbatim', () => {
     const observed = [line('Đồ thị có', 0), line('7 đỉnh.', 1)];

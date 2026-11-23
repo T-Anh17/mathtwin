@@ -11,6 +11,20 @@ export interface MvpFailure {
 }
 const mean = (xs: number[]) => xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0;
 const ratio = (n: number, d: number) => d ? `${n}/${d} (${(n / d * 100).toFixed(1)}%)` : 'chưa đo (0 mẫu)';
+const causeText: Record<DeviationCause, [string, string]> = {
+  pending_questions: ['Còn câu hỏi chưa trả lời được', 'sản phẩm (hỏi lại)'],
+  strike_off_mark: ['Tự đánh gạch dòng lời giải không có nét gạch', 'sản phẩm (gạch xóa)'],
+  strike_merged: ['Box B gộp dòng bị gạch với dòng lời giải, dòng lời giải mất theo', 'sản phẩm (box B + gạch xóa)'],
+  region_excluded: ['Dòng học sinh bị đổi thành đề/hình (box B lệch vùng), không được hỏi', 'sản phẩm (bộ đọc + lọc vùng)'],
+  claim_line_missing: ['Dòng chứa mệnh đề không có trong chữ máy đọc', 'sản phẩm (đọc)'],
+  unclassified: ['Chưa phân loại được từ checkpoint', 'chưa rõ'],
+};
+/** Shared wording for every evaluator report that exposes a row deviation. */
+export function deviationReason(deviation: MvpRow['deviation']): [string, string] {
+  if (!deviation) return causeText.unclassified;
+  const [reason, owner] = causeText[deviation.cause];
+  return [`${reason} (dòng ${deviation.lines.join(', ') || '—'})`, owner];
+}
 export function mvpReport(date: string, rows: MvpRow[], planned: number, machine: string, failures: MvpFailure[] = []) {
   const n = rows.length;
   const count = (fn: (r: MvpRow) => boolean) => rows.filter(fn).length;
@@ -26,19 +40,6 @@ export function mvpReport(date: string, rows: MvpRow[], planned: number, machine
     return counts;
   }, new Map<string, number>());
   const taskResultChanges = rows.filter((r) => r.finalVerdict !== r.expected.verdict);
-  const causeText: Record<DeviationCause, [string, string]> = {
-    pending_questions: ['Còn câu hỏi chưa trả lời được', 'sản phẩm (hỏi lại)'],
-    strike_off_mark: ['Tự đánh gạch dòng lời giải không có nét gạch', 'sản phẩm (gạch xóa)'],
-    strike_merged: ['Box B gộp dòng bị gạch với dòng lời giải, dòng lời giải mất theo', 'sản phẩm (box B + gạch xóa)'],
-    region_excluded: ['Dòng học sinh bị đổi thành đề/hình (box B lệch vùng), không được hỏi', 'sản phẩm (bộ đọc + lọc vùng)'],
-    claim_line_missing: ['Dòng chứa mệnh đề không có trong chữ máy đọc', 'sản phẩm (đọc)'],
-    unclassified: ['Chưa phân loại được từ checkpoint', 'chưa rõ'],
-  };
-  const deviationReason = (row: MvpRow): [string, string] => {
-    if (!row.deviation) return causeText.unclassified;
-    const [reason, owner] = causeText[row.deviation.cause];
-    return [`${reason} (dòng ${row.deviation.lines.join(', ') || '—'})`, owner];
-  };
   const struckRows = sums((r) => r.strikes.onMark.length + r.strikes.offMark.length);
   const offMarkRows = sums((r) => r.strikes.offMark.length);
   const solutionRows = sums((r) => r.session.workLines.filter((l) => l.region === 'solution' || l.region === 'table').length);
@@ -79,7 +80,7 @@ ${silent.map((r) => `- ${r.id}: (${r.comparison.silentFalseCorrect ? 'i' : r.com
 
 | Bài | Truth → kết luận | Nguyên nhân chính | Thuộc |
 | --- | --- | --- | --- |
-${taskResultChanges.map((r) => { const [reason, owner] = deviationReason(r); return `| ${r.id} | ${r.expected.verdict} → ${r.finalVerdict} | ${reason} | ${owner} |`; }).join('\n') || '| Không có | — | — | — |'}
+${taskResultChanges.map((r) => { const [reason, owner] = deviationReason(r.deviation); return `| ${r.id} | ${r.expected.verdict} → ${r.finalVerdict} | ${reason} | ${owner} |`; }).join('\n') || '| Không có | — | — | — |'}
 
 Nguyên nhân được tính từ phiên cuối và phép căn dòng Lô 3.6 trên từng dòng truth mang mệnh đề, không dựa vào tên bài; thứ tự ưu tiên: còn câu hỏi → gạch không có nét → box gộp dòng gạch → dòng bị đổi thành đề/hình → dòng vắng. Lỗi của bộ mô phỏng (placeholder/dòng đang hỏi bị bỏ qua) đã sửa ở vòng 2 nên không còn trong bảng; mọi hàng trên là rủi ro sản phẩm, chỉ ghi nhận ở lô này, không tự sửa ngoài phạm vi review.
 
