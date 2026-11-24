@@ -1,6 +1,7 @@
 import { expect, it } from 'vitest';
 import { compareRead, normalizeDraft, readProblem, resizeImage, ReadDraftSchema } from '@mathtwin/reader';
-import { completionRequest, graphResult, lineResult, parseCompletion, plainLines, spottingLines } from '../src/index.js';
+import type { TextReader } from '@mathtwin/reader';
+import { completionRequest, defaultWorkLineStripConfig, graphResult, lineResult, mergeStripLines, parseCompletion, plainLines, readLinesInStrips, spottingLines } from '../src/index.js';
 import { draft, FakeVisionReader, image } from '../../reader/test/fixtures.js';
 
 const encoder = new TextEncoder();
@@ -27,6 +28,50 @@ it('requires region in B schema and measures its tokens independently from text 
   const result = lineResult(scored(text, new Map([[text.indexOf('figure'), { probability: .4 }]])), 1000, 1000);
   expect(result[0]).toMatchObject({ text: 'A', conf: .99, region: 'figure', regionConf: .4 });
   expect(JSON.stringify(completionRequest('b', 'lines', ['data:image/png;base64,AA==']))).toContain('region');
+});
+type Box = [number, number, number, number];
+const line = (text: string, conf: number, box?: Box) => ({ text, conf, alternatives: [], ...(box ? { box } : {}) });
+it('reads dense pages in horizontal bands, retries only a retryable band, and keeps the overlap copy owned by its row', async () => {
+  const calls: number[] = [];
+  // One physical line at page y 260–290 (‰) lies in the overlap of the two halves of the retried first band (cut at 270).
+  const reader: TextReader = { engine: 'fake', readLines: async (images) => {
+    const height = images[0]!.height; calls.push(height);
+    if (calls.length === 1) throw { code: 'repetition_loop' };
+    const lines = calls.length === 2 ? [line('Dòng trên', .9, [0, 100, 1000, 300]), line('Dòng trùg', .4, [0, 891.6, 1000, 994.5])]
+      : calls.length === 3 ? [line('Dòng trùng', .9, [0, 39.8, 1000, 142.7])]
+        : [line('Dòng cuối', .8, [0, 100, 1000, 200])];
+    return { lines, usage: { engine: 'fake', passes: 1, latencyMs: 1 } };
+  } };
+  const page = { width: 100, height: 2000, pixels: new Uint8ClampedArray(800_000) };
+  const result = await readLinesInStrips(reader, page, undefined, { config: defaultWorkLineStripConfig });
+  expect(calls).toHaveLength(4); expect(result.lines.map((l) => l.text)).toEqual(['Dòng trên', 'Dòng trùng', 'Dòng cuối']);
+  expect(result.lines[1]?.conf).toBe(.9); expect(result.usage.lineStrips).toEqual({ ...defaultWorkLineStripConfig, retriedBands: 1, predictedTokens: [] });
+  expect(result.lines[1]?.box?.[1]).toBeCloseTo(260, 0); expect(result.usage.lineCount).toBe(3);
+});
+const top = { top: 0, bottom: .54, ownTop: 0, ownBottom: .5 }, bottom = { top: .46, bottom: 1, ownTop: .5, ownBottom: 1 };
+it('drops a line cut by a band edge when the owning band read that row, whatever its spelling', () => {
+  expect(mergeStripLines([{ band: top, lines: [line('A', 1, [0, 100, 1000, 130]), line('d(B) =', .3, [0, 525, 1000, 540])] },
+    { band: bottom, lines: [line('d(B) = 3', .9, [0, 515, 1000, 545]), line('C', 1, [0, 700, 1000, 730])] }]).map((l) => l.text))
+    .toEqual(['A', 'd(B) = 3', 'C']);
+});
+it('keeps an overlap line the owning band missed, and lines without box in reading order', () => {
+  expect(mergeStripLines([{ band: top, lines: [line('A', 1, [0, 100, 1000, 130]), line('B', .8, [0, 510, 1000, 530])] },
+    { band: bottom, lines: [line('không box', .5), line('C', 1, [0, 700, 1000, 730])] }]).map((l) => l.text))
+    .toEqual(['A', 'B', 'không box', 'C']);
+});
+
+it('splits a truncated band once and records completion tokens for successful strips', async () => {
+  let calls = 0;
+  const reader: TextReader = { engine: 'fake', readLines: async () => {
+    calls++;
+    if (calls === 1) throw { code: 'read_failed', reason: 'truncated' };
+    return { lines: [{ text: `Dòng ${calls}`, conf: 1, alternatives: [], box: [0, 0, 10, 10] }],
+      usage: { engine: 'fake', passes: 1, latencyMs: 1,
+        serverTimings: { promptMs: 1, predictedMs: 1, promptTokens: 1, predictedTokens: calls } } };
+  } };
+  const page = { width: 100, height: 2000, pixels: new Uint8ClampedArray(800_000) };
+  const result = await readLinesInStrips(reader, page, undefined, { config: defaultWorkLineStripConfig });
+  expect(result.usage.lineStrips).toEqual({ ...defaultWorkLineStripConfig, retriedBands: 1, predictedTokens: [2, 3, 4] });
 });
 
 it('requires boxes for work lines while problem reading keeps optional boxes', () => {
@@ -109,9 +154,9 @@ it.each(['stop', 'length'])('reports repeated n-grams separately and retains fin
   expect(() => parseCompletion({ choices: [{ finish_reason, message: { content: '{"lines":[{"text":"' + 'lặp chữ '.repeat(12) } }] }, true))
     .toThrow(expect.objectContaining({ code: 'repetition_loop', reason: 'repetition_loop', finish_reason }));
 });
-it('rejects token-limited incomplete JSON without repairing it; complete JSON at length is still truncated', () => {
+it('reports token-limited JSON as truncation without confusing it for a repetition loop', () => {
   expect(() => parseCompletion({ choices: [{ finish_reason: 'length', message: { content: '{"lines":[' } }] }, true))
-    .toThrow(expect.objectContaining({ code: 'repetition_loop', finish_reason: 'length' }));
+    .toThrow(expect.objectContaining({ code: 'read_failed', reason: 'truncated', finish_reason: 'length' }));
   expect(() => parseCompletion({ choices: [{ finish_reason: 'length', message: { content: '{"lines":[]}' } }] }, true))
     .toThrow(expect.objectContaining({ reason: 'truncated' }));
   // Closed malformed JSON and braces inside strings are not an unclosed JSON loop.

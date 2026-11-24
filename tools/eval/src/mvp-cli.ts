@@ -3,6 +3,7 @@ import { readFile, mkdir, readdir, rename, writeFile, stat } from 'node:fs/promi
 import { join, resolve } from 'node:path';
 import { cpus, totalmem, platform, arch } from 'node:os';
 import { LlamaCppReader, LlamaCppReadError } from '@mathtwin/reader-llamacpp';
+import { defaultWorkLineStripConfig } from '@mathtwin/reader-llamacpp-shared';
 import { FigureReader, NoGlyphReader } from '@mathtwin/reader-figure';
 import { readProblem, compareRead } from '@mathtwin/reader';
 import type { ReadDraft, TextReader } from '@mathtwin/reader';
@@ -21,15 +22,18 @@ import type { MvpRow, MvpFailure } from './mvp-report.js';
 
 const root = resolve(process.cwd());
 const args = process.argv.slice(2);
-let date = new Date().toISOString().slice(0, 10), limit = 40, rescore = false;
+let date = new Date().toISOString().slice(0, 10), limit = 40, rescore = false, selectedIds: string[] | undefined;
 for (let i = 0; i < args.length; i++) {
   if (args[i] === '--rescore' && !rescore) { rescore = true; continue; }
   const flag = args[i], value = args[++i];
   if (flag === '--date' && /^\d{4}-\d{2}-\d{2}$/.test(value ?? '')) date = value!;
   else if (flag === '--limit' && Number.isSafeInteger(Number(value)) && Number(value) > 0 && Number(value) <= 40) limit = Number(value);
-  else throw new Error('Dùng eval:mvp [--date YYYY-MM-DD] [--limit 1..40] [--rescore]. Chạy từ gốc repo.');
+  else if (flag === '--ids' && value && /^[a-z0-9,-]+$/u.test(value)) selectedIds = [...new Set(value.split(','))];
+  else throw new Error('Dùng eval:mvp [--date YYYY-MM-DD] [--limit 1..40] [--ids id,id,…] [--rescore]. Chạy từ gốc repo.');
 }
-const config = { schema: 1, model: 'b', maxImageSide: 768, threads: 4, gpuLayers: 0, passes: 1 };
+const workReader = { contextSize: 8192, maxTokens: 3072, readTimeout: 600_000, timeoutMs: 780_000 };
+const config = { schema: 3, model: 'b', maxImageSide: 768, workLineStrips: defaultWorkLineStripConfig, workReader, threads: 4, gpuLayers: 0, passes: 1,
+  ...(selectedIds ? { selectedIds } : {}) };
 const serverPath = join(root, '.build-cache/llama-win/bin/llama-server.exe');
 const cache = join(root, 'reports/.debug', `mvp-${date}`);
 const output = join(root, 'reports', `mvp-eval-${date}`);
@@ -52,13 +56,16 @@ const previous = rescore ? await rescoreBaseline() : undefined;
 // original inference report, so an isolated worktree need not hold model files.
 const identities = previous?.identities ?? await Promise.all([serverPath, join(root, '.models/b/Qwen3VL-2B-Instruct-Q4_K_M.gguf'), join(root, '.models/b/mmproj-Qwen3VL-2B-Instruct-F16.gguf')].map(async (path) => ({ path, size: (await stat(path)).size })));
 const implementation = await Promise.all(['mvp.ts', 'mvp-oracle.ts', 'mvp-cli.ts', 'mvp-report.ts'].map((f) => readFile(join(root, 'tools/eval/src', f))));
+implementation.push(await readFile(join(root, 'packages/reader-llamacpp-shared/src/line-strips.ts')), await readFile(join(root, 'apps/mobile/src/flow/work-reading.ts')));
 const fingerprint = createHash('sha256').update(JSON.stringify({ config, identities })).update(Buffer.concat(implementation)).digest('hex');
 if (previous && (JSON.stringify(previous.config) !== JSON.stringify(config) || JSON.stringify(previous.identities) !== JSON.stringify(identities)))
   throw new Error('Chỉ chấm lại OCR bằng cùng cấu hình B và cùng tệp model/server.');
 if (rescore) await atomicJson(join(cache, `before-rescore-${fingerprint.slice(0, 12)}.json`), await readJson(output + '.json'));
 const llama = new LlamaCppReader({ model: 'b', serverPath, modelsDirectory: join(root, '.models'), threads: 4, gpuLayers: 0, maxImageSide: 768, timeoutMs: 420_000, readTimeout: 300_000 });
-const text: TextReader = { engine: llama.engine, readLines: async (images, signal) => {
-  const result = await llama.readLines(images, signal), image = images[0]!;
+const lineLlama = new LlamaCppReader({ model: 'b', serverPath, modelsDirectory: join(root, '.models'), threads: 4, gpuLayers: 0,
+  maxImageSide: config.workLineStrips.maxLongEdge, ...workReader });
+const text: TextReader = { engine: lineLlama.engine, readLines: async (images, signal, options) => {
+  const result = await lineLlama.readLines(images, signal, options), image = images[0]!;
   return { ...result, lines: result.lines.map((l) => ({ ...l, ...(l.box ? { box: l.box.map((v, axis) => v * 1000 / (axis % 2 ? image.height : image.width)) as [number, number, number, number] } : {}) })) };
 } };
 const figure = new FigureReader({ glyphReader: new NoGlyphReader() });
@@ -67,7 +74,8 @@ const readers: Readers = { text, problem: async (images, signal) => {
   for (const draft of outcome.drafts) for (const v of draft.vertices) if (v.box) v.box = v.box.map((n, axis) => n * 1000 / (axis % 2 ? images[0]!.height : images[0]!.width)) as [number, number, number, number];
   return outcome;
 }, figure: async (image, signal): Promise<ReadDraft> => (await figure.read([image], 'edges', signal)).draft };
-const samples = await loadCases(join(root, 'testdata/images-synthetic-hw'), limit);
+const allSamples = await loadCases(join(root, 'testdata/images-synthetic-hw'), selectedIds ? 40 : limit);
+const samples = selectedIds ? selectedIds.map((id) => allSamples.find((sample) => sample.id === id) ?? (() => { throw new Error(`Không có ca synthetic-hw: ${id}`); })()) : allSamples;
 const rows: MvpRow[] = [], failures: MvpFailure[] = [];
 async function failureDetails(failed: MvpFailure, sample: ImageCase, session?: Session): Promise<MvpFailure> {
   const detail: MvpFailure = { ...failed, expected: (await readJson(join(sample.directory, 'work.json')) as WorkTruth).expected };

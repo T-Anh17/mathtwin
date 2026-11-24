@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { captureImage, fileDataUrl } from './capture.js';
-import { decodeImage } from './images.js';
+import { decodeImage, rotateImageDataUrl } from './images.js';
 import { workerRunner } from './figure-suggest.js';
 import { ProblemConfirmScreen } from './ProblemConfirmScreen.js';
 import type { ProblemPhoto } from './ProblemConfirmScreen.js';
@@ -83,6 +83,17 @@ export function ProblemFlowScreen({ session: s, busy, photoStore, readers, reade
     try { await onEvent({ type: 'problem_capture', photos: [...s.problemPhotos, ref] }); }
     catch (e) { await photoStore.remove(ref.id); throw e; }
   };
+  const rotate = async (page: number) => {
+    if (!photoStore) throw { code: 'image_invalid' };
+    const old = s.problemPhotos[page]; if (!old) throw { code: 'image_invalid' };
+    const blob = await (await fetch(await photoStore.url(old.id))).blob();
+    const data = await rotateImageDataUrl(await fileDataUrl(new File([blob], 'problem', { type: blob.type })));
+    const image = (await decodeImage(data)).original;
+    const ref = await photoStore.put(blobOf(data), { width: image.width, height: image.height, page });
+    const photos = s.problemPhotos.map((item, index) => index === page ? ref : item);
+    try { await onEvent({ type: 'problem_capture', photos }); }
+    catch (error) { await photoStore.remove(ref.id); throw error; }
+  };
   const back = () => { abort.current?.abort(); onBack(); };
   const switchManual = () => { abort.current?.abort(); setWorking(false); setManual(true); };
   const banner = preview && <p className="banner" role="status">{m.preview}</p>;
@@ -104,6 +115,7 @@ export function ProblemFlowScreen({ session: s, busy, photoStore, readers, reade
     </div> : <>
       {photos.map((photo, page) => <div className="card" key={s.problemPhotos[page]?.id ?? page}>
         <img src={photo.image} alt={m.page(page)} style={{ width: '100%' }}/>
+        <button className="btn btn-outline" disabled={working || busy} onClick={() => void action(() => rotate(page))}>{m.rotate}</button>
         <button className="btn btn-outline" disabled={working || busy} onClick={() => void action(async () => {
           await onEvent({ type: 'problem_capture', photos: s.problemPhotos.filter((_, i) => i !== page).map((p, i) => ({ ...p, page: i })) });
         })}>{m.remove}</button></div>)}

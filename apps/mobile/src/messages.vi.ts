@@ -50,7 +50,7 @@ export const vi = {
     invalid_json: 'Kết quả JSON không hợp lệ.', missing_probs: 'Thiếu xác suất token; không thể tính độ tin cậy.',
     truncated: 'Kết quả bị cắt ngắn.', http_error: 'Lỗi kết nối tới model trong máy.',
     logprob_alignment: 'Không căn được xác suất token với nội dung; không thể tính độ tin cậy.',
-    repetition_loop: 'Model lặp nội dung hoặc hết token khi JSON chưa hoàn chỉnh; lượt đọc thất bại.',
+    repetition_loop: 'Model lặp nội dung; lượt đọc thất bại.',
     low_ram: 'RAM dưới ngưỡng; cần xác nhận cảnh báo trước khi chạy.', no_space: 'Máy không đủ dung lượng trống.',
     checksum: 'File sai số byte hoặc SHA-256; đã xóa file.', model_missing: 'Model chưa đủ file được kiểm tra.',
     download_failed: 'Tải gián đoạn; bấm Tải để tiếp tục.', dataset_invalid: 'Bộ đo hoặc ids.json không hợp lệ.',

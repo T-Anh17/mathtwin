@@ -30,7 +30,7 @@ describe('image pairs', () => {
     expect(pairs[0]!.lines).toMatchObject([{ text: 'Đề bài', region: 'question', page: 0 }, { text: 'A | B', region: 'table', page: 0 }]);
   });
 
-  it('runs a pair through the MVP adapter without rereading an unboxed page', async () => {
+  it('runs a pair through the MVP adapter without rereading an unboxed page after its configured bands', async () => {
     const root = await temp(), pairFolder = join(root, 'generated-01'); await mkdir(pairFolder);
     const source = resolve('testdata/images-synthetic-hw/01-elements-multigraph-dancing-perspective/1.png');
     await cp(source, join(pairFolder, 'de-1.png')); await cp(source, join(pairFolder, 'bai-1.png'));
@@ -45,7 +45,7 @@ describe('image pairs', () => {
     const outcome: ReadOutcome = { spec, graph: spec.graph, graphUncertain: [], drafts: [], issues: [], usage: { engine: 'fake', passes: 1, latencyMs: 1 } };
     const readers: Readers = { problem: async () => { problemReads++; return structuredClone(outcome); }, text: { engine: 'fake', readLines: async () => { workReads++; return { lines: [{ text: 'Có 2 đỉnh.', conf: 1, alternatives: [], region: 'solution' }], usage: { engine: 'fake', passes: 1, latencyMs: 1 } }; } } };
     const row = await runMvpPair(pair, '2026-11-23', readers, new AbortController().signal, async () => {});
-    expect(problemReads).toBe(1); expect(workReads).toBe(1); expect(row.manualRegionPages).toEqual([0]);
+    expect(problemReads).toBe(1); expect(workReads).toBe(2); expect(row.manualRegionPages).toEqual([0]);
     expect(row.session.problemPhotos).toHaveLength(1); expect(row.session.workPhotos).toHaveLength(1);
   });
 });

@@ -4,7 +4,7 @@ export const workVi = {
   previewLine: 'Đường đi ngắn nhất từ A đến C dài 5.',
   capture: 'Ảnh bài làm', manual: 'Gõ bài làm', manualHint: 'Mỗi dòng một bước, giữ đúng thứ tự em đã viết.',
   submit: 'Đọc các bước đã gõ', add: 'Chụp thêm trang', choose: 'Chọn ảnh bài làm', read: 'Đọc bài làm',
-  remove: 'Xóa trang', up: 'Đưa trang lên trước', down: 'Đưa trang xuống sau',
+  remove: 'Xóa trang', rotate: 'Xoay ảnh 90°', up: 'Đưa trang lên trước', down: 'Đưa trang xuống sau',
   page: (page: number) => `Trang bài làm ${page + 1}`,
   progress: (page: number, total: number) => `Đang đọc trang bài làm ${page + 1}/${total}`,
   missingReader: 'Bộ đọc B chưa tải. Tải trong Cài đặt hoặc gõ bài làm.',

@@ -3,7 +3,7 @@ import { Capacitor } from '@capacitor/core';
 import { vocabularyOf, validWorkBox } from '@mathtwin/work';
 import type { WorkBox } from '@mathtwin/work';
 import { captureImage, fileDataUrl } from './capture.js';
-import { decodeImage } from './images.js';
+import { decodeImage, rotateImageDataUrl } from './images.js';
 import { Topbar } from './product-ui.js';
 import { WorkScreen } from './WorkScreen.js';
 import { ResultScreen } from './ResultScreen.js';
@@ -98,6 +98,17 @@ export function WorkFlowScreen({ session: s, busy, photoStore, readers, readerRe
     if (to !== undefined && item) photos.splice(to, 0, item);
     await onEvent({ type: 'work_capture_photos', photos });
   });
+  const rotate = async (index: number) => {
+    if (!photoStore) throw { code: 'image_invalid' };
+    const old = s.workPhotos[index]; if (!old) throw { code: 'image_invalid' };
+    const blob = await (await fetch(await photoStore.url(old.id))).blob();
+    const data = await rotateImageDataUrl(await fileDataUrl(new File([blob], 'work', { type: blob.type })));
+    const image = (await decodeImage(data)).original;
+    const ref = await photoStore.put(blobOf(data), { width: image.width, height: image.height, page: index });
+    const photos = s.workPhotos.map((item, page) => page === index ? ref : item);
+    try { await onEvent({ type: 'work_capture_photos', photos }); }
+    catch (error) { await photoStore.remove(ref.id); throw error; }
+  };
   const banner = <><p className="text-xs muted">{sessionVi.stages[s.stage]}</p>{preview && <p className="banner" role="status">{problemVi.preview}</p>}</>;
   const alert = error && <p className="banner banner-error" role="alert">{error}</p>;
   if (showSolution) return <SolutionScreen session={s} busy={busy || working} onBack={() => setShowSolution(false)} onWork={(source) => {
@@ -163,6 +174,7 @@ export function WorkFlowScreen({ session: s, busy, photoStore, readers, readerRe
     </div> : <>
       {photos.map((photo, index) => <div className="card" key={s.workPhotos[index]?.id ?? index}>
         <img src={photo.image} alt={m.page(index)} style={{ width: '100%' }}/><div className="work-buttons">
+          <button className="btn btn-outline" disabled={busy || working} onClick={() => void action(() => rotate(index))}>{m.rotate}</button>
           <button className="btn btn-outline" disabled={busy || working} onClick={() => editPages(index)}>{m.remove}</button>
           <button className="btn btn-outline" aria-label={m.up} disabled={!index || busy || working} onClick={() => editPages(index, index - 1)}>↑</button>
           <button className="btn btn-outline" aria-label={m.down} disabled={index === photos.length - 1 || busy || working} onClick={() => editPages(index, index + 1)}>↓</button>

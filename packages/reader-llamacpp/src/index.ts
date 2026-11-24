@@ -19,7 +19,15 @@ interface CommonOptions {
   contextSize?: number; maxTokens?: number; timeoutMs?: number; startupTimeoutMs?: number;
   threads?: number; maxImageSide?: number; maxLongEdge?: number; readTimeout?: number; dry?: DryConfig; alternativesThreshold?: number;
   paddleTextMode?: 'spotting' | 'ocr';
+  diagnostics?: (event: LlamaDiagnosticEvent) => void;
 }
+export type LlamaDiagnosticEvent =
+  | { type: 'server_stderr'; elapsedMs: number; text: string }
+  | { type: 'server_exit'; elapsedMs: number }
+  | { type: 'request_start'; elapsedMs: number; path: string }
+  | { type: 'response'; elapsedMs: number; path: string; status: number }
+  | { type: 'request_error'; elapsedMs: number; path: string; name: string; message: string; code?: string }
+  | { type: 'internal_error'; elapsedMs: number; name: string; message: string; code?: string };
 export type LlamaCppOptions = CommonOptions & (
   { serverPath: string; serverUrl?: never; apiKey?: never }
   | { serverUrl: string; apiKey: string; serverPath?: never }
@@ -42,6 +50,15 @@ export function privateServerUrl(value: string): string {
 }
 function abortError(): LlamaCppReadError { return new LlamaCppReadError('read_failed', 'aborted'); }
 function checkAbort(signal?: AbortSignal): void { if (signal?.aborted) throw abortError(); }
+function errorDiagnostic(error: unknown): { name: string; message: string; code?: string } {
+  if (!(error instanceof Error)) return { name: 'Error', message: String(error) };
+  const code = 'code' in error && typeof error.code === 'string' ? error.code : undefined;
+  return { name: error.name, message: error.message, ...(code === undefined ? {} : { code }) };
+}
+function retryableStartupError(error: unknown): boolean {
+  return error instanceof TypeError || (error !== null && typeof error === 'object' && 'code' in error
+    && (error.code === 'ECONNREFUSED' || error.code === 'ECONNRESET' || error.code === 'EPIPE'));
+}
 async function cancellable<T>(action: () => Promise<T>, signal: AbortSignal): Promise<T> {
   let listener: (() => void) | undefined;
   try {
@@ -74,7 +91,7 @@ export class LlamaCppReader implements VisionReader, TextReader {
     this.options = { modelsDirectory: fileURLToPath(new URL('../../../.models/', import.meta.url)),
       gpuLayers: 0, mmprojGpu: false, contextSize: 8192, maxTokens: defaultMaxTokens, timeoutMs: imageTimeout(readTimeout), startupTimeoutMs: 120_000,
       threads: availableParallelism(), alternativesThreshold: 0.1, paddleTextMode: 'spotting', ...options,
-      readTimeout, maxImageSide, maxLongEdge: maxImageSide, dry: { ...(options.dry ?? defaultDry) } };
+      readTimeout, maxImageSide, maxLongEdge: maxImageSide, dry: { ...(options.dry ?? defaultDry) }, diagnostics: options.diagnostics ?? (() => {}) };
     const o = this.options;
     validateDry(o.dry);
     if (![o.contextSize, o.maxTokens, o.timeoutMs, o.readTimeout, o.startupTimeoutMs, o.threads, o.maxImageSide].every((n) => Number.isSafeInteger(n) && n > 0 && n <= 2_147_483_647)
@@ -116,6 +133,7 @@ export class LlamaCppReader implements VisionReader, TextReader {
     const start = performance.now(), timeout = AbortSignal.timeout(this.options.timeoutMs + this.options.readTimeout * Math.max(0, images.length - 1)), lifetime = new AbortController();
     const combined = AbortSignal.any([timeout, lifetime.signal, ...(signal ? [signal] : [])]);
     let child: ReturnType<LlamaRuntime['start']> | undefined;
+    let unsubscribeStderr: (() => void) | undefined;
     let startup: AbortSignal | undefined;
     try {
       if (!images.length) throw new LlamaCppReadError('read_failed', 'invalid_json');
@@ -137,14 +155,25 @@ export class LlamaCppReader implements VisionReader, TextReader {
           '--host', '127.0.0.1', '--port', String(port), '--gpu-layers', String(this.options.gpuLayers),
           '--ctx-size', String(this.options.contextSize), '--parallel', '1', '--threads', String(this.options.threads),
           '--offline', '--no-webui', '--api-key', apiKey, ...(this.options.mmprojGpu ? [] : ['--no-mmproj-offload'])]);
+        unsubscribeStderr = child.onStderr?.((text) => this.options.diagnostics({ type: 'server_stderr', elapsedMs: performance.now() - start, text }));
+        void child.exited.then(() => this.options.diagnostics({ type: 'server_exit', elapsedMs: performance.now() - start }));
         base = `http://127.0.0.1:${port}`;
       }
-      const request = (path: string, body?: unknown, requestSignal = combined): Promise<Response> =>
-        cancellable(() => this.runtime.fetch(`${base}${path}`, { method: body === undefined ? 'GET' : 'POST',
+      const request = async (path: string, body?: unknown, requestSignal = combined): Promise<Response> => {
+        this.options.diagnostics({ type: 'request_start', elapsedMs: performance.now() - start, path });
+        try {
+          const response = await cancellable(() => this.runtime.fetch(`${base}${path}`, { method: body === undefined ? 'GET' : 'POST',
           headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
           ...(body === undefined ? {} : { body: JSON.stringify(body), keepalive: false,
             headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json', Connection: 'close' } }),
           signal: requestSignal, redirect: 'error' }), requestSignal);
+          this.options.diagnostics({ type: 'response', elapsedMs: performance.now() - start, path, status: response.status });
+          return response;
+        } catch (error) {
+          this.options.diagnostics({ type: 'request_error', elapsedMs: performance.now() - start, path, ...errorDiagnostic(error) });
+          throw error;
+        }
+      };
       const metrics: (ServerTimings | undefined)[] = [];
       const finishes: string[] = [];
       const work = async (): Promise<T> => {
@@ -159,7 +188,7 @@ export class LlamaCppReader implements VisionReader, TextReader {
             if (response.status !== 503) throw new LlamaCppReadError('read_failed', 'http_error');
           } catch (error) {
             readiness.throwIfAborted();
-            if (!(error instanceof TypeError)) throw error;
+            if (!retryableStartupError(error)) throw error;
           }
           await delay(100, undefined, { signal: readiness });
         }
@@ -194,12 +223,14 @@ export class LlamaCppReader implements VisionReader, TextReader {
       }
       return { ...result, usage };
     } catch (error) {
+      this.options.diagnostics({ type: 'internal_error', elapsedMs: performance.now() - start, ...errorDiagnostic(error) });
       if (signal?.aborted) throw abortError();
       if (timeout.aborted || startup?.aborted) throw new LlamaCppReadError('read_failed', 'timeout');
       if (error instanceof LlamaCppReadError) throw error;
       throw new LlamaCppReadError('read_failed');
     } finally {
       lifetime.abort();
+      unsubscribeStderr?.();
       try { await child?.stop(); }
       catch { throw new LlamaCppReadError('read_failed', 'server_exit'); }
       finally { this.active = false; }

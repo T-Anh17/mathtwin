@@ -11,11 +11,11 @@ function nativeChild() {
   return child;
 }
 
-it('launches the direct child without a shell, visible window or content logs and waits for close', async () => {
+it('launches the direct child without a shell or visible window and waits for close', async () => {
   const child = nativeChild();
   const process = nodeRuntime.start('D:/fixture/llama-server.exe', ['--host', '127.0.0.1']);
   expect(spawnMock).toHaveBeenCalledWith('D:/fixture/llama-server.exe', ['--host', '127.0.0.1'],
-    { shell: false, windowsHide: true, stdio: 'ignore' });
+    { shell: false, windowsHide: true, stdio: ['ignore', 'ignore', 'pipe'] });
   const stopped = process.stop();
   expect(child.kill).toHaveBeenCalledOnce();
   child.emit('close', 0);

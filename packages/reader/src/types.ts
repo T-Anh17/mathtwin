@@ -19,6 +19,8 @@ export interface ReadUsage {
   detectionMs?: number;
   recognitionMs?: number;
   lineMs?: number[];
+  /** Audit of deterministic horizontal bands used for a dense handwritten page. */
+  lineStrips?: { bands: number; overlap: number; maxLongEdge: number; retriedBands: number; predictedTokens: number[] };
 }
 export type ReadUncertainty = NonNullable<ProblemSpec['uncertain']>[number];
 export interface ReadOutcome {

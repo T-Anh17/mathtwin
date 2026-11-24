@@ -4,7 +4,7 @@ import { sessionVi } from './flow/messages.vi.js';
 
 export const problemVi = {
   capture: 'Ảnh đề bài', confirm: 'Chờ xác nhận đề', manual: 'Nhập tay đề', add: 'Chụp thêm ảnh', choose: 'Chọn ảnh',
-  read: 'Đọc đề', cancel: 'Hủy đọc', resume: 'Tiếp tục đọc', retry: 'Thử lại', remove: 'Xóa ảnh',
+  read: 'Đọc đề', cancel: 'Hủy đọc', resume: 'Tiếp tục đọc', retry: 'Thử lại', remove: 'Xóa ảnh', rotate: 'Xoay ảnh 90°',
   missing: 'Bộ đọc B chưa tải. Tải trong Cài đặt hoặc nhập tay đề.', settings: 'Mở Cài đặt',
   preview: 'Bản xem thử dùng bộ đọc giả lập. Kết quả dưới đây là dữ liệu mô phỏng, không phải nội dung ảnh.',
   speed: 'Bộ đọc B khoảng 2 GB; số đo cũ khoảng 49 giây/trang trên điện thoại mạnh, vượt mục tiêu 15 giây.',

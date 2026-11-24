@@ -20,22 +20,6 @@ function repetitionLoop(text: string): boolean {
   }
   return false;
 }
-function unclosedJson(text: string): boolean {
-  const stack: string[] = [];
-  let quoted = false, escaped = false;
-  for (const char of text) {
-    if (quoted) {
-      if (escaped) escaped = false;
-      else if (char === '\\') escaped = true;
-      else if (char === '"') quoted = false;
-    } else if (char === '"') quoted = true;
-    else if (char === '{' || char === '[') stack.push(char);
-    else if (char === '}' || char === ']') {
-      if (stack.pop() !== (char === '}' ? '{' : '[')) return false;
-    }
-  }
-  return quoted || stack.length > 0;
-}
 /** Read metadata before parsing so failed device records retain the server finish reason. */
 export function completionFinishReason(raw: unknown): string | undefined {
   if (!raw || typeof raw !== 'object' || !('choices' in raw) || !Array.isArray(raw.choices)) return;
@@ -72,8 +56,10 @@ function parseResponse(raw: unknown, expectsJson: boolean): Completion {
   const choice = object(body.choices[0]);
   const text = choice.message && typeof choice.message === 'object' ? object(choice.message).content : undefined;
   const finish = typeof choice.finish_reason === 'string' ? choice.finish_reason : undefined;
-  if (typeof text === 'string' && (repetitionLoop(text)
-    || (finish === 'length' && (expectsJson || /^[\s]*[\[{]/.test(text)) && unclosedJson(text)))) return failed('repetition_loop', finish);
+  // llama.cpp uses finish_reason=length both for an actual repeated completion
+  // and for ordinary JSON that simply exhausted its token budget. Only content
+  // establishes a loop; an unclosed JSON document is otherwise truncation.
+  if (typeof text === 'string' && repetitionLoop(text)) return failed('repetition_loop', finish);
   if (finish !== 'stop') return failed('truncated', finish);
   if (typeof text !== 'string' || !text.trim()) return failed('invalid_json');
   if (!choice.logprobs || typeof choice.logprobs !== 'object') return failed('missing_probs');

@@ -1,6 +1,8 @@
 import { detectMissingLines, filterWorkRegions, readWork, validWorkBox, validWorkLineBox, suggestWorkRegion } from '@mathtwin/work';
 import type { WorkBox, WorkLine, WorkVocabulary } from '@mathtwin/work';
 import type { PreparedImage, TextReader } from '@mathtwin/reader';
+import { defaultWorkLineStripConfig, withLineStrips } from '@mathtwin/reader-llamacpp-shared';
+import type { LineStripAudit, LineStripConfig } from '@mathtwin/reader-llamacpp-shared';
 import { checkImage, readingTask } from './reading.js';
 
 export interface WorkPageRead {
@@ -10,6 +12,7 @@ export interface WorkPageRead {
   missingLineCheckUnavailable?: boolean;
   suggestedRegion?: WorkBox;
   failed?: boolean;
+  lineStrips?: LineStripAudit;
 }
 
 export function processWorkPage(image: PreparedImage, reading: WorkPageRead, region?: WorkBox): WorkPageRead {
@@ -31,7 +34,7 @@ export function processWorkPage(image: PreparedImage, reading: WorkPageRead, reg
 
 /** When OCR supplied no boxes, reread the user's crop instead of guessing which text it contains. */
 export async function readWorkRegion(image: PreparedImage, reading: WorkPageRead, region: WorkBox, reader: TextReader,
-  vocab: WorkVocabulary, signal: AbortSignal): Promise<WorkPageRead> {
+  vocab: WorkVocabulary, signal: AbortSignal, stripConfig: LineStripConfig = defaultWorkLineStripConfig): Promise<WorkPageRead> {
   signal.throwIfAborted();
   if (!validWorkBox(region)) throw new Error('Invalid solution region.');
   if (reading.raw.every((l) => l.box && validWorkLineBox(l.box))) return processWorkPage(image, reading, region);
@@ -40,7 +43,7 @@ export async function readWorkRegion(image: PreparedImage, reading: WorkPageRead
   const width = right - left, height = bottom - top, pixels = new Uint8ClampedArray(width * height * 4);
   for (let y = 0; y < height; y++) pixels.set(image.pixels.subarray(((top + y) * image.width + left) * 4, ((top + y) * image.width + right) * 4), y * width * 4);
   const started = performance.now();
-  const read = await readingTask((signal) => readWork([{ pixels, width, height }], { reader, vocab, signal, continuation: reading.page > 0 }), signal);
+  const read = await readingTask((signal) => readWork([{ pixels, width, height }], { reader: withLineStrips(reader, stripConfig), vocab, signal, continuation: reading.page > 0 }), signal, stripReadTimeout(stripConfig));
   const cropLines = read.lines.map(({ box, ...l }): WorkLine => ({ ...l, page: reading.page, ...(box && validWorkLineBox(box) ? {
     box: [(left + box[0] * width / 1000) / image.width * 1000, (top + box[1] * height / 1000) / image.height * 1000,
       (left + box[2] * width / 1000) / image.width * 1000, (top + box[3] * height / 1000) / image.height * 1000],
@@ -51,8 +54,12 @@ export async function readWorkRegion(image: PreparedImage, reading: WorkPageRead
     && !cropLines.some((c) => c.text.trim() === l.text.trim()));
   const raw = [...cropLines, ...retained].map((l, index) => ({ ...l, index }));
   signal.throwIfAborted();
-  return processWorkPage(image, { ...reading, raw, missingLineCheckUnavailable: raw.some((l) => !l.box), ms: reading.ms + performance.now() - started }, region);
+  return processWorkPage(image, { ...reading, raw, missingLineCheckUnavailable: raw.some((l) => !l.box), ms: reading.ms + performance.now() - started,
+    ...(read.usage.lineStrips ? { lineStrips: read.usage.lineStrips } : {}) }, region);
 }
+
+/** One 180 s page budget per band: a dense page read in K bands may legitimately take K reads (a retried band splits within its budget). */
+export function stripReadTimeout(config: LineStripConfig): number { return 180_000 * config.bands; }
 
 /** Normalized TextReader boundary. Every page is durable before starting the next. */
 export async function readWorkPages(options: {
@@ -60,6 +67,7 @@ export async function readWorkPages(options: {
   load: (page: number) => Promise<PreparedImage>; saved?: WorkPageRead[];
   figures?: (image: PreparedImage, signal: AbortSignal) => Promise<WorkBox[]>;
   progress: (page: number) => void; checkpoint: (page: WorkPageRead) => Promise<void>; now?: () => number; timeoutMs?: number;
+  stripConfig?: LineStripConfig;
 }): Promise<boolean> {
   const { signal } = options, now = options.now ?? (() => performance.now());
   for (let page = 0; page < options.count; page++) {
@@ -77,7 +85,8 @@ export async function readWorkPages(options: {
     }
     if (saved && !saved.failed) { await options.checkpoint(processWorkPage(image, saved, saved.region)); continue; }
     let result: Awaited<ReturnType<typeof readWork>>;
-    try { result = await readingTask((signal) => readWork([image], { reader: options.reader, vocab: options.vocab, signal, continuation: page > 0 }), signal, options.timeoutMs); }
+    try { result = await readingTask((signal) => readWork([image], { reader: withLineStrips(options.reader, options.stripConfig ?? defaultWorkLineStripConfig), vocab: options.vocab, signal, continuation: page > 0 }),
+      signal, options.timeoutMs ?? stripReadTimeout(options.stripConfig ?? defaultWorkLineStripConfig)); }
     catch (error) {
       signal.throwIfAborted();
       await options.checkpoint({ ...saved, page, raw: saved?.raw ?? [], lines: saved?.lines ?? [], ms: now() - started, needsRegion: true, inspected: false, failed: true });
@@ -85,7 +94,8 @@ export async function readWorkPages(options: {
     }
     const raw = result.lines.map((l) => ({ ...l, page }));
     // Save OCR even if optional geometry or missing-line inspection fails afterwards.
-    const reading: WorkPageRead = { page, raw, lines: raw, ms: now() - started, needsRegion: true };
+    const reading: WorkPageRead = { page, raw, lines: raw, ms: now() - started, needsRegion: true,
+      ...(result.usage.lineStrips ? { lineStrips: result.usage.lineStrips } : {}) };
     await options.checkpoint(reading);
     signal.throwIfAborted();
     if (options.figures) {

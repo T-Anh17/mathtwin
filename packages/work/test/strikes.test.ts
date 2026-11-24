@@ -86,7 +86,8 @@ describe('strike confirmation and reading', () => {
     const c = canvas(); c.glyphs(); c.stroke(36, 45, 256, 43);
     const clean = canvas(); clean.glyphs();
     const reader: TextReader = { engine: 'fake', readLines: vi.fn(async () => ({ lines: [{ ...c.line(), struck: true }],
-      usage: { engine: 'fake', passes: 1, latencyMs: 2, peakMemoryMb: 3, sentImages: [], finish_reason: ['stop'], lineMs: [1] } })) };
+      usage: { engine: 'fake', passes: 1, latencyMs: 2, peakMemoryMb: 3, sentImages: [], finish_reason: ['stop'], lineMs: [1],
+        lineStrips: { bands: 2, overlap: .08, maxLongEdge: 1024, retriedBands: 1, predictedTokens: [400, 3072] } } })) };
     const signal = new AbortController().signal;
     vi.stubGlobal('process', undefined); vi.stubGlobal('Buffer', undefined);
     let output: Awaited<ReturnType<typeof readWork>>;
@@ -95,7 +96,8 @@ describe('strike confirmation and reading', () => {
     expect(output.lines.map((l) => [l.page, l.index, l.struck])).toEqual([[0, 0, true], [1, 1, false]]);
     expect(output.parsed.ignored).toContainEqual({ line: 0, reason: 'struck' });
     expect(output.parsed.steps.every((s) => !s.lines.includes(0))).toBe(true);
-    expect(output.usage).toMatchObject({ passes: 2, latencyMs: 4, lineCount: 2, peakMemoryMb: 3, lineMs: [1, 1], finish_reason: ['stop', 'stop'] });
+    expect(output.usage).toMatchObject({ passes: 2, latencyMs: 4, lineCount: 2, peakMemoryMb: 3, lineMs: [1, 1], finish_reason: ['stop', 'stop'],
+      lineStrips: { bands: 2, overlap: .08, maxLongEdge: 1024, retriedBands: 2, predictedTokens: [400, 3072, 400, 3072] } });
     expect(reader.readLines).toHaveBeenNthCalledWith(2, [clean.image], signal, { continuation: true });
   });
   it('propagates abort and reader failures and accepts no pages', async () => {

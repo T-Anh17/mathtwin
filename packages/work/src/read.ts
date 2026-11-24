@@ -22,6 +22,11 @@ Promise<{ lines: WorkLine[]; parsed: ParsedWork; usage: ReadUsage }> {
     if (read.usage.lineMs) usage.lineMs = [...usage.lineMs ?? [], ...read.usage.lineMs];
     if (read.usage.sentImages) usage.sentImages = [...usage.sentImages ?? [], ...read.usage.sentImages];
     if (read.usage.finish_reason) usage.finish_reason = [...usage.finish_reason ?? [], ...read.usage.finish_reason];
+    if (read.usage.lineStrips) {
+      const strips = read.usage.lineStrips, prior = usage.lineStrips;
+      usage.lineStrips = { ...strips, retriedBands: (prior?.retriedBands ?? 0) + strips.retriedBands,
+        predictedTokens: [...prior?.predictedTokens ?? [], ...strips.predictedTokens] };
+    }
     if (read.usage.serverTimings) {
       const total = usage.serverTimings ?? { promptMs: 0, predictedMs: 0, promptTokens: 0, predictedTokens: 0 };
       for (const key of ['promptMs', 'predictedMs', 'promptTokens', 'predictedTokens'] as const) total[key] += read.usage.serverTimings[key];

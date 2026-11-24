@@ -5,7 +5,7 @@ import type { PreparedImage, TextReader } from '@mathtwin/reader';
 import type { ProblemSpec } from '@mathtwin/core';
 import type { WorkLine } from '@mathtwin/work';
 import { vocabularyOf } from '@mathtwin/work';
-import { readWorkPages, processWorkPage, readWorkRegion, ignoredWorkLines } from '../src/flow/work-reading.js';
+import { readWorkPages, processWorkPage, readWorkRegion, ignoredWorkLines, stripReadTimeout } from '../src/flow/work-reading.js';
 import type { WorkPageRead } from '../src/flow/work-reading.js';
 import { createSession, sessionReducer as reduce } from '../src/flow/sessionReducer.js';
 import { createMemoryData, createMemoryStorage } from '../src/storage/memory.js';
@@ -228,4 +228,9 @@ it('renders uncertainty, local issues, accurate question reasons, empty missing 
   expect(labels).not.toMatch(/\b(?:e1|v3)\b/);
   const region = renderToStaticMarkup(createElement(RegionPicker, { photo: { image: 'blob:local', width: 100, height: 200 }, busy: false, onDone: noop }));
   expect(region).toContain(`aria-label="${workVi.regionLabel}"`); expect(region).toContain('type="number"');
+});
+
+it('gives a dense work page one 180 s budget per band instead of one per page', () => {
+  expect(stripReadTimeout({ bands: 2, overlap: .08, maxLongEdge: 1024 })).toBe(360_000);
+  expect(stripReadTimeout({ bands: 1, overlap: 0, maxLongEdge: 1024 })).toBe(180_000);
 });

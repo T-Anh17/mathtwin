@@ -6,6 +6,7 @@ import { Benchmark, engineFor } from './benchmark.js';
 import { decodeImage } from './images.js';
 import { mobile, transport } from './native.js';
 import { workerRunner } from './figure-suggest.js';
+import { defaultWorkLineStripConfig } from '@mathtwin/reader-llamacpp-shared';
 
 function encode(image: PreparedImage): string {
   const canvas = document.createElement('canvas'); canvas.width = image.width; canvas.height = image.height;
@@ -37,7 +38,8 @@ export function createProblemReaders(benchmark: Pick<Benchmark, 'run'>, lifecycl
     await activity(true);
     try {
       const result = await benchmark.run({ id: 'problem', dataUrl: encodeImage(images[0]!), imageSource: 'gallery' },
-        { model: 'b', passes: 1, mode, threads: 4, minRamGb: 6, allowLowRam: false, backgroundIdleMinutes: 5 }, signal, textOptions);
+        { model: 'b', passes: 1, mode, threads: 4, minRamGb: 6, allowLowRam: false, backgroundIdleMinutes: 5,
+          ...(mode === 'lines' ? { maxImageSide: defaultWorkLineStripConfig.maxLongEdge, maxTokens: 3072, readTimeout: 600_000 } : {}) }, signal, textOptions);
       if (result.errorCode) throw { code: result.errorCode };
       return result;
     } finally { await activity(false); }

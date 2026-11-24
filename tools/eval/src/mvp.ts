@@ -300,7 +300,7 @@ export async function runMvpSample(input: MvpInput) {
   }
   if (session.stage === 'work_reading') {
     await readWorkPages({ count: workImages.length, reader: readers.text, vocab: vocabularyOf(session.spec), signal, load: async (page) => workImages[page]!,
-      saved: session.workPages ?? [], timeoutMs: 420_000, progress: () => {},
+      saved: session.workPages ?? [], timeoutMs: 1_920_000, progress: () => {},
       checkpoint: async (reading) => { send({ type: 'work_page', reading }); await input.checkpoint(session); } });
   }
   let regionQuestions = input.prior?.regionQuestions ?? 0;

@@ -124,13 +124,13 @@ describe('Android benchmark flow with fake native plugin (no device/model/networ
     expect(result.config).toMatchObject({ maxImageSide, readTimeout: 450_000, maxTokens: 1024 });
     expect(result.usage.sentImages?.[0]?.maxImageSide).toBe(maxImageSide);
   });
-  it.each(['graph', 'lines'] as const)('retains repetition_loop and finish_reason through failed %s runs and export', async (mode) => {
+  it.each(['graph', 'lines'] as const)('retains truncation and finish_reason through failed %s runs and export', async (mode) => {
     const { runner, http } = fake();
     mock.mocked(http.post).mockResolvedValue({ status: 200, data: { choices: [{ finish_reason: 'length', message: { content: '{"lines":[' } }] } });
     const result = await runner.run(image, { ...config, mode }, signal());
-    expect(result.errorCode).toBe('repetition_loop'); expect(result.linePasses ?? []).toEqual([]);
+    expect(result.errorCode).toBe('truncated'); expect(result.linePasses ?? []).toEqual([]);
     expect(result.usage).toMatchObject({ finish_reason: ['length'], sentImages: [{ maxImageSide: 768 }] });
-    expect(JSON.parse(exportReport({ version: 1, device, results: [result] }))).toMatchObject({ results: [{ errorCode: 'repetition_loop', usage: { finish_reason: ['length'] } }] });
+    expect(JSON.parse(exportReport({ version: 1, device, results: [result] }))).toMatchObject({ results: [{ errorCode: 'truncated', usage: { finish_reason: ['length'] } }] });
   });
   it('runs a stripped-fence response end-to-end with measured confidence', async () => {
     const { runner, http } = fake();

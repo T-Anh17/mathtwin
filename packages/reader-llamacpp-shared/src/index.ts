@@ -6,3 +6,5 @@ export { LlamaCppReadError } from './errors.js';
 export type { LlamaFailureReason } from './errors.js';
 export { parseCompletion, glyphResult, completionFinishReason, graphResult, lineResult, plainLines, spottingLines, normalizedBox, valueConfidence } from './response.js';
 export type { Completion, ScoredToken, TokenAlternative } from './response.js';
+export { defaultWorkLineStripConfig, validateLineStripConfig, mergeStripLines, readLinesInStrips, withLineStrips } from './line-strips.js';
+export type { LineStripConfig, LineStripAudit, StripBand } from './line-strips.js';

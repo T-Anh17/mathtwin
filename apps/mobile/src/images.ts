@@ -25,3 +25,17 @@ export async function decodeImage(dataUrl: string, maxImageSide = defaultMaxImag
   canvas.width = 0; canvas.height = 0;
   return { original, resized, encoded };
 }
+
+/** Persisted rotation, never an inferred orientation: subsequent reading uses this exact bitmap. */
+export async function rotateImageDataUrl(dataUrl: string): Promise<string> {
+  const decoded = await decodeImage(dataUrl);
+  const { width, height, pixels } = decoded.original;
+  const canvas = document.createElement('canvas'); canvas.width = height; canvas.height = width;
+  const ctx = canvas.getContext('2d'); if (!ctx) throw { code: 'image_invalid' };
+  const source = document.createElement('canvas'); source.width = width; source.height = height;
+  const sourceCtx = source.getContext('2d'); if (!sourceCtx) throw { code: 'image_invalid' };
+  sourceCtx.putImageData(new ImageData(new Uint8ClampedArray(pixels), width, height), 0, 0);
+  ctx.translate(height, 0); ctx.rotate(Math.PI / 2); ctx.drawImage(source, 0, 0);
+  const result = canvas.toDataURL('image/png'); source.width = 0; source.height = 0; canvas.width = 0; canvas.height = 0;
+  return result;
+}
