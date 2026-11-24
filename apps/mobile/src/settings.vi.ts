@@ -1,5 +1,5 @@
 export const settingsVi = {
-  models: 'Bộ đọc trên máy', a: 'A · PaddleOCR-VL-1.5', b: 'B · Qwen3-VL-2B · bộ đọc chính',
+  models: 'Bộ đọc trên máy', b: 'B · Qwen3-VL-2B · bộ đọc chính',
   d: 'D · Nháp hình đồ thị, không cần tải model',
   downloaded: 'Đã tải và kiểm tra SHA-256', missing: 'Chưa tải đủ hoặc chưa được kiểm tra',
   download: 'Tải', remove: 'Xóa model', cancel: 'Hủy tải', sha: 'SHA-256 dự kiến',
