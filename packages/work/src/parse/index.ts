@@ -4,6 +4,7 @@ import { workMessages } from '../messages.vi.js';
 import { parsePrimary } from './primary.js';
 import { tableLike, validTableReading } from './table.js';
 import { strikeUncertain } from '../strikes.js';
+import { lostDiacritics } from '../diacritics.js';
 
 const bodyOf = ({ step: _step, raw: _raw, conf: _conf, box: _box, ...body }: ParsedStep['claim']): ClaimBody => body;
 const key = (step: ParsedStep): string => step.lines.join(',');
@@ -11,7 +12,15 @@ const equalBody = (a: ClaimBody, b: ClaimBody): boolean => JSON.stringify(a) ===
 
 export function parseWork(lines: WorkLine[], vocab: WorkVocabulary, opts?: { confThreshold?: number }): ParsedWork {
   const threshold = opts?.confThreshold ?? 0.85;
-  const selected = lines.map((line) => ({ ...line, text: line.text.normalize('NFC') }));
+  // Complete accent loss in OCR text is a doubtful reading (rule 6): drop the
+  // per-character scores and cap conf, so it is asked as 'reading' and can never
+  // become silent prose or evidence for ĐÚNG. User-confirmed text is exempt.
+  const selected = lines.map((line): WorkLine => {
+    const text = line.text.normalize('NFC');
+    if (line.textConfirmed || !lostDiacritics(text, vocab)) return { ...line, text };
+    const { charConf: _charConf, ...withoutScores } = line;
+    return { ...withoutScores, text, conf: Math.min(line.conf, threshold - 0.01) };
+  });
   const protectedLines = new Set(lines.some((line) => line.alternatives.length)
     ? parsePrimary(selected, vocab, opts).ignored.filter((item) => ['question', 'figure', 'struck'].includes(item.reason)).map((item) => item.line) : []);
   const replace = (position: number, text: string): WorkLine[] => selected.map((line, i) => i === position ? { ...line, text } : line);

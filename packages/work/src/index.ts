@@ -1,5 +1,6 @@
 export type * from './types.js';
 export { vocabularyOf } from './vocabulary.js';
+export { lostDiacritics, inspectLostDiacritics } from './diacritics.js';
 export { compareWork, claimKey } from './compare.js';
 export { parseWork } from './parse/index.js';
 export { gradeWork } from './grade.js';
