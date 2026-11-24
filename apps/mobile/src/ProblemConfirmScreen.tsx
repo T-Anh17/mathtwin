@@ -15,6 +15,13 @@ import { sessionVi } from './flow/messages.vi.js';
 import type { GraphLayout } from './flow/types.js';
 
 export interface ProblemPhoto { image: string; width: number; height: number }
+function hasBlankRequiredTaskParameter(task: ProblemSpec['task']): boolean {
+  switch (task.type) {
+    case 'path': case 'shortest_path': return !task.from.trim() || !task.to.trim();
+    case 'postman': return !task.start.trim();
+    default: return false;
+  }
+}
 function GraphReadPreview({ spec }: { spec: ProblemSpec }) {
   const editor = editorFromGraph(spec.graph);
   return <svg viewBox="0 0 400 400" role="img" aria-label={m.graph} className="problem-graph">
@@ -35,12 +42,13 @@ export function ProblemConfirmScreen({ outcome, pages = [], photos, manual, busy
   const [inputs, setInputs] = useState<Record<string, string>>({});
   const [error, setError] = useState('');
   const suggestion = outcome ? taskSuggestion(outcome) : null;
+  const canAcceptSuggestion = Boolean(suggestion?.task) && !taskReviewed && !hasBlankRequiredTaskParameter(spec.task);
   const questions = confirmationQuestions({ ...(outcome ?? { graph: null, graphUncertain: [], drafts: [], issues: [], usage: { engine: '', passes: 0, latencyMs: 0 } }), spec });
   const answer = (item: string, value: unknown) => {
     try { setSpec(applyConfirmation(spec, { [item]: value })); setError(''); } catch { setError(m.invalid); }
   };
   const acceptSuggestion = () => {
-    if (!suggestion?.task) return;
+    if (!canAcceptSuggestion || !suggestion?.task) return;
     try {
       const answers = Object.fromEntries((spec.uncertain ?? []).filter((item) => item.item.startsWith('task.') || item.item === 'questionFormat')
         .map((item) => [item.item, item.candidates[0]]));
@@ -64,7 +72,7 @@ export function ProblemConfirmScreen({ outcome, pages = [], photos, manual, busy
     {outcome?.drafts.map((draft, i) => draft.question?.rawText && <p className="card" key={i}>{draft.question.rawText}</p>)}
     {suggestion?.task && <section className="card question-card"><h2 className="section-title">{m.suggested}: {sessionVi.tasks[suggestion.task.type]}{suggestionParameters(suggestion.task)}</h2>
       <p>{m.suggestedReason(suggestion.matched.join(', '))}</p>
-      <button className="btn btn-outline" onClick={acceptSuggestion}>{m.acceptSuggestion}</button></section>}
+      <button className="btn btn-outline" disabled={!canAcceptSuggestion} onClick={acceptSuggestion}>{m.acceptSuggestion}</button></section>}
     <div className="problem-comparison"><div>{photos.map((photo, page) => <button className="problem-photo" key={page} onClick={() => setPhotoPage(page)} aria-label={m.page(page)} aria-pressed={photoPage === page}>
       <img src={photo.image} alt={m.source}/><span>{m.page(page)}</span></button>)}</div>
       <div className="card"><GraphReadPreview spec={spec}/><button className="btn btn-outline btn-block" onClick={() => setEditing(editorFromGraph(spec.graph, graphLayout))}>{m.edit}</button></div></div>

@@ -44,6 +44,16 @@ describe('4.2 problem confirmation', () => {
       runner: previewReaders().figure!, onBack: () => {}, onDone: () => {} }));
     expect(html).toContain(m.suggested); expect(html).toContain('từ A đến C'); expect(html).toContain(m.acceptSuggestion);
   });
+  it('locks one-tap confirmation when a suggested postman route still lacks its required start', async () => {
+    const read = await outcome();
+    read.spec = null; read.graphUncertain = [];
+    read.drafts[0]!.question!.rawText = 'Xe thu gom rác trên toàn bộ các con đường để quét sạch các tuyến đường.';
+    expect(taskSuggestion(read)?.task).toEqual({ type: 'postman', start: '' });
+    const html = renderToStaticMarkup(createElement(ProblemConfirmScreen, { outcome: read,
+      photos: [{ image: 'blob:question', width: 2, height: 2 }], manual: false, busy: false,
+      runner: previewReaders().figure!, onBack: () => {}, onDone: () => {} }));
+    expect(html).toContain(`<button class="btn btn-outline" disabled="">${m.acceptSuggestion}</button>`);
+  });
   it('maps every uncertainty to candidates and a coarse measured endpoint crop', async () => {
     const read = await outcome(), questions = confirmationQuestions(read);
     expect(questions.map((q) => q.item)).toEqual(read.spec!.uncertain!.map((q) => q.item));
