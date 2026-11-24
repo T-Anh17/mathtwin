@@ -45,7 +45,7 @@ describe('4.6 fake readers: recoverable failures in both flows', () => {
       ['exec_blocked', m.failures.server], ['timeout', m.failures.timeout], ['image_invalid', m.failures.image],
     ]) it(`${flow}: ${code} keeps the first page; retry and manual remain possible`, async () => {
       const storage = createMemoryStorage();
-      let s = flow === 'problem' ? sessionReducer(fresh(), { type: 'problem_photos', photos: [photo(0), photo(1)] })
+      let s = flow === 'problem' ? sessionReducer(sessionReducer(fresh(), { type: 'problem_photos', photos: [photo(0), photo(1)] }), { type: 'problem_read_request' })
         : sessionReducer(sessionReducer(fresh(), { type: 'manual_spec', spec }), { type: 'work_photos', photos: [photo(0), photo(1)] });
       const checkpoint = async (event: SessionEvent) => { s = runSessionEvent(s, event); await storage.sessions.put(s); };
       let calls = 0;

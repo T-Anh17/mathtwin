@@ -29,7 +29,9 @@ export type SessionEvent =
   | { type: 'work_manual_page'; page: number; lines: string[] }
   | { type: 'problem_page'; reading: ProblemPageRead }
   | { type: 'problem_capture'; photos: PhotoRef[] }
-  | { type: 'problem_photos'; photos: PhotoRef[] } | { type: 'problem_read'; outcome: ReadOutcome; ms: number }
+  | { type: 'problem_photos'; photos: PhotoRef[] }
+  | { type: 'problem_read_request' } | { type: 'problem_read_cancel' }
+  | { type: 'problem_read'; outcome: ReadOutcome; ms: number }
   | { type: 'spec_confirmed'; spec: ProblemSpec; graphLayout?: GraphLayout } | { type: 'manual_spec'; spec: ProblemSpec; graphLayout?: GraphLayout }
   | { type: 'work_capture'; source: 'photo' | 'manual' }
   | { type: 'work_photos'; photos: PhotoRef[] }

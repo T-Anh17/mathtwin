@@ -80,7 +80,15 @@ export function sessionReducer(s: Session, e: SessionEvent, ops: SessionOperatio
     }
     case 'problem_photos': {
       if (!e.photos.length) return s;
-      return { ...createSession(s.id, s.createdAt), problemPhotos: structuredClone(e.photos), stage: 'problem_reading' };
+      return { ...createSession(s.id, s.createdAt), problemPhotos: structuredClone(e.photos), stage: 'problem_confirm' };
+    }
+    case 'problem_read_request':
+      return s.stage === 'problem_confirm' && !s.specConfirmed && s.problemPhotos.length
+        ? { ...s, stage: 'problem_reading' } : s;
+    case 'problem_read_cancel': {
+      if (s.stage !== 'problem_reading') return s;
+      const { problemRead: _read, spec: _spec, solution: _solution, graphLayout: _layout, readerId: _reader, ...rest } = s;
+      return { ...rest, stage: 'problem_confirm', specConfirmed: false, specSource: 'photo' };
     }
     case 'problem_read': {
       if (s.stage !== 'problem_reading') return s;

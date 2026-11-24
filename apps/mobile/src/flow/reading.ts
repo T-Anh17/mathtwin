@@ -110,3 +110,9 @@ export function combineProblemPages(pages: ProblemPageRead[]): ReadOutcome {
     drafts, usage: { engine: outcomes[0]!.usage.engine,
       passes: outcomes.reduce((n, o) => n + o.usage.passes, 0), latencyMs: outcomes.reduce((n, o) => n + o.usage.latencyMs, 0) } };
 }
+
+/** B reads the problem photos only after an explicit request (stage `problem_reading`);
+ * the default path after capture goes straight to manual entry. */
+export function shouldReadProblem(stage: string, options: { manual: boolean; readerReady: boolean; available: boolean }): boolean {
+  return stage === 'problem_reading' && !options.manual && options.readerReady && options.available;
+}

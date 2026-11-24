@@ -13,16 +13,17 @@ import { pairInputHash, runMvpPair } from './mvp-pairs.js';
 import { deviationReason } from './mvp-report.js';
 
 const root = resolve(process.cwd()), args = process.argv.slice(2);
-let source: PairSource | undefined, directory: string | undefined, date = new Date().toISOString().slice(0, 10), rescore = false;
+let source: PairSource | undefined, directory: string | undefined, date = new Date().toISOString().slice(0, 10), rescore = false, problemRead: 'none' | 'b' = 'none';
 for (let i = 0; i < args.length; i++) {
   if (args[i] === '--rescore' && !rescore) { rescore = true; continue; }
   const flag = args[i], value = args[++i];
   if (flag === '--source' && (value === 'real' || value === 'generated')) source = value;
   else if (flag === '--dir' && value) directory = value;
   else if (flag === '--date' && /^\d{4}-\d{2}-\d{2}$/u.test(value ?? '')) date = value!;
-  else throw new Error('Dùng eval:mvp -- --source real|generated --dir <thư mục> [--date YYYY-MM-DD] [--rescore].');
+  else if (flag === '--problem-read' && (value === 'none' || value === 'b')) problemRead = value;
+  else throw new Error('Dùng eval:mvp -- --source real|generated --dir <thư mục> [--date YYYY-MM-DD] [--rescore] [--problem-read none|b].');
 }
-if (!source || !directory) throw new Error('Dùng eval:mvp -- --source real|generated --dir <thư mục> [--date YYYY-MM-DD] [--rescore].');
+if (!source || !directory) throw new Error('Dùng eval:mvp -- --source real|generated --dir <thư mục> [--date YYYY-MM-DD] [--rescore] [--problem-read none|b].');
 const pairs = await loadPairs(directory, source);
 if (!pairs.length) throw new Error('Thư mục cặp rỗng; không tạo kết quả độ chính xác giả.');
 const config = { schema: 1, model: 'b', maxImageSide: 768, threads: 4, gpuLayers: 0, passes: 1 };
@@ -30,7 +31,8 @@ const serverPath = join(root, '.build-cache/llama-win/bin/llama-server.exe'), mo
 const identities = await Promise.all([serverPath, join(modelsDirectory, 'b/Qwen3VL-2B-Instruct-Q4_K_M.gguf'), join(modelsDirectory, 'b/mmproj-Qwen3VL-2B-Instruct-F16.gguf')]
   .map(async (path) => ({ path, size: (await stat(path)).size })));
 const fingerprint = createHash('sha256').update(JSON.stringify({ config, identities })).update(await readFile(new URL(import.meta.url))).digest('hex');
-const cache = join(root, 'reports/.debug', `mvp-${source}-${date}`), output = join(root, 'reports', `mvp-${source}-${date}`);
+const baselineCache = join(root, 'reports/.debug', `mvp-${source}-${date}`), cache = join(root, 'reports/.debug', `mvp-${source}-${date}${problemRead === 'none' ? '-none' : ''}`);
+const output = join(root, 'reports', `mvp-${source}-${date}${problemRead === 'none' ? '-none' : ''}`);
 await mkdir(cache, { recursive: true });
 const atomic = async (path: string, value: unknown) => { await writeFile(path + '.tmp', JSON.stringify(value, null, 2) + '\n'); await rename(path + '.tmp', path); };
 const llama = new LlamaCppReader({ model: 'b', serverPath, modelsDirectory, threads: 4, gpuLayers: 0, maxImageSide: 768, timeoutMs: 420_000, readTimeout: 300_000 });
@@ -49,7 +51,7 @@ const machine = `${platform()} ${arch()}; ${cpus()[0]?.model ?? 'CPU'}; ${cpus()
 const persist = async () => {
   const completed = rows.length, verdictCorrect = rows.filter((row) => row.finalVerdict === row.expected.verdict).length;
   const manualCrops = rows.reduce((count, row) => count + row.manualRegionPages.length, 0);
-  await atomic(output + '.json', { date, source, directory: resolve(directory!), config, identities, fingerprint, machine, planned: pairs.length, rows, failures });
+  await atomic(output + '.json', { date, source, problemRead, directory: resolve(directory!), config, identities, fingerprint, machine, planned: pairs.length, rows, failures });
   await writeFile(output + '.md', `# Đo MVP cặp ${source} — ${date}\n\nĐã hoàn tất ${completed}/${pairs.length} cặp; lỗi đọc ${failures.length}. Kết luận trùng nhãn giáo viên: ${verdictCorrect}/${pairs.length}.\n\nBài đúng bị chấm oan thành SAI: ${rows.filter((row) => row.expected.verdict === 'DUNG' && row.finalVerdict === 'SAI').length}. CẦN XÁC NHẬN: ${rows.filter((row) => row.finalVerdict === 'CAN_XAC_NHAN').length}; KHÔNG ĐỦ CĂN CỨ: ${rows.filter((row) => row.finalVerdict === 'KHONG_DU_CAN_CU').length}.\n\nKhoanh vùng tay cần vì nhãn không có box: ${manualCrops} trang. Máy: ${machine}. Ảnh chỉ đọc từ ${resolve(directory!)}; báo cáo chỉ dùng mã cặp.\n\n| Cặp | Giáo viên | Kết quả | Trang đề | Trang bài | Khoanh tay | Thời gian (s) |\n| --- | --- | --- | ---: | ---: | ---: | ---: |\n${rows.map((row) => { const pair = pairs.find((item) => item.id === row.id)!; return `| ${row.id} | ${row.expected.verdict} | ${row.finalVerdict} | ${pair.problemFiles.length} | ${pair.workFiles.length} | ${row.manualRegionPages.length} | ${(row.machineMs / 1000).toFixed(1)} |`; }).join('\n')}\n${failures.length ? `\nLỗi: ${failures.map((failure) => `${failure.id}: ${failure.error}`).join('; ')}` : ''}\n`);
   const report = await readFile(output + '.md', 'utf8');
   const reasons = new Map(rows.map((row) => [row.id, row.deviation ? deviationReason(row.deviation)[0] : '—']));
@@ -62,9 +64,9 @@ const persist = async () => {
 };
 const signal = AbortSignal.timeout(4 * 60 * 60_000);
 for (const pair of pairs) {
-  const path = join(cache, `${pair.id}.json`), inputHash = await pairInputHash(pair);
+  const path = join(cache, `${pair.id}.json`), priorPath = join(problemRead === 'none' && rescore ? baselineCache : cache, `${pair.id}.json`), inputHash = await pairInputHash(pair);
   let saved: { fingerprint: string; inputHash: string; session?: import('../../../apps/mobile/src/flow/types.js').Session; row?: Awaited<ReturnType<typeof runMvpPair>> } | undefined;
-  try { saved = JSON.parse(await readFile(path, 'utf8')) as typeof saved; } catch (error) { if (!(error instanceof Error) || !('code' in error) || (error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; }
+  try { saved = JSON.parse(await readFile(priorPath, 'utf8')) as typeof saved; } catch (error) { if (!(error instanceof Error) || !('code' in error) || (error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; }
   if (saved && saved.inputHash !== inputHash) throw new Error(`Checkpoint khác nhãn hoặc ảnh: ${pair.id}. Dùng --date mới.`);
   // A page-level checkpoint contains only raw reader state.  It is safe to
   // resume it after a local flow fix, and avoids spending a second B read.
@@ -73,8 +75,9 @@ for (const pair of pairs) {
   if (saved?.row && !rescore) { rows.push(saved.row); console.log(`${rows.length}/${pairs.length} ${pair.id}: đã lưu`); continue; }
   if (rescore && !saved?.row) throw new Error(`Thiếu checkpoint để chấm lại: ${pair.id}`);
   try {
-    const active: Readers = rescore ? { text: { engine: 'cached-B', readLines: async () => { throw new Error('Chấm lại không được gọi suy luận.'); } }, problem: async () => { throw new Error('Chấm lại không được gọi suy luận.'); } } : readers;
-    const row = await runMvpPair(pair, date, active, signal, async (session) => atomic(path, { fingerprint, inputHash, session }), saved?.session, saved?.row);
+    const active: Readers = rescore ? { text: { engine: 'cached-B', readLines: async () => { throw new Error('Chấm lại không được gọi suy luận.'); } },
+      problem: async () => { throw new Error('Chấm lại không được gọi suy luận.'); }, ...(problemRead === 'none' ? { figure: readers.figure } : {}) } : readers;
+    const row = await runMvpPair(pair, date, active, signal, async (session) => atomic(path, { fingerprint, inputHash, session }), saved?.session, saved?.row, problemRead);
     await atomic(path, { fingerprint, inputHash, row }); rows.push(row); console.log(`${rows.length}/${pairs.length} ${pair.id}: ${row.finalVerdict}; ${(row.machineMs / 1000).toFixed(1)} s`);
   } catch (error) {
     const message = error instanceof LlamaCppReadError ? `${error.message} [${error.code}/${error.reason ?? 'unknown'}]` : error instanceof Error ? error.message : String(error);

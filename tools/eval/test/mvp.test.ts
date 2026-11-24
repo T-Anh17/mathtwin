@@ -5,10 +5,10 @@ import type { PreparedImage, ReadDraft, ReadOutcome } from '@mathtwin/reader';
 import type { WorkLine, WorkTruth } from '@mathtwin/work';
 import { createSession, sessionReducer } from '../../../apps/mobile/src/flow/sessionReducer.js';
 import type { Session } from '../../../apps/mobile/src/flow/types.js';
-import { alignMvpWork, deviationCause, replayMvpWork, strikeAudit, runMvpSample, simulateManualWorkRegion, simulateProblemConfirmation, truthWorkAnswers } from '../src/mvp.js';
+import { alignMvpWork, deviationCause, replayMvpWork, strikeAudit, runMvpSample, simulateManualWorkRegion, simulateProblemConfirmation, truthWorkAnswers, formEditCount, noneModeFromStoredRow } from '../src/mvp.js';
 import type { MvpInput } from '../src/mvp.js';
 import { checkMvpSolution } from '../src/mvp-oracle.js';
-import { deviationReason, mvpReport } from '../src/mvp-report.js';
+import { deviationReason, graphEffort, mvpReport } from '../src/mvp-report.js';
 import { compareAlignedWork } from '../src/work-alignment.js';
 import { parseWork, vocabularyOf } from '@mathtwin/work';
 import { loadCases } from '../src/dataset.js';
@@ -66,6 +66,38 @@ describe('MVP evaluator, fake adapters only', () => {
     expect(rescored.session.workPages?.[0]?.raw[0]?.text).toBe('Có 3 đỉnh.');
     expect(rescored.finalVerdict).toBe('DUNG');
     expect(rescored.timings.figureDraft).toBe(123);
+  });
+  it('uses the default none mode without calling the problem reader or storing its output', async () => {
+    const image: PreparedImage = { width: 20, height: 20, pixels: new Uint8ClampedArray(1600).fill(255) };
+    let problemCalls = 0;
+    const row = await runMvpSample({ id: 'none', date: '2026-11-18', image, truth: spec, reference: [line('Có 2 đỉnh.')], workTruth: truth,
+      region: [0, 600, 1000, 1000], figure: { version: 1, width: 20, height: 20, box: [0, 0, 20, 20], crossings: [],
+        vertices: [{ id: 'A', label: 'A', center: [2.5, 2.5], labelBox: [1, 1, 4, 4], contours: [], style: '', gap: 0 },
+          { id: 'B', label: 'B', center: [10.5, 2.5], labelBox: [9, 1, 12, 4], contours: [], style: '', gap: 0 }],
+        edges: [{ id: 'e1', u: 'A', v: 'B', w: 3, name: null, polyline: [] }] },
+      readers: { problem: async () => { problemCalls++; throw new Error('B must not run'); }, text: { engine: 'fake', readLines: async () => ({
+        lines: [line('Có 2 đỉnh.')], usage: { engine: 'fake', passes: 1, latencyMs: 1 },
+      }) }, figure: async () => ({ representation: 'figure', directed: false, vertices: [], edges: [], statedFacts: { vertexCount: null, edgeCount: null, weightUnit: null }, question: null, unreadable: [] }) },
+      signal: new AbortController().signal, checkpoint: async () => {}, problemRead: 'none' });
+    expect(problemCalls).toBe(0); expect(row.session.problemRead).toBeUndefined(); expect(row.session.problemPages).toBeUndefined();
+    expect(row.session.specSource).toBe('manual'); expect(row.problemFormEdits).toBe(2); expect(row.timings.problemRead).toBe(0);
+  });
+  it('re-expresses a stored B row as the default none path without touching its work side', () => {
+    const stored = { problemQuestions: 3, problemFormEdits: 0, machineMs: 100_000, workQuestions: 4, finalVerdict: 'SAI' as const,
+      timings: { problemRead: 80_000, figureDraft: 500, workRead: 15_000 }, session: { spec } };
+    const none = noneModeFromStoredRow(stored);
+    expect(none.problemRead).toBe('none'); expect(none.problemQuestions).toBe(0);
+    expect(none.problemFormEdits).toBe(formEditCount(spec) + 1); expect(none.timings.problemRead).toBe(0);
+    expect(none.machineMs).toBe(20_000); expect(none.workQuestions).toBe(4); expect(none.finalVerdict).toBe('SAI');
+    expect(none.timings.workRead).toBe(15_000); expect(none.timings.figureDraft).toBe(500);
+    expect(() => noneModeFromStoredRow({ ...stored, session: {} })).toThrow();
+  });
+  it('counts manual graph entry for none rows and the D draft for B rows', () => {
+    const effort = { draftOps: 5, manualOps: 12 };
+    expect(graphEffort({ problemRead: 'none', effort } as unknown as Parameters<typeof graphEffort>[0])).toBe(12);
+    expect(graphEffort({ problemRead: 'b', effort } as unknown as Parameters<typeof graphEffort>[0])).toBe(5);
+    // Rows saved before the mode existed were B rows.
+    expect(graphEffort({ effort } as unknown as Parameters<typeof graphEffort>[0])).toBe(5);
   });
   it('answers uncertain task fields but never fixes a confident task from truth', () => {
     const wrong: ProblemSpec = { ...spec, task: { type: 'degree' } };
