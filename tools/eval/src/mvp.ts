@@ -8,7 +8,7 @@ import { createSession, sessionReducer } from '../../../apps/mobile/src/flow/ses
 import type { Session, SessionEvent } from '../../../apps/mobile/src/flow/types.js';
 import { readProblemPages } from '../../../apps/mobile/src/flow/reading.js';
 import type { Readers } from '../../../apps/mobile/src/flow/reading.js';
-import { confirmationQuestions, initialProblem, replaceGraph, confirmProblem } from '../../../apps/mobile/src/flow/confirmation.js';
+import { confirmationQuestions, initialProblem, replaceGraph, confirmProblem, replaceSuggestedFields, taskSuggestion } from '../../../apps/mobile/src/flow/confirmation.js';
 import { readWorkPages, readWorkRegion, combinedWorkLines, processWorkPage } from '../../../apps/mobile/src/flow/work-reading.js';
 import type { WorkPageRead } from '../../../apps/mobile/src/flow/work-reading.js';
 import { resultView, solutionView } from '../../../apps/mobile/src/flow/view.js';
@@ -25,25 +25,46 @@ export function simulateProblemConfirmation(outcome: ReadOutcome, truth: Problem
   let spec = replaceGraph(initialProblem(outcome), structuredClone(truth.graph));
   const taskFields = truth.task as unknown as Record<string, unknown>;
   const answers: Record<string, unknown> = {};
+  const suggestion = taskSuggestion(outcome);
+  const fullFormEdits = formEditCount(truth);
   let formEdits = 0;
   // A missing task needs the same explicit form entry as in ProblemConfirmScreen.
   if (!outcome.spec || spec.uncertain?.some((u) => u.item === 'task.type')) {
     spec = { ...spec, task: structuredClone(truth.task) };
-    if (!outcome.spec) {
-      // This is the form the user sees, not a fixed "task + format" proxy.
-      // A statements task asks for the copied proposition and its check for each item.
-      const task = truth.task as unknown as Record<string, unknown>;
-      formEdits = 1 + Object.entries(task).reduce((count, [key, value]) => key === 'type' ? count
-        : key === 'items' && Array.isArray(value) ? count + value.length * 2 : count + 1, 0);
-    }
+    if (!outcome.spec) formEdits = suggestion?.task?.type === truth.task.type ? changedSuggestionFields(suggestion.task, truth) : fullFormEdits;
   }
-  if (!outcome.spec) { spec.questionFormat = truth.questionFormat; formEdits++; }
+  if (!outcome.spec) {
+    spec.questionFormat = truth.questionFormat;
+    if (suggestion?.questionFormat !== truth.questionFormat) formEdits++;
+    spec = replaceSuggestedFields(spec);
+  }
   for (const flag of spec.uncertain ?? []) {
     if (flag.item === 'questionFormat') answers[flag.item] = truth.questionFormat;
     else if (flag.item.startsWith('task.')) answers[flag.item] = taskFields[flag.item.slice(5)] ?? null;
   }
   // Never repair a confident, incorrect task merely because truth is available.
-  return { spec: confirmProblem(spec, answers), questions: questions.length, formEdits };
+  const suggestionTaskCorrect = suggestion?.task?.type === truth.task.type;
+  const suggestionParametersCorrect = suggestionTaskCorrect && JSON.stringify(suggestion?.task) === JSON.stringify(truth.task);
+  return { spec: confirmProblem(spec, answers), questions: questions.length, formEdits, suggestion: {
+    available: Boolean(suggestion?.task), typeCorrect: suggestionTaskCorrect, parametersCorrect: suggestionParametersCorrect,
+    formEditsBefore: !outcome.spec ? fullFormEdits + 1 : 0, formEditsAfter: formEdits,
+  } };
+}
+
+function formEditCount(spec: ProblemSpec): number {
+  const task = spec.task as unknown as Record<string, unknown>;
+  return 1 + Object.entries(task).reduce((count, [key, value]) => key === 'type' ? count
+    : key === 'items' && Array.isArray(value) ? count + value.length * 2 : count + 1, 0);
+}
+function changedSuggestionFields(suggested: ProblemSpec['task'], truth: ProblemSpec): number {
+  const candidate = suggested as unknown as Record<string, unknown>;
+  const expected = truth.task as unknown as Record<string, unknown>;
+  let edits = 0;
+  for (const [key, value] of Object.entries(expected)) {
+    if (key === 'type' || JSON.stringify(candidate[key]) === JSON.stringify(value)) continue;
+    edits += key === 'items' && Array.isArray(value) ? value.length * 2 : 1;
+  }
+  return edits;
 }
 
 /** Preserve the Lô 3.6 text DP. Only an actual missing-ink question can use crop geometry. */
@@ -324,7 +345,7 @@ export async function runMvpSample(input: MvpInput) {
   timings.workRead = session.timings.workRead ?? 0;
   return { id: input.id, task: truth.task.type, source: 'synthetic-hw' as const, expected: input.workTruth.expected,
     readComparison, bComparison, confirmedCorrect, solutionCheck, effort, problemQuestions: confirmation.questions,
-    problemFormEdits: confirmation.formEdits, workQuestions: replay.questions, regionQuestions,
+    problemFormEdits: confirmation.formEdits, problemSuggestion: confirmation.suggestion, workQuestions: replay.questions, regionQuestions,
     reviews: replay.reviews, reviewEdits: replay.reviewEdits, comparison, rawComparison, audit, beforeAudit, manualRegionPages,
     finalVerdict: session.workGrade!.result.verdict, result, solution, timings,
     strikes: strikeAudit(session.workLines, reference),

@@ -1,5 +1,5 @@
-import { applyConfirmation } from '@mathtwin/reader';
-import type { ReadOutcome } from '@mathtwin/reader';
+import { applyConfirmation, suggestTask } from '@mathtwin/reader';
+import type { ReadOutcome, TaskSuggestion } from '@mathtwin/reader';
 import type { Graph, ProblemSpec } from '@mathtwin/core';
 import { validateSpec } from '@mathtwin/core';
 import { problemVi as m } from '../problem.vi.js';
@@ -37,8 +37,30 @@ export function confirmProblem(spec: ProblemSpec, answers: Record<string, unknow
 }
 export function initialProblem(outcome?: ReadOutcome): ProblemSpec {
   if (outcome?.spec) return structuredClone(outcome.spec);
+  const suggestion = outcome ? taskSuggestion(outcome) : null;
   return { graph: structuredClone(outcome?.graph ?? { directed: false, vertices: [], edges: [] }),
-    task: { type: 'elements' }, questionFormat: 'tu_luan', uncertain: structuredClone(outcome?.graphUncertain ?? []) };
+    task: structuredClone(suggestion?.task ?? { type: 'elements' }), questionFormat: suggestion?.questionFormat ?? 'tu_luan',
+    uncertain: [...structuredClone(outcome?.graphUncertain ?? []), ...uncertainties(suggestion)] };
+}
+export function questionText(outcome: ReadOutcome): string | null {
+  const text = outcome.drafts.map((draft) => draft.question?.rawText?.trim()).find((value): value is string => Boolean(value));
+  return text ?? null;
+}
+export function taskSuggestion(outcome: ReadOutcome): TaskSuggestion | null {
+  if (outcome.spec) return null;
+  const text = questionText(outcome);
+  if (!text) return null;
+  return suggestTask(text, (outcome.graph?.vertices ?? []).map((vertex) => vertex.label));
+}
+function uncertainties(suggestion: TaskSuggestion | null): NonNullable<ProblemSpec['uncertain']> {
+  if (!suggestion?.task) return [];
+  const task = suggestion.task as unknown as Record<string, unknown>;
+  return suggestion.uncertain.map((item) => ({ item, candidates: [structuredClone(item === 'questionFormat' ? suggestion.questionFormat : task[item.slice(5)])] }));
+}
+/** A suggestion only exists until the person edits the corresponding form field. */
+export function replaceSuggestedFields(spec: ProblemSpec): ProblemSpec {
+  const uncertain = spec.uncertain?.filter((item) => !item.item.startsWith('task.') && item.item !== 'questionFormat');
+  return uncertain === undefined ? { ...spec } : { ...spec, uncertain };
 }
 export function replaceGraph(spec: ProblemSpec, graph: Graph): ProblemSpec {
   return { ...spec, graph, uncertain: (spec.uncertain ?? []).filter((u) => u.item.startsWith('task.') || u.item === 'questionFormat') };

@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { readFile, mkdir, rename, writeFile, stat } from 'node:fs/promises';
+import { readFile, mkdir, readdir, rename, writeFile, stat } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { cpus, totalmem, platform, arch } from 'node:os';
 import { LlamaCppReader, LlamaCppReadError } from '@mathtwin/reader-llamacpp';
@@ -14,7 +14,7 @@ import type { ImageCase } from './dataset.js';
 import { syntheticWorkPage } from './work-layout.js';
 import type { FigureAnnotation, Point } from './figure-geometry.js';
 import { validateWork } from './work-data.js';
-import { runMvpSample, mvpReadComparisons } from './mvp.js';
+import { runMvpSample, mvpReadComparisons, simulateProblemConfirmation } from './mvp.js';
 import { checkMvpSolution } from './mvp-oracle.js';
 import { mvpReport } from './mvp-report.js';
 import type { MvpRow, MvpFailure } from './mvp-report.js';
@@ -36,11 +36,23 @@ const output = join(root, 'reports', `mvp-eval-${date}`);
 const atomicJson = async (path: string, value: unknown) => { await writeFile(path + '.tmp', JSON.stringify(value, null, 2) + '\n'); await rename(path + '.tmp', path); };
 const machine = `${platform()} ${arch()}; ${cpus()[0]?.model ?? 'CPU'}; ${cpus().length} logical CPUs; ${(totalmem() / 2 ** 30).toFixed(1)} GiB RAM; Node ${process.version}`;
 await mkdir(cache, { recursive: true });
-// No fetch/download path: all three files must already exist.
-const identities = await Promise.all([serverPath, join(root, '.models/b/Qwen3VL-2B-Instruct-Q4_K_M.gguf'), join(root, '.models/b/mmproj-Qwen3VL-2B-Instruct-F16.gguf')].map(async (path) => ({ path, size: (await stat(path)).size })));
+type PreviousReport = { fingerprint: string; rescoredFrom?: string; config: unknown; identities: unknown; failures: MvpFailure[]; rows: unknown[]; planned: number };
+async function rescoreBaseline(): Promise<PreviousReport> {
+  const current = await readJson(output + '.json') as PreviousReport;
+  if (current.rows.length + current.failures.length >= current.planned) return current;
+  const snapshots = await Promise.all((await readdir(cache)).filter((name) => /^before-rescore-.*\.json$/u.test(name)).map(async (name) => {
+    try { return await readJson(join(cache, name)) as PreviousReport; } catch { return null; }
+  }));
+  const best = [current, ...snapshots.filter((value): value is PreviousReport => value !== null)]
+    .sort((left, right) => right.rows.length + right.failures.length - left.rows.length - left.failures.length)[0]!;
+  return best;
+}
+const previous = rescore ? await rescoreBaseline() : undefined;
+// A rescore never initializes B.  Its identity is the one recorded by the
+// original inference report, so an isolated worktree need not hold model files.
+const identities = previous?.identities ?? await Promise.all([serverPath, join(root, '.models/b/Qwen3VL-2B-Instruct-Q4_K_M.gguf'), join(root, '.models/b/mmproj-Qwen3VL-2B-Instruct-F16.gguf')].map(async (path) => ({ path, size: (await stat(path)).size })));
 const implementation = await Promise.all(['mvp.ts', 'mvp-oracle.ts', 'mvp-cli.ts', 'mvp-report.ts'].map((f) => readFile(join(root, 'tools/eval/src', f))));
 const fingerprint = createHash('sha256').update(JSON.stringify({ config, identities })).update(Buffer.concat(implementation)).digest('hex');
-const previous = rescore ? await readJson(output + '.json') as { fingerprint: string; rescoredFrom?: string; config: unknown; identities: unknown; failures: MvpFailure[] } : undefined;
 if (previous && (JSON.stringify(previous.config) !== JSON.stringify(config) || JSON.stringify(previous.identities) !== JSON.stringify(identities)))
   throw new Error('Chỉ chấm lại OCR bằng cùng cấu hình B và cùng tệp model/server.');
 if (rescore) await atomicJson(join(cache, `before-rescore-${fingerprint.slice(0, 12)}.json`), await readJson(output + '.json'));
@@ -79,13 +91,26 @@ for (const sample of samples) {
   const inputHash = createHash('sha256').update(await readFile(join(sample.directory, '1.png'))).update(JSON.stringify(sample.truth)).update(await readFile(join(sample.directory, 'work.json'))).digest('hex');
   let saved: { fingerprint: string; inputHash: string; session: Session; row?: MvpRow } | undefined;
   try { saved = await readJson(path) as typeof saved; } catch (error) { if (objectCode(error) !== 'ENOENT') throw error; }
-  if (saved && (saved.inputHash !== inputHash || saved.fingerprint !== fingerprint && (!previous || saved.fingerprint !== previous.fingerprint && saved.fingerprint !== previous.rescoredFrom))) throw new Error(`Checkpoint khác cấu hình/mã/ảnh: ${sample.id}. Dùng --date mới hoặc lưu trữ checkpoint cũ; --rescore chỉ dùng OCR gốc với cấu hình đọc không đổi.`);
-  if (rescore && !saved?.row) {
-    const failed = previous?.failures.find((f) => f.id === sample.id);
-    if (!failed) throw new Error(`Chưa có kết quả hoặc lỗi đọc đã lưu để chấm lại: ${sample.id}`);
-    failures.push(await failureDetails(failed, sample, saved?.session));
-    await persist(); console.log(`${sample.id}: giữ lỗi đọc, chấm các khâu đã lưu`); continue;
+  if (rescore && saved?.row && saved.inputHash !== inputHash) {
+    // The evaluation fixture may have moved after the OCR checkpoint was
+    // recorded.  For this task-only rescore, use only the stored B outcome and
+    // the confirmed spec already present in that same checkpoint; do not mix
+    // it with a newer image/truth pair or invoke B.
+    if (!saved.session.problemRead || !saved.session.spec) throw new Error(`Checkpoint thiếu đề đã xác nhận: ${sample.id}`);
+    const confirmation = simulateProblemConfirmation(saved.session.problemRead, saved.session.spec);
+    rows.push({ ...saved.row, problemFormEdits: confirmation.formEdits, problemSuggestion: confirmation.suggestion });
+    console.log(`${rows.length}/${samples.length} ${sample.id}: chấm gợi ý từ checkpoint`);
+    await persist(); continue;
   }
+  if (rescore && !saved?.row) {
+    const failed = previous?.failures.find((entry) => entry.id === sample.id);
+    if (!failed) throw new Error(`Chưa có kết quả hoặc lỗi đọc đã lưu để chấm lại: ${sample.id}`);
+    // Keep a failed OCR row as recorded.  Its newer fixture counterpart is not
+    // evidence about the older inference checkpoint.
+    failures.push({ ...failed, ...(saved?.session ? { timings: saved.session.timings } : {}) });
+    await persist(); console.log(`${sample.id}: giữ lỗi đọc đã lưu`); continue;
+  }
+  if (saved && (saved.inputHash !== inputHash || !rescore && saved.fingerprint !== fingerprint && (!previous || saved.fingerprint !== previous.fingerprint && saved.fingerprint !== previous.rescoredFrom))) throw new Error(`Checkpoint khác cấu hình/mã/ảnh: ${sample.id}. Dùng --date mới hoặc lưu trữ checkpoint cũ; --rescore chỉ dùng OCR gốc với cấu hình đọc không đổi.`);
   if (saved?.row && !rescore) { rows.push(saved.row); console.log(`${rows.length}/${samples.length} ${sample.id}: đã lưu`); continue; }
   try {
     const began = performance.now(); const page = await syntheticWorkPage(root, sample.id); const decode = performance.now() - began;

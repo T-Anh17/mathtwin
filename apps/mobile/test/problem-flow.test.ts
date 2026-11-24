@@ -5,7 +5,7 @@ import { applyConfirmation, normalizeDraft } from '@mathtwin/reader';
 import type { ReadOutcome } from '@mathtwin/reader';
 import { validateSpec } from '@mathtwin/core';
 import { previewReaders } from '../src/preview-readers.js';
-import { confirmationQuestions, confirmationValue, confirmProblem, initialProblem, replaceGraph } from '../src/flow/confirmation.js';
+import { confirmationQuestions, confirmationValue, confirmProblem, initialProblem, replaceGraph, replaceSuggestedFields, taskSuggestion } from '../src/flow/confirmation.js';
 import { combineProblemPages, readProblemPages } from '../src/flow/reading.js';
 import type { ProblemPageRead, Readers, ReadingProgress } from '../src/flow/reading.js';
 import { createSession, sessionReducer as reduce } from '../src/flow/sessionReducer.js';
@@ -23,6 +23,27 @@ const outcome = () => previewReaders().problem([image]);
 const pageRead = (outcome: ReadOutcome, page = 0): ProblemPageRead => ({ page, outcome, ms: 4, figureMs: 2 });
 
 describe('4.2 problem confirmation', () => {
+  it('keeps a rule suggestion unconfirmed until one explicit confirmation, and form edits replace it', async () => {
+    const read = await outcome();
+    read.spec = null; read.graphUncertain = [];
+    read.drafts[0]!.question!.rawText = 'Tìm đường đi ngắn nhất từ A đến C.';
+    const suggestion = taskSuggestion(read)!;
+    expect(suggestion.task).toEqual({ type: 'shortest_path', from: 'A', to: 'C' });
+    let session = reduce(fresh(), { type: 'problem_photos', photos: [photo] });
+    session = reduce(session, { type: 'problem_read', outcome: read, ms: 1 });
+    expect(session.specConfirmed).toBe(false); expect(session.solution).toBeUndefined();
+    expect(session.spec?.task).toEqual(suggestion.task);
+    const accepted = confirmProblem(session.spec!, Object.fromEntries(session.spec!.uncertain!.map((item) => [item.item, item.candidates[0]])));
+    session = reduce(session, { type: 'spec_confirmed', spec: accepted });
+    expect(session.specConfirmed).toBe(true); expect(session.spec?.task).toEqual(suggestion.task);
+    const edited = replaceSuggestedFields({ ...initialProblem(read), task: { type: 'connectivity' } });
+    expect(edited.uncertain).toEqual([]);
+    expect(confirmProblem(edited, {}).task).toEqual({ type: 'connectivity' });
+    const html = renderToStaticMarkup(createElement(ProblemConfirmScreen, { outcome: read,
+      photos: [{ image: 'blob:question', width: 2, height: 2 }], manual: false, busy: false,
+      runner: previewReaders().figure!, onBack: () => {}, onDone: () => {} }));
+    expect(html).toContain(m.suggested); expect(html).toContain('từ A đến C'); expect(html).toContain(m.acceptSuggestion);
+  });
   it('maps every uncertainty to candidates and a coarse measured endpoint crop', async () => {
     const read = await outcome(), questions = confirmationQuestions(read);
     expect(questions.map((q) => q.item)).toEqual(read.spec!.uncertain!.map((q) => q.item));

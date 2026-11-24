@@ -40,6 +40,8 @@ export function mvpReport(date: string, rows: MvpRow[], planned: number, machine
     return counts;
   }, new Map<string, number>());
   const taskResultChanges = rows.filter((r) => r.finalVerdict !== r.expected.verdict);
+  const suggestions = rows.map((r) => r.problemSuggestion).filter((value): value is NonNullable<typeof value> => value !== undefined);
+  const availableSuggestions = suggestions.filter((value) => value.available);
   const struckRows = sums((r) => r.strikes.onMark.length + r.strikes.offMark.length);
   const offMarkRows = sums((r) => r.strikes.offMark.length);
   const solutionRows = sums((r) => r.session.workLines.filter((l) => l.region === 'solution' || l.region === 'table').length);
@@ -53,6 +55,8 @@ export function mvpReport(date: string, rows: MvpRow[], planned: number, machine
 Kết luận nghiệm thu: **chưa đủ căn cứ**. Chưa có ≥30 cặp ảnh thật viết tay có nhãn. Hoàn thành đo ${n}/${planned} trang synthetic-hw; ${failures.length} lỗi chạy. Chỉ xem hoàn tất chức năng khi các cổng kiểm tra trong phần xác minh đều xanh; không tự hạ ngưỡng nghiệm thu.
 
 B đọc yêu cầu hiện **chưa đóng góp được ProblemSpec nào**: ${ratio(rows.filter((r) => r.session.problemRead?.spec !== null).length, unreadProblems.length)} trong các trang đã có checkpoint đọc đề; ${unreadProblems.length}/${planned} trang phải nhập form dạng bài. Các issue trên ${unreadProblems.length} trang không có ProblemSpec: ${[...problemIssues.entries()].sort((a, b) => b[1] - a[1]).map(([code, total]) => `\`${code}\` ${total}`).join('; ') || 'không có checkpoint để đếm'}. Đây là rủi ro đọc đề, không được diễn giải thành B đã dựng được yêu cầu.
+
+Gợi ý luật Lô 5.2 (chỉ từ chữ đề B đã lưu, luôn chờ xác nhận): có gợi ý ${availableSuggestions.length}/${suggestions.length}; đúng dạng ${availableSuggestions.filter((value) => value.typeCorrect).length}/${suggestions.length}; đúng cả tham số ${availableSuggestions.filter((value) => value.parametersCorrect).length}/${suggestions.length}; gợi ý sai ${availableSuggestions.filter((value) => !value.typeCorrect || !value.parametersCorrect).length}/${suggestions.length}. Công nhập form cho các trang có checkpoint: trước ${sums((r) => r.problemSuggestion?.formEditsBefore ?? r.problemFormEdits)}; sau ${sums((r) => r.problemSuggestion?.formEditsAfter ?? r.problemFormEdits)}. Gợi ý sai không tự vào spec; mô phỏng vẫn dùng thao tác sửa form theo truth.
 
 Máy tính: ${machine}. **Mọi thời gian dưới đây là Node trên máy tính, không phải điện thoại.** B cục bộ Qwen3-VL-2B Q4_K_M + mmproj F16, cạnh ảnh tối đa 768, CPU 4 threads, GPU 0; llama-server khởi động/dừng theo mỗi lần gọi adapter. Không tải model mới, không adb. Số điện thoại cũ khoảng 49 s/trang (vivo X100s Pro), không suy ra từ số máy tính.
 

@@ -4,6 +4,8 @@ export type * from './types.js';
 export { normalizeCharConfidence } from './char-confidence.js';
 export { normalizeLabel, CONFIDENCE_THRESHOLD } from './model.js';
 export { normalizeDraft } from './normalize.js';
+export { suggestTask } from './task-rules.js';
+export type { TaskSuggestion } from './task-rules.js';
 export { reconcile } from './reconcile.js';
 export { readProblem } from './read.js';
 export { applyConfirmation } from './confirmation.js';

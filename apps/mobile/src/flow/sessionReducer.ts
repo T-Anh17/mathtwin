@@ -3,6 +3,7 @@ import { applyWorkAnswers, gradeWork, parseWork, vocabularyOf } from '@mathtwin/
 import type { Session, SessionEvent } from './types.js';
 import { sessionVi } from './messages.vi.js';
 import { combinedWorkLines } from './work-reading.js';
+import { taskSuggestion, initialProblem } from './confirmation.js';
 
 /** Identity and clock belong to the caller, keeping all transitions deterministic. */
 export function createSession(id: string, createdAt: string): Session {
@@ -84,7 +85,8 @@ export function sessionReducer(s: Session, e: SessionEvent, ops: SessionOperatio
     case 'problem_read': {
       if (s.stage !== 'problem_reading') return s;
       const outcome = structuredClone(e.outcome);
-      return { ...s, stage: 'problem_confirm', problemRead: outcome, ...(outcome.spec ? { spec: outcome.spec } : {}),
+      const suggested = taskSuggestion(outcome);
+      return { ...s, stage: 'problem_confirm', problemRead: outcome, ...(outcome.spec || suggested?.task ? { spec: initialProblem(outcome) } : {}),
         timings: { ...s.timings, problemRead: s.problemPages?.reduce((n, p) => n + p.ms, 0) ?? e.ms }, readerId: outcome.usage.engine };
     }
     case 'manual_spec': case 'spec_confirmed': {

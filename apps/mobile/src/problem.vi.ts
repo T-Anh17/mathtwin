@@ -10,6 +10,7 @@ export const problemVi = {
   speed: 'Bộ đọc B khoảng 2 GB; số đo cũ khoảng 49 giây/trang trên điện thoại mạnh, vượt mục tiêu 15 giây.',
   edit: 'Sửa đồ thị', draft: 'Dùng nháp hình D để sửa', draftNote: 'Nháp D chỉ là gợi ý; cần soát mọi đỉnh, cạnh và trọng số.',
   done: 'Xác nhận đề', other: 'Nhập giá trị khác', answer: 'Áp dụng', unresolved: 'Trả lời hết các chỗ chưa chắc trước khi xác nhận.',
+  suggested: 'Máy gợi ý', suggestedReason: (matched: string) => `Lý do: khớp từ khóa ${matched}.`, acceptSuggestion: 'Đúng yêu cầu này',
   keepGraph: 'Giữ đồ thị này',
   invalid: 'Đề chưa hợp lệ. Kiểm tra đồ thị, dạng bài và các tham số.', failed: 'Không đọc được đề. Có thể thử lại hoặc nhập tay; phần đã đọc đã được giữ.',
   noSpec: 'Chưa hiểu đủ đề. Sửa đồ thị và yêu cầu theo ảnh gốc trước khi xác nhận.', noBox: 'Chưa xác định vùng cắt; hãy xem ảnh gốc.',
@@ -34,6 +35,15 @@ export const problemVi = {
   progress: (page: number, total: number, figure: boolean) => `${figure ? 'Đang nháp hình' : 'Đang đọc đề'} · trang ${page + 1}/${total}`,
   formats: { tu_luan: 'Tự luận', trac_nghiem: 'Trắc nghiệm', dung_sai: 'Đúng / sai', tra_loi_ngan: 'Trả lời ngắn' },
 };
+
+export function suggestionParameters(task: ProblemSpec['task']): string {
+  const start = 'start' in task && task.start ? `, xuất phát từ ${task.start}` : '';
+  if (task.type === 'path' || task.type === 'shortest_path') return `, từ ${task.from} đến ${task.to}`;
+  if (task.type === 'euler' || task.type === 'hamilton') return `, ${task.want === 'path' ? 'đường đi' : task.want === 'any' ? 'đường đi hoặc chu trình' : 'chu trình'}${start}`;
+  if (task.type === 'tsp') return `, ${task.method === 'nearest_neighbor' ? 'láng giềng gần nhất' : task.method === 'optimal' ? 'tối ưu' : 'cả hai'}${start}`;
+  if (task.type === 'postman') return `, xuất phát từ ${task.start}`;
+  return '';
+}
 
 function confirmationTarget(spec: ProblemSpec, item: string) {
   const indexedEdge = /^(?:graph\.)?edges\[(\d+)\](?:\.(w|u|v|name))?$/.exec(item);

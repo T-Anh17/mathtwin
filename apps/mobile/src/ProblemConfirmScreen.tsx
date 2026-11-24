@@ -8,9 +8,10 @@ import { Actions, Topbar } from './product-ui.js';
 import { editorFromGraph, edgeShapes, fromDraft } from './graph-editor.js';
 import type { EditorGraph } from './graph-editor.js';
 import type { ProblemPageRead, FigureDraftRunner } from './flow/reading.js';
-import { confirmationQuestions, confirmationValue, confirmProblem, initialProblem, replaceGraph } from './flow/confirmation.js';
+import { confirmationQuestions, confirmationValue, confirmProblem, initialProblem, replaceGraph, replaceSuggestedFields, taskSuggestion } from './flow/confirmation.js';
 import { decodeImage } from './images.js';
-import { problemVi as m, confirmationQuestionText, confirmationCandidateText } from './problem.vi.js';
+import { problemVi as m, confirmationQuestionText, confirmationCandidateText, suggestionParameters } from './problem.vi.js';
+import { sessionVi } from './flow/messages.vi.js';
 import type { GraphLayout } from './flow/types.js';
 
 export interface ProblemPhoto { image: string; width: number; height: number }
@@ -33,9 +34,18 @@ export function ProblemConfirmScreen({ outcome, pages = [], photos, manual, busy
   const [graphReviewed, setGraphReviewed] = useState(manual || !!outcome?.spec);
   const [inputs, setInputs] = useState<Record<string, string>>({});
   const [error, setError] = useState('');
+  const suggestion = outcome ? taskSuggestion(outcome) : null;
   const questions = confirmationQuestions({ ...(outcome ?? { graph: null, graphUncertain: [], drafts: [], issues: [], usage: { engine: '', passes: 0, latencyMs: 0 } }), spec });
   const answer = (item: string, value: unknown) => {
     try { setSpec(applyConfirmation(spec, { [item]: value })); setError(''); } catch { setError(m.invalid); }
+  };
+  const acceptSuggestion = () => {
+    if (!suggestion?.task) return;
+    try {
+      const answers = Object.fromEntries((spec.uncertain ?? []).filter((item) => item.item.startsWith('task.') || item.item === 'questionFormat')
+        .map((item) => [item.item, item.candidates[0]]));
+      setSpec(applyConfirmation(spec, answers)); setTaskReviewed(true); setError('');
+    } catch { setError(m.invalid); }
   };
   if (editing) return <GraphEditScreen initial={editing} photo={photos[photoPage]?.image ?? null}
     {...(graphLayout ? { initialAspect: graphLayout.aspect } : {})}
@@ -52,6 +62,9 @@ export function ProblemConfirmScreen({ outcome, pages = [], photos, manual, busy
     {!manual && !outcome?.spec && <p role="status">{m.noSpec}</p>}
     {outcome?.issues.map((issue, i) => <p role="status" key={i}>{issue.message}</p>)}
     {outcome?.drafts.map((draft, i) => draft.question?.rawText && <p className="card" key={i}>{draft.question.rawText}</p>)}
+    {suggestion?.task && <section className="card question-card"><h2 className="section-title">{m.suggested}: {sessionVi.tasks[suggestion.task.type]}{suggestionParameters(suggestion.task)}</h2>
+      <p>{m.suggestedReason(suggestion.matched.join(', '))}</p>
+      <button className="btn btn-outline" onClick={acceptSuggestion}>{m.acceptSuggestion}</button></section>}
     <div className="problem-comparison"><div>{photos.map((photo, page) => <button className="problem-photo" key={page} onClick={() => setPhotoPage(page)} aria-label={m.page(page)} aria-pressed={photoPage === page}>
       <img src={photo.image} alt={m.source}/><span>{m.page(page)}</span></button>)}</div>
       <div className="card"><GraphReadPreview spec={spec}/><button className="btn btn-outline btn-block" onClick={() => setEditing(editorFromGraph(spec.graph, graphLayout))}>{m.edit}</button></div></div>
@@ -67,7 +80,7 @@ export function ProblemConfirmScreen({ outcome, pages = [], photos, manual, busy
       <label>{m.other}<input value={inputs[q.item] ?? ''} onChange={(e) => setInputs({ ...inputs, [q.item]: e.target.value })}/></label>
       <button className="btn btn-outline" disabled={!inputs[q.item]?.trim()} onClick={() => answer(q.item, confirmationValue(inputs[q.item] ?? ''))}>{m.answer}</button>
     </section>)}
-    <ProblemForm spec={spec} taskReviewed={taskReviewed} onChange={setSpec} onTaskEdited={() => setTaskReviewed(true)}/>
+    <ProblemForm spec={spec} taskReviewed={taskReviewed} onChange={(next) => setSpec(replaceSuggestedFields(next))} onTaskEdited={() => setTaskReviewed(true)}/>
     {error && <div role="alert" className="banner banner-error">{error}</div>}
     </div><Actions><button className="btn btn-primary btn-block" disabled={busy || questions.length > 0} onClick={submit}>{m.done}</button></Actions></div>;
 }
