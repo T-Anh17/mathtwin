@@ -7,11 +7,12 @@ export function applyWorkAnswers(lines: WorkLine[], answers: WorkAnswer[]): Work
     const answer = byLine.get(line.index);
     if (!answer) return { ...line, alternatives: [...line.alternatives], ...(line.charConf ? { charConf: [...line.charConf] } : {}) };
     if ('skip' in answer) return { ...line, skipped: true, missing: false };
+    if ('region' in answer) return { ...line, region: answer.region, regionSource: 'user', regionConfirmed: true, skipped: false };
     if ('struck' in answer) {
-      const { strikeScore: _strikeScore, ...rest } = line;
+      const { strikeScore: _strikeScore, strokeBand: _strokeBand, strikeQuestion: _strikeQuestion, ...rest } = line;
       return { ...rest, struck: answer.struck };
     }
-    const { charConf: _charConf, skipped: _skipped, ...rest } = line;
+    const { charConf: _charConf, skipped: _skipped, strikeQuestion: _strikeQuestion, ...rest } = line;
     return { ...rest, missing: false, text: answer.text.normalize('NFC'), conf: 1, alternatives: [] };
   });
 }

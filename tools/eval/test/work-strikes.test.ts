@@ -9,6 +9,9 @@ it('measures all 40 synthetic pages without truth cancellation flags in inferenc
   expect(pages.reduce((sum, p) => sum + p.lines, 0)).toBe(168);
   expect(pages.reduce((sum, p) => sum + p.fp, 0)).toBe(0);
   expect(pages.reduce((sum, p) => sum + p.fn, 0)).toBe(0);
+  // Lô 5.3 rule 4: every truth cancellation is either struck silently (non-claim, safe box) or asked.
+  expect(pages.reduce((sum, p) => sum + p.tp + p.asked, 0)).toBe(40);
+  expect(pages.flatMap((p) => p.detections).filter((d) => d.asked && !d.truth)).toEqual([]);
   expect(pages.reduce((sum, p) => sum + p.struckAsContent, 0)).toBe(0);
 }, 30000);
 

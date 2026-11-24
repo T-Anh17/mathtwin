@@ -5,14 +5,15 @@ import type { WorkLine } from './types.js';
 export const STRIKE_NO = 0.3;
 export const STRIKE_YES = 0.8;
 export const strikeUncertain = (line: WorkLine): boolean => !line.struck && line.strikeScore !== undefined
-  && line.strikeScore > STRIKE_NO && line.strikeScore < STRIKE_YES;
+  && (line.strikeQuestion === true || line.strikeScore > STRIKE_NO && line.strikeScore < STRIKE_YES);
 const clamp = (n: number): number => Math.max(0, Math.min(1, n));
 
 /** Pixel evidence only: neither transcription nor pre-existing struck flags are inspected. */
-export function detectStrikes(image: PreparedImage, lines: WorkLine[]): { line: number; struck: boolean; score: number }[] {
+export function detectStrikes(image: PreparedImage, lines: WorkLine[]): { line: number; struck: boolean; score: number; strokeBand?: number }[] {
   const { width, height, at } = pageInk(image);
   return lines.map((line) => {
-    const result = (score: number) => ({ line: line.index, struck: score >= STRIKE_YES, score });
+    const result = (score: number, strokeY?: number) => ({ line: line.index, struck: score >= STRIKE_YES, score,
+      ...(strokeY === undefined ? {} : { strokeBand: clamp((strokeY - y0) / boxHeight) }) });
     const box = line.box;
     if (!box || !box.every(Number.isFinite) || box[0] < 0 || box[1] < 0 || box[2] > 1000 || box[3] > 1000
       || box[2] <= box[0] || box[3] <= box[1]) return result(.5);
@@ -31,7 +32,7 @@ export function detectStrikes(image: PreparedImage, lines: WorkLine[]): { line: 
     const density = count / (w * h);
     const opaque = h >= 8 && h >= boxHeight * .55 && w >= h * .5 && w <= h * 30
       ? clamp((density - .45) / .5) : 0;
-    let horizontal = 0;
+    let horizontal = 0, horizontalY: number | undefined;
     if (h >= 8 && w >= h * 2) {
       const radius = Math.max(1, Math.round(h * .035)), separation = Math.max(3, Math.ceil(h * .14));
       for (let cy = t + h * .3; cy <= t + h * .7; cy += Math.max(1, h * .05)) {
@@ -55,10 +56,10 @@ export function detectStrikes(image: PreparedImage, lines: WorkLine[]): { line: 
           const score = text && longest / w >= .25
             ? coverage >= .7 ? .5 + .5 * coverage : coverage >= .45 ? .4 + .4 * coverage : .1 * coverage
             : .1 * coverage;
-          horizontal = Math.max(horizontal, score);
+          if (score > horizontal) { horizontal = score; horizontalY = cy; }
         }
       }
     }
-    return result(clamp(Math.max(opaque, horizontal)));
+    return result(clamp(Math.max(opaque, horizontal)), horizontal >= opaque ? horizontalY : (t + b) / 2);
   });
 }

@@ -39,6 +39,8 @@ it('restores a near-region excluded error, regrades, clears acknowledgment, and 
   let s = reduce(fresh(), { type: 'work_photos', photos: [photo('a')] });
   s = reduce(s, { type: 'work_page', reading: { page: 0, raw, lines: raw, ms: 1, needsRegion: false, inspected: true, region: [0, 450, 1000, 620] } });
   s = reduce(s, { type: 'work_read', lines: [], ms: 0 });
+  expect(s.workGrade?.questions[0]?.kind).toBe('region');
+  s = reduce(s, { type: 'work_answer', answer: { line: 1, region: 'question' } });
   s = reduce(s, { type: 'review_ack' }); expect(s.workGrade?.result.verdict).toBe('DUNG');
   const ignored = ignoredWorkLines(s.workLines, s.workPages!); expect(ignored.map((l) => l.index)).toEqual([1]);
   const html = renderToStaticMarkup(createElement(WorkScreen, { spec, initialLines: s.workLines, pages: [], grade: s.workGrade!,
@@ -228,4 +230,26 @@ it('renders uncertainty, local issues, accurate question reasons, empty missing 
   expect(labels).not.toMatch(/\b(?:e1|v3)\b/);
   const region = renderToStaticMarkup(createElement(RegionPicker, { photo: { image: 'blob:local', width: 100, height: 200 }, busy: false, onDone: noop }));
   expect(region).toContain(`aria-label="${workVi.regionLabel}"`); expect(region).toContain('type="number"');
+});
+
+it('Lô 5.3: a crop that excludes a working claim asks "Bài làm / Đề, hình" with the line crop, and the answer regrades', () => {
+  const raw: WorkLine[] = [line(), { ...line('Đồ thị có 3 đỉnh.'), index: 1, box: [50, 630, 950, 670] }];
+  let s = reduce(fresh(), { type: 'work_photos', photos: [photo('a')] });
+  s = reduce(s, { type: 'work_page', reading: processWorkPage(img, { page: 0, raw, lines: raw, ms: 1, needsRegion: true }, [0, 450, 1000, 620]) });
+  s = reduce(s, { type: 'work_read', lines: [], ms: 0 });
+  // Before the answer the line is not silently dropped: no KHONG_DU_CAN_CU / DUNG, one region question.
+  expect(s.workGrade?.result.verdict).toBe('CAN_XAC_NHAN');
+  const question = s.workGrade!.questions[0]!;
+  expect(question).toMatchObject({ kind: 'region', lines: [1], box: [50, 630, 950, 670], shownText: 'Đồ thị có 3 đỉnh.' });
+  const pages = [{ image: 'blob:local', width: 100, height: 100 }];
+  const html = renderToStaticMarkup(createElement(WorkQuestionScreen, { question, lines: s.workLines, pages, onAnswer: noop, onBack: noop }));
+  expect(html).toContain('class="work-crop"'); expect(html).toContain('viewBox=');
+  expect(html).toContain(`>${workVi.solution}</button>`); expect(html).toContain(`>${workVi.questionOrFigure}</button>`);
+  expect(html).toContain(workVi.status(question)); expect(html).not.toContain('<textarea');
+  const asWork = reduce(s, { type: 'work_answer', answer: { line: 1, region: 'solution' } });
+  expect(asWork.workGrade?.result.verdict).toBe('SAI'); expect(asWork.workGrade?.questions).toEqual([]);
+  expect(asWork.workPages?.[0]?.lines[1]).toMatchObject({ region: 'solution', regionConfirmed: true });
+  const asProblem = reduce(s, { type: 'work_answer', answer: { line: 1, region: 'question' } });
+  expect(asProblem.workGrade?.questions).toEqual([]);
+  expect(reduce(asProblem, { type: 'review_ack' }).workGrade?.result.verdict).toBe('DUNG');
 });

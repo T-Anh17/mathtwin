@@ -4,6 +4,7 @@ export type WorkBox = [number, number, number, number];
 export const validWorkBox = (b: WorkBox): boolean => b.every((n) => Number.isFinite(n) && n >= 0 && n <= 1000) && b[2] > b[0] && b[3] > b[1];
 export const validWorkLineBox = (b: WorkBox): boolean => validWorkBox(b) && (b[2] - b[0]) * (b[3] - b[1]) < 800_000;
 const inside = (a: WorkBox, b: WorkBox): boolean => a[0] >= b[0] && a[1] >= b[1] && a[2] <= b[2] && a[3] <= b[3];
+const overlaps = (a: WorkBox, b: WorkBox): boolean => a[0] < b[2] && b[0] < a[2] && a[1] < b[3] && b[1] < a[3];
 const continuationHeading = /^\s*\(?\s*tiếp(?:\s+theo)?\s+bài\s+\d+\s*\)?\s*[:.]?\s*$/iu;
 const hasContinuationQuestion = (lines: WorkLine[]): boolean => lines.some((line) =>
   line.page > 0 && line.region === 'question' && !continuationHeading.test(line.text.normalize('NFC')));
@@ -24,7 +25,8 @@ export function suggestWorkRegion(lines: WorkLine[]): WorkBox | undefined {
 /** Geometry only; never interprets claims or manufactures solution text. Boxes are 0..1000. */
 export function filterWorkRegions(lines: WorkLine[], options: { figures?: WorkBox[]; solution?: WorkBox; cropped?: boolean } = {}) {
   if (options.solution && !validWorkBox(options.solution)) throw new Error('Invalid solution region.');
-  lines = lines.map(({ box, ...line }) => ({ ...line, ...(box && validWorkLineBox(box) ? { box } : {}) }));
+  lines = lines.map(({ box, ...line }) => ({ ...line, ...(line.region ? { regionSource: line.regionSource ?? 'model' as const } : {}),
+    ...(box && validWorkLineBox(box) ? { box } : {}) }));
   const annotations = lines.filter((l) => l.box && !(l.region === 'table' && (l.regionConf ?? 1) >= .85)
     && /^(?:[\p{L}]|v[_₀-₉\d]+|\d+(?:[.,]\d+)?)$/u.test(l.text.trim()));
   const clustered = new Set<number>();
@@ -42,13 +44,21 @@ export function filterWorkRegions(lines: WorkLine[], options: { figures?: WorkBo
     if (group.length >= 3 && Math.max(...group.map((l) => l.box![0])) - Math.min(...group.map((l) => l.box![0])) >= 40)
       group.forEach((l) => clustered.add(l.index));
   }
+  const figureLike = (line: WorkLine): boolean => line.box !== undefined
+    && (options.figures?.some((b) => validWorkBox(b) && inside(line.box!, b)) === true || clustered.has(line.index));
   const filtered = lines.map((line): WorkLine => {
     if (options.solution) {
       // User-confirmed geometry wins over both model labels and figure heuristics.
-      return { ...line, region: (line.box ? inside(line.box, options.solution) : options.cropped) ? (line.region === 'table' ? 'table' : 'solution') : 'question', regionConf: 1 };
+      const region = (line.box ? inside(line.box, options.solution) : options.cropped) ? (line.region === 'table' ? 'table' : 'solution') : 'question';
+      // Only a crop that moves a line out of B's working label, or cuts through the line's box, is a
+      // user exclusion (phase 5 rule 5a); figure-label geometry outside the crop stays a figure exclusion.
+      const agreed = region === 'question' && (line.region === 'question' || line.region === 'figure')
+        && !(line.box && overlaps(line.box, options.solution));
+      const regionSource = region !== 'question' ? 'user' : agreed ? line.regionSource ?? 'model' : figureLike(line) ? 'figure' : 'user';
+      return { ...line, region, regionSource, regionConf: 1 };
     }
-    if (line.box && (options.figures?.some((b) => validWorkBox(b) && inside(line.box!, b)) || clustered.has(line.index)))
-      return { ...line, region: 'figure', regionConf: 1 };
+    if (figureLike(line))
+      return { ...line, region: 'figure', regionSource: 'figure', regionConf: 1 };
     return { ...line };
   });
   // A continuation can contain either a new prompt or mislabelled working.
