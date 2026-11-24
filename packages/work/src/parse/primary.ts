@@ -4,10 +4,51 @@ import { workMessages } from '../messages.vi.js';
 import { labelList, LabelError } from './labels.js';
 import { gradingContent, isHeading, proseClause, splitClauses, walkKind } from './prose.js';
 import type { ProseContext } from './prose.js';
-import { language, sameQuestion, symbols } from './text.js';
+import { fold, language, sameQuestion, symbols } from './text.js';
 import { parseTable, tableLike } from './table.js';
 import { clauseEvidence, readingConfidence, stepConfidence } from './confidence.js';
 import { strikeUncertain } from '../strikes.js';
+
+interface ItemPrefix { text: string; statementId?: string; ambiguous: boolean }
+/** Join a wrapped proposition only at a syntactic continuation point. */
+function joinsLogicalLine(previous: WorkLine, next: WorkLine): boolean {
+  const before = symbols(previous.text).trim();
+  const after = symbols(next.text).trim();
+  if (!before || !after) return false;
+  if (/(?:→|-)\s*$/u.test(before)) return !/[=()]/u.test(after) && /^(?:[\p{L}\p{N}_\s→,\-]+)[.]?$/u.test(after);
+  if (/(?:=|\+|×)\s*$/u.test(before)) return /^[\d∞(+\-]/u.test(after);
+  if (/[:,]\s*$/u.test(before)) return !/^(?:chu\s+trinh|duong\s+di|hanh\s+trinh)\b/iu.test(language(before, []));
+  const folded = language(before, []).trim();
+  if (/\b(?:va|và|la|là|nen|nên|tu|từ|voi|với|cua|của|do|do đó|vì)\s*$/iu.test(folded)) return true;
+  return /^(?:→|=|\+|-)(?=\s|[\p{L}\p{N}(])/u.test(after) && /(?:=|\+|×|→|-)\s*[^.]+$/u.test(before);
+}
+/**
+ * Item markers are not graph vertices.  Strip one only when the surrounding
+ * exercise format or the following vocabulary proves it is a marker.  A lone
+ * `a)` can also be a genuine vertex label, so keep that case for confirmation.
+ */
+function itemPrefix(input: string, vocab: WorkVocabulary): ItemPrefix | undefined {
+  const match = input.match(/^\s*([a-dA-D])[).]\s*(.*)$/u);
+  if (!match) return undefined;
+  const label = match[1]!;
+  const rest = match[2]!;
+  const normalized = language(rest, vocab.vertexLabels);
+  const statementId = vocab.statementIds.find((id) => fold(id) === fold(label));
+  const cue = /^(?:dung|sai|d|s)(?:$|[\s.,;:])|^(?:chon|tu)\b/u.test(normalized);
+  const itemFormat = vocab.questionFormat === 'dung_sai' || vocab.questionFormat === 'trac_nghiem' || statementId !== undefined;
+  if (cue || itemFormat && rest.trim()) return { text: rest, ...(statementId ? { statementId } : {}), ambiguous: false };
+  if (itemFormat) return undefined;
+  const vertexCollision = vocab.vertexLabels.some((vertex) => fold(vertex) === fold(label));
+  return { text: input, ambiguous: vertexCollision };
+}
+
+function itemJudgment(text: string, statementId: string | undefined): { body?: ClaimBody; remainder: string } {
+  if (!statementId) return { remainder: text };
+  const match = text.match(/^\s*(đúng|dung|sai|đ|d|s)(?:[.,:;]\s*|\s+|$)(.*)$/iu);
+  if (!match) return { remainder: text };
+  const value = fold(match[1]!);
+  return { body: { type: 'statement', id: statementId, value: value === 'dung' || value === 'd' }, remainder: match[2]!.trim() };
+}
 
 export function parsePrimary(lines: WorkLine[], vocab: WorkVocabulary, opts?: { confThreshold?: number }): ParsedWork {
   const parsed: ParsedWork = { steps: [], ignored: [], unchecked: [], issues: [] };
@@ -74,22 +115,25 @@ export function parsePrimary(lines: WorkLine[], vocab: WorkVocabulary, opts?: { 
       continue;
     }
     const sources = [line];
-    while (/(?:→|-|=|\+|×|:)\s*$/u.test(symbols(sources.at(-1)!.text))) {
+    while (joinsLogicalLine(sources.at(-1)!, ordered[i + 1] ?? { ...line, text: '' })) {
       const next = ordered[i + 1];
       if (!next || next.page > sources.at(-1)!.page + 1 || ignoredReason(next) || strikeUncertain(next) || next.region === 'table' || tableLines.has(next.index)) break;
-      const route = /(?:→|-)\s*$/u.test(symbols(sources.at(-1)!.text));
-      if (!route) {
-        if (!/^[\d∞(+\-]/u.test(symbols(next.text)) || /[\p{L}]/u.test(symbols(next.text))) break;
-        sources.push(next); i++; continue;
+      if (/(?:→|-)\s*$/u.test(symbols(sources.at(-1)!.text))) {
+        // A wrapped route can consume only vertex notation, never the next claim.
+        try { labelList(symbols(next.text).replace(/(?:→|-)\s*$/u, ''), vocab.vertexLabels); }
+        catch (error) { if (error instanceof LabelError) break; throw error; }
       }
-      // A wrapped route may consume only route text, not the next independent claim.
-      if (!/^[\p{L}\p{N}_\s→,-]+[.]?$/u.test(symbols(next.text))) break;
-      try { labelList(symbols(next.text).replace(/(?:→|-)\s*$/u, ''), vocab.vertexLabels); }
-      catch (error) { if (error instanceof LabelError) break; throw error; }
       sources.push(next); i++;
     }
     const text = sources.map((l) => l.text).join(' ');
-    const normalized = language(text, vocab.vertexLabels);
+    const prefix = itemPrefix(text, vocab);
+    if (prefix?.ambiguous) {
+      parsed.unchecked.push(...sources.map((source) => source.index)); issue('ambiguous_line', sources); issue('unparsed_line', sources);
+      continue;
+    }
+    const item = itemJudgment(prefix?.text ?? text, prefix?.statementId);
+    const parseText = item.remainder;
+    const normalized = language(parseText, vocab.vertexLabels);
     if (isHeading(normalized)) {
       context.kind = walkKind(normalized, vocab);
       if (readingConfidence(line) < threshold) { parsed.unchecked.push(line.index); issue('unparsed_line', [line]); }
@@ -97,12 +141,14 @@ export function parsePrimary(lines: WorkLine[], vocab: WorkVocabulary, opts?: { 
       continue;
     }
     try {
-      const bodies: { body: ClaimBody; clause: string }[] = [];
+      const bodies: { body: ClaimBody; clause: string }[] = item.body ? [{ body: item.body, clause: prefix?.text ?? text }] : [];
       let incomplete = false;
       // Keep algorithm explanations and equalities together; their numbers are literal.
       const algorithm = /\b(?:chon|danh dau|co dinh|khoanh|nhan(?! (?:thay|xet|duoc|ra|so|tong|do|bac|cac)\b)|gan nhan|lap lai|canh lap|them canh|gan nhat|nho nhat)\b/u.test(normalized) && !/duong di ngan nhat/u.test(normalized)
         || /\b(?:n|l)\s*\(/u.test(normalized);
-      const clauses = algorithm ? [text] : splitClauses(text, vocab);
+      // Keep a single algorithm sentence atomic, but do not let an action in a
+      // later sentence suppress an independently complete preceding claim.
+      const clauses = algorithm ? parseText.split(/(?<=[.])\s+/u).filter(Boolean) : splitClauses(parseText, vocab);
       const local: ProseContext = { ...context };
       local.lastGradingLine = !ordered.slice(i + 1).some((next) => !ignoredReason(next)
         && (next.region === 'table' || gradingContent(next.text, vocab) || (() => {
@@ -116,13 +162,24 @@ export function parsePrimary(lines: WorkLine[], vocab: WorkVocabulary, opts?: { 
         if (found) {
           bodies.push(...found.map((body) => ({ body, clause })));
           for (const body of found) if (body.type === 'walk') local.walk = body.vertices;
-        } else if (gradingContent(clause, vocab)) incomplete = true;
-      }
-      if (bodies.length) {
-        for (const { body, clause } of bodies) append(body, sources, 'text', clauseEvidence(sources, clause, body));
+        } else if (!item.body && gradingContent(clause, vocab)) incomplete = true;
       }
       if (incomplete) {
         parsed.unchecked.push(...sources.map((s) => s.index)); issue('unparsed_line', sources);
+      } else if (bodies.length) {
+        // A line is atomic for grading. Keeping a recognized fragment when a
+        // sibling fragment is unknown can make core grade it without context.
+        const priorSelection = parsed.steps.some((step) => step.claim.type === 'dijkstra_select');
+        const initialized = [...parsed.steps.map((step) => step.claim), ...bodies.map(({ body }) => body)]
+          .find((body): body is Extract<typeof body, { type: 'dijkstra_init' }> => body.type === 'dijkstra_init');
+        const firstLabel = bodies.findIndex(({ body }) => body.type === 'dijkstra_label');
+        const implicit = vocab.task === 'shortest_path' && !priorSelection && initialized !== undefined && firstLabel >= 0
+          ? { body: { type: 'dijkstra_select' as const, v: initialized.source, implicit: true }, clause: text } : undefined;
+        for (let index = 0; index < bodies.length; index++) {
+          if (index === firstLabel && implicit) append(implicit.body, sources, 'text', clauseEvidence(sources, implicit.clause, implicit.body));
+          const { body, clause } = bodies[index]!;
+          append(body, sources, 'text', clauseEvidence(sources, clause, body));
+        }
       } else if (!bodies.length) {
         for (const source of sources) {
           if (readingConfidence(source) < threshold) { parsed.unchecked.push(source.index); issue('unparsed_line', [source]); }

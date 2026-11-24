@@ -70,7 +70,8 @@ export type ClaimBody =
   | { type: 'walk'; kind: 'path' | 'euler_path' | 'euler_circuit' | 'hamilton_path' | 'hamilton_cycle' | 'tsp_tour' | 'postman_tour'; vertices: VertexId[]; edgeIds?: string[] }
   | { type: 'length'; vertices: VertexId[]; value: number }
   | { type: 'dijkstra_init'; source: VertexId }
-  | { type: 'dijkstra_select'; v: VertexId }
+  /** `implicit` records the conventional first selection of a written source. */
+  | { type: 'dijkstra_select'; v: VertexId; implicit?: boolean }
   | { type: 'dijkstra_label'; v: VertexId; value: number | null; via?: VertexId }
   | { type: 'nn_step'; from: VertexId; to: VertexId }
   | { type: 'postman_duplicate'; vertices: VertexId[] }

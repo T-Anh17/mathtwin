@@ -36,7 +36,7 @@ type SubjectKind = 'vertices' | 'edges' | 'odd' | 'degree_sum' | 'component_coun
 export const vertexQualifier = '(?:(?:cua|tai|o|cho|den|toi)\\s+)?(?:(?:dinh|diem)\\s+)?';
 interface Subject { kind: SubjectKind; start: number; end: number; text: string }
 const subjects: [SubjectKind, RegExp][] = [
-  ['degree_sum', /\b(?:tong(?: so)? bac(?: cua (?:cac )?dinh)?|tong cac bac)\b/gu],
+  ['degree_sum', /\b(?:tong(?: tat ca)?(?: so)? bac(?: cua (?:cac )?dinh)?|tong cac bac|tong tat ca cac bac)\b/gu],
   ['odd', /\b(?:(?:so(?: luong)?|cac|tap(?: hop)?) )?dinh(?: co)? bac le\b/gu],
   ['component_count', /\b(?:(?:so(?: luong)?|cac) )?(?:thanh phan|nhom)(?: lien thong)\b/gu],
   ['loop_count', /\b(?:(?:so(?: luong)?|cac) )?(?:canh )?khuyen\b/gu],
@@ -59,12 +59,16 @@ function topics(text: string): Subject[] {
 export function slotClaim(text: string, vocab: WorkVocabulary, context: ProseContext): ClaimBody[] | undefined {
   // In a grouping construction the object being divided is not a count topic.
   text = text.replace(/\bchia\s+(?:(?:cac|tap|tap hop)\s+)?(?:dinh|canh)\s+thanh\b/gu, 'chia thanh');
+  // A theorem number is a citation, never a graph vertex count.
+  text = text.replace(/\bdinh li\s+\d+\b/gu, '');
   const found = topics(text);
   if (found.length !== 1) return undefined;
   const subject = found[0]!;
   const before = text.slice(0, subject.start);
   const after = text.slice(subject.end);
   const rest = before + ' ' + after;
+  // “Mỗi đỉnh ... bậc 4” describes degrees, not a four-vertex graph.
+  if (subject.kind === 'vertices' && /\bbac\b/u.test(after)) return undefined;
   const afterNumbers = writtenNumbers(after, vocab.vertexLabels);
   if (!text.includes('=') && (afterNumbers.length > 1 || afterNumbers.length > 0 && numericValue(before) !== undefined
     || !afterNumbers.length && writtenNumbers(rest, vocab.vertexLabels).length > 1)) return undefined;
