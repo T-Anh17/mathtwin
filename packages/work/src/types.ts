@@ -4,6 +4,8 @@ import type { TextLine } from '@mathtwin/reader';
 export interface WorkLine extends TextLine {
   /** An ink band without a transcription; cleared only by an explicit user answer. */
   missing?: boolean;
+  /** Text typed or confirmed by the user; OCR spelling evidence no longer applies. */
+  textConfirmed?: boolean;
   page: number; index: number; skipped?: boolean;
   /** Pixel cancellation evidence; user struck answers clear this score. */
   strikeScore?: number;

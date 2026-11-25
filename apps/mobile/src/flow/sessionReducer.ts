@@ -43,7 +43,7 @@ export function sessionReducer(s: Session, e: SessionEvent, ops: SessionOperatio
     }
     case 'work_manual_page': {
       if (s.stage !== 'work_reading' || !s.workPages?.some((p) => p.page === e.page && p.failed) || !e.lines.some((l) => l.trim())) return s;
-      const lines = e.lines.filter((l) => l.trim()).map((text, index) => ({ text, index, page: e.page, conf: 1, alternatives: [], region: 'solution' as const, struck: false }));
+      const lines = e.lines.filter((l) => l.trim()).map((text, index) => ({ text, index, page: e.page, conf: 1, alternatives: [], region: 'solution' as const, struck: false, textConfirmed: true }));
       const workPages = s.workPages.map((p) => p.page !== e.page ? p : { page: p.page, raw: lines, lines, ms: p.ms,
         needsRegion: false, inspected: true, missingLineCheckUnavailable: true, region: [0, 0, 1000, 1000] as [number, number, number, number] });
       const next = { ...s, workPages, workLines: combinedWorkLines(workPages), reviewAcknowledged: false };
@@ -131,7 +131,7 @@ export function sessionReducer(s: Session, e: SessionEvent, ops: SessionOperatio
     case 'manual_work': {
       if (!s.specConfirmed || !s.solution) return s;
       return regrade({ ...clearWork(s), stage: 'work_review', workSource: 'manual', workLines: e.lines.map((text, index) => ({
-        text, index, page: 0, conf: 1, alternatives: [], region: 'solution',
+        text, index, page: 0, conf: 1, alternatives: [], region: 'solution', textConfirmed: true,
       })) }, ops);
     }
     case 'work_answer': {

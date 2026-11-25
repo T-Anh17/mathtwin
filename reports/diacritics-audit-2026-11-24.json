@@ -1,0 +1,74 @@
+{
+  "generatedAt": "2026-11-24T16:07:32.811Z",
+  "definition": "OCR line has no Vietnamese diacritic (including đ) and matches at least three familiar accented Vietnamese words.",
+  "threshold": 0.85,
+  "labels": "C:\\Users\\arthur.anh\\Documents\\Codex\\2026-11-18\\b-n-l-gi-o-vi\\outputs\\handwriting-prompts\\labels.json",
+  "checkpoints": [
+    {
+      "name": "read-eval-generated-handwriting-2026-11-19",
+      "report": "D:\\work_place\\mathtwin-wt54\\reports\\read-eval-generated-handwriting-2026-11-19.json",
+      "fingerprint": "dfd09367f6c789939402bbc17b19e87b168aad51e9abf6ce78f16e3b955c4f86",
+      "observationFingerprint": "8c54e7ba14c6a9e7b8ce342ce73151e40fd590b20ba5c7ec13986df1b9d23478",
+      "pages": 46,
+      "missingVocabularyCases": [
+        9,
+        10
+      ],
+      "allAccentLossLines": 32,
+      "highConfidenceAccentLossLines": 4,
+      "definitionLines": 21,
+      "unaskedDefinitionLines": 0,
+      "unaskedAccentLossLines": 4,
+      "nonSolutionDefinitionLines": 5,
+      "nonQualifyingHighConfidenceLines": 4,
+      "nonQualifyingReasons": {
+        "one_or_two_familiar_words": 4
+      },
+      "falsePositiveLines": 0
+    },
+    {
+      "name": "read-eval-generated-handwriting-2026-11-19-reader-revision",
+      "report": "D:\\work_place\\mathtwin-wt54\\reports\\read-eval-generated-handwriting-2026-11-19-reader-revision.json",
+      "fingerprint": "ac25837e98a5ec5a3957f4dc126909a5f1cfca8f929005f0a0ab053c37dff676",
+      "observationFingerprint": "171941c9e1babc836c6c9ce7b6502e072287751a711c6f5a7fc58d43ca0866ef",
+      "pages": 46,
+      "missingVocabularyCases": [
+        9,
+        10
+      ],
+      "allAccentLossLines": 7,
+      "highConfidenceAccentLossLines": 4,
+      "definitionLines": 2,
+      "unaskedDefinitionLines": 0,
+      "unaskedAccentLossLines": 3,
+      "nonSolutionDefinitionLines": 1,
+      "nonQualifyingHighConfidenceLines": 3,
+      "nonQualifyingReasons": {
+        "one_or_two_familiar_words": 3
+      },
+      "falsePositiveLines": 0
+    },
+    {
+      "name": "read-eval-generated-handwriting-2026-11-24-phase5",
+      "report": "D:\\work_place\\mathtwin-wt54\\reports\\read-eval-generated-handwriting-2026-11-24-phase5.json",
+      "fingerprint": "196e5f35629054a30b821060fe285d9da45d87462372b0c57e265cc09a3c50ea",
+      "observationFingerprint": "196e5f35629054a30b821060fe285d9da45d87462372b0c57e265cc09a3c50ea",
+      "pages": 46,
+      "missingVocabularyCases": [
+        9,
+        10
+      ],
+      "allAccentLossLines": 27,
+      "highConfidenceAccentLossLines": 6,
+      "definitionLines": 18,
+      "unaskedDefinitionLines": 0,
+      "unaskedAccentLossLines": 3,
+      "nonSolutionDefinitionLines": 6,
+      "nonQualifyingHighConfidenceLines": 3,
+      "nonQualifyingReasons": {
+        "one_or_two_familiar_words": 3
+      },
+      "falsePositiveLines": 0
+    }
+  ]
+}

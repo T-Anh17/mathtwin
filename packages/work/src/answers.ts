@@ -13,6 +13,6 @@ export function applyWorkAnswers(lines: WorkLine[], answers: WorkAnswer[]): Work
       return { ...rest, struck: answer.struck };
     }
     const { charConf: _charConf, skipped: _skipped, strikeQuestion: _strikeQuestion, ...rest } = line;
-    return { ...rest, missing: false, text: answer.text.normalize('NFC'), conf: 1, alternatives: [] };
+    return { ...rest, missing: false, text: answer.text.normalize('NFC'), conf: 1, alternatives: [], textConfirmed: true };
   });
 }
