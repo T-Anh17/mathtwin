@@ -4,8 +4,8 @@ import { arch, cpus, platform, totalmem } from 'node:os';
 import { join, resolve } from 'node:path';
 import { LlamaCppReader, LlamaCppReadError } from '@mathtwin/reader-llamacpp';
 import { FigureReader, NoGlyphReader } from '@mathtwin/reader-figure';
-import { compareText, readProblem } from '@mathtwin/reader';
-import type { ReadDraft, TextLine, TextReader } from '@mathtwin/reader';
+import { editDistance, readProblem } from '@mathtwin/reader';
+import type { ReadDraft, TextReader } from '@mathtwin/reader';
 import type { WorkLine } from '@mathtwin/work';
 import { defaultWorkLineStripConfig } from '@mathtwin/reader-llamacpp-shared';
 import type { Readers } from '../../../apps/mobile/src/flow/reading.js';
@@ -13,7 +13,7 @@ import { loadPairs, pairWorkLines } from './pair-data.js';
 import type { PairSource } from './pair-data.js';
 import { pairInputHash, runMvpPair } from './mvp-pairs.js';
 import { deviationReason } from './mvp-report.js';
-import { alignWorkLines, joinedText } from './work-alignment.js';
+import { alignWorkLines, joinedText, readingText } from './work-alignment.js';
 
 const root = resolve(process.cwd()), args = process.argv.slice(2);
 let source: PairSource | undefined, directory: string | undefined, date = new Date().toISOString().slice(0, 10), rescore = false, baseline: string | undefined, problemRead: 'none' | 'b' = 'none';
@@ -71,16 +71,25 @@ function digitLinesWrong(observed: WorkLine[], reference: WorkLine[]): number {
     return actual.map((line) => joinedText(actual, [line.index])).join(' ').match(/\d+/gu)?.join(',') !== truth.map((line) => line.text).join(' ').match(/\d+/gu)?.join(',');
   }).length;
 }
+/** CER over solution/table lines using the same DP line alignment as grading evaluation; extra observed lines are not counted. */
+function solutionCer(observed: WorkLine[], reference: WorkLine[]): { errors: number; reference: number } {
+  const total = { errors: 0, reference: 0 };
+  for (const group of alignWorkLines(observed, reference).groups) {
+    const truth = reference.filter((line) => group.truth.includes(line.index) && !line.struck && (line.region === 'solution' || line.region === 'table'));
+    if (!truth.length) continue;
+    const expected = [...readingText(truth.map((line) => line.text).join(' '))];
+    total.errors += editDistance(expected, [...readingText(joinedText(observed, group.observed))]); total.reference += expected.length;
+  }
+  return total;
+}
 async function publicRows(): Promise<PublicPairRow[]> {
   return Promise.all(rows.map(async (row) => {
     const pair = pairs.find((item) => item.id === row.id)!;
     const reference = await pairWorkLines(pair.lines, pair.workFiles.map((file) => join(pair.directory, file)));
-    const truth = reference.map((line) => ({ text: line.text, region: line.region ?? 'solution' as const,
-      ...(line.struck === undefined ? {} : { struck: line.struck }), ...(line.box ? { box: line.box } : {}) }));
-    const score = compareText(rawWorkLines(row) as TextLine[], truth);
+    const cer = solutionCer(rawWorkLines(row), reference);
     return { id: row.id, expected: pair.teacher.verdict, finalVerdict: row.finalVerdict, workPages: pair.workFiles.length,
-      machineMs: row.machineMs, workReadMs: row.timings.workRead, cerErrors: score.byRegion.solution.cer.errors,
-      cerReference: score.byRegion.solution.cer.reference, digitLinesWrong: digitLinesWrong(rawWorkLines(row), reference),
+      machineMs: row.machineMs, workReadMs: row.timings.workRead, cerErrors: cer.errors,
+      cerReference: cer.reference, digitLinesWrong: digitLinesWrong(rawWorkLines(row), reference),
       retriedBands: (row.session.workPages ?? []).reduce((total, page) => total + (page.lineStrips?.retriedBands ?? 0), 0),
       predictedTokens: (row.session.workPages ?? []).flatMap((page) => page.lineStrips?.predictedTokens ?? []) };
   }));
@@ -95,7 +104,8 @@ const persist = async () => {
   const manualCrops = rows.reduce((count, row) => count + row.manualRegionPages.length, 0);
   const summaryRows = await publicRows(), before = await baselineFailures();
   const cer = summaryRows.reduce((total, row) => ({ errors: total.errors + row.cerErrors, reference: total.reference + row.cerReference }), { errors: 0, reference: 0 });
-  const averageWorkSeconds = summaryRows.length ? summaryRows.reduce((sum, row) => sum + row.workReadMs, 0) / summaryRows.length / 1000 : 0;
+  const workPageCount = summaryRows.reduce((sum, row) => sum + row.workPages, 0);
+  const averageWorkSeconds = workPageCount ? summaryRows.reduce((sum, row) => sum + row.workReadMs, 0) / workPageCount / 1000 : 0;
   const stripTokens = summaryRows.flatMap((row) => row.predictedTokens).sort((a, b) => a - b);
   const percentile = (p: number): number => stripTokens.length ? stripTokens[Math.min(stripTokens.length - 1, Math.ceil(stripTokens.length * p) - 1)]! : 0;
   const retriedBands = summaryRows.reduce((sum, row) => sum + row.retriedBands, 0);
@@ -104,7 +114,7 @@ const persist = async () => {
     retriedBands, stripTokens: { count: stripTokens.length, p50: percentile(.5), p90: percentile(.9) }, failures: failures.map((failure) => ({ id: failure.id, error: failure.error })) };
   await atomic(output + '.json', report);
   const attempted = completed + failures.length;
-  await writeFile(output + '.md', `# Đo MVP cặp ${source} — ${date}\n\nChế độ đọc đề: **${problemRead}**. Đã hoàn tất ${completed}/${pairs.length} cặp; đã thử ${attempted}/${pairs.length}. Lỗi đọc lượt này: ${failures.length}/${attempted || 0}${before === undefined ? '' : `; mốc trước: ${before}/${pairs.length}`}. Không so trước/sau khi lượt mới chưa hoàn tất. Kết luận trùng nhãn nháp: ${verdictCorrect}/${pairs.length}.\n\nCER bài làm (chỉ vùng lời giải): ${(cer.reference ? cer.errors / cer.reference * 100 : 0).toFixed(2)}% (${cer.errors}/${cer.reference}); dòng mang số đọc sai số: ${report.digitLinesWrong}. Thời gian đọc bài trung bình: ${averageWorkSeconds.toFixed(1)} s/trang.\n\nBài đúng bị chấm oan thành SAI: ${rows.filter((row) => row.expected.verdict === 'DUNG' && row.finalVerdict === 'SAI').length}. CẦN XÁC NHẬN: ${rows.filter((row) => row.finalVerdict === 'CAN_XAC_NHAN').length}; KHÔNG ĐỦ CĂN CỨ: ${rows.filter((row) => row.finalVerdict === 'KHONG_DU_CAN_CU').length}.\n\nKhoanh vùng tay cần vì nhãn không có box: ${manualCrops} trang. Cấu hình đọc bài: ${config.workLineStrips.bands} dải ngang, chồng ${(config.workLineStrips.overlap * 100).toFixed(0)}%, cạnh dải ${config.workLineStrips.maxLongEdge}px. Nhãn ảnh thật là nhãn nháp, chưa giáo viên soát. Báo cáo không chứa chữ OCR/bài làm.\n\n| Cặp | Nhãn nháp | Kết quả | Trang bài | Đọc bài (s) | CER lời giải | Dòng số sai |\n| --- | --- | --- | ---: | ---: | ---: | ---: |\n${summaryRows.map((row) => `| ${row.id} | ${row.expected} | ${row.finalVerdict} | ${row.workPages} | ${(row.workReadMs / 1000).toFixed(1)} | ${row.cerReference ? (row.cerErrors / row.cerReference * 100).toFixed(2) + '%' : '—'} | ${row.digitLinesWrong} |`).join('\n')}\n${failures.length ? `\nLỗi: ${failures.map((failure) => `${failure.id}: ${failure.error}`).join('; ')}` : ''}\n`);
+  await writeFile(output + '.md', `# Đo MVP cặp ${source} — ${date}\n\nChế độ đọc đề: **${problemRead}**. Đã hoàn tất ${completed}/${pairs.length} cặp; đã thử ${attempted}/${pairs.length}. Lỗi đọc lượt này: ${failures.length}/${attempted || 0}${before === undefined ? '' : `; mốc trước: ${before}/${pairs.length}`}. Không so trước/sau khi lượt mới chưa hoàn tất. Kết luận trùng nhãn nháp: ${verdictCorrect}/${pairs.length}.\n\nCER bài làm (chỉ vùng lời giải, căn dòng DP, không tính dòng thừa): ${(cer.reference ? cer.errors / cer.reference * 100 : 0).toFixed(2)}% (${cer.errors}/${cer.reference}); dòng mang số đọc sai số: ${report.digitLinesWrong}. Thời gian đọc bài trung bình: ${averageWorkSeconds.toFixed(1)} s/trang.\n\nBài đúng bị chấm oan thành SAI: ${rows.filter((row) => row.expected.verdict === 'DUNG' && row.finalVerdict === 'SAI').length}. CẦN XÁC NHẬN: ${rows.filter((row) => row.finalVerdict === 'CAN_XAC_NHAN').length}; KHÔNG ĐỦ CĂN CỨ: ${rows.filter((row) => row.finalVerdict === 'KHONG_DU_CAN_CU').length}.\n\nKhoanh vùng tay cần vì nhãn không có box: ${manualCrops} trang. Cấu hình đọc bài: ${config.workLineStrips.bands} dải ngang, chồng ${(config.workLineStrips.overlap * 100).toFixed(0)}%, cạnh dải ${config.workLineStrips.maxLongEdge}px. Nhãn ảnh thật là nhãn nháp, chưa giáo viên soát. Báo cáo không chứa chữ OCR/bài làm.\n\n| Cặp | Nhãn nháp | Kết quả | Trang bài | Đọc bài (s) | CER lời giải | Dòng số sai |\n| --- | --- | --- | ---: | ---: | ---: | ---: |\n${summaryRows.map((row) => `| ${row.id} | ${row.expected} | ${row.finalVerdict} | ${row.workPages} | ${(row.workReadMs / 1000).toFixed(1)} | ${row.cerReference ? (row.cerErrors / row.cerReference * 100).toFixed(2) + '%' : '—'} | ${row.digitLinesWrong} |`).join('\n')}\n${failures.length ? `\nLỗi: ${failures.map((failure) => `${failure.id}: ${failure.error}`).join('; ')}` : ''}\n`);
   const markdown = (await readFile(output + '.md', 'utf8')).replace('\n\nBài đúng bị chấm oan', `\n\nDải phải chia lại: ${retriedBands}; token sinh mỗi dải: p50 ${report.stripTokens.p50}, p90 ${report.stripTokens.p90} (${report.stripTokens.count} dải có đo). Context ${config.workReader.contextSize}, tối đa ${config.workReader.maxTokens} token/dải, chờ ${config.workReader.readTimeout / 1000} s/dải.\n\nBài đúng bị chấm oan`);
   const reasons = new Map(rows.map((row) => [row.id, row.deviation ? deviationReason(row.deviation)[0] : '—']));
   const withReasons = markdown
