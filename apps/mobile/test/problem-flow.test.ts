@@ -6,7 +6,7 @@ import type { ReadOutcome } from '@mathtwin/reader';
 import { validateSpec } from '@mathtwin/core';
 import { previewReaders } from '../src/preview-readers.js';
 import { confirmationQuestions, confirmationValue, confirmProblem, initialProblem, replaceGraph, replaceSuggestedFields, taskSuggestion } from '../src/flow/confirmation.js';
-import { combineProblemPages, readProblemPages } from '../src/flow/reading.js';
+import { combineProblemPages, readProblemPages, shouldReadProblem } from '../src/flow/reading.js';
 import type { ProblemPageRead, Readers, ReadingProgress } from '../src/flow/reading.js';
 import { createSession, sessionReducer as reduce } from '../src/flow/sessionReducer.js';
 import { createMemoryStorage } from '../src/storage/memory.js';
@@ -30,6 +30,7 @@ describe('4.2 problem confirmation', () => {
     const suggestion = taskSuggestion(read)!;
     expect(suggestion.task).toEqual({ type: 'shortest_path', from: 'A', to: 'C' });
     let session = reduce(fresh(), { type: 'problem_photos', photos: [photo] });
+    session = reduce(session, { type: 'problem_read_request' });
     session = reduce(session, { type: 'problem_read', outcome: read, ms: 1 });
     expect(session.specConfirmed).toBe(false); expect(session.solution).toBeUndefined();
     expect(session.spec?.task).toEqual(suggestion.task);
@@ -43,6 +44,16 @@ describe('4.2 problem confirmation', () => {
       photos: [{ image: 'blob:question', width: 2, height: 2 }], manual: false, busy: false,
       runner: previewReaders().figure!, onBack: () => {}, onDone: () => {} }));
     expect(html).toContain(m.suggested); expect(html).toContain('từ A đến C'); expect(html).toContain(m.acceptSuggestion);
+  });
+  it('locks one-tap confirmation when a suggested postman route still lacks its required start', async () => {
+    const read = await outcome();
+    read.spec = null; read.graphUncertain = [];
+    read.drafts[0]!.question!.rawText = 'Xe thu gom rác trên toàn bộ các con đường để quét sạch các tuyến đường.';
+    expect(taskSuggestion(read)?.task).toEqual({ type: 'postman', start: '' });
+    const html = renderToStaticMarkup(createElement(ProblemConfirmScreen, { outcome: read,
+      photos: [{ image: 'blob:question', width: 2, height: 2 }], manual: false, busy: false,
+      runner: previewReaders().figure!, onBack: () => {}, onDone: () => {} }));
+    expect(html).toContain(`<button class="btn btn-outline" disabled="">${m.acceptSuggestion}</button>`);
   });
   it('maps every uncertainty to candidates and a coarse measured endpoint crop', async () => {
     const read = await outcome(), questions = confirmationQuestions(read);
@@ -112,10 +123,16 @@ describe('4.2 problem confirmation', () => {
 });
 
 describe('4.2 reading, checkpoints and cancellation', () => {
-  it('preview goes photos → read → answer all questions → spec_confirmed', async () => {
+  it('keeps photo entry on the form by default, then reads only after an explicit request', async () => {
     const readers = previewReaders(), checkpoints: ProblemPageRead[] = [], progress: ReadingProgress[] = [];
     let s = reduce(fresh(), { type: 'problem_photos', photos: [photo] });
-    const read = await readProblemPages({ count: 1, readers, signal: new AbortController().signal, load: async () => image,
+    expect(s.stage).toBe('problem_confirm'); expect(s.problemRead).toBeUndefined(); expect(s.spec).toBeUndefined();
+    let calls = 0;
+    const counted = { ...readers, problem: async (...args: Parameters<typeof readers.problem>) => { calls++; return readers.problem(...args); } };
+    expect(calls).toBe(0);
+    s = reduce(s, { type: 'problem_read_request' });
+    expect(s.stage).toBe('problem_reading');
+    const read = await readProblemPages({ count: 1, readers: counted, signal: new AbortController().signal, load: async () => image,
       progress: (p) => progress.push(p), checkpoint: async (reading) => { checkpoints.push(reading); s = reduce(s, { type: 'problem_page', reading }); } });
     expect(progress.map((p) => p.phase)).toEqual(['problem', 'figure']);
     expect(checkpoints).toHaveLength(2); expect(checkpoints[0]?.figure).toBeUndefined(); expect(checkpoints[1]?.figure).toBeDefined();
@@ -125,6 +142,54 @@ describe('4.2 reading, checkpoints and cancellation', () => {
     const spec = confirmProblem(read.spec!, answers);
     s = reduce(s, { type: 'spec_confirmed', spec });
     expect(s.stage).toBe('solution'); expect(s.specConfirmed).toBe(true); expect(s.solution).toBeDefined();
+    expect(calls).toBe(1);
+  });
+  it('cancels a requested read without publishing partial pages or accepting late output', async () => {
+    const read = await outcome();
+    let s = reduce(fresh(), { type: 'problem_photos', photos: [photo] });
+    s = reduce(s, { type: 'problem_read_request' });
+    s = reduce(s, { type: 'problem_page', reading: pageRead(read) });
+    s = reduce(s, { type: 'problem_read_cancel' });
+    expect(s.stage).toBe('problem_confirm'); expect(s.problemRead).toBeUndefined(); expect(s.spec).toBeUndefined();
+    const late = reduce(s, { type: 'problem_read', outcome: read, ms: 1 });
+    expect(late).toEqual(s);
+  });
+  it('lets a user-entered spec next to an unread photo reach the solution as manual input', async () => {
+    const spec = replaceGraph(initialProblem(), (await outcome()).spec!.graph);
+    spec.task = { type: 'shortest_path', from: 'A', to: 'C' };
+    let s = reduce(fresh(), { type: 'problem_photos', photos: [photo] });
+    s = reduce(s, { type: 'manual_spec', spec: confirmProblem(spec, {}) });
+    expect(s.stage).toBe('solution'); expect(s.specSource).toBe('manual'); expect(s.problemPhotos).toEqual([photo]);
+  });
+  it('ignores read requests without photos or after a confirmed solution', async () => {
+    const empty = reduce(fresh(), { type: 'problem_read_request' });
+    expect(empty.stage).toBe('problem_capture');
+    const solved = reduce(fresh(), { type: 'manual_spec', spec: (await outcome()).spec! });
+    expect(reduce(solved, { type: 'problem_read_request' })).toEqual(solved);
+  });
+  it('starts the B reader only after an explicit request, never by default', async () => {
+    const ready = { manual: false, readerReady: true, available: true };
+    let s = reduce(fresh(), { type: 'problem_photos', photos: [photo] });
+    expect(shouldReadProblem(s.stage, ready)).toBe(false);
+    s = reduce(s, { type: 'problem_read_request' });
+    expect(shouldReadProblem(s.stage, ready)).toBe(true);
+    expect(shouldReadProblem(s.stage, { ...ready, manual: true })).toBe(false);
+    expect(shouldReadProblem(s.stage, { ...ready, readerReady: false })).toBe(false);
+    s = reduce(s, { type: 'problem_read', outcome: await outcome(), ms: 1 });
+    expect(shouldReadProblem(s.stage, ready)).toBe(false);
+  });
+  it('offers the optional read only before a reading, and always offers cancel while reading', async () => {
+    const render = (session: ReturnType<typeof fresh>, readerReady: boolean) => renderToStaticMarkup(createElement(ProblemFlowScreen, { session, busy: false,
+      readerReady, onEvent: () => {}, onBack: () => {} }));
+    const unread = reduce(fresh(), { type: 'problem_photos', photos: [photo] });
+    expect(render(unread, true)).toContain(m.done); expect(render(unread, true)).not.toContain(m.resume);
+    const stuck = render(reduce(unread, { type: 'problem_read_request' }), false);
+    expect(stuck).toContain(m.cancel); expect(stuck).toContain(m.resume);
+    const confirm = (extra: Record<string, unknown>) => renderToStaticMarkup(createElement(ProblemConfirmScreen, {
+      photos: [{ image: 'blob:question', width: 2, height: 2 }], manual: true, busy: false, readerReady: true,
+      runner: previewReaders().figure!, onBack: () => {}, onDone: () => {}, ...extra }));
+    expect(confirm({ onReadRequest: () => {} })).toContain(m.machineRead);
+    expect(confirm({})).not.toContain(m.machineRead);
   });
   it('manual graph and parameters reach solution without a reader', async () => {
     const spec = replaceGraph(initialProblem(), (await outcome()).spec!.graph);
@@ -150,6 +215,7 @@ describe('4.2 reading, checkpoints and cancellation', () => {
   it('resumes after app restart without rereading durable pages; reports the next page', async () => {
     const storage = createMemoryStorage(), controller = new AbortController();
     let s = reduce(fresh(), { type: 'problem_photos', photos: [photo, { ...photo, id: 'p2', page: 1 }] });
+    s = reduce(s, { type: 'problem_read_request' });
     const readers = previewReaders(); delete readers.figure;
     await expect(readProblemPages({ count: 2, readers, signal: controller.signal, load: async () => image, progress: () => {},
       checkpoint: async (reading) => { s = reduce(s, { type: 'problem_page', reading }); await storage.sessions.put(s); controller.abort(); } })).rejects.toBeDefined();

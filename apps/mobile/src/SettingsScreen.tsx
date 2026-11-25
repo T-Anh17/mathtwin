@@ -40,7 +40,7 @@ export function SettingsScreen({ onNavigate, onBenchmark, onDemo, modelApi, usag
   const disabled = busy || working;
   return <div className="screen settings-screen"><div className="topbar" style={{ paddingLeft: 16 }}><h1>{productVi.settings}</h1></div><div className="content">
     <h2 className="section-title">{m.models}</h2><p>{m.downloadNote}</p>
-    {(['b', 'a'] as const).map((model) => {
+    {(['b'] as const).map((model) => {
       const files = manifest.files.filter((f) => f.model === model), bytes = files.reduce((n, f) => n + f.bytes, 0);
       const state = models.find((s) => s.model === model);
       const ready = state?.ready ?? false;

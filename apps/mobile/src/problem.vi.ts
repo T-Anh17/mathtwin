@@ -4,10 +4,13 @@ import { sessionVi } from './flow/messages.vi.js';
 
 export const problemVi = {
   capture: 'Ảnh đề bài', confirm: 'Chờ xác nhận đề', manual: 'Nhập tay đề', add: 'Chụp thêm ảnh', choose: 'Chọn ảnh',
-  read: 'Đọc đề', cancel: 'Hủy đọc', resume: 'Tiếp tục đọc', retry: 'Thử lại', remove: 'Xóa ảnh', rotate: 'Xoay ảnh 90°',
+  read: 'Đọc đề', continueEntry: 'Tiếp tục nhập đề', machineRead: 'Đọc đề bằng máy (khoảng 2 phút)',
+  cancel: 'Hủy', resume: 'Tiếp tục đọc', retry: 'Thử lại', remove: 'Xóa ảnh', rotate: 'Xoay ảnh 90°',
   missing: 'Bộ đọc B chưa tải. Tải trong Cài đặt hoặc nhập tay đề.', settings: 'Mở Cài đặt',
   preview: 'Bản xem thử dùng bộ đọc giả lập. Kết quả dưới đây là dữ liệu mô phỏng, không phải nội dung ảnh.',
-  speed: 'Bộ đọc B khoảng 2 GB; số đo cũ khoảng 49 giây/trang trên điện thoại mạnh, vượt mục tiêu 15 giây.',
+  speed: 'Đọc đề bằng máy mất khoảng 2 phút mỗi trang (số đo trên máy tính); nháp đọc được thường vẫn phải sửa nhiều.',
+  replaceRead: 'Phần đề đang nhập sẽ bị bỏ và thay bằng nháp máy đọc; nếu hủy hoặc đọc lỗi, phần này cũng không được giữ lại. Bạn có muốn tiếp tục?',
+  replaceReadConfirm: 'Bỏ phần đang nhập và đọc', replaceReadBack: 'Tiếp tục chỉnh sửa',
   edit: 'Sửa đồ thị', draft: 'Dùng nháp hình D để sửa', draftNote: 'Nháp D chỉ là gợi ý; cần soát mọi đỉnh, cạnh và trọng số.',
   done: 'Xác nhận đề', other: 'Nhập giá trị khác', answer: 'Áp dụng', unresolved: 'Trả lời hết các chỗ chưa chắc trước khi xác nhận.',
   suggested: 'Máy gợi ý', suggestedReason: (matched: string) => `Lý do: khớp từ khóa ${matched}.`, acceptSuggestion: 'Đúng yêu cầu này',

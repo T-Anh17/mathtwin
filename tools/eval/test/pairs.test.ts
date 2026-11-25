@@ -44,7 +44,7 @@ describe('image pairs', () => {
     let problemReads = 0, workReads = 0;
     const outcome: ReadOutcome = { spec, graph: spec.graph, graphUncertain: [], drafts: [], issues: [], usage: { engine: 'fake', passes: 1, latencyMs: 1 } };
     const readers: Readers = { problem: async () => { problemReads++; return structuredClone(outcome); }, text: { engine: 'fake', readLines: async () => { workReads++; return { lines: [{ text: 'Có 2 đỉnh.', conf: 1, alternatives: [], region: 'solution' }], usage: { engine: 'fake', passes: 1, latencyMs: 1 } }; } } };
-    const row = await runMvpPair(pair, '2026-11-23', readers, new AbortController().signal, async () => {});
+    const row = await runMvpPair(pair, '2026-11-23', readers, new AbortController().signal, async () => {}, undefined, undefined, 'b');
     expect(problemReads).toBe(1); expect(workReads).toBe(2); expect(row.manualRegionPages).toEqual([0]);
     expect(row.session.problemPhotos).toHaveLength(1); expect(row.session.workPhotos).toHaveLength(1);
   });

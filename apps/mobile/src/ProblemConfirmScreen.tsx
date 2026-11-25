@@ -15,6 +15,13 @@ import { sessionVi } from './flow/messages.vi.js';
 import type { GraphLayout } from './flow/types.js';
 
 export interface ProblemPhoto { image: string; width: number; height: number }
+function hasBlankRequiredTaskParameter(task: ProblemSpec['task']): boolean {
+  switch (task.type) {
+    case 'path': case 'shortest_path': return !task.from.trim() || !task.to.trim();
+    case 'postman': return !task.start.trim();
+    default: return false;
+  }
+}
 function GraphReadPreview({ spec }: { spec: ProblemSpec }) {
   const editor = editorFromGraph(spec.graph);
   return <svg viewBox="0 0 400 400" role="img" aria-label={m.graph} className="problem-graph">
@@ -22,9 +29,10 @@ function GraphReadPreview({ spec }: { spec: ProblemSpec }) {
     {editor.vertices.map((v) => <g key={v.key}><circle cx={v.x * 400} cy={v.y * 400} r="17"/><text x={v.x * 400} y={v.y * 400 + 5}>{v.label}</text></g>)}
   </svg>;
 }
-export function ProblemConfirmScreen({ outcome, pages = [], photos, manual, busy, runner, onBack, onDone }: {
+export function ProblemConfirmScreen({ outcome, pages = [], photos, manual, busy, runner, readerReady = false, onReadRequest, onSettings, onBack, onDone }: {
   outcome?: ReadOutcome; pages?: ProblemPageRead[]; photos: ProblemPhoto[]; manual: boolean; busy: boolean;
-  runner: FigureDraftRunner; onBack: () => void; onDone: (spec: ProblemSpec, layout?: GraphLayout) => void;
+  runner: FigureDraftRunner; readerReady?: boolean; onReadRequest?: () => void; onSettings?: () => void;
+  onBack: () => void; onDone: (spec: ProblemSpec, layout?: GraphLayout) => void;
 }) {
   const [spec, setSpec] = useState(() => initialProblem(outcome));
   const [editing, setEditing] = useState<EditorGraph | null>(null);
@@ -34,13 +42,16 @@ export function ProblemConfirmScreen({ outcome, pages = [], photos, manual, busy
   const [graphReviewed, setGraphReviewed] = useState(manual || !!outcome?.spec);
   const [inputs, setInputs] = useState<Record<string, string>>({});
   const [error, setError] = useState('');
+  const [edited, setEdited] = useState(false);
+  const [confirmRead, setConfirmRead] = useState(false);
   const suggestion = outcome ? taskSuggestion(outcome) : null;
+  const canAcceptSuggestion = Boolean(suggestion?.task) && !taskReviewed && !hasBlankRequiredTaskParameter(spec.task);
   const questions = confirmationQuestions({ ...(outcome ?? { graph: null, graphUncertain: [], drafts: [], issues: [], usage: { engine: '', passes: 0, latencyMs: 0 } }), spec });
   const answer = (item: string, value: unknown) => {
-    try { setSpec(applyConfirmation(spec, { [item]: value })); setError(''); } catch { setError(m.invalid); }
+    try { setSpec(applyConfirmation(spec, { [item]: value })); setEdited(true); setError(''); } catch { setError(m.invalid); }
   };
   const acceptSuggestion = () => {
-    if (!suggestion?.task) return;
+    if (!canAcceptSuggestion || !suggestion?.task) return;
     try {
       const answers = Object.fromEntries((spec.uncertain ?? []).filter((item) => item.item.startsWith('task.') || item.item === 'questionFormat')
         .map((item) => [item.item, item.candidates[0]]));
@@ -50,7 +61,7 @@ export function ProblemConfirmScreen({ outcome, pages = [], photos, manual, busy
   if (editing) return <GraphEditScreen initial={editing} photo={photos[photoPage]?.image ?? null}
     {...(graphLayout ? { initialAspect: graphLayout.aspect } : {})}
     runner={runner} decode={async (data) => (await decodeImage(data)).original}
-    onBack={() => setEditing(null)} onDone={(graph, layout) => { setSpec(replaceGraph(spec, graph)); setGraphLayout(layout); setGraphReviewed(true); setEditing(null); }}/ >;
+    onBack={() => setEditing(null)} onDone={(graph, layout) => { setSpec(replaceGraph(spec, graph)); setGraphLayout(layout); setGraphReviewed(true); setEdited(true); setEditing(null); }}/ >;
   const submit = () => {
     try {
       if (!taskReviewed || (!graphReviewed && spec.task.type !== 'degree_sequence')) throw new Error(m.noSpec);
@@ -64,7 +75,7 @@ export function ProblemConfirmScreen({ outcome, pages = [], photos, manual, busy
     {outcome?.drafts.map((draft, i) => draft.question?.rawText && <p className="card" key={i}>{draft.question.rawText}</p>)}
     {suggestion?.task && <section className="card question-card"><h2 className="section-title">{m.suggested}: {sessionVi.tasks[suggestion.task.type]}{suggestionParameters(suggestion.task)}</h2>
       <p>{m.suggestedReason(suggestion.matched.join(', '))}</p>
-      <button className="btn btn-outline" onClick={acceptSuggestion}>{m.acceptSuggestion}</button></section>}
+      <button className="btn btn-outline" disabled={!canAcceptSuggestion} onClick={acceptSuggestion}>{m.acceptSuggestion}</button></section>}
     <div className="problem-comparison"><div>{photos.map((photo, page) => <button className="problem-photo" key={page} onClick={() => setPhotoPage(page)} aria-label={m.page(page)} aria-pressed={photoPage === page}>
       <img src={photo.image} alt={m.source}/><span>{m.page(page)}</span></button>)}</div>
       <div className="card"><GraphReadPreview spec={spec}/><button className="btn btn-outline btn-block" onClick={() => setEditing(editorFromGraph(spec.graph, graphLayout))}>{m.edit}</button></div></div>
@@ -80,7 +91,18 @@ export function ProblemConfirmScreen({ outcome, pages = [], photos, manual, busy
       <label>{m.other}<input value={inputs[q.item] ?? ''} onChange={(e) => setInputs({ ...inputs, [q.item]: e.target.value })}/></label>
       <button className="btn btn-outline" disabled={!inputs[q.item]?.trim()} onClick={() => answer(q.item, confirmationValue(inputs[q.item] ?? ''))}>{m.answer}</button>
     </section>)}
-    <ProblemForm spec={spec} taskReviewed={taskReviewed} onChange={(next) => setSpec(replaceSuggestedFields(next))} onTaskEdited={() => setTaskReviewed(true)}/>
+    <ProblemForm spec={spec} taskReviewed={taskReviewed} onChange={(next) => { setSpec(replaceSuggestedFields(next)); setEdited(true); }} onTaskEdited={() => { setTaskReviewed(true); setEdited(true); }}/>
+    {onReadRequest && photos.length > 0 && <section className="card">
+      <button className="btn btn-outline btn-block" disabled={!readerReady || busy} onClick={() => {
+        if (edited) setConfirmRead(true); else onReadRequest();
+      }}>{m.machineRead}</button>
+      {!readerReady && <><p className="text-xs muted">{m.missing}</p>{onSettings && <button className="btn btn-outline" onClick={onSettings}>{m.settings}</button>}</>}
+      {readerReady && <p className="text-xs muted">{m.speed}</p>}
+      {confirmRead && <div className="question-card"><p role="alert">{m.replaceRead}</p><div className="options">
+        <button className="btn btn-primary" onClick={onReadRequest}>{m.replaceReadConfirm}</button>
+        <button className="btn btn-outline" onClick={() => setConfirmRead(false)}>{m.replaceReadBack}</button>
+      </div></div>}
+    </section>}
     {error && <div role="alert" className="banner banner-error">{error}</div>}
     </div><Actions><button className="btn btn-primary btn-block" disabled={busy || questions.length > 0} onClick={submit}>{m.done}</button></Actions></div>;
 }

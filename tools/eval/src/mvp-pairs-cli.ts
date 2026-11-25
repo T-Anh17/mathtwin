@@ -16,7 +16,7 @@ import { deviationReason } from './mvp-report.js';
 import { alignWorkLines, joinedText } from './work-alignment.js';
 
 const root = resolve(process.cwd()), args = process.argv.slice(2);
-let source: PairSource | undefined, directory: string | undefined, date = new Date().toISOString().slice(0, 10), rescore = false, baseline: string | undefined;
+let source: PairSource | undefined, directory: string | undefined, date = new Date().toISOString().slice(0, 10), rescore = false, baseline: string | undefined, problemRead: 'none' | 'b' = 'none';
 for (let i = 0; i < args.length; i++) {
   if (args[i] === '--rescore' && !rescore) { rescore = true; continue; }
   const flag = args[i], value = args[++i];
@@ -24,9 +24,10 @@ for (let i = 0; i < args.length; i++) {
   else if (flag === '--dir' && value) directory = value;
   else if (flag === '--date' && /^\d{4}-\d{2}-\d{2}$/u.test(value ?? '')) date = value!;
   else if (flag === '--baseline' && value) baseline = value;
-  else throw new Error('Dùng eval:mvp -- --source real|generated --dir <thư mục> [--date YYYY-MM-DD] [--baseline <report.json>] [--rescore].');
+  else if (flag === '--problem-read' && (value === 'none' || value === 'b')) problemRead = value;
+  else throw new Error('Dùng eval:mvp -- --source real|generated --dir <thư mục> [--date YYYY-MM-DD] [--baseline <report.json>] [--rescore] [--problem-read none|b].');
 }
-if (!source || !directory) throw new Error('Dùng eval:mvp -- --source real|generated --dir <thư mục> [--date YYYY-MM-DD] [--baseline <report.json>] [--rescore].');
+if (!source || !directory) throw new Error('Dùng eval:mvp -- --source real|generated --dir <thư mục> [--date YYYY-MM-DD] [--baseline <report.json>] [--rescore] [--problem-read none|b].');
 const pairs = await loadPairs(directory, source);
 if (!pairs.length) throw new Error('Thư mục cặp rỗng; không tạo kết quả độ chính xác giả.');
 const workReader = { contextSize: 8192, maxTokens: 3072, readTimeout: 600_000, timeoutMs: 780_000 };
@@ -36,7 +37,8 @@ const identities = await Promise.all([serverPath, join(modelsDirectory, 'b/Qwen3
   .map(async (path) => ({ path, size: (await stat(path)).size })));
 const fingerprint = createHash('sha256').update(JSON.stringify({ config, identities })).update(await readFile(new URL(import.meta.url)))
   .update(await readFile(join(root, 'packages/reader-llamacpp-shared/src/line-strips.ts'))).update(await readFile(join(root, 'apps/mobile/src/flow/work-reading.ts'))).digest('hex');
-const cache = join(root, 'reports/.debug', `mvp-${source}-${date}`), output = join(root, 'reports', `mvp-${source}-${date}`);
+const baselineCache = join(root, 'reports/.debug', `mvp-${source}-${date}`), cache = join(root, 'reports/.debug', `mvp-${source}-${date}${problemRead === 'none' ? '-none' : ''}`);
+const output = join(root, 'reports', `mvp-${source}-${date}${problemRead === 'none' ? '-none' : ''}`);
 await mkdir(cache, { recursive: true });
 const atomic = async (path: string, value: unknown) => { await writeFile(path + '.tmp', JSON.stringify(value, null, 2) + '\n'); await rename(path + '.tmp', path); };
 const llama = new LlamaCppReader({ model: 'b', serverPath, modelsDirectory, threads: 4, gpuLayers: 0, maxImageSide: 768, timeoutMs: 420_000, readTimeout: 300_000 });
@@ -97,12 +99,12 @@ const persist = async () => {
   const stripTokens = summaryRows.flatMap((row) => row.predictedTokens).sort((a, b) => a - b);
   const percentile = (p: number): number => stripTokens.length ? stripTokens[Math.min(stripTokens.length - 1, Math.ceil(stripTokens.length * p) - 1)]! : 0;
   const retriedBands = summaryRows.reduce((sum, row) => sum + row.retriedBands, 0);
-  const report = { date, source, config, fingerprint, machine, planned: pairs.length, completed, readingFailures: failures.length,
+  const report = { date, source, problemRead, config, fingerprint, machine, planned: pairs.length, completed, readingFailures: failures.length,
     ...(before === undefined ? {} : { baselineReadingFailures: before }), verdictCorrect, manualCrops, cer, digitLinesWrong: summaryRows.reduce((sum, row) => sum + row.digitLinesWrong, 0), rows: summaryRows,
     retriedBands, stripTokens: { count: stripTokens.length, p50: percentile(.5), p90: percentile(.9) }, failures: failures.map((failure) => ({ id: failure.id, error: failure.error })) };
   await atomic(output + '.json', report);
   const attempted = completed + failures.length;
-  await writeFile(output + '.md', `# Đo MVP cặp ${source} — ${date}\n\nĐã hoàn tất ${completed}/${pairs.length} cặp; đã thử ${attempted}/${pairs.length}. Lỗi đọc lượt này: ${failures.length}/${attempted || 0}${before === undefined ? '' : `; mốc trước: ${before}/${pairs.length}`}. Không so trước/sau khi lượt mới chưa hoàn tất. Kết luận trùng nhãn nháp: ${verdictCorrect}/${pairs.length}.\n\nCER bài làm (chỉ vùng lời giải): ${(cer.reference ? cer.errors / cer.reference * 100 : 0).toFixed(2)}% (${cer.errors}/${cer.reference}); dòng mang số đọc sai số: ${report.digitLinesWrong}. Thời gian đọc bài trung bình: ${averageWorkSeconds.toFixed(1)} s/trang.\n\nBài đúng bị chấm oan thành SAI: ${rows.filter((row) => row.expected.verdict === 'DUNG' && row.finalVerdict === 'SAI').length}. CẦN XÁC NHẬN: ${rows.filter((row) => row.finalVerdict === 'CAN_XAC_NHAN').length}; KHÔNG ĐỦ CĂN CỨ: ${rows.filter((row) => row.finalVerdict === 'KHONG_DU_CAN_CU').length}.\n\nKhoanh vùng tay cần vì nhãn không có box: ${manualCrops} trang. Cấu hình đọc bài: ${config.workLineStrips.bands} dải ngang, chồng ${(config.workLineStrips.overlap * 100).toFixed(0)}%, cạnh dải ${config.workLineStrips.maxLongEdge}px. Nhãn ảnh thật là nhãn nháp, chưa giáo viên soát. Báo cáo không chứa chữ OCR/bài làm.\n\n| Cặp | Nhãn nháp | Kết quả | Trang bài | Đọc bài (s) | CER lời giải | Dòng số sai |\n| --- | --- | --- | ---: | ---: | ---: | ---: |\n${summaryRows.map((row) => `| ${row.id} | ${row.expected} | ${row.finalVerdict} | ${row.workPages} | ${(row.workReadMs / 1000).toFixed(1)} | ${row.cerReference ? (row.cerErrors / row.cerReference * 100).toFixed(2) + '%' : '—'} | ${row.digitLinesWrong} |`).join('\n')}\n${failures.length ? `\nLỗi: ${failures.map((failure) => `${failure.id}: ${failure.error}`).join('; ')}` : ''}\n`);
+  await writeFile(output + '.md', `# Đo MVP cặp ${source} — ${date}\n\nChế độ đọc đề: **${problemRead}**. Đã hoàn tất ${completed}/${pairs.length} cặp; đã thử ${attempted}/${pairs.length}. Lỗi đọc lượt này: ${failures.length}/${attempted || 0}${before === undefined ? '' : `; mốc trước: ${before}/${pairs.length}`}. Không so trước/sau khi lượt mới chưa hoàn tất. Kết luận trùng nhãn nháp: ${verdictCorrect}/${pairs.length}.\n\nCER bài làm (chỉ vùng lời giải): ${(cer.reference ? cer.errors / cer.reference * 100 : 0).toFixed(2)}% (${cer.errors}/${cer.reference}); dòng mang số đọc sai số: ${report.digitLinesWrong}. Thời gian đọc bài trung bình: ${averageWorkSeconds.toFixed(1)} s/trang.\n\nBài đúng bị chấm oan thành SAI: ${rows.filter((row) => row.expected.verdict === 'DUNG' && row.finalVerdict === 'SAI').length}. CẦN XÁC NHẬN: ${rows.filter((row) => row.finalVerdict === 'CAN_XAC_NHAN').length}; KHÔNG ĐỦ CĂN CỨ: ${rows.filter((row) => row.finalVerdict === 'KHONG_DU_CAN_CU').length}.\n\nKhoanh vùng tay cần vì nhãn không có box: ${manualCrops} trang. Cấu hình đọc bài: ${config.workLineStrips.bands} dải ngang, chồng ${(config.workLineStrips.overlap * 100).toFixed(0)}%, cạnh dải ${config.workLineStrips.maxLongEdge}px. Nhãn ảnh thật là nhãn nháp, chưa giáo viên soát. Báo cáo không chứa chữ OCR/bài làm.\n\n| Cặp | Nhãn nháp | Kết quả | Trang bài | Đọc bài (s) | CER lời giải | Dòng số sai |\n| --- | --- | --- | ---: | ---: | ---: | ---: |\n${summaryRows.map((row) => `| ${row.id} | ${row.expected} | ${row.finalVerdict} | ${row.workPages} | ${(row.workReadMs / 1000).toFixed(1)} | ${row.cerReference ? (row.cerErrors / row.cerReference * 100).toFixed(2) + '%' : '—'} | ${row.digitLinesWrong} |`).join('\n')}\n${failures.length ? `\nLỗi: ${failures.map((failure) => `${failure.id}: ${failure.error}`).join('; ')}` : ''}\n`);
   const markdown = (await readFile(output + '.md', 'utf8')).replace('\n\nBài đúng bị chấm oan', `\n\nDải phải chia lại: ${retriedBands}; token sinh mỗi dải: p50 ${report.stripTokens.p50}, p90 ${report.stripTokens.p90} (${report.stripTokens.count} dải có đo). Context ${config.workReader.contextSize}, tối đa ${config.workReader.maxTokens} token/dải, chờ ${config.workReader.readTimeout / 1000} s/dải.\n\nBài đúng bị chấm oan`);
   const reasons = new Map(rows.map((row) => [row.id, row.deviation ? deviationReason(row.deviation)[0] : '—']));
   const withReasons = markdown
@@ -113,9 +115,9 @@ const persist = async () => {
 };
 const signal = AbortSignal.timeout(5 * 60 * 60_000);
 for (const pair of pairs) {
-  const path = join(cache, `${pair.id}.json`), inputHash = await pairInputHash(pair);
+  const path = join(cache, `${pair.id}.json`), priorPath = join(problemRead === 'none' && rescore ? baselineCache : cache, `${pair.id}.json`), inputHash = await pairInputHash(pair);
   let saved: { fingerprint: string; inputHash: string; session?: import('../../../apps/mobile/src/flow/types.js').Session; row?: Awaited<ReturnType<typeof runMvpPair>> } | undefined;
-  try { saved = JSON.parse(await readFile(path, 'utf8')) as typeof saved; } catch (error) { if (!(error instanceof Error) || !('code' in error) || (error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; }
+  try { saved = JSON.parse(await readFile(priorPath, 'utf8')) as typeof saved; } catch (error) { if (!(error instanceof Error) || !('code' in error) || (error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; }
   if (saved && saved.inputHash !== inputHash) throw new Error(`Checkpoint khác nhãn hoặc ảnh: ${pair.id}. Dùng --date mới.`);
   // A page-level checkpoint contains only raw reader state.  It is safe to
   // resume it after a local flow fix, and avoids spending a second B read.
@@ -124,8 +126,9 @@ for (const pair of pairs) {
   if (saved?.row && !rescore) { rows.push(saved.row); console.log(`${rows.length}/${pairs.length} ${pair.id}: đã lưu`); continue; }
   if (rescore && !saved?.row) throw new Error(`Thiếu checkpoint để chấm lại: ${pair.id}`);
   try {
-    const active: Readers = rescore ? { text: { engine: 'cached-B', readLines: async () => { throw new Error('Chấm lại không được gọi suy luận.'); } }, problem: async () => { throw new Error('Chấm lại không được gọi suy luận.'); } } : readers;
-    const row = await runMvpPair(pair, date, active, signal, async (session) => atomic(path, { fingerprint, inputHash, session }), saved?.session, saved?.row);
+    const active: Readers = rescore ? { text: { engine: 'cached-B', readLines: async () => { throw new Error('Chấm lại không được gọi suy luận.'); } },
+      problem: async () => { throw new Error('Chấm lại không được gọi suy luận.'); }, ...(problemRead === 'none' ? { figure: readers.figure } : {}) } : readers;
+    const row = await runMvpPair(pair, date, active, signal, async (session) => atomic(path, { fingerprint, inputHash, session }), saved?.session, saved?.row, problemRead);
     await atomic(path, { fingerprint, inputHash, row }); rows.push(row); console.log(`${rows.length}/${pairs.length} ${pair.id}: ${row.finalVerdict}; ${(row.machineMs / 1000).toFixed(1)} s`);
   } catch (error) {
     const message = error instanceof LlamaCppReadError ? `${error.message} [${error.code}/${error.reason ?? 'unknown'}]` : error instanceof Error ? error.message : String(error);

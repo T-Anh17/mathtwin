@@ -21,7 +21,8 @@ const line = (text = 'Đồ thị có 2 đỉnh.', conf = 1): WorkLine => ({ tex
 const fresh = () => createSession('s1', '2026-11-18T00:00:00Z');
 function stages(): Record<Stage, Session> {
   const problem_capture = fresh();
-  const problem_reading = reduce(problem_capture, { type: 'problem_photos', photos: [photo] });
+  const problem_waiting = reduce(problem_capture, { type: 'problem_photos', photos: [photo] });
+  const problem_reading = reduce(problem_waiting, { type: 'problem_read_request' });
   const problem_confirm = reduce(problem_reading, { type: 'problem_read', outcome, ms: 10 });
   const solution = reduce(problem_confirm, { type: 'spec_confirmed', spec });
   const work_capture = reduce(solution, { type: 'retake', target: 'work' });

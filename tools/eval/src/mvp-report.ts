@@ -25,6 +25,8 @@ export function deviationReason(deviation: MvpRow['deviation']): [string, string
   const [reason, owner] = causeText[deviation.cause];
   return [`${reason} (dòng ${deviation.lines.join(', ') || '—'})`, owner];
 }
+/** The default no-reading path starts from an empty graph (manual entry); the B path edits the D draft. */
+export function graphEffort(row: MvpRow): number { return (row.problemRead ?? 'b') === 'none' ? row.effort.manualOps : row.effort.draftOps; }
 export function mvpReport(date: string, rows: MvpRow[], planned: number, machine: string, failures: MvpFailure[] = []) {
   const n = rows.length;
   const count = (fn: (r: MvpRow) => boolean) => rows.filter(fn).length;
@@ -103,7 +105,7 @@ ${[
     ['Nhóm dòng sửa trong soát', (r: MvpRow) => r.reviewEdits],
     ['Sửa đồ thị từ nháp D', (r: MvpRow) => r.effort.draftOps],
     ['Tự nhập đồ thị (đối chứng)', (r: MvpRow) => r.effort.manualOps],
-    ['Tổng công theo định nghĩa (câu đề + câu bài + sửa đồ thị + soát)', (r: MvpRow) => r.problemQuestions + r.workQuestions + r.effort.draftOps + r.reviews],
+    ['Tổng công theo định nghĩa (câu đề + câu bài + công đồ thị + soát; công đồ thị: none = tự nhập, b = sửa nháp D)', (r: MvpRow) => r.problemQuestions + r.workQuestions + graphEffort(r) + r.reviews],
   ].map(([name, fn]) => { const f = fn as (r: MvpRow) => number; return `| ${name} | ${sums(f)} | ${mean(rows.map(f)).toFixed(2)} | ${Math.max(0, ...rows.map(f))} |`; }).join('\n')}
 
 Câu hỏi đề + bài trung bình ${mean(rows.map((r) => r.problemQuestions + r.workQuestions)).toFixed(2)}/bài. Khoanh vùng và nhập form được báo riêng, không giấu công ngoài công thức. Công D dùng nguyên figureEffort Lô 2.12: 1 lần chạm/ô gõ, ghép đỉnh theo vị trí, cạnh theo cặp đầu và bội số, cạnh gắn đỉnh xóa biến mất miễn phí, nhập mọi trọng số/tên; tự nhập có nhãn A… tự đặt. Tọa độ truth lấy từ đường data-vertex trong source.svg rồi áp biến đổi phối cảnh của bộ sinh; labelBox cao 27 px theo cỡ chữ layout (ước lượng hình học được khai báo). Đây là công mô phỏng, chưa đo thao tác người thật.

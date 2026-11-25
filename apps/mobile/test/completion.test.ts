@@ -45,7 +45,7 @@ describe('4.6 fake readers: recoverable failures in both flows', () => {
       ['exec_blocked', m.failures.server], ['timeout', m.failures.timeout], ['image_invalid', m.failures.image],
     ]) it(`${flow}: ${code} keeps the first page; retry and manual remain possible`, async () => {
       const storage = createMemoryStorage();
-      let s = flow === 'problem' ? sessionReducer(fresh(), { type: 'problem_photos', photos: [photo(0), photo(1)] })
+      let s = flow === 'problem' ? sessionReducer(sessionReducer(fresh(), { type: 'problem_photos', photos: [photo(0), photo(1)] }), { type: 'problem_read_request' })
         : sessionReducer(sessionReducer(fresh(), { type: 'manual_spec', spec }), { type: 'work_photos', photos: [photo(0), photo(1)] });
       const checkpoint = async (event: SessionEvent) => { s = runSessionEvent(s, event); await storage.sessions.put(s); };
       let calls = 0;
@@ -147,10 +147,11 @@ describe('4.6 settings, storage and measured session', () => {
     expect(await storage.sessions.list()).toEqual([]); expect(data.photos.size).toBe(0); expect(revoke).toHaveBeenCalledWith(url);
     await expect(storage.photos.url(ref.id)).rejects.toThrow(); await storage.close(); revoke.mockRestore();
   });
-  it('settings exposes A/B manifests, storage and demo, with C restricted to benchmark', () => {
+  it('settings exposes only the primary B manifest, storage and demo', () => {
     const html = renderToStaticMarkup(createElement(SettingsScreen, { onNavigate: noop, onBenchmark: noop,
       usage: { sessions: 2, historyBytes: 500, photoBytes: 2000 } }));
-    for (const file of manifest.files.filter((f) => f.model !== 'c')) expect(html).toContain(file.sha256);
+    for (const file of manifest.files.filter((f) => f.model === 'b')) expect(html).toContain(file.sha256);
+    for (const file of manifest.files.filter((f) => f.model === 'a')) expect(html).not.toContain(file.sha256);
     expect(html).toContain(m.clear); expect(html).toContain(m.demo); expect(html).toContain(m.unknownCpu);
     expect(html).not.toContain('VietOCR'); expect(html).not.toContain('internal-');
     for (const file of manifest.files.filter((f) => f.model === 'c')) expect(html).not.toContain(file.sha256);

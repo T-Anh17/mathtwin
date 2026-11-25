@@ -8,7 +8,7 @@ import type { ProblemPhoto } from './ProblemConfirmScreen.js';
 import { Topbar } from './product-ui.js';
 import { problemVi as m } from './problem.vi.js';
 import { sessionVi } from './flow/messages.vi.js';
-import { combineProblemPages, readProblemPages } from './flow/reading.js';
+import { readProblemPages, shouldReadProblem } from './flow/reading.js';
 import type { Readers, ReadingProgress } from './flow/reading.js';
 import type { Session, SessionEvent } from './flow/types.js';
 import type { PhotoStore } from './flow/store.js';
@@ -41,7 +41,7 @@ export function ProblemFlowScreen({ session: s, busy, photoStore, readers, reade
     return () => { live = false; };
   }, [photoKey, photoStore]);
   useEffect(() => {
-    if (s.stage !== 'problem_reading' || manual || !readers || !photoStore || !readerReady) return;
+    if (!readers || !photoStore || !shouldReadProblem(s.stage, { manual, readerReady, available: true })) return;
     const controller = new AbortController(); abort.current = controller;
     let live = true;
     setWorking(true); setError('');
@@ -61,7 +61,13 @@ export function ProblemFlowScreen({ session: s, busy, photoStore, readers, reade
         });
         if (live && !controller.signal.aborted) await onEvent({ type: 'problem_read', outcome,
           ms: current.current.timings.problemRead ?? outcome.usage.latencyMs });
-      } catch (e) { if (live) setError(readingError(e)); }
+      } catch (e) {
+        // A user cancel already sent problem_read_cancel; only reader failures return here.
+        if (live && !controller.signal.aborted) {
+          try { await onEvent({ type: 'problem_read_cancel' }); setError(readingError(e)); }
+          catch { setError(m.failed); }
+        }
+      }
       finally {
         try { if (acquired) await readers.activity?.(false); }
         catch (e) { if (live) setError(readingError(e)); }
@@ -97,21 +103,27 @@ export function ProblemFlowScreen({ session: s, busy, photoStore, readers, reade
   const back = () => { abort.current?.abort(); onBack(); };
   const switchManual = () => { abort.current?.abort(); setWorking(false); setManual(true); };
   const banner = preview && <p className="banner" role="status">{m.preview}</p>;
-  const retainedOutcome = s.problemRead ?? (s.problemPages?.length ? combineProblemPages(s.problemPages) : undefined);
+  const retainedOutcome = s.problemRead;
+  const manualEntry = manual || !retainedOutcome;
+  const cancelReading = () => {
+    abort.current?.abort(); setWorking(false);
+    void Promise.resolve(onEvent({ type: 'problem_read_cancel' })).then(() => setError(settingsVi.cancelled)).catch(() => setError(m.failed));
+  };
   if (manual || s.stage === 'problem_confirm') return <div data-stage={s.stage}>{banner}<ProblemConfirmScreen
-    {...(retainedOutcome ? { outcome: retainedOutcome } : {})} pages={s.problemPages ?? []} photos={photos} manual={manual} busy={busy}
+    {...(retainedOutcome ? { outcome: retainedOutcome } : {})} pages={retainedOutcome ? s.problemPages ?? [] : []} photos={photos} manual={manualEntry} busy={busy}
+    readerReady={readerReady} {...(onSettings ? { onSettings } : {})}
+    {...(s.stage === 'problem_confirm' && !retainedOutcome ? { onReadRequest: () => void Promise.resolve(onEvent({ type: 'problem_read_request' })).catch(() => setError(m.failed)) } : {})}
     runner={readers?.figure ?? workerRunner} onBack={back} onDone={(spec, graphLayout) => {
-      void Promise.resolve(onEvent({ type: manual ? 'manual_spec' : 'spec_confirmed', spec, ...(graphLayout ? { graphLayout } : {}) })).catch(() => setError(m.failed));
+      void Promise.resolve(onEvent({ type: manualEntry ? 'manual_spec' : 'spec_confirmed', spec, ...(graphLayout ? { graphLayout } : {}) })).catch(() => setError(m.failed));
     }}/>{error && <p role="alert">{error}</p>}</div>;
   return <div className="screen" data-stage={s.stage}><Topbar title={sessionVi.stages[s.stage]} onBack={back}/><div className="content">
     {banner}
     {!readerReady && <div className="card"><p>{m.missing}</p><button className="btn btn-outline" onClick={onSettings}>{m.settings}</button></div>}
-    {!preview && <p className="text-xs muted">{m.speed}</p>}
     {s.stage === 'problem_reading' ? <div className="card">
       <p role="status">{progress ? m.progress(progress.page, progress.total, progress.phase === 'figure') : sessionVi.stages.problem_reading}</p>
       <progress max={s.problemPhotos.length} value={s.problemPages?.length ?? 0} aria-label={m.read}/>
-      {working ? <button className="btn btn-outline" onClick={() => { abort.current?.abort(); setError(settingsVi.cancelled); setWorking(false); }}>{m.cancel}</button>
-        : <button className="btn btn-primary" disabled={!readerReady || busy} onClick={() => setAttempt((v) => v + 1)}>{m.resume}</button>}
+      {!working && <button className="btn btn-primary" disabled={!readerReady || busy} onClick={() => setAttempt((v) => v + 1)}>{m.resume}</button>}
+      <button className="btn btn-outline" disabled={busy} onClick={cancelReading}>{m.cancel}</button>
     </div> : <>
       {photos.map((photo, page) => <div className="card" key={s.problemPhotos[page]?.id ?? page}>
         <img src={photo.image} alt={m.page(page)} style={{ width: '100%' }}/>
@@ -133,8 +145,8 @@ export function ProblemFlowScreen({ session: s, busy, photoStore, readers, reade
       }}/>
       {Capacitor.isNativePlatform() && <button className="btn btn-outline btn-block" disabled={working || busy} onClick={() => void action(async () => add(await captureImage()))}>{m.add}</button>}
       <button className="btn btn-outline btn-block" disabled={working || busy} onClick={() => input.current?.click()}>{m.choose}</button>
-      <button className="btn btn-primary btn-block" disabled={!s.problemPhotos.length || !readerReady || working || busy}
-        onClick={() => void action(async () => { await onEvent({ type: 'problem_photos', photos: s.problemPhotos }); })}>{m.read}</button>
+      <button className="btn btn-primary btn-block" disabled={!s.problemPhotos.length || working || busy}
+        onClick={() => void action(async () => { await onEvent({ type: 'problem_photos', photos: s.problemPhotos }); })}>{m.continueEntry}</button>
     </>}
     {error && <p role="alert" className="banner banner-error">{error}</p>}
     <button className="btn btn-outline btn-block" disabled={busy} onClick={switchManual}>{m.manual}</button>

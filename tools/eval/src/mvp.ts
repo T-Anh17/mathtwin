@@ -1,7 +1,7 @@
 import { solve, validateSpec } from '@mathtwin/core';
 import type { ProblemSpec } from '@mathtwin/core';
 import { compareRead, normalizeDraft } from '@mathtwin/reader';
-import type { PreparedImage, ReadOutcome } from '@mathtwin/reader';
+import type { PreparedImage, ReadDraft, ReadOutcome } from '@mathtwin/reader';
 import { gradeWork, parseWork, vocabularyOf } from '@mathtwin/work';
 import type { WorkAnswer, WorkLine, WorkQuestion, WorkTruth, WorkBox } from '@mathtwin/work';
 import { createSession, sessionReducer } from '../../../apps/mobile/src/flow/sessionReducer.js';
@@ -51,10 +51,23 @@ export function simulateProblemConfirmation(outcome: ReadOutcome, truth: Problem
   } };
 }
 
-function formEditCount(spec: ProblemSpec): number {
+export function formEditCount(spec: ProblemSpec): number {
   const task = spec.task as unknown as Record<string, unknown>;
   return 1 + Object.entries(task).reduce((count, [key, value]) => key === 'type' ? count
     : key === 'items' && Array.isArray(value) ? count + value.length * 2 : count + 1, 0);
+}
+
+/** Re-express a stored B-mode row under the default no-reading path when its
+ * fixture changed after the OCR checkpoint: the work side (OCR, questions,
+ * review, verdict) is kept as recorded; only the problem side is replaced by a
+ * full manual form entry of the spec confirmed in that same checkpoint. */
+export function noneModeFromStoredRow<T extends { problemQuestions: number; problemFormEdits: number;
+  machineMs: number; timings: { problemRead: number }; session: { spec?: ProblemSpec } }>(row: T): T & { problemRead: 'none' } {
+  if (!row.session.spec) throw new Error('Checkpoint thiếu đề đã xác nhận.');
+  const formEdits = formEditCount(row.session.spec) + 1;
+  return { ...row, problemRead: 'none', problemQuestions: 0, problemFormEdits: formEdits,
+    problemSuggestion: { available: false, typeCorrect: false, parametersCorrect: false, formEditsBefore: formEdits, formEditsAfter: formEdits },
+    machineMs: row.machineMs - row.timings.problemRead, timings: { ...row.timings, problemRead: 0 } };
 }
 function changedSuggestionFields(suggested: ProblemSpec['task'], truth: ProblemSpec): number {
   const candidate = suggested as unknown as Record<string, unknown>;
@@ -237,6 +250,9 @@ export interface MvpInput {
   /** A label-derived solution area.  `undefined` means a person would have to
    * draw the crop; the evaluator records that work but does not reread B. */
   regionByPage?: (page: number) => WorkBox | undefined;
+  /** `none` follows the default product path: the person enters the problem
+   * form and graph; `b` explicitly opts into the B problem reader. */
+  problemRead?: 'none' | 'b';
   saved?: Session; checkpoint: (session: Session) => Promise<void>;
   /** Explicit evaluator-only replay: raw OCR is retained, no corrected text is recycled. */
   prior?: { session: Session; regionQuestions: number; manualRegionPages: number[]; timings: { workRead: number; decode: number; region: number } };
@@ -256,10 +272,11 @@ export async function runMvpSample(input: MvpInput) {
   const { image, truth, reference, readers, signal } = input;
   const problemImages = input.problemImages ?? [image];
   const workImages = input.workImages ?? [image];
-  let session = input.prior ? { ...createSession(input.id, input.date), stage: 'problem_reading' as const,
+  const problemRead = input.problemRead ?? 'b';
+  let session = problemRead === 'b' && input.prior ? { ...createSession(input.id, input.date), stage: 'problem_reading' as const,
     problemPhotos: structuredClone(input.prior.session.problemPhotos), problemPages: structuredClone(input.prior.session.problemPages ?? []),
     timings: { ...input.prior.session.timings, figureDraft: (input.prior.session.problemPages ?? []).reduce((n, p) => n + p.figureMs, 0) } }
-    : input.saved ?? createSession(input.id, input.date);
+    : problemRead === 'b' ? input.saved ?? createSession(input.id, input.date) : createSession(input.id, input.date);
   const timings = { decode: 0, problemRead: 0, figureDraft: 0, confirm: 0, solve: 0, workRead: 0, region: input.prior?.timings.region ?? 0, inspection: 0, grade: 0, replay: 0, view: 0 };
   const ops = { solve: ((...args: Parameters<typeof solve>) => { const t = performance.now(); const result = solve(...args); timings.solve += performance.now() - t; return result; }),
     gradeWork: ((...args: Parameters<typeof gradeWork>) => { const t = performance.now(); const result = gradeWork(...args); timings.grade += performance.now() - t; return result; }) };
@@ -267,21 +284,41 @@ export async function runMvpSample(input: MvpInput) {
   const problemPhotos = problemImages.map((page, index) => ({ id: `${input.id}-de-${index + 1}`, width: page.width, height: page.height, page: index }));
   const workPhotos = workImages.map((page, index) => ({ id: `${input.id}-bai-${index + 1}`, width: page.width, height: page.height, page: index }));
   if (session.stage === 'problem_capture') send({ type: 'problem_photos', photos: problemPhotos });
-  if (session.stage === 'problem_reading') {
+  if (problemRead === 'b' && session.stage === 'problem_confirm') send({ type: 'problem_read_request' });
+  if (problemRead === 'b' && session.stage === 'problem_reading') {
     const outcome = await readProblemPages({ count: problemImages.length, readers, signal, load: async (page) => problemImages[page]!, saved: session.problemPages ?? [], progress: () => {},
       timeoutMs: 420_000, checkpoint: async (reading) => { send({ type: 'problem_page', reading }); await input.checkpoint(session); } });
     send({ type: 'problem_read', outcome, ms: outcome.usage.latencyMs }); await input.checkpoint(session);
   }
-  const outcome = session.problemRead;
-  if (!outcome) throw new Error('Checkpoint thiếu kết quả đọc đề.');
-  const { draft, readComparison, bComparison } = mvpReadComparisons(session, truth);
+  let draft: ReadDraft | undefined;
+  let readComparison: ReturnType<typeof mvpReadComparisons>['readComparison'] | undefined;
+  let bComparison: ReturnType<typeof mvpReadComparisons>['bComparison'] | undefined;
+  let confirmation: ReturnType<typeof simulateProblemConfirmation>;
+  let confirmedCorrect: boolean;
+  if (problemRead === 'b') {
+    const outcome = session.problemRead;
+    if (!outcome) throw new Error('Checkpoint thiếu kết quả đọc đề.');
+    ({ draft, readComparison, bComparison } = mvpReadComparisons(session, truth));
+    const t = performance.now();
+    confirmation = simulateProblemConfirmation(outcome, truth);
+    timings.confirm = performance.now() - t;
+    if (session.stage === 'problem_confirm') { send({ type: 'spec_confirmed', spec: confirmation.spec }); await input.checkpoint(session); }
+    confirmedCorrect = compareRead({ ...outcome, spec: session.spec! }, truth).completeCorrect;
+  } else {
+    const began = performance.now();
+    draft = readers.figure ? await readers.figure(problemImages[0]!, signal) : undefined;
+    timings.figureDraft = performance.now() - began;
+    const t = performance.now();
+    const formEdits = formEditCount(truth) + 1;
+    confirmation = { spec: structuredClone(truth), questions: 0, formEdits, suggestion: {
+      available: false, typeCorrect: false, parametersCorrect: false, formEditsBefore: formEdits, formEditsAfter: formEdits,
+    } };
+    timings.confirm = performance.now() - t;
+    if (session.stage === 'problem_confirm') { send({ type: 'manual_spec', spec: confirmation.spec }); await input.checkpoint(session); }
+    confirmedCorrect = true;
+  }
   const effort = figureEffort(draft ?? { vertices: [], edges: [] }, input.figure);
-  const t = performance.now();
-  const confirmation = simulateProblemConfirmation(outcome, truth);
-  timings.confirm = performance.now() - t;
-  if (session.stage === 'problem_confirm') { send({ type: 'spec_confirmed', spec: confirmation.spec }); await input.checkpoint(session); }
   if (!session.spec || !session.solution || !validateSpec(session.spec).ok) throw new Error('Đề xác nhận chưa hợp lệ.');
-  const confirmedCorrect = compareRead({ ...outcome, spec: session.spec }, truth).completeCorrect;
   const solutionCheck = confirmedCorrect ? checkMvpSolution(truth, session.solution) : { correct: false, reason: 'Đề xác nhận khác truth' };
   if (session.stage === 'solution') { send({ type: 'work_capture', source: 'photo' }); send({ type: 'work_photos', photos: workPhotos }); }
   if (input.prior) {
@@ -341,9 +378,10 @@ export async function runMvpSample(input: MvpInput) {
   const beforeAudit = auditWork(truth, observed, input.workTruth, reference, { parsed: parseWork(observed, vocabularyOf(session.spec!)), grade: before }, replay.alignment, rawComparison);
   const viewed = performance.now(); const result = resultView(session); const solution = solutionView(session.spec!, session.solution!);
   timings.view = performance.now() - viewed;
-  timings.problemRead = session.timings.problemRead ?? 0; timings.figureDraft = session.timings.figureDraft ?? 0;
+  timings.problemRead = problemRead === 'b' ? session.timings.problemRead ?? 0 : 0;
+  if (problemRead === 'b') timings.figureDraft = session.timings.figureDraft ?? 0;
   timings.workRead = session.timings.workRead ?? 0;
-  return { id: input.id, task: truth.task.type, source: 'synthetic-hw' as const, expected: input.workTruth.expected,
+  return { id: input.id, task: truth.task.type, source: 'synthetic-hw' as const, problemRead, expected: input.workTruth.expected,
     readComparison, bComparison, confirmedCorrect, solutionCheck, effort, problemQuestions: confirmation.questions,
     problemFormEdits: confirmation.formEdits, problemSuggestion: confirmation.suggestion, workQuestions: replay.questions, regionQuestions,
     reviews: replay.reviews, reviewEdits: replay.reviewEdits, comparison, rawComparison, audit, beforeAudit, manualRegionPages,

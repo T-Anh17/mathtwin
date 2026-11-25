@@ -25,13 +25,13 @@ export async function pairInputHash(pair: PairCase): Promise<string> {
   hash.update(JSON.stringify({ truth: pair.truth, lines: pair.lines, teacher: pair.teacher, work: pair.work ?? null }));
   return hash.digest('hex');
 }
-export async function runMvpPair(pair: PairCase, date: string, readers: Readers, signal: AbortSignal, checkpoint: (session: Awaited<ReturnType<typeof runMvpSample>>['session']) => Promise<void>, saved?: Session, prior?: Awaited<ReturnType<typeof runMvpSample>>) {
+export async function runMvpPair(pair: PairCase, date: string, readers: Readers, signal: AbortSignal, checkpoint: (session: Awaited<ReturnType<typeof runMvpSample>>['session']) => Promise<void>, saved?: Session, prior?: Awaited<ReturnType<typeof runMvpSample>>, problemRead: 'none' | 'b' = 'none') {
   const problemImages = await Promise.all(pair.problemFiles.map((file) => prepared(join(pair.directory, file))));
   const workImages = await Promise.all(pair.workFiles.map((file) => prepared(join(pair.directory, file))));
   const reference = await pairWorkLines(pair.lines, pair.workFiles.map((file) => join(pair.directory, file)));
   const regions = new Map(workImages.map((_, page) => [page, solutionRegion(reference, page)]));
   return runMvpSample({ id: pair.id, date, image: workImages[0]!, problemImages, workImages, truth: pair.truth,
     workTruth: pair.work ?? teacherWorkTruth(pair.teacher), reference, region: regions.get(0) ?? [0, 0, 1000, 1000],
-    regionByPage: (page) => regions.get(page), figure: annotation(pair, problemImages[0]!), readers, signal, checkpoint,
+    regionByPage: (page) => regions.get(page), figure: annotation(pair, problemImages[0]!), readers, signal, checkpoint, problemRead,
     ...(saved ? { saved } : {}), ...(prior ? { prior } : {}) });
 }
