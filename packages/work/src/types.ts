@@ -7,6 +7,14 @@ export interface WorkLine extends TextLine {
   page: number; index: number; skipped?: boolean;
   /** Pixel cancellation evidence; user struck answers clear this score. */
   strikeScore?: number;
+  /** Relative vertical centre of the detected cancellation stroke in this line's box. */
+  strokeBand?: number;
+  /** High cancellation evidence that must be confirmed instead of being discarded. */
+  strikeQuestion?: boolean;
+  /** Why a line was assigned outside the solution region. */
+  regionSource?: 'model' | 'user' | 'figure';
+  /** A region answer is durable across later filtering and regrading. */
+  regionConfirmed?: boolean;
 }
 export interface WorkVocabulary {
   vertexLabels: string[]; edgeNames: string[]; task: Task['type'];
@@ -30,13 +38,14 @@ export interface ParsedWork {
 }
 export interface WorkQuestion {
   reason?: 'missing';
-  kind: 'reading' | 'unparsed' | 'struck'; lines: number[]; page: number;
+  kind: 'reading' | 'unparsed' | 'struck' | 'region'; lines: number[]; page: number;
   box?: [number, number, number, number]; shownText: string; options: string[];
 }
 export interface WorkGrade {
   result: GradeResult; firstErrorLines?: number[]; questions: WorkQuestion[]; readingCheck?: WorkQuestion;
 }
-export type WorkAnswer = { line: number; text: string } | { line: number; struck: boolean } | { line: number; skip: true };
+export type WorkAnswer = { line: number; text: string } | { line: number; struck: boolean }
+  | { line: number; region: 'solution' | 'question' } | { line: number; skip: true };
 export interface WorkTruth {
   claims: Claim[]; lineOf: Record<string, number[]>;
   expected: { verdict: GradeResult['verdict']; firstErrorStep?: number | null; errorCode?: GradeResult['errorCode'] | null };

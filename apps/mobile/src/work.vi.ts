@@ -18,7 +18,8 @@ export const workVi = {
   missingLineCheckUnavailable: 'Máy không kiểm được dòng bị sót trên trang này',
   left: 'Trái (%)', top: 'Trên (%)', right: 'Phải (%)', bottom: 'Dưới (%)',
   nothing: 'Không có gì ở đây', uncertain: 'chưa chắc', ask: 'Kiểm tra chỗ tiếp theo', ack: 'Đúng như bài em viết',
+  solution: 'Bài làm', questionOrFigure: 'Đề, hình',
   review: 'Xem các dòng đã đọc và vùng ảnh trước khi xác nhận.',
   status: (q: WorkQuestion) => q.reason === 'missing' ? 'Có thể sót dòng.' : q.kind === 'struck' ? 'Dòng này có thể bị gạch.'
-    : q.kind === 'reading' ? 'Máy đọc chưa chắc.' : 'Máy chưa hiểu dòng này.',
+    : q.kind === 'region' ? 'Dòng này là bài làm hay đề/hình?' : q.kind === 'reading' ? 'Máy đọc chưa chắc.' : 'Máy chưa hiểu dòng này.',
 } as const;

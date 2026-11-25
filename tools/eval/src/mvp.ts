@@ -2,7 +2,7 @@ import { solve, validateSpec } from '@mathtwin/core';
 import type { ProblemSpec } from '@mathtwin/core';
 import { compareRead, normalizeDraft } from '@mathtwin/reader';
 import type { PreparedImage, ReadDraft, ReadOutcome } from '@mathtwin/reader';
-import { gradeWork, parseWork, vocabularyOf } from '@mathtwin/work';
+import { applyStrikeRule, gradeWork, parseWork, vocabularyOf } from '@mathtwin/work';
 import type { WorkAnswer, WorkLine, WorkQuestion, WorkTruth, WorkBox } from '@mathtwin/work';
 import { createSession, sessionReducer } from '../../../apps/mobile/src/flow/sessionReducer.js';
 import type { Session, SessionEvent } from '../../../apps/mobile/src/flow/types.js';
@@ -122,9 +122,11 @@ export function simulateManualWorkRegion(image: PreparedImage, reading: WorkPage
     if (!matches.length) return line;
     const regions = matches.map((match) => match.region);
     if (regions.every((region) => region === 'solution' || region === 'table'))
-      return { ...line, region: regions.every((region) => region === 'table') ? 'table' as const : 'solution' as const, regionConf: 1 };
+      return { ...line, region: regions.every((region) => region === 'table') ? 'table' as const : 'solution' as const, regionSource: 'user' as const, regionConf: 1 };
     if (regions.every((region) => region === 'question' || region === 'figure'))
-      return { ...line, region: regions.every((region) => region === 'figure') ? 'figure' as const : 'question' as const, regionConf: 1 };
+      return { ...line, region: regions.every((region) => region === 'figure') ? 'figure' as const : 'question' as const, regionConf: 1,
+        // Lô 5.3: a hand crop that overrides B's working label is a user exclusion (rule 5a).
+        regionSource: line.region === 'question' || line.region === 'figure' ? line.regionSource ?? 'model' as const : 'user' as const };
     // One OCR group spanning distinct truth regions is ambiguous: retain B's label.
     return line;
   });
@@ -204,22 +206,34 @@ export function truthWorkAnswers(indices: number[], lines: WorkLine[], truth: Wo
   });
 }
 
+/** Answer a region question only from its aligned truth region; unmatched or mixed text stays excluded. */
+export function simulateRegionAnswer(indices: number[], lines: WorkLine[], truth: WorkLine[], alignment: WorkAlignment): WorkAnswer[] {
+  return indices.map((line): WorkAnswer => {
+    const group = alignment.groups.find((item) => item.observed.includes(line));
+    const refs = truth.filter((item) => group?.truth.includes(item.index));
+    const solution = refs.length > 0 && refs.every((item) => item.region === 'solution' || item.region === 'table');
+    return { line, region: solution ? 'solution' : 'question' };
+  });
+}
+
 export function replayMvpWork(start: Session, truth: WorkLine[], ops?: Parameters<typeof sessionReducer>[2]) {
   let session = start;
   const alignment = alignMvpWork(start.workLines, truth);
-  const answered = new Set<number>();
+  const answered = new Set<number>(), regionAnswered = new Set<number>();
   let questions = 0, reviews = 0, reviewEdits = 0;
   const send = (event: SessionEvent) => { session = sessionReducer(session, event, ops); };
-  const respond = (indices: number[]) => {
-    const answers = truthWorkAnswers(indices, session.workLines, truth, alignment);
-    for (const answer of answers) { send({ type: 'work_answer', answer }); answered.add(answer.line); }
+  const respond = (indices: number[], kind?: WorkQuestion['kind']) => {
+    const answers = kind === 'region' ? simulateRegionAnswer(indices, session.workLines, truth, alignment)
+      : truthWorkAnswers(indices, session.workLines, truth, alignment);
+    // Lô 5.3: a region answer may turn the line into working with its own reading question.
+    for (const answer of answers) { send({ type: 'work_answer', answer }); ('region' in answer ? regionAnswered : answered).add(answer.line); }
     return answers.length > 0;
   };
   for (let round = 0; round <= start.workLines.length * 3 + 1; round++) {
     const pending: WorkQuestion[] = [...(session.workGrade?.questions ?? []),
       ...(session.workGrade?.readingCheck ? [session.workGrade.readingCheck] : [])];
-    const next = pending.find((q) => q.lines.some((i) => !answered.has(i)));
-    if (next) { questions++; if (respond(next.lines)) continue; }
+    const next = pending.find((q) => q.lines.some((i) => !(q.kind === 'region' ? regionAnswered : answered).has(i)));
+    if (next) { questions++; if (respond(next.lines, next.kind)) continue; }
     if (session.stage !== 'work_review' || session.workGrade?.questions.length) break;
     // This is the actual review gate, not an unconditional oracle repair pass.
     reviews = 1;
@@ -327,7 +341,9 @@ export async function runMvpSample(input: MvpInput) {
     if (!pages?.length || pages.some((p) => p.failed || !p.inspected)) throw new Error('Không có đủ OCR gốc để chấm lại.');
     for (const page of pages) {
       const labelledRegion = input.regionByPage?.(page.page);
-      const reread = { ...structuredClone(page), lines: structuredClone(page.raw) };
+      // Lô 5.3: strike decisions are recomputed from pixels + rule 4; the stored B text is unchanged.
+      const raw = applyStrikeRule(structuredClone(page.raw), workImages[page.page]!, vocabularyOf(session.spec));
+      const reread = { ...structuredClone(page), raw, lines: raw };
       send({ type: 'work_page', reading: input.regionByPage && !labelledRegion
         ? simulateManualWorkRegion(workImages[page.page]!, reread, reference)
         : processWorkPage(workImages[page.page]!, reread, input.prior.regionQuestions ? page.region : undefined) });

@@ -11,8 +11,10 @@ interface Placement { text: string; x: number; y: number; size: number; region: 
 interface Cancellation { lineIndex: number; kind: 'single' | 'opaque'; imageBox: Box }
 export interface StrikePageMeasurement {
   id: string; lines: number; positives: number; tp: number; fp: number; fn: number; uncertain: number;
+  /** Lô 5.3: high-score lines kept for a struck question instead of a silent strike (rule 4). */
+  asked: number;
   struckAsContent: number;
-  detections: { line: number; truth: boolean; kind?: string; score: number; struck: boolean }[];
+  detections: { line: number; truth: boolean; kind?: string; score: number; struck: boolean; asked: boolean }[];
 }
 const json = async <T>(path: string): Promise<T> => JSON.parse(await readFile(path, 'utf8')) as T;
 
@@ -64,13 +66,14 @@ export async function measureStrikes(root: string): Promise<StrikePageMeasuremen
     const positives = new Set(cancellations.map((c) => c.lineIndex));
     if (truthLines.some((line, index) => Boolean(line.struck) !== positives.has(index))) throw new Error(`Cancellation truth mismatch: ${id}`);
     const detections = output.lines.filter((l) => l.region === 'solution' || l.region === 'table').map((line) => ({
-      line: line.index, truth: positives.has(line.index), score: line.strikeScore!, struck: line.struck === true,
+      line: line.index, truth: positives.has(line.index), score: line.strikeScore!, struck: line.struck === true, asked: line.strikeQuestion === true,
       ...(positives.has(line.index) ? { kind: cancellations.find((c) => c.lineIndex === line.index)!.kind } : {}),
     }));
     pages.push({ id, lines: detections.length, positives: positives.size,
       tp: detections.filter((d) => d.truth && d.struck).length, fp: detections.filter((d) => !d.truth && d.struck).length,
-      fn: detections.filter((d) => d.truth && !d.struck).length,
-      uncertain: detections.filter((d) => !d.struck && d.score > STRIKE_NO).length,
+      fn: detections.filter((d) => d.truth && !d.struck && !d.asked).length,
+      asked: detections.filter((d) => d.asked).length,
+      uncertain: detections.filter((d) => !d.struck && !d.asked && d.score > STRIKE_NO).length,
       struckAsContent: output.parsed.steps.filter((step) => step.lines.some((line) => positives.has(line))).length, detections });
   }
   return pages;

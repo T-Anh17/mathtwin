@@ -1,8 +1,10 @@
 import { grade } from '@mathtwin/core';
 import type { Claim, ProblemSpec } from '@mathtwin/core';
-import type { ParsedStep, ParsedWork, WorkGrade, WorkQuestion } from './types.js';
+import type { ParsedStep, ParsedWork, WorkGrade, WorkLine, WorkQuestion, WorkVocabulary } from './types.js';
 import { workMessages } from './messages.vi.js';
 import { readingConfidence } from './parse/confidence.js';
+import { parseWork } from './parse/index.js';
+import { vocabularyOf } from './vocabulary.js';
 
 /** Display labels become core ids only at this grading boundary. */
 function coreClaim(spec: ProblemSpec, claim: Claim): Claim {
@@ -24,6 +26,33 @@ function coreClaim(spec: ProblemSpec, claim: Claim): Claim {
     case 'final_answer': return { ...claim, value: answer(claim.value) };
     default: return claim;
   }
+}
+
+/** Vocabulary-only: does this line yield a claim when read as working, in its page context?
+ * With `unchecked`, working-like content the parser cannot interpret (e.g. "Chọn A:") also counts. */
+export function lineCarriesClaim(lines: WorkLine[], index: number, vocab: WorkVocabulary, opts: { unchecked?: boolean } = {}): boolean {
+  const trial = lines.map((line): WorkLine => {
+    if (line.index !== index) return line;
+    const { strikeScore: _score, strokeBand: _band, strikeQuestion: _question, skipped: _skipped, ...plain } = line;
+    return { ...plain, region: line.region === 'table' ? 'table' : 'solution', struck: false };
+  });
+  const parsed = parseWork(trial, vocab);
+  return parsed.steps.some((step) => step.lines.includes(index)) || opts.unchecked === true && parsed.unchecked.includes(index);
+}
+
+/** Rule 5 of phase 5: lines excluded from the working that would carry a claim must be asked about. */
+export function regionQuestionLines(spec: ProblemSpec, source: WorkLine[]): WorkLine[] {
+  const order = (a: WorkLine, b: WorkLine): number => a.page - b.page || a.index - b.index;
+  const firstSolution = [...source].sort(order).find((line) => line.region === 'solution' || line.region === 'table');
+  const candidates = source.filter((line) => !line.regionConfirmed && !line.skipped && !line.missing && !line.struck
+    && (line.region === 'question' || line.region === 'figure') && (
+      // (a) moved out of B's working label by the user's crop;
+      line.regionSource === 'user'
+      // (b) B labelled it question although it follows the first working line.
+      || (line.regionSource ?? 'model') === 'model' && line.region === 'question' && firstSolution !== undefined && order(firstSolution, line) < 0));
+  if (!candidates.length) return [];
+  const vocab = vocabularyOf(spec);
+  return candidates.filter((line) => lineCarriesClaim(source, line.index, vocab, { unchecked: true }));
 }
 
 export function gradeWork(spec: ProblemSpec, parsed: ParsedWork, opts?: { confThreshold?: number }): WorkGrade {
@@ -70,6 +99,7 @@ export function gradeWork(spec: ProblemSpec, parsed: ParsedWork, opts?: { confTh
   };
   const threshold = opts?.confThreshold ?? 0.85;
   const relevant = (indices: number[]): boolean => !first || indices.some((line) => first.lines.some((index) => line === index || before(line, index)));
+  const regionLines = regionQuestionLines(spec, source).filter((line) => relevant([line.index]));
   // A doubtful earlier action may change all subsequent state, even if core accepts it.
   const uncertain = parsed.steps.filter((step) => (step.claim.conf ?? 1) < threshold && relevant(step.lines));
   const struck = new Set(parsed.issues.filter((issue) => issue.code === 'struck_uncertain').flatMap((issue) => issue.lines ?? []));
@@ -83,6 +113,13 @@ export function gradeWork(spec: ProblemSpec, parsed: ParsedWork, opts?: { confTh
       if (struck.has(index)) return { ...question('struck', [index]), options: [workMessages.struck_yes, workMessages.struck_no] };
       return question(line && readingConfidence(line) < threshold ? 'reading' : 'unparsed', [index]);
     }));
+  }
+  if (regionLines.length) {
+    // Rule 5: an excluded proposition is never dropped silently, and KHONG_DU_CAN_CU waits for these answers.
+    output.questions.push(...regionLines.map((line): WorkQuestion => ({ kind: 'region', lines: [line.index], page: line.page,
+      ...(line.box ? { box: line.box } : {}), shownText: line.text, options: [workMessages.region_solution, workMessages.region_question] })));
+    const { errorCode: _errorCode, ...rest } = output.result;
+    output.result = { ...rest, verdict: 'CAN_XAC_NHAN', message: workMessages.region };
   }
   output.questions = output.questions.filter((q, i, all) => all.findIndex((other) => other.lines.join(',') === q.lines.join(',')) === i);
   const missing = source.filter((l) => l.missing && !l.skipped);

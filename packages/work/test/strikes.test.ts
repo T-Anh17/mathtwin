@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { PreparedImage, TextReader } from '@mathtwin/reader';
 import type { ProblemSpec } from '@mathtwin/core';
-import { applyWorkAnswers, detectStrikes, gradeWork, parseWork, readWork, STRIKE_NO, STRIKE_YES, vocabularyOf } from '../src/index.js';
+import { applyStrikeRule, applyWorkAnswers, decideStrikes, detectStrikes, gradeWork, parseWork, readWork, STRIKE_NO, STRIKE_YES, vocabularyOf } from '../src/index.js';
 import type { WorkLine } from '../src/index.js';
 
 function canvas(width = 320, height = 120) {
@@ -63,6 +63,66 @@ describe('pixel cancellation evidence', () => {
 });
 
 describe('strike confirmation and reading', () => {
+  it('pixels: a normal box with a middle stroke strikes a non-claim silently, but a claim is asked', () => {
+    const c = canvas(); c.glyphs(); c.stroke(36, 45, 256, 43);
+    const prose = { ...c.line(), text: 'Bỏ dòng này.' };
+    const struck = applyStrikeRule([prose], c.image, vocab)[0]!;
+    expect(struck).toMatchObject({ struck: true }); expect(struck.strokeBand).toBeGreaterThanOrEqual(.3); expect(struck.strokeBand).toBeLessThanOrEqual(.7);
+    const claim = { ...c.line(), text: 'Số cạnh = 5.' };
+    expect(applyStrikeRule([claim], c.image, vocab)[0]).toMatchObject({ struck: false, strikeQuestion: true });
+    const graded = gradeWork(spec, parseWork(applyStrikeRule([claim], c.image, vocab), vocab));
+    expect(graded.result.verdict).toBe('CAN_XAC_NHAN'); expect(graded.questions).toEqual([expect.objectContaining({ kind: 'struck', lines: [7] })]);
+  });
+  describe('Lô 5.3 rule 4 (decideStrikes)', () => {
+    // Four working rows of height 20 (median 20) on one page.
+    const row = (index: number, text: string, height = 20): WorkLine => ({ index, page: 0, text, conf: 1, alternatives: [], region: 'solution',
+      box: [50, 100 + index * 60, 900, 100 + index * 60 + height] });
+    const rows = () => [row(0, 'Đồ thị có 1 đỉnh.'), row(1, 'Ta xét từng đỉnh.'), row(2, 'Bỏ dòng này.'), row(3, 'Số cạnh = 0.')];
+    const mark = (line: number, score: number, strokeBand?: number) => ({ line, struck: score >= STRIKE_YES, score, ...(strokeBand === undefined ? {} : { strokeBand }) });
+    const clean = (lines: WorkLine[]) => lines.map((l) => mark(l.index, 0, .5));
+    it('box twice the median height with score 1.0 is asked, not struck', () => {
+      const lines = rows(); lines[2] = row(2, 'Bỏ dòng này.', 40);
+      const evidence = clean(lines); evidence[2] = mark(2, 1, .5);
+      expect(decideStrikes(lines, evidence, vocab)[2]).toMatchObject({ struck: false, strikeQuestion: true, strikeScore: 1 });
+    });
+    it('normal box, stroke through the middle, non-claim line: struck silently', () => {
+      const lines = rows(), evidence = clean(lines); evidence[2] = mark(2, 1, .5);
+      const out = decideStrikes(lines, evidence, vocab);
+      expect(out[2]).toMatchObject({ struck: true }); expect(out[2]!.strikeQuestion).toBeUndefined();
+      expect(parseWork(out, vocab).issues.filter((i) => i.code === 'struck_uncertain')).toEqual([]);
+    });
+    it('stroke outside 30–70% of the box (underline position) is asked', () => {
+      for (const band of [.15, .85]) {
+        const lines = rows(), evidence = clean(lines); evidence[2] = mark(2, .95, band);
+        expect(decideStrikes(lines, evidence, vocab)[2]).toMatchObject({ struck: false, strikeQuestion: true });
+      }
+    });
+    it('a claim line with score 1.0 is asked', () => {
+      const lines = rows(), evidence = clean(lines); evidence[0] = mark(0, 1, .5);
+      const out = decideStrikes(lines, evidence, vocab);
+      expect(out[0]).toMatchObject({ struck: false, strikeQuestion: true });
+      expect(gradeWork(spec, parseWork(out, vocab)).questions).toContainEqual(expect.objectContaining({ kind: 'struck', lines: [0] }));
+    });
+    it('every claim line of the page marked struck: each one is asked, nothing is lost', () => {
+      const lines = rows(), evidence = lines.map((l) => mark(l.index, 1, .5));
+      const out = decideStrikes(lines, evidence, vocab);
+      expect(out.filter((l) => l.index === 0 || l.index === 3).map((l) => [l.struck, l.strikeQuestion])).toEqual([[false, true], [false, true]]);
+      const graded = gradeWork(spec, parseWork(out, vocab));
+      expect(graded.result.verdict).toBe('CAN_XAC_NHAN');
+      expect(graded.questions.filter((q) => q.kind === 'struck').flatMap((q) => q.lines)).toEqual(expect.arrayContaining([0, 3]));
+    });
+    it('missing box or stroke position is never struck silently', () => {
+      const lines = rows(); const { box: _box, ...noBox } = lines[2]!; lines[2] = noBox;
+      const evidence = clean(lines); evidence[2] = mark(2, 1);
+      expect(decideStrikes(lines, evidence, vocab)[2]).toMatchObject({ struck: false, strikeQuestion: true });
+    });
+    it('a user struck answer clears the question flag', () => {
+      const lines = rows(), evidence = clean(lines); evidence[0] = mark(0, 1, .5);
+      const answered = applyWorkAnswers(decideStrikes(lines, evidence, vocab), [{ line: 0, struck: true }]);
+      expect(answered[0]).toMatchObject({ struck: true }); expect(answered[0]!.strikeQuestion).toBeUndefined();
+      expect(gradeWork(spec, parseWork(answered, vocab)).questions.filter((q) => q.kind === 'struck')).toEqual([]);
+    });
+  });
   it('asks once for uncertain lines, including blank and table rows; explicit answers clear evidence', () => {
     for (const text of ['Số cạnh = 5.', '']) {
       const c = canvas(); const line = { ...c.line(), text, strikeScore: .5, region: 'table' as const, alternatives: ['Số cạnh = 0.'] };
@@ -93,8 +153,8 @@ describe('strike confirmation and reading', () => {
     let output: Awaited<ReturnType<typeof readWork>>;
     try { output = await readWork([c.image, clean.image], { reader, vocab, signal }); }
     finally { vi.unstubAllGlobals(); }
-    expect(output.lines.map((l) => [l.page, l.index, l.struck])).toEqual([[0, 0, true], [1, 1, false]]);
-    expect(output.parsed.ignored).toContainEqual({ line: 0, reason: 'struck' });
+    expect(output.lines.map((l) => [l.page, l.index, l.struck, l.strikeQuestion])).toEqual([[0, 0, false, true], [1, 1, false, undefined]]);
+    expect(output.parsed.issues).toContainEqual(expect.objectContaining({ code: 'struck_uncertain', lines: [0] }));
     expect(output.parsed.steps.every((s) => !s.lines.includes(0))).toBe(true);
     expect(output.usage).toMatchObject({ passes: 2, latencyMs: 4, lineCount: 2, peakMemoryMb: 3, lineMs: [1, 1], finish_reason: ['stop', 'stop'],
       lineStrips: { bands: 2, overlap: .08, maxLongEdge: 1024, retriedBands: 2, predictedTokens: [400, 3072, 400, 3072] } });

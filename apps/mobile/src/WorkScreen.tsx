@@ -30,17 +30,20 @@ export function WorkQuestionScreen({ question, lines, pages, onAnswer, onBack, b
   return <div className="screen work-screen"><Topbar title={m.work.question} onBack={onBack}/><div className="content">
     <div className="card question-card"><p role="status">{workVi.status(question)}</p><WorkCrop pages={pages} page={question.page} box={question.box}/>
       <div className="text-xs muted">{m.work.shown}</div><p className="work-text math">{question.shownText}</p>
-      {question.kind === 'struck' ? <div className="work-buttons">
+      {question.kind === 'region' ? <div className="work-buttons">
+        <button className="btn btn-outline" disabled={busy} onClick={() => onAnswer(question.lines.map((line) => ({ line, region: 'solution' })))}>{workVi.solution}</button>
+        <button className="btn btn-outline" disabled={busy} onClick={() => onAnswer(question.lines.map((line) => ({ line, region: 'question' })))}>{workVi.questionOrFigure}</button>
+      </div> : question.kind === 'struck' ? <div className="work-buttons">
         {[true, false].map((struck) => <button className="btn btn-outline" disabled={busy} key={String(struck)} onClick={() => onAnswer(question.lines.map((line) => ({ line, struck })))}>{struck ? m.work.struckYes : m.work.struckNo}</button>)}
       </div> : <div className="options">{question.options.filter((option) => option !== m.work.skip && option.split('\n').length === question.lines.length).map((option) =>
         <button className="option math work-text" key={option} aria-pressed={selected === option} onClick={() => choose(option)}>{option}</button>)}</div>}
-      <div className="section-title">{m.work.retype}</div>
+      {question.kind !== 'region' && <><div className="section-title">{m.work.retype}</div>
       {sources.map((line) => <label className="work-field" key={line.index}>{m.work.line(line.index, line.page)}
         {(line.page !== question.page || sources.length > 1) && <WorkCrop pages={pages} page={line.page} box={line.box}/>}
-        <textarea value={texts[line.index] ?? ''} onChange={(event) => { setSelected(null); setTexts({ ...texts, [line.index]: event.target.value }); }}/></label>)}
+        <textarea value={texts[line.index] ?? ''} onChange={(event) => { setSelected(null); setTexts({ ...texts, [line.index]: event.target.value }); }}/></label>)}</>}
     </div></div><Actions><div className="work-buttons">
-      <button className="btn btn-outline" disabled={busy} onClick={() => onAnswer(question.lines.map((line) => ({ line, skip: true })))}>{question.reason === 'missing' ? workVi.nothing : m.work.skip}</button>
-      <button className="btn btn-primary" disabled={busy || question.lines.some((line) => !texts[line]?.trim())} onClick={() => onAnswer(textAnswers(question, texts))}>{m.work.apply}</button>
+      {question.kind !== 'region' && <><button className="btn btn-outline" disabled={busy} onClick={() => onAnswer(question.lines.map((line) => ({ line, skip: true })))}>{question.reason === 'missing' ? workVi.nothing : m.work.skip}</button>
+      <button className="btn btn-primary" disabled={busy || question.lines.some((line) => !texts[line]?.trim())} onClick={() => onAnswer(textAnswers(question, texts))}>{m.work.apply}</button></>}
     </div></Actions></div>;
 }
 

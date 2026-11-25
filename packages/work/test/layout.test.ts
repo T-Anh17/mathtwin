@@ -1,4 +1,4 @@
-import { expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import type { WorkLine } from '../src/index.js';
 import { applyWorkAnswers, detectMissingLines, filterWorkRegions, gradeWork, parseWork, vocabularyOf, suggestWorkRegion } from '../src/index.js';
 import type { PreparedImage } from '@mathtwin/reader';
@@ -52,6 +52,68 @@ it('asks for the region before excluding question-labelled working on a continua
   const confirmed = filterWorkRegions(lines, { solution: [0, 250, 900, 850] });
   expect(confirmed.needsRegion).toBe(false);
   expect(confirmed.lines.map((row) => row.region)).toEqual(['question', 'solution', 'solution']);
+});
+
+describe('Lô 5.3 rule 5: region exclusions never drop a claim silently', () => {
+  const choice = JSON.parse(readFileSync(new URL('../../../testdata/core/20-four-choice-question/spec.json', import.meta.url), 'utf8')) as ProblemSpec;
+  const check = (s: ProblemSpec, rows: WorkLine[]) => gradeWork(s, parseWork(rows, vocabularyOf(s)));
+  const crop: [number, number, number, number] = [0, 400, 1000, 1000];
+  it('asks about "Chọn A:" whose box falls outside the crop instead of concluding KHONG_DU_CAN_CU, then regrades', () => {
+    const rows: WorkLine[] = [{ ...line('Câu 3: phương án nào đúng?', 0, 50, 50), region: 'question' },
+      { ...line('Chọn A:', 1, 50, 120), region: 'solution' }];
+    const cropped = filterWorkRegions(rows, { solution: crop }).lines;
+    expect(cropped.map((l) => [l.region, l.regionSource])).toEqual([['question', 'model'], ['question', 'user']]);
+    const before = check(choice, cropped);
+    expect(before.result.verdict).toBe('CAN_XAC_NHAN');
+    expect(before.questions).toEqual([expect.objectContaining({ kind: 'region', lines: [1], page: 0, box: [50, 120, 70, 140], shownText: 'Chọn A:' })]);
+    const work = check(choice, applyWorkAnswers(cropped, [{ line: 1, region: 'solution' }]));
+    // Now part of the working: the parser asks about the uninterpretable text instead of a region.
+    expect(work.questions).toEqual([expect.objectContaining({ kind: 'unparsed', lines: [1] })]);
+    const typed = check(choice, applyWorkAnswers(applyWorkAnswers(cropped, [{ line: 1, region: 'solution' }]), [{ line: 1, text: 'Chọn A' }]));
+    expect(typed.questions).toEqual([]); expect(typed.result.verdict).toBe('DUNG');
+    const exam = check(choice, applyWorkAnswers(cropped, [{ line: 1, region: 'question' }]));
+    expect(exam.questions).toEqual([]); expect(exam.result.verdict).toBe('KHONG_DU_CAN_CU');
+    // The answer is durable: a later regrade of the answered lines does not ask again.
+    expect(check(choice, applyWorkAnswers(applyWorkAnswers(cropped, [{ line: 1, region: 'question' }]), [])).questions).toEqual([]);
+  });
+  it('keeps excluding figure labels A, I, a without asking, also in a multiple-choice task', () => {
+    const rows = [line('A', 0, 100, 100), line('I', 1, 180, 120), line('a', 2, 130, 160), { ...line('Chọn A', 3, 100, 500), region: 'solution' as const }];
+    for (const s of [spec, choice]) {
+      const cropped = filterWorkRegions(rows, { solution: crop }).lines;
+      expect(cropped.slice(0, 3).map((l) => [l.region, l.regionSource])).toEqual([['question', 'figure'], ['question', 'figure'], ['question', 'figure']]);
+      expect(check(s, cropped).questions.filter((q) => q.kind === 'region')).toEqual([]);
+      const clustered = filterWorkRegions(rows).lines;
+      expect(check(s, clustered).questions.filter((q) => q.kind === 'region')).toEqual([]);
+    }
+  });
+  it('does not ask when the crop agrees with B that a line is the problem', () => {
+    const rows: WorkLine[] = [{ ...line('Đồ thị có 2 đỉnh.', 0, 50, 50), region: 'question' }, { ...line('Đồ thị có 1 đỉnh.', 1, 50, 500), region: 'solution' }];
+    const cropped = filterWorkRegions(rows, { solution: crop }).lines;
+    expect(cropped[0]).toMatchObject({ region: 'question', regionSource: 'model' });
+    expect(check(spec, cropped).questions).toEqual([]);
+  });
+  it('asks about a B question line that the crop cuts through (box straddles the crop edge)', () => {
+    const rows: WorkLine[] = [{ ...line('Cho đồ thị G như hình.', 0, 50, 100), region: 'question' },
+      { ...line('Đồ thị có 2 đỉnh.', 1, 50, 395), region: 'question' }, { ...line('Đồ thị có 1 đỉnh.', 2, 50, 500), region: 'solution' }];
+    const cropped = filterWorkRegions(rows, { solution: crop }).lines;
+    expect(cropped.map((l) => [l.region, l.regionSource])).toEqual([['question', 'model'], ['question', 'user'], ['solution', 'user']]);
+    expect(check(spec, cropped).questions).toEqual([expect.objectContaining({ kind: 'region', lines: [1] })]);
+  });
+  it('asks when B labels a claim as question after the first working line, but not before it', () => {
+    const rows: WorkLine[] = [{ ...line('Đồ thị có 3 đỉnh.', 0, 50, 100), region: 'question' },
+      { ...line('Đồ thị có 1 đỉnh.', 1, 50, 500), region: 'solution' },
+      { ...line('Đồ thị có 2 đỉnh.', 2, 50, 600), region: 'question' },
+      { ...line('Cho đồ thị G như hình.', 3, 50, 650), region: 'question' }];
+    const filtered = filterWorkRegions(rows).lines;
+    expect(check(spec, filtered).questions).toEqual([expect.objectContaining({ kind: 'region', lines: [2] })]);
+    const kept = check(spec, applyWorkAnswers(filtered, [{ line: 2, region: 'solution' }]));
+    expect(kept.questions).toEqual([]); expect(kept.result.verdict).toBe('SAI');
+  });
+  it('does not ask about an excluded line after the first error, which cannot change SAI', () => {
+    const rows: WorkLine[] = [{ ...line('Đồ thị có 2 đỉnh.', 0, 50, 500), region: 'solution' }, { ...line('Đồ thị có 1 đỉnh.', 1, 50, 600), region: 'question' }];
+    const graded = check(spec, filterWorkRegions(rows).lines);
+    expect(graded.result.verdict).toBe('SAI'); expect(graded.questions).toEqual([]);
+  });
 });
 
 it('Bài 26 page 2: blocks a truncated region proposal for the saved 11/15 misclassified working lines', () => {
